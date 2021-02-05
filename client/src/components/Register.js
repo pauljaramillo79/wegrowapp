@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import "./Register.css";
 import { ReactComponent as Logo } from "../assets/_images/logo-web.svg";
 import Axios from "axios";
@@ -14,9 +14,64 @@ const Register = () => {
     isSubmitting: false,
     errorMessage: null,
   };
-  const [data, setData] = React.useState(initialState);
-
+  const [data, setData] = useState(initialState);
+  const initErrors = {
+    code: "",
+    username: "",
+    password: "",
+    cpassword: "",
+    matchpasswords: "",
+  };
+  const [errors, setErrors] = useState(initErrors);
   // Handlers
+  const handleValidation = (e) => {
+    const field = e.target.name;
+    const value = e.target.value;
+    const validCode = RegExp("([A-Z]{3,3})");
+    const validEmailRegex = RegExp(
+      /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i
+    );
+    const validPasswordRegex = RegExp(
+      "^(((?=.*[a-z])(?=.*[A-Z]))|((?=.*[a-z])(?=.*[0-9]))|((?=.*[A-Z])(?=.*[0-9])))(?=.{6,})"
+    );
+    switch (field) {
+      case "code":
+        setErrors({
+          ...errors,
+          // [field]: value.length != 3 ? "must be exactly 3 characters" : "",
+          [field]:
+            validCode.test(value) && value.length === 3
+              ? ""
+              : "must be all CAPS and 3 exactly characters",
+        });
+        break;
+      case "username":
+        setErrors({
+          ...errors,
+          [field]: validEmailRegex.test(value)
+            ? ""
+            : "must be valid email format",
+        });
+        break;
+      case "password":
+        setErrors({
+          ...errors,
+          [field]: validPasswordRegex.test(value) ? (
+            ""
+          ) : (
+            <>
+              <p>must contain at least 1 lowercase</p>
+              <p>at least 1 uppercase</p>
+              <p>at least 1 numeric</p>
+              <p>at least one symbol</p>
+              <p> at least 8 characters long</p>
+            </>
+          ),
+        });
+      default:
+        break;
+    }
+  };
   const handleInputChange = (e) => {
     setData({
       ...data,
@@ -25,7 +80,21 @@ const Register = () => {
   };
   const handleFormSubmit = (e) => {
     e.preventDefault();
-    console.log(data);
+    if (data.password !== data.cpassword) {
+      setData({
+        ...data,
+        errorMessage: "passwords do not match",
+      });
+      console.log(Object.values(errors).every((x) => x == ""));
+    } else {
+      setData({
+        ...data,
+        errorMessage: "",
+      });
+      if (Object.values(errors).every((x) => x == "")) {
+        console.log("submitting");
+      }
+    }
   };
   return (
     <div className="Register">
@@ -40,7 +109,10 @@ const Register = () => {
           name="code"
           id="code"
           onChange={handleInputChange}
+          onBlur={handleValidation}
         />
+        {<span className="inputerror">{errors.code}</span>}
+
         <input
           required
           type="text"
@@ -63,11 +135,14 @@ const Register = () => {
           required
           type="text"
           value={data.username}
-          placeholder="username"
+          placeholder="username (wegrow email)"
           name="username"
           id="username"
           onChange={handleInputChange}
+          onBlur={handleValidation}
         />
+        {<span className="inputerror">{errors.username}</span>}
+
         <input
           required
           type="password"
@@ -76,7 +151,10 @@ const Register = () => {
           name="password"
           id="password"
           onChange={handleInputChange}
+          onBlur={handleValidation}
         />
+        {<span className="inputerror">{errors.password}</span>}
+
         <input
           required
           type="password"
@@ -89,6 +167,7 @@ const Register = () => {
         <button disabled={data.isSubmitting}>
           {data.isSubmitting ? "Loading..." : "Register"}
         </button>
+        {<span className="message">{errors.matchpasswords}</span>}
         {data.errorMessage && (
           <span className="message">{data.errorMessage}</span>
         )}
