@@ -2,6 +2,7 @@ After cloning this repository, you will need to create a file name server/config
 
 For local database:
 
+```
 module.exports = {
 dbconnect: {
 host: "localhost",
@@ -10,9 +11,11 @@ password: "yourpassword",
 database: "yourdatabase",
 },
 };
+```
 
 For AWS:
 
+```
 module.exports = {
 dbconnect: {
 host: process.env.RDS_HOSTNAME,
@@ -22,3 +25,4 @@ port: process.env.RDS_PORT,
 database: "ebdb", // replace ebdb with name of your AWS RDS Instance
 },
 };
+```
