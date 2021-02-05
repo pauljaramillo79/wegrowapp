@@ -13,6 +13,7 @@ const Register = () => {
     cpassword: "",
     isSubmitting: false,
     errorMessage: null,
+    successMessage: null,
   };
   const [data, setData] = useState(initialState);
   const initErrors = {
@@ -20,7 +21,6 @@ const Register = () => {
     username: "",
     password: "",
     cpassword: "",
-    matchpasswords: "",
   };
   const [errors, setErrors] = useState(initErrors);
   // Handlers
@@ -93,6 +93,18 @@ const Register = () => {
       });
       if (Object.values(errors).every((x) => x == "")) {
         console.log("submitting");
+        Axios.post("/register", {
+          username: data.username,
+          password: data.password,
+          code: data.code,
+          tname: data.name,
+          tlastname: data.lastname,
+        }).then((response) => {
+          setData({
+            ...data,
+            successMessage: `${response.data.message} ${response.data.username}`,
+          });
+        });
       }
     }
   };
@@ -167,10 +179,10 @@ const Register = () => {
         <button disabled={data.isSubmitting}>
           {data.isSubmitting ? "Loading..." : "Register"}
         </button>
-        {<span className="message">{errors.matchpasswords}</span>}
         {data.errorMessage && (
-          <span className="message">{data.errorMessage}</span>
+          <span className="errormessage">{data.errorMessage}</span>
         )}
+        <span className="successmessage">{data.successMessage}</span>
       </form>
     </div>
   );

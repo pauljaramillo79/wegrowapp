@@ -24,4 +24,11 @@ router.get("/flower", (req, res) => {
   //   });
 });
 
+router.post("/register", (req, res) => {
+  res.json({
+    message: "Succesfully registered",
+    username: "Paul",
+  });
+});
+
 module.exports = router;
