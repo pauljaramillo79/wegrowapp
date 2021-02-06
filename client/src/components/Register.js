@@ -92,19 +92,26 @@ const Register = () => {
         errorMessage: "",
       });
       if (Object.values(errors).every((x) => x == "")) {
-        console.log("submitting");
         Axios.post("/register", {
           username: data.username,
           password: data.password,
           code: data.code,
           tname: data.name,
           tlastname: data.lastname,
-        }).then((response) => {
-          setData({
-            ...data,
-            successMessage: `${response.data.message} ${response.data.username}`,
+        })
+          .then((response) => {
+            setData({
+              ...data,
+              successMessage: `${response.data.message} ${response.data.username}`,
+              errorMessage: "",
+            });
+          })
+          .catch((error) => {
+            setData({
+              ...data,
+              errorMessage: error.message || error.statusText,
+            });
           });
-        });
       }
     }
   };
@@ -117,7 +124,7 @@ const Register = () => {
           required
           type="text"
           value={data.code}
-          placeholder="code"
+          placeholder="user id (3 letters)"
           name="code"
           id="code"
           onChange={handleInputChange}

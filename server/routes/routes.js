@@ -1,6 +1,8 @@
 const express = require("express");
 const router = express();
 const db = require("../config/pool");
+const bcrypt = require("bcryptjs");
+const { json } = require("express");
 
 router.get("/", (req, res) => {
   res.send("flowers smell nice");
@@ -24,11 +26,30 @@ router.get("/flower", (req, res) => {
   //   });
 });
 
-router.post("/register", (req, res) => {
-  res.json({
-    message: "Succesfully registered",
-    username: "Paul",
-  });
+router.post("/register", async (req, res) => {
+  let username = req.body.username;
+  let password = req.body.password;
+  let code = req.body.code;
+  let tname = req.body.tname;
+  let tlastname = req.body.tname;
+  let active = "y";
+  let firstlogin = "y";
+  let hashedPassword = await bcrypt.hash(password, 8);
+  await db.query(
+    "INSERT INTO traderList (tCode, tName, tLastName, userName, password, active, firstlogin) VALUES (?,?,?,?,?,?,?);",
+    [code, tname, tlastname, username, hashedPassword, active, firstlogin],
+    (err) => {
+      if (err) {
+        console.log(err);
+      } else {
+        return res.json({
+          success: true,
+          message: "Succesfully registered",
+          username: username,
+        });
+      }
+    }
+  );
 });
 
 module.exports = router;
