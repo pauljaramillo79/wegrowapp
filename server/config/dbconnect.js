@@ -5,7 +5,7 @@ module.exports = {
     host: "localhost",
     user: "admin",
     password: "MateoPatricio@2015",
-    database: "mysql-server-client-aws",
+    database: "weGrow",
   },
 };
 
