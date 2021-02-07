@@ -6,10 +6,10 @@ import Home from "./components/Home";
 export const AuthContext = createContext();
 
 const initialState = {
-  isAuthenticated: false,
-  user: null,
+  isAuthenticated: JSON.parse(localStorage.getItem("isAuthenticated")) || false,
+  user: JSON.parse(localStorage.getItem("user")) || null,
   accesstoken: null,
-  refreshtoken: null,
+  refreshtoken: JSON.parse(localStorage.getItem("refreshtoken")) || null,
 };
 const reducer = (state, action) => {
   switch (action.type) {
@@ -19,6 +19,7 @@ const reducer = (state, action) => {
         "refreshtoken",
         JSON.stringify(action.payload.refreshtoken)
       );
+      localStorage.setItem("isAuthenticated", true);
       return {
         ...state,
         isAuthenticated: true,
