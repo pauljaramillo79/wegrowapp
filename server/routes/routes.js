@@ -2,7 +2,6 @@ const express = require("express");
 const router = express();
 const db = require("../config/pool");
 const bcrypt = require("bcryptjs");
-// const { json } = require("express");
 const jwt = require("jsonwebtoken");
 
 router.get("/", (req, res) => {
@@ -60,7 +59,6 @@ router.post("/login", async (req, res) => {
     "SELECT * FROM traderList WHERE username = ?",
     [username, password],
     (err, results) => {
-      console.log(results);
       if (err) {
         console.log(err);
       }
@@ -76,12 +74,22 @@ router.post("/login", async (req, res) => {
             });
           } else {
             const user = results[0].tName;
-            let accesstoken = jwt.sign({ username: username }, "123", {
-              expiresIn: "15min",
-            });
-            let refreshtoken = jwt.sign({ username: username }, "123", {
-              expiresIn: "24hrs",
-            });
+            let accesstoken = jwt.sign(
+              { username: username },
+              // process.env.ACCESS_TOKEN_SECRET,
+              "123",
+              {
+                expiresIn: "15min",
+              }
+            );
+            let refreshtoken = jwt.sign(
+              { username: username },
+              // process.env.REFRESH_TOKEN_SECRET,
+              "123",
+              {
+                expiresIn: "24hrs",
+              }
+            );
             return res.json({
               success: true,
               message: "Succesfully logged in",
