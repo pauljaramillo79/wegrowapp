@@ -28,10 +28,7 @@ const Home = () => {
       return response;
     },
     async (error) => {
-      if (
-        refreshtoken &&
-        error.response.status === 403 //&&
-      ) {
+      if (refreshtoken && error.response.status === 403) {
         const res = await refreshAxios.post("/refreshtoken");
         accesstoken = res.data.accesstoken;
         return await authAxios.post(
@@ -55,7 +52,9 @@ const Home = () => {
         setData(response.data.post);
       })
       .catch((error) => {
-        console.log(error.response);
+        if (error) {
+          console.log(error.response);
+        }
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
