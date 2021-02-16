@@ -27,32 +27,36 @@ const Home = () => {
     (response) => {
       return response;
     },
-    (error) => {
+    async (error) => {
       if (
         refreshtoken &&
         error.response.status === 403 //&&
       ) {
-        return refreshAxios.post("/refreshtoken").then((res) => {
-          accesstoken = res.data.accesstoken;
-          return authAxios.post(
-            "/test",
-            {},
-            {
-              headers: {
-                Authorization: `Bearer ${accesstoken}`,
-              },
-            }
-          );
-        });
+        const res = await refreshAxios.post("/refreshtoken");
+        accesstoken = res.data.accesstoken;
+        return await authAxios.post(
+          "/test",
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${accesstoken}`,
+            },
+          }
+        );
       }
-      return Promise.reject(error);
+      return Promise.reject(error.response);
     }
   );
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(async () => {
-    await authAxios.post("/test").then((response) => {
-      setData(response.data.post);
-    });
+    await authAxios
+      .post("/test")
+      .then((response) => {
+        setData(response.data.post);
+      })
+      .catch((error) => {
+        console.log(error.response);
+      });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
