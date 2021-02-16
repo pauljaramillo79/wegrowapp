@@ -1,8 +1,33 @@
+// require("dotenv").config({ path: __dirname + "/../config/.env" });
+
 const express = require("express");
 const router = express();
 const db = require("../config/pool");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+
+const authenticateToken = (req, res, next) => {
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
+  if (token == null) return res.sendStatus(401);
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
+    if (err) return res.sendStatus(403);
+    req.user = user;
+    next();
+  });
+};
+const authenticateRefreshToken = (req, res, next) => {
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
+
+  if (token == null) return res.sendStatus(401);
+
+  jwt.verify(token, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
+    if (err) return res.sendStatus(403);
+    req.user = user;
+    next();
+  });
+};
 
 router.get("/", (req, res) => {
   res.send("flowers smell nice");
@@ -74,18 +99,19 @@ router.post("/login", async (req, res) => {
             });
           } else {
             const user = results[0].tName;
+            const usercode = results[0].tCode;
             let accesstoken = jwt.sign(
-              { username: username },
-              // process.env.ACCESS_TOKEN_SECRET,
-              "123",
+              { username: username, user: user, usercode: usercode },
+              process.env.ACCESS_TOKEN_SECRET,
+              // "123",
               {
-                expiresIn: "15min",
+                expiresIn: "10min",
               }
             );
             let refreshtoken = jwt.sign(
-              { username: username },
-              // process.env.REFRESH_TOKEN_SECRET,
-              "123",
+              { username: username, user: user, usercode: usercode },
+              process.env.REFRESH_TOKEN_SECRET,
+              // "123",
               {
                 expiresIn: "24hrs",
               }
@@ -107,6 +133,32 @@ router.post("/login", async (req, res) => {
       }
     }
   );
+});
+
+router.post("/test", authenticateToken, (req, res) => {
+  res.json({
+    post: "this is a protected route",
+    user: req.user.usercode,
+  });
+});
+
+router.post("/refreshtoken", authenticateRefreshToken, (req, res) => {
+  console.log("refreshing token");
+  username = req.user.username;
+  user = req.user.user;
+  usercode = req.user.usercode;
+  console.log(req.user);
+  let accesstoken = jwt.sign(
+    { username: username, user: user, usercode: usercode },
+    process.env.ACCESS_TOKEN_SECRET,
+    // "123",
+    {
+      expiresIn: "10min",
+    }
+  );
+  res.json({
+    accesstoken: accesstoken,
+  });
 });
 
 module.exports = router;

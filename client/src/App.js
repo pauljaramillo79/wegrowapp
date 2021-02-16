@@ -34,6 +34,12 @@ const reducer = (state, action) => {
         isAuthenticated: false,
         user: null,
       };
+    // case "REFRESHTOKEN":
+    //   console.log(action.payload.accesstoken);
+    //   return {
+    //     ...state,
+    //     accesstoken: action.payload.accesstoken,
+    //   };
     default:
       return;
   }
