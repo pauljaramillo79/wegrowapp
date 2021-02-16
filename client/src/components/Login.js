@@ -25,7 +25,6 @@ const Login = () => {
       password: data.password,
     })
       .then((response) => {
-        console.log(response);
         setData({
           ...data,
           errorMessage: response.data.message,
