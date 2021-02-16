@@ -2,6 +2,7 @@ import "./App.css";
 import React, { useContext, useReducer, createContext } from "react";
 import Login from "./components/Login";
 import Home from "./components/Home";
+import Header from "./components/Header";
 
 export const AuthContext = createContext();
 
@@ -48,7 +49,16 @@ function App() {
   const [state, dispatch] = useReducer(reducer, initialState);
   return (
     <AuthContext.Provider value={{ state, dispatch }}>
-      <div className="App">{!state.isAuthenticated ? <Login /> : <Home />}</div>
+      <div className="App">
+        {!state.isAuthenticated ? (
+          <Login />
+        ) : (
+          <>
+            <Header />
+            <Home />
+          </>
+        )}
+      </div>
     </AuthContext.Provider>
   );
 }

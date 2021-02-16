@@ -4,15 +4,13 @@ import Axios from "axios";
 
 const Home = () => {
   const [data, setData] = useState();
-  const { state, dispatch } = useContext(AuthContext);
-  const logoutHandler = (e) => {
-    dispatch({
-      type: "LOGOUT",
-    });
-  };
+  const { state } = useContext(AuthContext);
 
+  // Get token values from UseContext and Local Storage
   let accesstoken = state.accesstoken;
   let refreshtoken = JSON.parse(localStorage.getItem("refreshtoken"));
+
+  // Declare custom axios calls for authorization and refreshing token
   const authAxios = Axios.create({
     headers: {
       Authorization: `Bearer ${accesstoken}`,
@@ -23,6 +21,8 @@ const Home = () => {
       Authorization: `Bearer ${refreshtoken}`,
     },
   });
+
+  // Define interceptor to handle error and refresh access token when appropriate
   authAxios.interceptors.response.use(
     (response) => {
       return response;
@@ -51,20 +51,12 @@ const Home = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(async () => {
     await authAxios.post("/test").then((response) => {
-      console.log(response.data);
       setData(response.data.post);
-      // console.log(response.data);
     });
   }, []);
   return (
     <div>
-      <h2>Welcome {state.user}</h2>
       <p>{data}</p>
-      {state.isAuthenticated ? (
-        <button onClick={logoutHandler}>Log Out</button>
-      ) : (
-        ""
-      )}
     </div>
   );
 };
