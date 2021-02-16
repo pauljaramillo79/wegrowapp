@@ -53,6 +53,7 @@ const Home = () => {
     await authAxios.post("/test").then((response) => {
       setData(response.data.post);
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
     <div>
