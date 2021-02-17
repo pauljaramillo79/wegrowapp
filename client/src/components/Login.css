@@ -45,7 +45,8 @@
   margin: 1rem 0;
   margin-bottom: 1rem;
 }
-.LoginForm button:hover {
+.LoginForm button:hover,
+.loginForm button:focus {
   background-color: rgb(68, 65, 162);
   color: white;
   cursor: pointer;

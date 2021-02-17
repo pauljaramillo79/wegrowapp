@@ -3,6 +3,7 @@ import React, { useReducer, createContext } from "react";
 import Login from "./components/Login";
 import Home from "./components/Home";
 import Header from "./components/Header";
+import Register from "./components/Register";
 
 export const AuthContext = createContext();
 

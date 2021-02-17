@@ -3,6 +3,8 @@ import "./Login.css";
 import Axios from "axios";
 import { AuthContext } from "../App";
 import { ReactComponent as Logo } from "../assets/_images/logo-web.svg";
+import ChangePwdModal from "./ChangePwdModal";
+import axios from "axios";
 
 const Login = () => {
   const { dispatch } = useContext(AuthContext);
@@ -10,7 +12,18 @@ const Login = () => {
     username: "",
     password: "",
   };
+  const [name, setName] = useState();
+  const [oldpwd, setOldpwd] = useState();
   const [data, setData] = useState(initialState);
+  const [modalState, setModalState] = useState(false);
+  const changePassword = (e) => {
+    e.preventDefault();
+    setModalState(false);
+  };
+  const cancelChangePassword = (e) => {
+    e.preventDefault();
+    setModalState(false);
+  };
   const handleInputChange = (e) => {
     e.preventDefault();
     setData({
@@ -25,15 +38,21 @@ const Login = () => {
       password: data.password,
     })
       .then((response) => {
-        setData({
-          ...data,
-          errorMessage: response.data.message,
-        });
-        if (response.data.success) {
-          dispatch({
-            type: "LOGIN",
-            payload: response.data,
+        if (response.data.firstlogin === "y") {
+          setName(response.data.user);
+          setModalState(true);
+          setOldpwd(data.password);
+        } else {
+          setData({
+            ...data,
+            errorMessage: response.data.message,
           });
+          if (response.data.success) {
+            dispatch({
+              type: "LOGIN",
+              payload: response.data,
+            });
+          }
         }
       })
       .catch((error) => {
@@ -44,34 +63,49 @@ const Login = () => {
           errorMessage: error.message || error.statusText,
         });
       });
+    setData({
+      ...data,
+      password: "",
+    });
   };
   return (
-    <div className="Login">
-      <form className="LoginForm" onSubmit={handleFormSubmit}>
-        <h2> Login </h2>
-        <Logo className="Logo" />
-        <input
-          type="text"
-          placeholder="username"
-          name="username"
-          id="username"
-          value={data.username}
-          onChange={handleInputChange}
-        />
-        <input
-          type="password"
-          placeholder="password"
-          name="password"
-          id="password"
-          value={data.password}
-          onChange={handleInputChange}
-        />
-        <button>Login</button>
-        {data.errorMessage && (
-          <span className="message">{data.errorMessage}</span>
-        )}
-      </form>
-    </div>
+    <>
+      <ChangePwdModal
+        show={modalState}
+        confirmPwdChange={changePassword}
+        cancelPwdChange={cancelChangePassword}
+        name={name}
+        oldpwd={oldpwd}
+        username={data.username}
+      />
+      <div className="Login">
+        <form className="LoginForm" onSubmit={handleFormSubmit}>
+          <h2> Login </h2>
+          <Logo className="Logo" />
+          <input
+            autoFocus
+            type="text"
+            placeholder="username"
+            name="username"
+            id="username"
+            value={data.username}
+            onChange={handleInputChange}
+          />
+          <input
+            type="password"
+            placeholder="password"
+            name="password"
+            id="password"
+            value={data.password}
+            onChange={handleInputChange}
+          />
+          <button>Login</button>
+          {data.errorMessage && (
+            <span className="errormessage">{data.errorMessage}</span>
+          )}
+        </form>
+      </div>
+    </>
   );
 };
 

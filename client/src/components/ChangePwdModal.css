@@ -1,0 +1,106 @@
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 50;
+}
+
+.modal-main {
+  position: fixed;
+  background: white;
+  width: 40%;
+  height: auto;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 3rem;
+  box-shadow: 3px 3px 30px rgb(0, 0, 0);
+  border-radius: 2rem;
+  font-family: "Roboto", sans-serif;
+}
+.modal-main h1 {
+  margin-bottom: 2rem;
+}
+.modal-main h2 {
+  padding-bottom: 1rem;
+  color: rgb(68, 65, 162);
+}
+.modal-main p {
+  padding-bottom: 2rem;
+}
+.modal-main button {
+  width: 60%;
+  padding: 0.8rem;
+  background-color: white;
+  border-radius: 1.3rem;
+  margin: 1rem 0;
+  margin-bottom: 0;
+  margin-top: 1rem;
+}
+.confirmbutton {
+  border: rgb(68, 65, 162) 1px solid;
+}
+.confirmbutton:hover,
+.confirmbutton:focus {
+  background-color: rgb(68, 65, 162);
+  color: white;
+  cursor: pointer;
+}
+.cancelbutton {
+  border: rgb(160, 182, 103) 1px solid;
+  margin-bottom: 1rem;
+}
+.cancelbutton:hover,
+.cancelbutton:focus {
+  background-color: rgb(160, 182, 103);
+  color: white;
+  cursor: pointer;
+}
+
+.display-block {
+  display: block;
+}
+
+.display-none {
+  display: none;
+}
+
+.form-group input {
+  min-width: 60%;
+  margin-left: 1rem;
+  border: none;
+  border-bottom: rgb(160, 182, 103) 1px solid;
+}
+.form-group {
+  display: flex;
+  flex-direction: row;
+  /* justify-content: space-between; */
+  padding-bottom: 1rem;
+  width: 60%;
+}
+
+.form-group h2 {
+  margin-bottom: 4rem;
+}
+.form-group label {
+  flex: none;
+  display: block;
+  width: 140px;
+}
+.changePwdModalForm {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.cpwdinputerror {
+  color: red;
+  font-size: 0.7rem;
+  margin-bottom: 0.5rem;
+}
+.cpwdinputerror p {
+  padding: 0;
+}

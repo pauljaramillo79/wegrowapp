@@ -90,7 +90,7 @@ router.post("/login", async (req, res) => {
       if (results.length > 0) {
         bcrypt.compare(password, results[0].password, (err1, response) => {
           if (err1) {
-            console.log(err);
+            console.log(err1);
           }
           if (!response) {
             res.json({
@@ -100,6 +100,7 @@ router.post("/login", async (req, res) => {
           } else {
             const user = results[0].tName;
             const usercode = results[0].tCode;
+            const firstlogin = results[0].firstlogin;
             let accesstoken = jwt.sign(
               { username: username, user: user, usercode: usercode },
               process.env.ACCESS_TOKEN_SECRET,
@@ -122,6 +123,7 @@ router.post("/login", async (req, res) => {
               accesstoken: accesstoken,
               refreshtoken: refreshtoken,
               user: user,
+              firstlogin: firstlogin,
             });
           }
         });
@@ -158,6 +160,38 @@ router.post("/refreshtoken", authenticateRefreshToken, (req, res) => {
   );
   res.json({
     accesstoken: accesstoken,
+  });
+});
+
+router.post("/changepassword", async (req, res) => {
+  oldpassword = req.body.oldpassword;
+  newpassword = req.body.oldpassword;
+  username = req.body.username;
+  await db.query(
+    "SELECT * FROM traderList WHERE username = ?",
+    [username],
+    (err, results) => {
+      if (err) {
+        console.log(results);
+      }
+      if (results.length > 0) {
+        bcrypt.compare(oldpassword, results[0].password, (err1, response) => {
+          if (err1) {
+            console.log(err1);
+          }
+          if (!response) {
+            console.log("passwords dont match");
+          } else {
+            console.log("passwords match");
+          }
+        });
+      }
+    }
+  );
+  res.json({
+    msg: "Changing pwd",
+    old: oldpassword,
+    new: newpassword,
   });
 });
 
