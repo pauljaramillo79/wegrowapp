@@ -9,6 +9,7 @@ const ChangePwdModal = ({
   name,
   oldpwd,
   username,
+  setCpwdsuccessmsg,
 }) => {
   const initchangePwdData = {
     oldpassword: "",
@@ -87,18 +88,17 @@ const ChangePwdModal = ({
     e.preventDefault();
     // console.log("submitting");
     if (Object.values(errorsCPwd).every((x) => x === "")) {
-      console.log(changePwdData.oldpassword);
-
       Axios.post("/changepassword", {
         oldpassword: changePwdData.oldpassword,
         newpassword: changePwdData.newpassword,
         username: username,
       }).then((response) => {
         console.log(response.data);
+        setCpwdsuccessmsg(response.data.msg);
         //   //   console.log(response);
         //   // });
       });
-      //   confirmPwdChange();
+      confirmPwdChange();
     }
   };
   return (

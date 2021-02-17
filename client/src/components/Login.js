@@ -14,10 +14,10 @@ const Login = () => {
   };
   const [name, setName] = useState();
   const [oldpwd, setOldpwd] = useState();
+  const [cpwdsuccessmsg, setCpwdsuccessmsg] = useState();
   const [data, setData] = useState(initialState);
   const [modalState, setModalState] = useState(false);
   const changePassword = (e) => {
-    e.preventDefault();
     setModalState(false);
   };
   const cancelChangePassword = (e) => {
@@ -77,6 +77,7 @@ const Login = () => {
         name={name}
         oldpwd={oldpwd}
         username={data.username}
+        setCpwdsuccessmsg={setCpwdsuccessmsg}
       />
       <div className="Login">
         <form className="LoginForm" onSubmit={handleFormSubmit}>
@@ -103,6 +104,7 @@ const Login = () => {
           {data.errorMessage && (
             <span className="errormessage">{data.errorMessage}</span>
           )}
+          <span className="successmessage">{cpwdsuccessmsg}</span>
         </form>
       </div>
     </>
