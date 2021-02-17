@@ -165,12 +165,13 @@ router.post("/refreshtoken", authenticateRefreshToken, (req, res) => {
 
 router.post("/changepassword", async (req, res) => {
   oldpassword = req.body.oldpassword;
-  newpassword = req.body.oldpassword;
+  newpassword = req.body.newpassword;
   username = req.body.username;
-  await db.query(
+  let hashedNewPassword = await bcrypt.hash(newpassword, 8);
+  db.query(
     "SELECT * FROM traderList WHERE username = ?",
     [username],
-    (err, results) => {
+    async (err, results) => {
       if (err) {
         console.log(results);
       }
@@ -180,19 +181,31 @@ router.post("/changepassword", async (req, res) => {
             console.log(err1);
           }
           if (!response) {
-            console.log("passwords dont match");
+            res.json({
+              success: false,
+              message: "Old password is incorrect",
+            });
           } else {
-            console.log("passwords match");
+            console.log(hashedNewPassword);
+            db.query(
+              `UPDATE traderList SET password='${hashedNewPassword}', firstlogin='n' WHERE userName='${username}'`,
+
+              (err1) => {
+                if (err1) {
+                  console.log(err1);
+                }
+              }
+            );
+            res.json({
+              success: true,
+              msg:
+                "Password change was successful. Please login in again with your new password.",
+            });
           }
         });
       }
     }
   );
-  res.json({
-    msg: "Changing pwd",
-    old: oldpassword,
-    new: newpassword,
-  });
 });
 
 module.exports = router;
