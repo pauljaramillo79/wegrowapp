@@ -10,6 +10,9 @@ const ChangePwdModal = ({
   oldpwd,
   username,
   setCpwdsuccessmsg,
+  accesstoken,
+  setData,
+  data,
 }) => {
   const initchangePwdData = {
     oldpassword: "",
@@ -88,17 +91,37 @@ const ChangePwdModal = ({
     e.preventDefault();
     // console.log("submitting");
     if (Object.values(errorsCPwd).every((x) => x === "")) {
-      Axios.post("/changepassword", {
-        oldpassword: changePwdData.oldpassword,
-        newpassword: changePwdData.newpassword,
-        username: username,
-      }).then((response) => {
-        console.log(response.data);
-        setCpwdsuccessmsg(response.data.msg);
-        //   //   console.log(response);
-        //   // });
-      });
+      Axios.post(
+        "/changepassword",
+        {
+          oldpassword: changePwdData.oldpassword,
+          newpassword: changePwdData.newpassword,
+          username: username,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${accesstoken}`,
+          },
+        }
+      )
+        .then((response) => {
+          setCpwdsuccessmsg(
+            <>
+              <p>{response.data.msg.split(".")[0]}</p>
+              <p>{response.data.msg.split(".")[1]}</p>
+            </>
+          );
+        })
+        .catch((error) => {
+          setData({
+            ...data,
+            errorMessage:
+              "You took to long. Please login again with original password.",
+          });
+        });
+
       confirmPwdChange();
+      setChangePwdData(initchangePwdData);
     }
   };
   return (

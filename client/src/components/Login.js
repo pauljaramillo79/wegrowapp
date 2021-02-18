@@ -15,6 +15,7 @@ const Login = () => {
   const [name, setName] = useState();
   const [oldpwd, setOldpwd] = useState();
   const [cpwdsuccessmsg, setCpwdsuccessmsg] = useState();
+  const [accesstoken, setAccesstoken] = useState();
   const [data, setData] = useState(initialState);
   const [modalState, setModalState] = useState(false);
   const changePassword = (e) => {
@@ -42,6 +43,7 @@ const Login = () => {
           setName(response.data.user);
           setModalState(true);
           setOldpwd(data.password);
+          setAccesstoken(response.data.accesstoken);
         } else {
           setData({
             ...data,
@@ -66,7 +68,9 @@ const Login = () => {
     setData({
       ...data,
       password: "",
+      errorMessage: "",
     });
+    setCpwdsuccessmsg("");
   };
   return (
     <>
@@ -78,6 +82,9 @@ const Login = () => {
         oldpwd={oldpwd}
         username={data.username}
         setCpwdsuccessmsg={setCpwdsuccessmsg}
+        accesstoken={accesstoken}
+        setData={setData}
+        data={data}
       />
       <div className="Login">
         <form className="LoginForm" onSubmit={handleFormSubmit}>

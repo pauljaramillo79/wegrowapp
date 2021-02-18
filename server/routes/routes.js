@@ -88,45 +88,52 @@ router.post("/login", async (req, res) => {
         console.log(err);
       }
       if (results.length > 0) {
-        bcrypt.compare(password, results[0].password, (err1, response) => {
-          if (err1) {
-            console.log(err1);
-          }
-          if (!response) {
-            res.json({
-              success: false,
-              message: "Wrong user/password combo",
-            });
-          } else {
-            const user = results[0].tName;
-            const usercode = results[0].tCode;
-            const firstlogin = results[0].firstlogin;
-            let accesstoken = jwt.sign(
-              { username: username, user: user, usercode: usercode },
-              process.env.ACCESS_TOKEN_SECRET,
-              // "123",
-              {
-                expiresIn: "10min",
-              }
-            );
-            let refreshtoken = jwt.sign(
-              { username: username, user: user, usercode: usercode },
-              process.env.REFRESH_TOKEN_SECRET,
-              // "123",
-              {
-                expiresIn: "24hrs",
-              }
-            );
-            return res.json({
-              success: true,
-              message: "Succesfully logged in",
-              accesstoken: accesstoken,
-              refreshtoken: refreshtoken,
-              user: user,
-              firstlogin: firstlogin,
-            });
-          }
-        });
+        if (results[0].active === "y") {
+          bcrypt.compare(password, results[0].password, (err1, response) => {
+            if (err1) {
+              console.log(err1);
+            }
+            if (!response) {
+              res.json({
+                success: false,
+                message: "Wrong user/password combo",
+              });
+            } else {
+              const user = results[0].tName;
+              const usercode = results[0].tCode;
+              const firstlogin = results[0].firstlogin;
+              let accesstoken = jwt.sign(
+                { username: username, user: user, usercode: usercode },
+                process.env.ACCESS_TOKEN_SECRET,
+                // "123",
+                {
+                  expiresIn: "10min",
+                }
+              );
+              let refreshtoken = jwt.sign(
+                { username: username, user: user, usercode: usercode },
+                process.env.REFRESH_TOKEN_SECRET,
+                // "123",
+                {
+                  expiresIn: "24hrs",
+                }
+              );
+              return res.json({
+                success: true,
+                message: "Succesfully logged in",
+                accesstoken: accesstoken,
+                refreshtoken: refreshtoken,
+                user: user,
+                firstlogin: firstlogin,
+              });
+            }
+          });
+        } else {
+          return res.json({
+            success: false,
+            message: "This account is not active",
+          });
+        }
       } else {
         return res.json({
           success: false,
@@ -163,7 +170,7 @@ router.post("/refreshtoken", authenticateRefreshToken, (req, res) => {
   });
 });
 
-router.post("/changepassword", async (req, res) => {
+router.post("/changepassword", authenticateToken, async (req, res) => {
   oldpassword = req.body.oldpassword;
   newpassword = req.body.newpassword;
   username = req.body.username;
@@ -186,7 +193,6 @@ router.post("/changepassword", async (req, res) => {
               message: "Old password is incorrect",
             });
           } else {
-            console.log(hashedNewPassword);
             db.query(
               `UPDATE traderList SET password='${hashedNewPassword}', firstlogin='n' WHERE userName='${username}'`,
 
@@ -199,7 +205,7 @@ router.post("/changepassword", async (req, res) => {
             res.json({
               success: true,
               msg:
-                "Password change was successful. Please login in again with your new password.",
+                "Password change was successful. Please log in again with your new password.",
             });
           }
         });
