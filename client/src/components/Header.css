@@ -5,7 +5,7 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  border-bottom: solid rgb(160, 182, 103) 2px;
+  border-bottom: solid rgb(160, 182, 103) 1px;
   align-items: center;
   box-shadow: 0 8px 8px 0 rgba(160, 182, 103, 0.2);
   height: 6vh;

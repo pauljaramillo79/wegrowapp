@@ -1,9 +1,11 @@
 import "./App.css";
 import React, { useReducer, createContext } from "react";
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import Login from "./components/Login";
 import Home from "./components/Home";
 import Header from "./components/Header";
 import Register from "./components/Register";
+import Nav from "./components/Nav";
 
 export const AuthContext = createContext();
 
@@ -56,7 +58,14 @@ function App() {
         ) : (
           <>
             <Header />
-            <Home />
+            <Router>
+              <Nav />
+              <Switch>
+                <Route exact path="/">
+                  <Home />
+                </Route>
+              </Switch>
+            </Router>
           </>
         )}
       </div>
