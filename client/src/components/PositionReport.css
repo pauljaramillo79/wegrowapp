@@ -1,0 +1,46 @@
+.positionreporttitle {
+  font-family: "Roboto", sans-serif;
+  color: rgb(68, 65, 162);
+}
+#positionreport {
+  margin-top: 0.5rem;
+  border-collapse: collapse;
+  font-family: "Roboto", sans-serif;
+}
+
+#positionreport td {
+  padding-right: 3.5rem;
+  font-size: 0.9rem;
+  padding-top: 0.1rem;
+  padding-left: 0.1rem;
+  font-family: "Roboto", sans-serif;
+
+  /* background-color: white; */
+}
+#positionreport th {
+  padding-right: 3rem;
+  font-size: 0.9rem;
+  border: none;
+  background-color: white;
+  font-family: "Roboto", sans-serif;
+}
+
+.fig {
+  text-align: right;
+}
+#positionreport tr:hover {
+  background-color: #ddeaf9;
+  cursor: pointer;
+}
+#positionreport .totals {
+  border-top: 1px solid black;
+  height: 2rem;
+  vertical-align: top;
+}
+.prodgroup {
+  background-color: rgb(160, 182, 103);
+  color: white;
+}
+.product {
+  /* background-color: rgb(228, 236, 204); */
+}
