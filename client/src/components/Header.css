@@ -5,13 +5,15 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  border-bottom: solid rgb(160, 182, 103) 1px;
+  border-bottom: solid rgb(68, 65, 162) 1px;
   align-items: center;
   box-shadow: 0 8px 8px 0 rgba(160, 182, 103, 0.2);
   height: 6vh;
   padding: 0.3rem 3rem;
   font-family: "Roboto", sans-serif;
-  background-color: white;
+  /* background-color: white; */
+  background-color: rgb(160, 182, 103);
+  color: white;
 }
 #navigation .logoutButton {
   background-color: transparent;
@@ -36,12 +38,14 @@ h2 {
 .welcomemsg {
   display: flex;
   align-items: baseline;
+  color: white;
 }
 
 .Logoheader {
   width: 2rem;
   height: 1.3rem;
   margin: 0 0.5rem;
+  color: white;
 }
 .userwelcome {
   display: flex;
