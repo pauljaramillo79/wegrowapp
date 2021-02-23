@@ -112,9 +112,7 @@ const PositionReport = () => {
                               .toString()
                               .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                           </td>
-                          <td className="fig">
-                            {x.Inventory.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-                          </td>
+                          <td className="fig">{x.Inventory}</td>
                           <td className="fig">
                             {x.Price.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                           </td>
