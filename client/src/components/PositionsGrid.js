@@ -56,7 +56,7 @@ const PositionsGrid = () => {
             <PositionAdd />
           </div>
           <div id="sales2" key="c">
-            <Positions />
+            {/* <Positions /> */}
           </div>
         </GridLayout>
       </div>
