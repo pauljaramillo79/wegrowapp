@@ -50,13 +50,13 @@ const PositionsGrid = () => {
           onLayoutChange={onLayoutChange}
         >
           <div id="sales1" key="a">
-            <PositionReport />
+            {/* <PositionReport /> */}
           </div>
           <div id="sales2" key="b">
             <PositionAdd />
           </div>
           <div id="sales2" key="c">
-            {/* <Positions /> */}
+            <Positions />
           </div>
         </GridLayout>
       </div>
