@@ -1,0 +1,31 @@
+.positionadd {
+  overflow: auto;
+  height: 100%;
+}
+.positionaddtitle {
+  font-family: "Roboto", sans-serif;
+  color: rgb(68, 65, 162);
+}
+#positionaddform {
+  display: flex;
+  flex-direction: column;
+  margin-top: 0.5rem;
+}
+#positionaddform input {
+  margin-bottom: 0.6rem;
+  padding: 0.3rem;
+  /* border: none; */
+  border: 1px solid rgb(160, 182, 103);
+}
+#positionaddform button {
+  padding: 0.3rem 1.5rem;
+  border: 2px solid rgb(68, 65, 162);
+  background-color: transparent;
+  border-radius: 3rem;
+}
+
+#positionaddform button:hover {
+  background-color: rgb(68, 65, 162);
+  color: white;
+  cursor: pointer;
+}

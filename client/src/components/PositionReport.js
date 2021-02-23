@@ -65,9 +65,9 @@ const PositionReport = () => {
   var prod = {};
 
   return (
-    <div>
+    <div className="positionreport">
       <h3 className="positionreporttitle">Position Report</h3>
-      <table id="positionreport">
+      <table id="positionreporttable">
         <thead>
           <tr>
             <th>WGP</th>

@@ -5,6 +5,8 @@ import GridLayout from "react-grid-layout";
 import "./Grid.css";
 import Home from "./Home";
 import PositionReport from "./PositionReport";
+import Positions from "./Positions";
+import PositionAdd from "./PositionAdd";
 
 const PositionsGrid = () => {
   const initlayout = [
@@ -51,10 +53,10 @@ const PositionsGrid = () => {
             <PositionReport />
           </div>
           <div id="sales2" key="b">
-            <Home />
+            <PositionAdd />
           </div>
           <div id="sales2" key="c">
-            c
+            <Positions />
           </div>
         </GridLayout>
       </div>

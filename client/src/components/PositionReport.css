@@ -1,38 +1,43 @@
+.positionreport {
+  overflow: auto;
+  height: 100%;
+}
 .positionreporttitle {
   font-family: "Roboto", sans-serif;
   color: rgb(68, 65, 162);
 }
-#positionreport {
+#positionreporttable {
   margin-top: 0.5rem;
   border-collapse: collapse;
   font-family: "Roboto", sans-serif;
 }
 
-#positionreport td {
+#positionreporttable td {
   padding-right: 3.5rem;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   padding-top: 0.1rem;
   padding-left: 0.1rem;
   font-family: "Roboto", sans-serif;
 
   /* background-color: white; */
 }
-#positionreport th {
+#positionreporttable th {
   padding-right: 3rem;
   font-size: 0.9rem;
   border: none;
   background-color: white;
   font-family: "Roboto", sans-serif;
+  font-weight: 400;
 }
 
 .fig {
   text-align: right;
 }
-#positionreport tr:hover {
+#positionreporttable tr:hover {
   background-color: #ddeaf9;
   cursor: pointer;
 }
-#positionreport .totals {
+#positionreporttable .totals {
   border-top: 1px solid black;
   height: 2rem;
   vertical-align: top;
