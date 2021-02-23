@@ -10,12 +10,12 @@ const Nav = () => {
       <button>Logistics</button> */}
       <ul id="navbar">
         <li>
-          <NavLink activeClassName="navbaractive" to="/sales">
+          <NavLink activeClassName="navbaractive" to="/management">
             Management
           </NavLink>
         </li>
         <li>
-          <NavLink activeClassName="navbaractive" to="/">
+          <NavLink exact activeClassName="navbaractive" to="/">
             Positions
           </NavLink>
         </li>

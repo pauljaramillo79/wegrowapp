@@ -3,7 +3,9 @@ import React, { useReducer, createContext } from "react";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import Login from "./components/Login";
 import Home from "./components/Home";
+import Grid1 from "./components/Grid1";
 import Header from "./components/Header";
+import PositionsGrid from "./components/PositionsGrid";
 import Register from "./components/Register";
 import Nav from "./components/Nav";
 
@@ -32,7 +34,10 @@ const reducer = (state, action) => {
         accesstoken: action.payload.accesstoken,
       };
     case "LOGOUT":
-      localStorage.clear();
+      localStorage.removeItem("user");
+      localStorage.removeItem("isAuthenticated");
+      localStorage.removeItem("refreshtoken");
+      // localStorage.clear();
       return {
         ...state,
         isAuthenticated: false,
@@ -62,7 +67,10 @@ function App() {
               <Nav />
               <Switch>
                 <Route exact path="/">
-                  <Home />
+                  <PositionsGrid />
+                </Route>
+                <Route path="/sales">
+                  <Grid1 />
                 </Route>
               </Switch>
             </Router>
