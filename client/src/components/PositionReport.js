@@ -55,10 +55,14 @@ const PositionReport = () => {
   const [gdata, setGdata] = useState({});
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(async () => {
-    await authAxios.post("/positionreport").then((result) => {
-      const rep = result.data.groupBy("productGroup");
-      setGdata(rep);
-    });
+    await authAxios
+      .post("/positionreport")
+      .then((result) => {
+        const rep = result.data.groupBy("productGroup");
+        setGdata(rep);
+      })
+      .catch((error) => console.log(error));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   var u = 0;
   var group = "";
