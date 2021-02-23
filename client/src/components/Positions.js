@@ -29,7 +29,7 @@ const Positions = () => {
   return (
     <div className="positionslist">
       <h3 className="positionslisttitle">Positions List</h3>
-      <PositionsTablesort config={CONFIG} />
+      {/* <PositionsTablesort config={CONFIG} /> */}
     </div>
   );
 };
