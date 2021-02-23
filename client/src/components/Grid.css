@@ -1,0 +1,13 @@
+.react-grid-item {
+  background-color: white;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  box-shadow: 3px 3px 30px rgb(170, 170, 170);
+}
+.gridcontainer {
+  padding-top: 9vh;
+}
+.layout {
+  background-color: rgb(223, 223, 223);
+  min-height: 100vh;
+}
