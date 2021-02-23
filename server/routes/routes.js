@@ -228,7 +228,7 @@ router.post("/positionreport", authenticateToken, async (req, res) => {
     }
   });
 });
-router.post("/positions", async (req, res) => {
+router.post("/positions", authenticateToken, async (req, res) => {
   db.query(
     "SELECT KTP AS WGP,positionID AS id, abbreviation, companyCode, packaging, shipmentStart AS Start, shipmentEnd AS End, concat('$',format(FOBCost,2)) AS FOB, format(quantityLow,2) AS quantity, year FROM positionsview",
     (err, results) => {
