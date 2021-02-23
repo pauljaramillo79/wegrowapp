@@ -4,9 +4,9 @@ import "./Positions.css";
 import Axios from "axios";
 
 const Positions = () => {
-  useEffect(() => {
-    Axios.post("/positions").then((result) => console.log(result.data));
-  }, []);
+  //   useEffect(() => {
+  //     Axios.post("/positions").then((result) => console.log(result.data));
+  //   }, []);
   // CONFIG is passed as a prop to TableSort component. Columns: in CONFIG must match the SQL query in /positions route in routes.js
   var CONFIG = {
     sort: { column: "year", order: "desc" },
@@ -33,7 +33,7 @@ const Positions = () => {
   return (
     <div className="positionslist">
       <h3 className="positionslisttitle">Positions List</h3>
-      {/* <PositionsTablesort config={CONFIG} /> */}
+      <PositionsTablesort config={CONFIG} />
     </div>
   );
 };
