@@ -1,8 +1,12 @@
-import React from "react";
+import React, { useEffect } from "react";
 import PositionsTablesort from "./PositionsTableSort";
 import "./Positions.css";
+import Axios from "axios";
 
 const Positions = () => {
+  useEffect(() => {
+    Axios.post("/positions").then((result) => console.log(result.data));
+  }, []);
   // CONFIG is passed as a prop to TableSort component. Columns: in CONFIG must match the SQL query in /positions route in routes.js
   var CONFIG = {
     sort: { column: "year", order: "desc" },
