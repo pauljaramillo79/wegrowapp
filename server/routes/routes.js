@@ -218,5 +218,14 @@ router.post("/changepassword", authenticateToken, async (req, res) => {
     }
   );
 });
-
+router.post("/positionreport", authenticateToken, async (req, res) => {
+  await db.query("SELECT * FROM positionreport", (err, results) => {
+    if (err) {
+      console.log(err);
+    }
+    if (results.length > 0) {
+      return res.status(200).send(results);
+    }
+  });
+});
 module.exports = router;
