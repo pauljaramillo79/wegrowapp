@@ -119,14 +119,18 @@ const PositionsTableSort = (props) => {
       if (operandMatch && operandMatch.length === 3) {
         filters[column] = ((match) => {
           return (x) => {
-            return operators[match[1]](x, match[2]);
+            if (x) {
+              return operators[match[1]](x, match[2]);
+            }
           };
         })(operandMatch);
       } else {
         filters[column] = (x) => {
-          return (
-            x.toString().toLowerCase().indexOf(filterText.toLowerCase()) > -1
-          );
+          if (x) {
+            return (
+              x.toString().toLowerCase().indexOf(filterText.toLowerCase()) > -1
+            );
+          }
         };
       }
     }
@@ -140,11 +144,29 @@ const PositionsTableSort = (props) => {
   if (sort.order === "desc") sortedItems.reverse();
   var cell = function (x) {
     return columnNames.map(function (c, i) {
-      return (
-        <td id={c + "-" + x.id} key={c + "-" + x.id}>
-          {x[c]}
-        </td>
-      );
+      if (typeof x[c] == "number") {
+        console.log(c, typeof x[c], x[c].toFixed(2));
+      }
+      if (c === "quantity") {
+        return (
+          <td id={c + "-" + x.id} key={c + "-" + x.id}>
+            {x[c].toFixed(2)}
+          </td>
+        );
+      }
+      if (c === "FOB") {
+        return (
+          <td id={c + "-" + x.id} key={c + "-" + x.id}>
+            {"$" + x[c].toFixed(2)}
+          </td>
+        );
+      } else {
+        return (
+          <td id={c + "-" + x.id} key={c + "-" + x.id}>
+            {x[c]}
+          </td>
+        );
+      }
     });
   };
 

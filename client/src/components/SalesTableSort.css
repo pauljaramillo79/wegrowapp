@@ -40,3 +40,18 @@
 .sales-filter input {
   width: 100%;
 }
+td[id^="materialCost"] {
+  text-align: right;
+}
+td[id^="oFreight"] {
+  text-align: right;
+}
+td[id^="priceBeforeInterest"] {
+  text-align: right;
+}
+td[id^="tradingProfit"] {
+  text-align: right;
+}
+td[id^="tradingMargin"] {
+  text-align: right;
+}

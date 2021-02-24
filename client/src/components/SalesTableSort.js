@@ -119,14 +119,18 @@ const SalesTableSort = (props) => {
       if (operandMatch && operandMatch.length === 3) {
         filters[column] = ((match) => {
           return (x) => {
-            return operators[match[1]](x, match[2]);
+            if (x) {
+              return operators[match[1]](x, match[2]);
+            }
           };
         })(operandMatch);
       } else {
         filters[column] = (x) => {
-          return (
-            x.toString().toLowerCase().indexOf(filterText.toLowerCase()) > -1
-          );
+          if (x) {
+            return (
+              x.toString().toLowerCase().indexOf(filterText.toLowerCase()) > -1
+            );
+          }
         };
       }
     }
@@ -140,11 +144,72 @@ const SalesTableSort = (props) => {
   if (sort.order === "desc") sortedItems.reverse();
   var cell = function (x) {
     return columnNames.map(function (c, i) {
-      return (
-        <td id={c + "-" + x.QSID} key={c + "-" + x.QSID}>
-          {x[c]}
-        </td>
-      );
+      if (c === "quantity") {
+        if (x[c]) {
+          return (
+            <td id={c + "-" + x.QSID} key={c + "-" + x.QSID}>
+              {x[c].toFixed(2)}
+            </td>
+          );
+        } else {
+          return (
+            <td id={c + "-" + x.QSID} key={c + "-" + x.QSID}>
+              {"na"}
+            </td>
+          );
+        }
+      }
+      if (
+        c === "materialCost" ||
+        c === "oFreight" ||
+        c === "priceBeforeInterest" ||
+        c === "tradingProfit" ||
+        c === "tradingMargin" ||
+        c === "netback"
+      ) {
+        if (x[c]) {
+          return (
+            <td id={c + "-" + x.QSID} key={c + "-" + x.QSID}>
+              {"$" + x[c].toFixed(2)}
+            </td>
+          );
+        } else {
+          return (
+            <td id={c + "-" + x.QSID} key={c + "-" + x.QSID}>
+              {""}
+            </td>
+          );
+        }
+      }
+      if (c === "percentageMargin") {
+        if (x[c]) {
+          return (
+            <td id={c + "-" + x.QSID} key={c + "-" + x.QSID}>
+              {x[c].toFixed(2) + "%"}
+            </td>
+          );
+        } else {
+          return (
+            <td id={c + "-" + x.QSID} key={c + "-" + x.QSID}>
+              {""}
+            </td>
+          );
+        }
+      } else {
+        if (x[c]) {
+          return (
+            <td id={c + "-" + x.QSID} key={c + "-" + x.QSID}>
+              {x[c]}
+            </td>
+          );
+        } else {
+          return (
+            <td id={c + "-" + x.QSID} key={c + "-" + x.QSID}>
+              {""}
+            </td>
+          );
+        }
+      }
     });
   };
 

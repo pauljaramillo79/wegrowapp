@@ -230,7 +230,7 @@ router.post("/positionreport", authenticateToken, async (req, res) => {
 });
 router.post("/positions", authenticateToken, async (req, res) => {
   db.query(
-    "SELECT KTP AS WGP,positionID AS id, abbreviation, companyCode, packaging, shipmentStart AS Start, shipmentEnd AS End, concat('$',format(FOBCost,2)) AS FOB, format(quantityLow,2) AS quantity, year FROM positionsview",
+    "SELECT KTP AS WGP,positionID AS id, abbreviation, companyCode, packaging, shipmentStart AS Start, shipmentEnd AS End, FOBCost AS FOB, quantityLow AS quantity, year FROM positionsview",
     (err, results) => {
       if (err) {
         console.log(err);
@@ -243,7 +243,8 @@ router.post("/positions", authenticateToken, async (req, res) => {
 });
 router.post("/sales", authenticateToken, async (req, res) => {
   db.query(
-    "SELECT DATE_FORMAT(QSDate,'%m/%d/%Y') AS QSDate,  QSID, saleType, KTP AS WGP, KTS AS WGS, abbreviation, supplier, customer, packingSize, marks, trader, beginning, finish, portOfLoad, portOfDestination, format(quantity,2) AS quantity, incoterms, paymentTerm, concat('$',format(materialCost,2)) AS materialCost, FreightTotal, freightCompany, oFreight, priceBeforeInterest, tradingProfit, tradingMargin, percentageMargin, netback, saleComplete FROM qsviewshort WHERE DATE_FORMAT(QSDate,'%Y')>(YEAR(CURDATE())-2) ORDER BY QSID Desc",
+    "SELECT DATE_FORMAT(QSDate,'%m/%d/%Y') AS QSDate,  QSID, saleType, KTP AS WGP, KTS AS WGS, abbreviation, supplier, customer, packingSize, marks, trader, beginning, finish, portOfLoad, portOfDestination, quantity, incoterms, paymentTerm, materialCost, FreightTotal, freightCompany, oFreight, priceBeforeInterest, tradingProfit, tradingMargin, (percentageMargin*100) AS percentageMargin, netback, saleComplete FROM qsviewshort ORDER BY QSID Desc LIMIT 300",
+    //WHERE DATE_FORMAT(QSDate,'%Y')>(YEAR(CURDATE())-2)
     (err, results) => {
       if (err) {
         console.log(err);
