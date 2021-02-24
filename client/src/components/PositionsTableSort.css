@@ -46,3 +46,27 @@ table thead tr:nth-child(1) th {
 .tablesorter .lastheader {
   background: #f5f5f5;
 }
+.filter-WGP input {
+  width: 70px;
+}
+.filter-abbreviation input {
+  width: 110px;
+}
+.filter-packaging input {
+  width: 70px;
+}
+.filter-Start input {
+  width: 90px;
+}
+.filter-End input {
+  width: 90px;
+}
+.filter-FOB input {
+  width: 90px;
+}
+.filter-quantity input {
+  width: 90px;
+}
+.filter-year input {
+  width: 90px;
+}

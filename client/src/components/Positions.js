@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import PositionsTablesort from "./PositionsTableSort";
+import PositionsTableSort from "./PositionsTableSort";
 import "./Positions.css";
 import Axios from "axios";
 
@@ -33,7 +33,7 @@ const Positions = () => {
   return (
     <div className="positionslist">
       <h3 className="positionslisttitle">Positions List</h3>
-      <PositionsTablesort config={CONFIG} />
+      <PositionsTableSort config={CONFIG} />
     </div>
   );
 };

@@ -3,11 +3,11 @@ import React, { useState, useEffect, useContext } from "react";
 import Axios from "axios";
 import _ from "lodash";
 import "./css/screen.css";
-import "./PositionsTableSort.css";
-import PositionModal from "../components/PositionModal";
+import PositionModal from "./PositionModal";
 import { AuthContext } from "../App";
+import "./SalesTableSort.css";
 
-const PositionsTableSort = (props) => {
+const SalesTableSort = (props) => {
   const { state } = useContext(AuthContext);
   // Get token values from UseContext and Local Storage
   let accesstoken = state.accesstoken;
@@ -33,7 +33,7 @@ const PositionsTableSort = (props) => {
         const res = await refreshAxios.post("/refreshtoken");
         accesstoken = res.data.accesstoken;
         return await authAxios.post(
-          "/positions",
+          "/sales",
           {},
           {
             headers: {
@@ -64,7 +64,7 @@ const PositionsTableSort = (props) => {
   const [postoedit, setPostoedit] = useState({});
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(async () => {
-    await authAxios.post("/positions").then((result) => {
+    await authAxios.post("/sales").then((result) => {
       setItems(result.data);
       setColumnNames(Object.keys(columns));
     });
@@ -141,7 +141,7 @@ const PositionsTableSort = (props) => {
   var cell = function (x) {
     return columnNames.map(function (c, i) {
       return (
-        <td id={c + "-" + x.id} key={c + "-" + x.id}>
+        <td id={c + "-" + x.QSID} key={c + "-" + x.QSID}>
           {x[c]}
         </td>
       );
@@ -175,7 +175,7 @@ const PositionsTableSort = (props) => {
 
   const filterInputs = columnNames.map((c) => {
     return (
-      <td className={"filter-" + c}>
+      <td className="sales-filter">
         <input
           type="text"
           value={columns[c].filterText}
@@ -211,4 +211,4 @@ const PositionsTableSort = (props) => {
   );
 };
 
-export default PositionsTableSort;
+export default SalesTableSort;

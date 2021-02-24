@@ -3,7 +3,7 @@ import React, { useReducer, createContext } from "react";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import Login from "./components/Login";
 import Home from "./components/Home";
-import Grid1 from "./components/Grid1";
+import SalesGrid from "./components/SalesGrid";
 import Header from "./components/Header";
 import PositionsGrid from "./components/PositionsGrid";
 import Register from "./components/Register";
@@ -70,7 +70,7 @@ function App() {
                   <PositionsGrid />
                 </Route>
                 <Route path="/sales">
-                  <Grid1 />
+                  <SalesGrid />
                 </Route>
               </Switch>
             </Router>

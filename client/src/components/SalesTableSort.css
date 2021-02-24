@@ -1,0 +1,42 @@
+/* .sales-filter-QSDate input {
+  width: 70px;
+  width: 100%;
+}
+.sales-filter-QSID input {
+  width: 60px;
+  width: 100%;
+}
+.sales-filter-saleType input {
+  width: 90px;
+}
+.sales-filter-WGP input {
+  width: 70px;
+}
+.sales-filter-WGS input {
+  width: 70px;
+}
+.sales-filter-abbreviation input {
+  width: 90px;
+  width: 100%;
+}
+.sales-filter-supplier input {
+  width: 90px;
+}
+.sales-filter-customer input {
+  width: 90px;
+}
+.sales-filter-beginning input {
+  width: 90px;
+}
+.sales-filter-finish input {
+  width: 90px;
+}
+.sales-filter-portOfLoad input {
+  width: 90px;
+}
+.sales-filter-porOfDestination input {
+  width: 90px;
+} */
+.sales-filter input {
+  width: 100%;
+}

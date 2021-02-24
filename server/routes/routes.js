@@ -241,4 +241,17 @@ router.post("/positions", authenticateToken, async (req, res) => {
     }
   );
 });
+router.post("/sales", authenticateToken, async (req, res) => {
+  db.query(
+    "SELECT DATE_FORMAT(QSDate,'%m/%d/%Y') AS QSDate,  QSID, saleType, KTP AS WGP, KTS AS WGS, abbreviation, supplier, customer, packingSize, marks, trader, beginning, finish, portOfLoad, portOfDestination, format(quantity,2) AS quantity, incoterms, paymentTerm, concat('$',format(materialCost,2)) AS materialCost, FreightTotal, freightCompany, oFreight, priceBeforeInterest, tradingProfit, tradingMargin, percentageMargin, netback, saleComplete FROM qsviewshort WHERE DATE_FORMAT(QSDate,'%Y')>(YEAR(CURDATE())-2) ORDER BY QSID Desc",
+    (err, results) => {
+      if (err) {
+        console.log(err);
+      }
+      if (results.length > 0) {
+        return res.status(200).send(results);
+      }
+    }
+  );
+});
 module.exports = router;

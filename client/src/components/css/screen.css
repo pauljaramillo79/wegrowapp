@@ -165,7 +165,7 @@ a {
 .tablesorter tbody > tr:hover > td {
   color: #000;
   background: #ddeaf9;
-  font-weight: bold;
+  /* font-weight: bold; */
 }
 /* End Table Sorter */
 
@@ -188,4 +188,7 @@ code {
 
 h2 {
   margin-bottom: 10px;
+}
+.tablesorter thead td .sales-filter {
+  margin-right: 10px;
 }
