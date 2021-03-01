@@ -255,4 +255,30 @@ router.post("/sales", authenticateToken, async (req, res) => {
     }
   );
 });
+router.post("/suppliers", (req, res) => {
+  db.query(
+    "SELECT supplierID, companyCode FROM supplierlist",
+    (err, results) => {
+      if (err) {
+        console.log(err);
+      }
+      if (results.length > 0) {
+        return res.status(200).send(results);
+      }
+    }
+  );
+});
+router.post("/productlist", (req, res) => {
+  db.query(
+    "SELECT productID, abbreviation, supplierlist.supplierID, companyCode FROM productList INNER JOIN prodNames ON productList.productName = prodNames.prodNameID INNER JOIN supplierList ON productList.supplierID = supplierList.supplierID ORDER BY productID ASC",
+    (err, results) => {
+      if (err) {
+        console.log(err);
+      }
+      if (results.length > 0) {
+        return res.status(200).send(results);
+      }
+    }
+  );
+});
 module.exports = router;

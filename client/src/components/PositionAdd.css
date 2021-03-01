@@ -11,11 +11,26 @@
   flex-direction: column;
   margin-top: 0.5rem;
 }
+#positionaddform .form-group {
+  padding-bottom: 0;
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+}
+#positionaddform label {
+  font-family: "Roboto", sans-serif;
+  font-size: 0.9rem;
+  flex: 1;
+  flex-basis: 20%;
+}
 #positionaddform input {
   margin-bottom: 0.6rem;
   padding: 0.3rem;
   /* border: none; */
   border: 1px solid rgb(160, 182, 103);
+  margin-left: 0;
+  flex: 4;
+  flex-basis: 80%;
 }
 #positionaddform button {
   padding: 0.3rem 1.5rem;

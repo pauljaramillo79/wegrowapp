@@ -48,6 +48,7 @@ const PositionsGrid = () => {
           rowHeight={30}
           width={1860}
           onLayoutChange={onLayoutChange}
+          margin={[20, 20]}
         >
           <div id="sales1" key="a">
             <PositionReport />

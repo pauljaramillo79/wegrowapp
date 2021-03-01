@@ -48,7 +48,7 @@ const ChangePwdModal = ({
     const value = e.target.value;
     const validPasswordRegex = RegExp(
       //   "^(((?=.*[a-z])(?=.*[A-Z]))|((?=.*[a-z])(?=.*[0-9]))|((?=.*[A-Z])(?=.*[0-9])))(?=.{6,})"
-      "^((?=.{8,})(?=.*[a-z])(?=.*[A-Z])(?=.*[0=9])(?=.*[@#$%^&+=]))"
+      "^(?=.{8,})(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[@#$%^&+=]).*$"
     );
     switch (field) {
       case "oldpassword":

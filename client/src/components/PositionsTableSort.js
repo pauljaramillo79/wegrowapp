@@ -144,9 +144,6 @@ const PositionsTableSort = (props) => {
   if (sort.order === "desc") sortedItems.reverse();
   var cell = function (x) {
     return columnNames.map(function (c, i) {
-      if (typeof x[c] == "number") {
-        console.log(c, typeof x[c], x[c].toFixed(2));
-      }
       if (c === "quantity") {
         return (
           <td id={c + "-" + x.id} key={c + "-" + x.id}>

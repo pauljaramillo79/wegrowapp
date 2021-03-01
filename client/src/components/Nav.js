@@ -15,6 +15,11 @@ const Nav = () => {
           </NavLink>
         </li>
         <li>
+          <NavLink activeClassName="navbaractive" to="/analysis">
+            Analysis
+          </NavLink>
+        </li>
+        <li>
           <NavLink exact activeClassName="navbaractive" to="/">
             Positions
           </NavLink>
@@ -26,8 +31,18 @@ const Nav = () => {
           </NavLink>
         </li>
         <li>
+          <NavLink activeClassName="navbaractive" to="/purchases">
+            Purchases
+          </NavLink>
+        </li>
+        <li>
           <NavLink activeClassName="navbaractive" to="/logistics">
             Logistics
+          </NavLink>
+        </li>
+        <li>
+          <NavLink activeClassName="navbaractive" to="/knowledge">
+            Knowledge
           </NavLink>
         </li>
         <li>
