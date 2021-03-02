@@ -58,6 +58,7 @@ const SearchField = ({
         onDoubleClick={(e) => {
           e.target.select();
         }}
+        required
       />
       <div className="flexbreak"></div>
       <div className="presearchresults"></div>
