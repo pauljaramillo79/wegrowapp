@@ -3,10 +3,11 @@ import "../../node_modules/react-grid-layout/css/styles.css";
 import "../../node_modules/react-resizable/css/styles.css";
 import GridLayout from "react-grid-layout";
 import "./Grid.css";
+import MgmtKeyFigures from "./MgmtKeyFigures";
 
 const ManagementGrid = () => {
   const initlayout = [
-    { i: "a", x: 0, y: 0, w: 8, h: 8 },
+    { i: "a", x: 0, y: 0, w: 5, h: 11, isDraggable: true, isResizable: false },
     { i: "b", x: 21, y: 0, w: 10, h: 12 },
     // { i: "c", x: 0, y: 12, w: 21, h: 8 },
   ];
@@ -44,7 +45,7 @@ const ManagementGrid = () => {
           margin={[20, 20]}
         >
           <div id="keyfigures" key="a">
-            Key Figures Here
+            <MgmtKeyFigures />
           </div>
           <div id="graph" key="b">
             Graph Here{" "}
