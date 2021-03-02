@@ -1,5 +1,5 @@
 // require("dotenv").config({ path: __dirname + "/../config/.env" });
-
+const moment = require("moment");
 const express = require("express");
 const router = express();
 const db = require("../config/pool");
@@ -281,4 +281,63 @@ router.post("/productlist", (req, res) => {
     }
   );
 });
+router.post("/checkposition", (req, res) => {
+  WGP = req.body.WGP;
+  db.query(`SELECT KTP from positions WHERE KTP='${WGP}'`, (err, results) => {
+    if (err) {
+      console.log(err);
+    }
+    if (results.length > 0) {
+      return res.json({
+        msg:
+          "Position number must be unique. This position number already exists",
+      });
+    } else {
+      return res.json({
+        msg: "OK",
+      });
+    }
+  });
+});
+router.post("/addposition", (req, res) => {
+  let {
+    WGP,
+    supplier,
+    product,
+    quantitylow,
+    quantityhigh,
+    FOB,
+    from,
+    to,
+  } = req.body.postoadd;
+  from = moment(from).format("MMMM");
+  to = moment(to).format("MMMM");
+  positiondate = moment(new Date()).format("YYYY-MM-DD HH:mm:ss");
+  db.query(
+    "INSERT INTO positions (KTP, supplier, productID, quantityLow, quantityHigh, FOBCost, shipmentStart, shipmentEnd, positionDate) VALUES (?,?,?,?,?,?,?,?,?);",
+    [
+      WGP,
+      supplier,
+      product,
+      quantitylow,
+      quantityhigh,
+      FOB,
+      from,
+      to,
+      positiondate,
+    ],
+    (err) => {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log("Added position");
+        return res.json({
+          success: true,
+          message: "Succesfully added position",
+        });
+      }
+    }
+  );
+});
+
 module.exports = router;

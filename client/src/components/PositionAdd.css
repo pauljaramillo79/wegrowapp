@@ -22,9 +22,10 @@
   font-size: 0.9rem;
   flex: 1;
   flex-basis: 20%;
+  margin-top: 0.7rem;
 }
 #positionaddform input {
-  margin-bottom: 0.6rem;
+  margin-top: 0.6rem;
   padding: 0.3rem;
   /* border: none; */
   border: 1px solid rgb(160, 182, 103);
@@ -33,6 +34,7 @@
   flex-basis: 80%;
 }
 #positionaddform button {
+  margin-top: 1.5rem;
   padding: 0.3rem 1.5rem;
   border: 2px solid rgb(68, 65, 162);
   background-color: transparent;
@@ -43,4 +45,10 @@
   background-color: rgb(68, 65, 162);
   color: white;
   cursor: pointer;
+}
+.posadderror {
+  color: red;
+  font-size: 0.85rem;
+  margin-left: 20%;
+  /* margin-bottom: 0.5rem; */
 }
