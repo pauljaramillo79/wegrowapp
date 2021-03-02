@@ -8,6 +8,8 @@ import Header from "./components/Header";
 import PositionsGrid from "./components/PositionsGrid";
 import Register from "./components/Register";
 import Nav from "./components/Nav";
+import { RefreshPositionsProvider } from "./contexts/RefreshPositionsProvider";
+import ManagementGrid from "./components/ManagementGrid";
 
 export const AuthContext = createContext();
 
@@ -56,28 +58,33 @@ const reducer = (state, action) => {
 function App() {
   const [state, dispatch] = useReducer(reducer, initialState);
   return (
-    <AuthContext.Provider value={{ state, dispatch }}>
-      <div className="App">
-        {!state.isAuthenticated ? (
-          <Login />
-        ) : (
-          <>
-            <Header />
-            <Router>
-              <Nav />
-              <Switch>
-                <Route exact path="/">
-                  <PositionsGrid />
-                </Route>
-                <Route path="/sales">
-                  <SalesGrid />
-                </Route>
-              </Switch>
-            </Router>
-          </>
-        )}
-      </div>
-    </AuthContext.Provider>
+    <RefreshPositionsProvider>
+      <AuthContext.Provider value={{ state, dispatch }}>
+        <div className="App">
+          {!state.isAuthenticated ? (
+            <Login />
+          ) : (
+            <>
+              <Header />
+              <Router>
+                <Nav />
+                <Switch>
+                  <Route exact path="/">
+                    <PositionsGrid />
+                  </Route>
+                  <Route path="/sales">
+                    <SalesGrid />
+                  </Route>
+                  <Route path="/management">
+                    <ManagementGrid />
+                  </Route>
+                </Switch>
+              </Router>
+            </>
+          )}
+        </div>
+      </AuthContext.Provider>
+    </RefreshPositionsProvider>
   );
 }
 

@@ -6,9 +6,11 @@ import "./css/screen.css";
 import "./PositionsTableSort.css";
 import PositionModal from "../components/PositionModal";
 import { AuthContext } from "../App";
+import { RefreshPositionsContext } from "../contexts/RefreshPositionsProvider";
 
 const PositionsTableSort = (props) => {
   const { state } = useContext(AuthContext);
+  const { posrefresh } = useContext(RefreshPositionsContext);
   // Get token values from UseContext and Local Storage
   let accesstoken = state.accesstoken;
   let refreshtoken = JSON.parse(localStorage.getItem("refreshtoken"));
@@ -69,7 +71,7 @@ const PositionsTableSort = (props) => {
       setColumnNames(Object.keys(columns));
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [posrefresh]);
   const handleFilterTextChange = (e, column) => {
     setColumns({
       ...columns,

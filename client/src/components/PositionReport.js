@@ -2,10 +2,11 @@ import React, { useState, useEffect, useContext } from "react";
 import Axios from "axios";
 import { AuthContext } from "../App";
 import "./PositionReport.css";
+import { RefreshPositionsContext } from "../contexts/RefreshPositionsProvider";
 
 const PositionReport = () => {
   const { state } = useContext(AuthContext);
-
+  const { posrefresh } = useContext(RefreshPositionsContext);
   // Get token values from UseContext and Local Storage
   let accesstoken = state.accesstoken;
   let refreshtoken = JSON.parse(localStorage.getItem("refreshtoken"));
@@ -63,7 +64,7 @@ const PositionReport = () => {
       })
       .catch((error) => console.log(error));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [posrefresh]);
   var u = 0;
   var group = "";
   var prod = {};
