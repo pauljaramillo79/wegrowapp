@@ -339,5 +339,21 @@ router.post("/addposition", (req, res) => {
     }
   );
 });
+router.post("/keyfigures", (req, res) => {
+  let currentyear = moment().format("YYYY");
+  let lastyear = Number(currentyear) - 1;
+  db.query(
+    "SELECT DATE_FORMAT(QSDate, '%Y') AS Year, SUM(quantity) AS Sales, SUM(salesTurnover) AS Revenue,  SUM(tradingMargin) AS Margin, SUM(tradingMargin)/SUM(quantity) AS Profit, COUNT(salesTurnover) AS Operations FROM quotationsheet WHERE ? <= DATE_FORMAT(QSDate, '%Y') && saleComplete=-1 GROUP BY DATE_FORMAT(QSDate,'%Y')",
+    [lastyear],
+    (err, results) => {
+      if (err) {
+        console.log(err);
+      }
+      if (results.length > 0) {
+        return res.status(200).send(results);
+      }
+    }
+  );
+});
 
 module.exports = router;
