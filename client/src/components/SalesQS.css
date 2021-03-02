@@ -1,0 +1,96 @@
+.salesQS {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  /* border: solid black 1px; */
+  font-family: "Roboto", sans-serif;
+  font-size: 0.9rem;
+}
+.salesQS-form {
+  display: flex;
+  width: 100%;
+  flex-wrap: wrap;
+}
+.salesQS-form section {
+  padding: 1rem;
+}
+.salesQS-form fieldset {
+  border: solid 1px black;
+  border-style: groove;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+  background-color: rgba(160, 182, 103, 0.2);
+}
+.salesQS-form legend {
+  /* background-color: white; */
+  font-weight: 900;
+  color: rgb(68, 65, 162);
+  font-size: 1rem;
+}
+.salesQS-form input {
+  border: black solid 1px;
+  line-height: 1.2rem;
+}
+.salesQS-form .form-group {
+  width: 100%;
+  padding-bottom: 0.3rem;
+  display: flex;
+  flex-wrap: wrap;
+}
+.salesQS-form .form-group label {
+  flex: 1;
+  flex-basis: 32%;
+}
+.salesQS-form .form-group input {
+  flex: 1;
+  flex-basis: 10%;
+}
+#salesQS-1 {
+  /* border: solid 1px black; */
+  flex: 1;
+  flex-basis: 18%;
+  min-height: 100%;
+}
+#salesQS-2 {
+  /* border: solid 1px black; */
+  flex: 1;
+  flex-basis: 22%;
+  min-height: 100%;
+}
+#salesQS-3 {
+  /* border: solid 1px black; */
+  flex: 1;
+  flex-basis: 50%;
+  min-height: 100%;
+}
+#salesQS-3-fieldset {
+  display: flex;
+  width: 100%;
+  flex-wrap: wrap;
+  height: 86%;
+}
+#salesQS-3-col1 {
+  /* border: solid 1px black; */
+  flex: 1;
+  flex-basis: 50%;
+}
+#salesQS-3-col2 {
+  /* border: solid 1px black; */
+  flex: 1;
+  flex-basis: 50%;
+}
+.salesQS-form button {
+  width: 32%;
+  margin-right: 0.5rem;
+  padding: 0.3rem 1.5rem;
+  border: 2px solid rgb(68, 65, 162);
+  background-color: transparent;
+  border-radius: 3rem;
+  margin-top: 0.5rem;
+}
+.salesQS-form button:hover {
+  background-color: rgb(68, 65, 162);
+  color: white;
+}

@@ -4,6 +4,7 @@ import "../../node_modules/react-resizable/css/styles.css";
 import GridLayout from "react-grid-layout";
 import "./Grid.css";
 import Sales from "./Sales";
+import SalesQS from "./SalesQS";
 
 const SalesGrid = () => {
   const initlayout = [
@@ -51,7 +52,7 @@ const SalesGrid = () => {
             <Sales />
           </div>
           <div id="sales2" key="b">
-            Sales Quotation Sheet
+            <SalesQS />
           </div>
           {/* <div id="sales2" key="c"></div> */}
         </GridLayout>
