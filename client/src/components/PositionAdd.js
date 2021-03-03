@@ -140,7 +140,7 @@ const PositionAdd = () => {
             searchURL={"/productlist"}
             searchName={"abbreviation"}
             searchID={"productID"}
-            otherName={"companyCode"}
+            otherName={"supplier"}
             otherID={"supplierID"}
             placeholder={"Product..."}
             setProdSupplier={setProdSupplier}

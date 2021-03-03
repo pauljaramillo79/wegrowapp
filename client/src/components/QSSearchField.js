@@ -46,9 +46,13 @@ const QSSearchField = ({
             setShow(false);
           }
         } else {
-          return (item[searchName] + item[searchID])
-            .toLowerCase()
-            .includes(searchTerm);
+          if (searchTerm != "") {
+            return (item[searchName] + item[searchID])
+              .toLowerCase()
+              .includes(searchTerm);
+          } else {
+            setShow(false);
+          }
         }
       });
       setSearchResults(results);
@@ -96,7 +100,6 @@ const QSSearchField = ({
                             selecteditem.lastIndexOf(")")
                           );
                           let name2 = selecteditem.split(") ")[2];
-                          console.log(name2);
                           setQSFields(
                             ID1,
                             ID2,
@@ -124,12 +127,35 @@ const QSSearchField = ({
                     <>
                       <li
                         onClick={(e) => {
-                          setSearchTerm(
-                            item[searchID] + " - " + item[searchName]
+                          let selecteditem = e.target.innerText;
+                          let ID1 = selecteditem.substring(
+                            selecteditem.indexOf("(") + 1,
+                            selecteditem.indexOf(")")
                           );
+                          let name1 = selecteditem.split(") - ")[1];
+
+                          console.log(ID1, name1);
+                          // setSearchTerm(
+                          //   item[searchID] + " - " + item[searchName]
+                          // );
+                          setQSFields(
+                            ID1,
+                            "",
+                            searchName,
+                            "",
+                            name1,
+                            ""
+                            // item[searchID],
+                            // item[otherID],
+                            // item[searchName],
+                            // item[otherName]
+                          );
+                          setSearchValue(item[searchName]);
+                          setSearchTerm(item[searchName]);
+                          setShow(false);
                         }}
                       >
-                        {item[searchID]} - {item[searchName]}
+                        ({item[searchID]}) - {item[searchName]}
                       </li>
                     </>
                   );

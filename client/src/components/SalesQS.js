@@ -5,27 +5,60 @@ import QSSearchField from "./QSSearchField";
 
 const SalesQS = () => {
   const QSDataInit = {
+    saleType: "",
     QSDate: moment().format("yyyy-MM-DD"),
     abbreviation: "",
-    companyCode: "",
+    supplier: "",
+    customer: "",
+    packsize: "",
+    marks: "",
+    from: "",
+    to: "",
   };
   const QSValuesInit = {
+    saleType: "",
     QSDate: moment().format("yyyy-MM-DD"),
     abbreviation: "",
-    companyCode: "",
+    supplier: "",
+    customer: "",
+    packsize: "",
+    marks: "",
+    from: "",
+    to: "",
   };
   const [QSData, setQSData] = useState(QSDataInit);
   const [QSValues, setQSValues] = useState(QSValuesInit);
   const setQSFields = (ID1, ID2, Field1, Field2, name1, name2) => {
+    if (ID2 === "" && Field2 === "" && name2 === "") {
+      setQSData({
+        ...QSData,
+        [Field1]: ID1,
+      });
+      setQSValues({
+        ...QSValues,
+        [Field1]: name1,
+      });
+    } else {
+      setQSData({
+        ...QSData,
+        [Field1]: ID1,
+        [Field2]: ID2,
+      });
+      setQSValues({
+        ...QSValues,
+        [Field1]: name1,
+        [Field2]: name2,
+      });
+    }
+  };
+  const handleChange = (e) => {
     setQSData({
       ...QSData,
-      [Field1]: ID1,
-      [Field2]: ID2,
+      [e.target.name]: e.target.value,
     });
     setQSValues({
       ...QSValues,
-      [Field1]: name1,
-      [Field2]: name2,
+      [e.target.name]: e.target.value,
     });
   };
   return (
@@ -41,13 +74,27 @@ const SalesQS = () => {
             <legend>Sale Type:</legend>
             {/* <div className="form-group"> */}
             <p>
-              <input name="saletype" type="radio" />
+              <input
+                name="saletype"
+                type="radio"
+                onClick={(e) => {
+                  setQSData({ ...QSData, saleType: 1 });
+                  setQSValues({ ...QSValues, saleType: "Back-to-back" });
+                }}
+              />
               <label htmlFor="">Back-to-back</label>
             </p>
             {/* </div> */}
             {/* <div className="form-group"> */}
             <p>
-              <input name="saletype" type="radio" />
+              <input
+                name="saletype"
+                type="radio"
+                onClick={(e) => {
+                  setQSData({ ...QSData, saleType: 2 });
+                  setQSValues({ ...QSValues, saleType: "Position" });
+                }}
+              />
               <label htmlFor="">Position</label>
               {/* </div> */}
             </p>
@@ -66,7 +113,7 @@ const SalesQS = () => {
                 searchURL={"/productlist"}
                 searchName={"abbreviation"}
                 searchID={"productID"}
-                otherName={"companyCode"}
+                otherName={"supplier"}
                 otherID={"supplierID"}
                 placeholder={"Product..."}
                 setQSFields={setQSFields}
@@ -77,14 +124,21 @@ const SalesQS = () => {
               <label htmlFor="">Supplier:</label>
               <input
                 placeholder="Supplier..."
-                value={QSValues.companyCode}
+                value={QSValues.supplier}
                 type="text"
                 readOnly
               />
             </div>
             <div className="form-group">
               <label htmlFor="">Customer:</label>
-              <input type="text" />
+              <QSSearchField
+                className="searchfield"
+                searchURL={"/customers"}
+                searchName={"customer"}
+                searchID={"customerID"}
+                placeholder={"Customer..."}
+                setQSFields={setQSFields}
+              />
             </div>
             <div className="form-group">
               <label htmlFor="">Contact:</label>
@@ -95,11 +149,21 @@ const SalesQS = () => {
             <legend>Packaging:</legend>
             <div className="form-group">
               <label htmlFor="">Pack Size:</label>
-              <input type="text" />
+              <input
+                value={QSData.packsize}
+                onChange={handleChange}
+                name="packsize"
+                type="text"
+              />
             </div>
             <div className="form-group">
               <label htmlFor="">Marks:</label>
-              <input type="text" />
+              <input
+                name="marks"
+                onChange={handleChange}
+                value={QSData.marks}
+                type="text"
+              />
             </div>
           </fieldset>
           <fieldset>
@@ -107,20 +171,44 @@ const SalesQS = () => {
             {/* <div className="form-group"> */}
             <div className="form-group">
               <label htmlFor="">From:</label>
-              <input type="date" />
+              <input
+                name="from"
+                onChange={handleChange}
+                value={QSData.from}
+                type="date"
+              />
             </div>
             <div className="form-group">
               <label htmlFor="">To:</label>
-              <input type="date" />
+              <input
+                name="to"
+                onChange={handleChange}
+                value={QSData.to}
+                type="date"
+              />
             </div>
             {/* </div> */}
             <div className="form-group">
               <label htmlFor="">POL:</label>
-              <input type="text" />
+              <QSSearchField
+                className="searchfield"
+                searchURL={"/POLS"}
+                searchName={"POL"}
+                searchID={"POLID"}
+                placeholder={"POL..."}
+                setQSFields={setQSFields}
+              />
             </div>
             <div className="form-group">
               <label htmlFor="">POD:</label>
-              <input type="text" />
+              <QSSearchField
+                className="searchfield"
+                searchURL={"/PODS"}
+                searchName={"POD"}
+                searchID={"PODID"}
+                placeholder={"POD..."}
+                setQSFields={setQSFields}
+              />
             </div>
           </fieldset>
         </section>

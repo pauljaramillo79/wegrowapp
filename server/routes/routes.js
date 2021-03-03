@@ -268,9 +268,45 @@ router.post("/suppliers", (req, res) => {
     }
   );
 });
+router.post("/customers", (req, res) => {
+  db.query(
+    "SELECT customerID, companyCode AS customer FROM customerList",
+    (err, results) => {
+      if (err) {
+        console.log(err);
+      }
+      if (results.length > 0) {
+        return res.status(200).send(results);
+      }
+    }
+  );
+});
+router.post("/POLS", (req, res) => {
+  db.query("SELECT POLID, portOfLoad AS POL FROM POLList", (err, results) => {
+    if (err) {
+      console.log(err);
+    }
+    if (results.length > 0) {
+      return res.status(200).send(results);
+    }
+  });
+});
+router.post("/PODS", (req, res) => {
+  db.query(
+    "SELECT PODID, portOfDestination AS POD FROM PODList",
+    (err, results) => {
+      if (err) {
+        console.log(err);
+      }
+      if (results.length > 0) {
+        return res.status(200).send(results);
+      }
+    }
+  );
+});
 router.post("/productlist", (req, res) => {
   db.query(
-    "SELECT productID, abbreviation, supplierlist.supplierID, companyCode FROM productList INNER JOIN prodNames ON productList.productName = prodNames.prodNameID INNER JOIN supplierlist ON productList.supplierID = supplierlist.supplierID ORDER BY productID ASC",
+    "SELECT productID, abbreviation, supplierlist.supplierID, companyCode AS supplier FROM productList INNER JOIN prodNames ON productList.productName = prodNames.prodNameID INNER JOIN supplierlist ON productList.supplierID = supplierlist.supplierID ORDER BY productID ASC",
     (err, results) => {
       if (err) {
         console.log(err);
