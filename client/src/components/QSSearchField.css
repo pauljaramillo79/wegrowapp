@@ -1,0 +1,51 @@
+/* .searchfield {
+  display: flex;
+  flex-direction: column;
+} */
+.QSsearchresults-container {
+  position: relative;
+  display: flex;
+  /* border: solid 1px gray; */
+}
+.QSsearchresults {
+  background-color: white;
+  position: absolute;
+  top: -20px;
+  font-family: "Roboto", sans-serif;
+  font-size: 0.9rem;
+  width: 330px;
+  border: solid 1px gray;
+  max-height: 20rem;
+  overflow-y: auto;
+
+  /* display: table; */
+}
+.QSsearchresults-border {
+}
+.QSsearchresults li {
+  padding-left: 10px;
+  /* border-bottom: solid 1px rgb(160, 182, 103); */
+}
+.QSsearchresults-hide {
+  display: none;
+}
+.flexbreak {
+  flex-basis: 100%;
+  height: 0;
+}
+.presearchresults {
+  /* min-width: 100%; */
+  /* height: 2px; */
+  flex: 1;
+  flex-basis: 22%;
+}
+.QSsearchresults {
+  /* display: block; */
+  flex: 4;
+  flex-basis: 70%;
+}
+.QSsearchresults li:hover {
+  background-color: #ddeaf9;
+  cursor: pointer;
+  /* color: white; */
+}

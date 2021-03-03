@@ -1,7 +1,33 @@
-import React from "react";
+import React, { useState } from "react";
 import "./SalesQS.css";
+import moment from "moment";
+import QSSearchField from "./QSSearchField";
 
 const SalesQS = () => {
+  const QSDataInit = {
+    QSDate: moment().format("yyyy-MM-DD"),
+    abbreviation: "",
+    companyCode: "",
+  };
+  const QSValuesInit = {
+    QSDate: moment().format("yyyy-MM-DD"),
+    abbreviation: "",
+    companyCode: "",
+  };
+  const [QSData, setQSData] = useState(QSDataInit);
+  const [QSValues, setQSValues] = useState(QSValuesInit);
+  const setQSFields = (ID1, ID2, Field1, Field2, name1, name2) => {
+    setQSData({
+      ...QSData,
+      [Field1]: ID1,
+      [Field2]: ID2,
+    });
+    setQSValues({
+      ...QSValues,
+      [Field1]: name1,
+      [Field2]: name2,
+    });
+  };
   return (
     <div className="salesQS">
       <h3 className="saleslisttitle">Quotation Sheet</h3>
@@ -9,7 +35,7 @@ const SalesQS = () => {
         <section id="salesQS-1">
           <div className="form-group">
             <label htmlFor="">QS Date:</label>
-            <input type="date" />
+            <input value={QSValues.QSDate} type="date" />
           </div>
           <fieldset>
             <legend>Sale Type:</legend>
@@ -31,15 +57,30 @@ const SalesQS = () => {
             <legend>General:</legend>
             <div className="form-group">
               <label htmlFor="">QSID:</label>
-              <input type="text" />
+              <input readOnly />
             </div>
             <div className="form-group">
               <label htmlFor="">Product:</label>
-              <input type="text" />
+              <QSSearchField
+                className="searchfield"
+                searchURL={"/productlist"}
+                searchName={"abbreviation"}
+                searchID={"productID"}
+                otherName={"companyCode"}
+                otherID={"supplierID"}
+                placeholder={"Product..."}
+                setQSFields={setQSFields}
+              />
             </div>
+
             <div className="form-group">
               <label htmlFor="">Supplier:</label>
-              <input type="text" />
+              <input
+                placeholder="Supplier..."
+                value={QSValues.companyCode}
+                type="text"
+                readOnly
+              />
             </div>
             <div className="form-group">
               <label htmlFor="">Customer:</label>
