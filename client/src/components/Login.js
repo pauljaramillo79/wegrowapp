@@ -50,6 +50,7 @@ const Login = () => {
             errorMessage: response.data.message,
           });
           if (response.data.success) {
+            // console.log(response.data);
             dispatch({
               type: "LOGIN",
               payload: response.data,

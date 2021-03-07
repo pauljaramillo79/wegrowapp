@@ -113,6 +113,7 @@ const PositionAdd = () => {
         general: "Please review items in red.",
       });
     }
+    setPostoadd(postoaddInit);
   };
   return (
     <div className="positionadd">
@@ -144,6 +145,7 @@ const PositionAdd = () => {
             otherID={"supplierID"}
             placeholder={"Product..."}
             setProdSupplier={setProdSupplier}
+            // value={postoadd.product}
           />
         </div>
         {/* <div className="form-group">

@@ -95,3 +95,11 @@
   background-color: rgb(68, 65, 162);
   color: white;
 }
+.QSfig {
+  text-align: right;
+  padding-right: 5px;
+}
+.QSfig2 {
+  text-align: right;
+  padding-right: 15px;
+}

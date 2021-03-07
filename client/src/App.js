@@ -24,6 +24,11 @@ const reducer = (state, action) => {
     case "LOGIN":
       localStorage.setItem("user", JSON.stringify(action.payload.user));
       localStorage.setItem(
+        "WGusercode",
+        JSON.stringify(action.payload.usercode)
+      );
+      localStorage.setItem("WGuserID", JSON.stringify(action.payload.userID));
+      localStorage.setItem(
         "refreshtoken",
         JSON.stringify(action.payload.refreshtoken)
       );
@@ -32,11 +37,14 @@ const reducer = (state, action) => {
         ...state,
         isAuthenticated: true,
         user: action.payload.user,
+        usercode: action.payload.usercode,
         refreshtoken: action.payload.refreshtoken,
         accesstoken: action.payload.accesstoken,
       };
     case "LOGOUT":
       localStorage.removeItem("user");
+      localStorage.removeItem("WGusercode");
+      localStorage.removeItem("WGuserID");
       localStorage.removeItem("isAuthenticated");
       localStorage.removeItem("refreshtoken");
       // localStorage.clear();

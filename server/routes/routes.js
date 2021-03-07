@@ -106,6 +106,7 @@ router.post("/login", async (req, res) => {
             } else {
               const user = results[0].tName;
               const usercode = results[0].tCode;
+              const userID = results[0].traderID;
               const firstlogin = results[0].firstlogin;
               let accesstoken = jwt.sign(
                 { username: username, user: user, usercode: usercode },
@@ -129,6 +130,8 @@ router.post("/login", async (req, res) => {
                 accesstoken: accesstoken,
                 refreshtoken: refreshtoken,
                 user: user,
+                usercode: usercode,
+                userID: userID,
                 firstlogin: firstlogin,
               });
             }
@@ -294,6 +297,32 @@ router.post("/POLS", (req, res) => {
 router.post("/PODS", (req, res) => {
   db.query(
     "SELECT PODID, portOfDestination AS POD FROM PODList",
+    (err, results) => {
+      if (err) {
+        console.log(err);
+      }
+      if (results.length > 0) {
+        return res.status(200).send(results);
+      }
+    }
+  );
+});
+router.post("/trafficmgrs", (req, res) => {
+  db.query(
+    "SELECT trafficID, tCode AS traffic FROM trafficList WHERE active='y'",
+    (err, results) => {
+      if (err) {
+        console.log(err);
+      }
+      if (results.length > 0) {
+        return res.status(200).send(results);
+      }
+    }
+  );
+});
+router.post("/paymentterms", (req, res) => {
+  db.query(
+    "SELECT paytermID, paymentTerm FROM paymentTerms",
     (err, results) => {
       if (err) {
         console.log(err);

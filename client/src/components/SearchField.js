@@ -14,6 +14,7 @@ const SearchField = ({
   const [data, setData] = useState();
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState();
+  const [show, setShow] = useState(false);
 
   const loadData = () => {
     Axios.post(searchURL).then((response) => {
@@ -22,20 +23,25 @@ const SearchField = ({
     });
   };
   const handleChange = (e) => {
+    setShow(true);
     setSearchTerm(e.target.value);
   };
   useEffect(() => {
     if (data) {
       const results = data.filter((item) => {
         if (otherName && otherID) {
-          return (
-            item[searchName] +
-            item[searchID] +
-            item[otherName] +
-            item[otherID]
-          )
-            .toLowerCase()
-            .includes(searchTerm);
+          if (searchTerm !== "") {
+            return (
+              item[searchName] +
+              item[searchID] +
+              item[otherName] +
+              item[otherID]
+            )
+              .toLowerCase()
+              .includes(searchTerm);
+          } else {
+            setShow(false);
+          }
         } else {
           return (item[searchName] + item[searchID])
             .toLowerCase()
@@ -70,7 +76,9 @@ const SearchField = ({
               //   console.log(Object.keys(item));
               if (otherID && otherName) {
                 return (
-                  <>
+                  <ul
+                    className={show ? "searchresults" : "QSsearchresults-hide"}
+                  >
                     <li
                       onClick={(e) => {
                         setProdSupplier(item[searchID], item[otherID]);
@@ -85,7 +93,7 @@ const SearchField = ({
                     >
                       {item[searchID]} - {item[searchName]} - {item[otherName]}
                     </li>
-                  </>
+                  </ul>
                 );
               } else {
                 return (
