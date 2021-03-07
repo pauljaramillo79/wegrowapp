@@ -99,7 +99,9 @@ const QSSearchField = ({
                             selecteditem.lastIndexOf("(") + 1,
                             selecteditem.lastIndexOf(")")
                           );
-                          let name2 = selecteditem.split(") ")[2];
+                          let name2 = selecteditem.substring(
+                            selecteditem.lastIndexOf(") ") + 1
+                          );
                           setQSFields(
                             ID1,
                             ID2,
