@@ -404,6 +404,109 @@ router.post("/addposition", (req, res) => {
     }
   );
 });
+router.post("/saveQS", (req, res) => {
+  console.log(req.body);
+  let {
+    saleType,
+    QSDate,
+    abbreviation,
+    supplier,
+    customer,
+    packsize,
+    marks,
+    from,
+    to,
+    POL,
+    POD,
+    TIC,
+    traffic,
+    incoterms,
+    CADintrate,
+    CADdays,
+    paymentTerm,
+    quantity,
+    materialcost,
+    pcommission,
+    pfinancecost,
+    sfinancecost,
+    freightpmt,
+    insurance,
+    inspectionpmt,
+    scommission,
+    interestcost,
+    legal,
+    pallets,
+    other,
+    totalcost,
+    interestrate,
+    interestdays,
+    pricebeforeint,
+    salesinterest,
+    priceafterint,
+    profit,
+    margin,
+    turnover,
+    pctmargin,
+    netback,
+  } = req.body.QSData;
+  db.query(
+    "INSERT INTO quotationsheet (saleTypeID, QSDate, productID, supplierID, customerID, packingSize, marks, `from`, `to`, POLID, PODID, traderID, trafficID, incoterms, pTermID, quantity, materialCost, pAgentCommission, pFinancialCostP, sFinancialCost, oFreight, insuranceCost, inspectionCost, sAgentCommission, interestCost, interestRate, interestPeriod, legal, pallets, others, totalCost, saleInterestRate, salePaymentPeriod, priceBeforeInterest, saleInterest, priceAfterInterest, tradingProfit, tradingMargin, salesTurnover, percentageMargin, netback) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);",
+    [
+      saleType,
+      QSDate,
+      abbreviation,
+      supplier,
+      customer,
+      packsize,
+      marks,
+      from,
+      to,
+      POL,
+      POD,
+      TIC,
+      traffic,
+      incoterms,
+      paymentTerm,
+      quantity,
+      materialcost,
+      pcommission,
+      pfinancecost,
+      sfinancecost,
+      freightpmt,
+      insurance,
+      inspectionpmt,
+      scommission,
+      interestcost,
+      CADintrate,
+      CADdays,
+      legal,
+      pallets,
+      other,
+      totalcost,
+      interestrate,
+      interestdays,
+      pricebeforeint,
+      salesinterest,
+      priceafterint,
+      profit,
+      margin,
+      turnover,
+      pctmargin,
+      netback,
+    ],
+    (err) => {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log("Added QS");
+        return res.json({
+          success: true,
+          message: "Succesfully added QS",
+        });
+      }
+    }
+  );
+});
 router.post("/keyfigures", (req, res) => {
   let currentyear = moment().format("YYYY");
   let lastyear = Number(currentyear) - 1;

@@ -7,9 +7,15 @@ export const RefreshPositionsProvider = ({ children }) => {
   const togglePosrefresh = (e) => {
     setPosrefresh((prevPosrefresh) => !prevPosrefresh);
   };
+  const [QSrefresh, setQSrefresh] = useState(true);
+  const toggleQSrefresh = (e) => {
+    setQSrefresh((prevQSrefresh) => !prevQSrefresh);
+  };
 
   return (
-    <RefreshPositionsContext.Provider value={{ posrefresh, togglePosrefresh }}>
+    <RefreshPositionsContext.Provider
+      value={{ posrefresh, togglePosrefresh, QSrefresh, toggleQSrefresh }}
+    >
       {children}
     </RefreshPositionsContext.Provider>
   );

@@ -44,14 +44,16 @@ const QSSearchField = ({
               .includes(searchTerm.toLowerCase());
           } else {
             setShow(false);
+            setQSFields("", "", searchName, otherName, "", "");
           }
         } else {
-          if (searchTerm != "") {
+          if (searchTerm !== "") {
             return (item[searchName] + item[searchID])
               .toLowerCase()
-              .includes(searchTerm);
+              .includes(searchTerm.toLowerCase());
           } else {
             setShow(false);
+            setQSFields("", "", searchName, "", "", "");
           }
         }
       });
@@ -76,6 +78,12 @@ const QSSearchField = ({
       <div className="flexbreak"></div>
       <span className="QSsearchresults-container">
         <ul className={show ? "QSsearchresults" : "QSsearchresults-hide"}>
+          {searchID === "productID" ? <li>...Add New Product</li> : ""}
+          {searchID === "customerID" ? <li>...Add New Customer</li> : ""}
+          {searchID === "POLID" ? <li>...Add New Loadport</li> : ""}
+          {searchID === "PODID" ? <li>...Add New Disport</li> : ""}
+          {searchID === "paytermID" ? <li>...Add New Payterm</li> : ""}
+
           {searchResults
             ? searchResults.map((item) => {
                 //   Object.entries(item).map((i, key) => console.log(i[1]));
@@ -100,11 +108,11 @@ const QSSearchField = ({
                             selecteditem.lastIndexOf(")")
                           );
                           let name2 = selecteditem.substring(
-                            selecteditem.lastIndexOf(") ") + 1
+                            selecteditem.lastIndexOf(") ") + 2
                           );
                           setQSFields(
-                            ID1,
-                            ID2,
+                            Number(ID1),
+                            Number(ID2),
                             searchName,
                             otherName,
                             name1,
@@ -141,7 +149,7 @@ const QSSearchField = ({
                           //   item[searchID] + " - " + item[searchName]
                           // );
                           setQSFields(
-                            ID1,
+                            Number(ID1),
                             "",
                             searchName,
                             "",

@@ -5,10 +5,12 @@ import _ from "lodash";
 import "./css/screen.css";
 import PositionModal from "./PositionModal";
 import { AuthContext } from "../App";
+import { RefreshPositionsContext } from "../contexts/RefreshPositionsProvider";
 import "./SalesTableSort.css";
 
 const SalesTableSort = (props) => {
   const { state } = useContext(AuthContext);
+  const { QSrefresh } = useContext(RefreshPositionsContext);
   // Get token values from UseContext and Local Storage
   let accesstoken = state.accesstoken;
   let refreshtoken = JSON.parse(localStorage.getItem("refreshtoken"));
@@ -69,7 +71,7 @@ const SalesTableSort = (props) => {
       setColumnNames(Object.keys(columns));
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [QSrefresh]);
   const handleFilterTextChange = (e, column) => {
     setColumns({
       ...columns,

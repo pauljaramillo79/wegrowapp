@@ -1,9 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import "./SalesQS.css";
 import moment from "moment";
 import QSSearchField from "./QSSearchField";
+import Axios from "axios";
+import { RefreshPositionsContext } from "../contexts/RefreshPositionsProvider";
 
 const SalesQS = () => {
+  const { toggleQSrefresh } = useContext(RefreshPositionsContext);
   const QSDataInit = {
     saleType: "",
     QSDate: moment().format("yyyy-MM-DD"),
@@ -14,11 +17,14 @@ const SalesQS = () => {
     marks: "",
     from: "",
     to: "",
+    POL: "",
+    POD: "",
     TIC: JSON.parse(localStorage.getItem("WGuserID")),
     traffic: "",
     incoterms: "",
     CADintrate: 0.03,
     CADdays: 15,
+    paymentTerm: "",
     quantity: 0,
     materialcost: 0,
     pcommission: 0,
@@ -54,11 +60,14 @@ const SalesQS = () => {
     marks: "",
     from: "",
     to: "",
+    POL: "",
+    POD: "",
     TIC: JSON.parse(localStorage.getItem("WGusercode")),
     traffic: "",
     incoterms: "",
     CADintrate: "3.00%",
     CADdays: "15",
+    paymentTerm: "",
     quantity: "",
     materialcost: "0.00",
     pcommission: "0.00",
@@ -173,10 +182,12 @@ const SalesQS = () => {
     setQSData({
       ...QSData,
       salesinterest: Number(
-        (QSData.interestrate *
-          Number(QSData.interestdays) *
-          Number(QSData.pricebeforeint)) /
+        (
+          (QSData.interestrate *
+            Number(QSData.interestdays) *
+            Number(QSData.pricebeforeint)) /
           365
+        ).toFixed(4)
       ),
     });
     setQSValues({
@@ -229,6 +240,7 @@ const SalesQS = () => {
         ).toFixed(2)
       ),
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     QSData.materialcost,
     QSData.pcommission,
@@ -259,23 +271,23 @@ const SalesQS = () => {
   }, [QSData.pricebeforeint, QSData.salesinterest]);
   //Update Included Interest Cost
   useEffect(() => {
-    // if (
-    //   QSData.CADdays !== 0 &&
-    //   QSData.CADintrate !== 0 &&
-    //   QSData.pricebeforeint !== 0
-    // ) {
-    console.log(typeof ((QSData.CADintrate * QSData.CADdays) / 365));
     setQSData({
       ...QSData,
       interestcost: Number(
-        (QSData.CADintrate * QSData.CADdays * QSData.pricebeforeint) / 365
+        (
+          (QSData.CADintrate * QSData.CADdays * QSData.pricebeforeint) /
+          365
+        ).toFixed(4)
       ),
       salesinterest: Number(
-        (QSData.interestrate *
-          Number(QSData.interestdays) *
-          Number(QSData.pricebeforeint)) /
+        (
+          (QSData.interestrate *
+            Number(QSData.interestdays) *
+            Number(QSData.pricebeforeint)) /
           365
+        ).toFixed(4)
       ),
+      priceafterint: QSData.pricebeforeint + QSData.salesinterest,
     });
     setQSValues({
       ...QSValues,
@@ -288,13 +300,41 @@ const SalesQS = () => {
           Number(QSData.pricebeforeint)) /
           365
       ).toFixed(2),
+      priceafterint: Number(
+        QSData.pricebeforeint + QSData.salesinterest
+      ).toFixed(2),
     });
+
     // }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [QSData.CADdays, QSData.CADintrate, QSData.pricebeforeint]);
+
   //Update economics
   useEffect(() => {
     if (QSData.quantity !== 0 && QSData.priceafterint !== 0) {
+      setQSData({
+        ...QSData,
+        profit: Number((QSData.priceafterint - QSData.totalcost).toFixed(4)),
+        margin: Number(
+          ((QSData.priceafterint - QSData.totalcost) * QSData.quantity).toFixed(
+            4
+          )
+        ),
+        turnover: Number((QSData.quantity * QSData.priceafterint).toFixed(4)),
+        pctmargin: Number(
+          (
+            (QSData.priceafterint - QSData.totalcost) /
+            QSData.priceafterint
+          ).toFixed(4)
+        ),
+        netback: Number(
+          (
+            QSData.priceafterint -
+            QSData.totalcost +
+            QSData.materialcost
+          ).toFixed(4)
+        ),
+      });
       setQSValues({
         ...QSValues,
         profit: Number(QSData.priceafterint - QSData.totalcost).toFixed(2),
@@ -318,11 +358,16 @@ const SalesQS = () => {
           .replace(/\B(?=(\d{3})+(?!\d))/g, ","),
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [QSData.quantity, QSData.priceafterint, QSData.totalcost]);
+  const addQS = (e) => {
+    e.preventDefault();
+    Axios.post("/saveQS", { QSData }).then(toggleQSrefresh());
+  };
   return (
     <div className="salesQS">
       <h3 className="saleslisttitle">Quotation Sheet</h3>
-      <form className="salesQS-form" action="">
+      <form className="salesQS-form" onSubmit={(e) => addQS(e)}>
         <section id="salesQS-1">
           <div className="form-group">
             <label htmlFor="">QS Date:</label>
@@ -335,6 +380,7 @@ const SalesQS = () => {
               <input
                 name="saletype"
                 type="radio"
+                required
                 onClick={(e) => {
                   setQSData({ ...QSData, saleType: 1 });
                   setQSValues({ ...QSValues, saleType: "Back-to-back" });
@@ -348,6 +394,7 @@ const SalesQS = () => {
               <input
                 name="saletype"
                 type="radio"
+                required
                 onClick={(e) => {
                   setQSData({ ...QSData, saleType: 2 });
                   setQSValues({ ...QSValues, saleType: "Position" });
@@ -375,6 +422,7 @@ const SalesQS = () => {
                 otherID={"supplierID"}
                 placeholder={"Product..."}
                 setQSFields={setQSFields}
+                required
               />
             </div>
 
@@ -384,6 +432,7 @@ const SalesQS = () => {
                 placeholder="Supplier..."
                 value={QSValues.supplier}
                 type="text"
+                required
                 readOnly
               />
             </div>
@@ -396,6 +445,7 @@ const SalesQS = () => {
                 searchID={"customerID"}
                 placeholder={"Customer..."}
                 setQSFields={setQSFields}
+                required
               />
             </div>
             <div className="form-group">
@@ -416,6 +466,7 @@ const SalesQS = () => {
                 onDoubleClick={(e) => {
                   e.target.select();
                 }}
+                required
               />
             </div>
             <div className="form-group">
@@ -429,6 +480,7 @@ const SalesQS = () => {
                 onDoubleClick={(e) => {
                   e.target.select();
                 }}
+                required
               />
             </div>
           </fieldset>
@@ -445,6 +497,7 @@ const SalesQS = () => {
                 onDoubleClick={(e) => {
                   e.target.select();
                 }}
+                required
               />
             </div>
             <div className="form-group">
@@ -457,6 +510,7 @@ const SalesQS = () => {
                 onDoubleClick={(e) => {
                   e.target.select();
                 }}
+                required
               />
             </div>
             {/* </div> */}
@@ -469,6 +523,7 @@ const SalesQS = () => {
                 searchID={"POLID"}
                 placeholder={"POL..."}
                 setQSFields={setQSFields}
+                required
               />
             </div>
             <div className="form-group">
@@ -480,6 +535,7 @@ const SalesQS = () => {
                 searchID={"PODID"}
                 placeholder={"POD..."}
                 setQSFields={setQSFields}
+                required
               />
             </div>
           </fieldset>
@@ -516,6 +572,7 @@ const SalesQS = () => {
                 onDoubleClick={(e) => {
                   e.target.select();
                 }}
+                required
               />
             </div>
             <div className="form-group">
@@ -527,6 +584,7 @@ const SalesQS = () => {
                 searchID={"paytermID"}
                 placeholder={"Payment terms..."}
                 setQSFields={setQSFields}
+                required
               />
             </div>
             <div className="form-group">
@@ -541,6 +599,7 @@ const SalesQS = () => {
                 }}
                 onChange={PercentageChange}
                 onBlur={PercentageBlur}
+                required
               />
             </div>
             <div className="form-group">
@@ -554,6 +613,7 @@ const SalesQS = () => {
                 onDoubleClick={(e) => {
                   e.target.select();
                 }}
+                required
               />
             </div>
           </fieldset>
@@ -598,6 +658,7 @@ const SalesQS = () => {
                     e.target.select();
                   }}
                   onBlur={QtyBlur}
+                  required
                 />
               </div>
               <fieldset>
@@ -615,6 +676,7 @@ const SalesQS = () => {
                     name="materialcost"
                     value={QSValues.materialcost}
                     onBlur={QtyBlur}
+                    required
                   />
                 </div>
                 <div className="form-group">
@@ -630,6 +692,7 @@ const SalesQS = () => {
                     value={QSValues.pcommission}
                     onChange={QtyChange}
                     onBlur={QtyBlur}
+                    required
                   />
                 </div>
                 <div className="form-group">
@@ -645,6 +708,7 @@ const SalesQS = () => {
                     value={QSValues.pfinancecost}
                     onChange={QtyChange}
                     onBlur={QtyBlur}
+                    required
                   />
                 </div>
                 <div className="form-group">
@@ -660,6 +724,7 @@ const SalesQS = () => {
                     onChange={QtyChange}
                     onBlur={QtyBlur}
                     type="text"
+                    required
                   />
                 </div>
                 <div className="form-group">
@@ -675,6 +740,7 @@ const SalesQS = () => {
                     onChange={QtyChange}
                     onBlur={QtyBlur}
                     type="text"
+                    required
                   />
                 </div>
                 <div className="form-group">
@@ -690,6 +756,7 @@ const SalesQS = () => {
                     onChange={QtyChange}
                     onBlur={QtyBlur}
                     type="text"
+                    required
                   />
                 </div>
                 <div className="form-group">
@@ -705,6 +772,7 @@ const SalesQS = () => {
                     onChange={QtyChange}
                     onBlur={QtyBlur}
                     type="text"
+                    required
                   />
                 </div>
                 <div className="form-group">
@@ -720,6 +788,7 @@ const SalesQS = () => {
                     onChange={QtyChange}
                     onBlur={QtyBlur}
                     type="text"
+                    required
                   />
                 </div>
                 <div className="form-group">
@@ -735,6 +804,7 @@ const SalesQS = () => {
                     onChange={QtyChange}
                     onBlur={QtyBlur}
                     type="text"
+                    required
                   />
                 </div>
                 <div className="form-group">
@@ -750,6 +820,7 @@ const SalesQS = () => {
                     onChange={QtyChange}
                     onBlur={QtyBlur}
                     type="text"
+                    required
                   />
                 </div>
                 <div className="form-group">
@@ -765,6 +836,7 @@ const SalesQS = () => {
                     onChange={QtyChange}
                     onBlur={QtyBlur}
                     type="text"
+                    required
                   />
                 </div>
                 <div className="form-group">
@@ -780,6 +852,7 @@ const SalesQS = () => {
                     onChange={QtyChange}
                     onBlur={QtyBlur}
                     type="text"
+                    required
                   />
                 </div>
               </fieldset>
@@ -790,6 +863,7 @@ const SalesQS = () => {
                   readOnly
                   value={QSValues.totalcost}
                   type="text"
+                  required
                 />
               </div>
             </section>
@@ -809,6 +883,7 @@ const SalesQS = () => {
                     onChange={PercentageChange}
                     onBlur={PercentageBlur}
                     type="text"
+                    required
                   />
                 </div>
                 <div className="form-group">
@@ -823,6 +898,7 @@ const SalesQS = () => {
                       e.target.select();
                     }}
                     type="text"
+                    required
                   />
                 </div>
               </fieldset>
@@ -840,6 +916,7 @@ const SalesQS = () => {
                     onChange={QtyChange}
                     onBlur={QtyBlur}
                     type="text"
+                    required
                   />
                 </div>
                 <div className="form-group">
@@ -849,6 +926,7 @@ const SalesQS = () => {
                     value={QSValues.salesinterest}
                     readOnly
                     type="text"
+                    required
                   />
                 </div>
               </fieldset>
@@ -859,6 +937,7 @@ const SalesQS = () => {
                   className="QSfig2"
                   value={QSValues.priceafterint}
                   type="text"
+                  required
                 />
               </div>
               <fieldset>
@@ -870,6 +949,7 @@ const SalesQS = () => {
                     className="QSfig"
                     value={QSValues.profit}
                     type="text"
+                    required
                   />
                 </div>
                 <div className="form-group">
@@ -879,6 +959,7 @@ const SalesQS = () => {
                     className="QSfig"
                     value={QSValues.margin}
                     type="text"
+                    required
                   />
                 </div>
                 <div className="form-group">
@@ -888,6 +969,7 @@ const SalesQS = () => {
                     className="QSfig"
                     value={QSValues.turnover}
                     type="text"
+                    required
                   />
                 </div>
                 <div className="form-group">
@@ -897,6 +979,7 @@ const SalesQS = () => {
                     className="QSfig"
                     value={QSValues.pctmargin}
                     type="text"
+                    required
                   />
                 </div>
                 <div className="form-group">
@@ -906,15 +989,20 @@ const SalesQS = () => {
                     className="QSfig"
                     value={QSValues.netback}
                     type="text"
+                    required
                   />
                 </div>
               </fieldset>
             </section>
           </fieldset>
 
-          <button>Offer</button>
-          <button>Save</button>
-          <button>Offer and Save</button>
+          <button type="button" onClick={(e) => console.log("prepareoffer")}>
+            Offer
+          </button>
+          <button type="submit">Save</button>
+          <button type="submit" onClick={(e) => console.log("prepare offer")}>
+            Offer and Save
+          </button>
         </section>
       </form>
     </div>
