@@ -507,6 +507,10 @@ router.post("/saveQS", (req, res) => {
     }
   );
 });
+router.delete("/deleteQS", (req, res) => {
+  let id = req.body.id;
+  db.query(`DELETE FROM quotationsheet WHERE QSID=${id}`);
+});
 router.post("/keyfigures", (req, res) => {
   let currentyear = moment().format("YYYY");
   let lastyear = Number(currentyear) - 1;

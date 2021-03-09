@@ -6,11 +6,14 @@ import "./css/screen.css";
 import PositionModal from "./PositionModal";
 import { AuthContext } from "../App";
 import { RefreshPositionsContext } from "../contexts/RefreshPositionsProvider";
+
+import { confirmAlert } from "react-confirm-alert";
+import "react-confirm-alert/src/react-confirm-alert.css";
 import "./SalesTableSort.css";
 
 const SalesTableSort = (props) => {
   const { state } = useContext(AuthContext);
-  const { QSrefresh } = useContext(RefreshPositionsContext);
+  const { QSrefresh, toggleQSrefresh } = useContext(RefreshPositionsContext);
   // Get token values from UseContext and Local Storage
   let accesstoken = state.accesstoken;
   let refreshtoken = JSON.parse(localStorage.getItem("refreshtoken"));
@@ -219,14 +222,45 @@ const SalesTableSort = (props) => {
     rows.push(
       <tr id={idx} key={idx}>
         {cell(item)}
-        <button
-          className="editbutton"
-          onClick={(e) => {
-            showEditModal(e, item);
-          }}
-        >
-          Edit
-        </button>
+        <div className="crudbuttons">
+          <button
+            className="editbutton"
+            onClick={(e) => {
+              showEditModal(e, item);
+            }}
+          >
+            Edit
+          </button>
+          <button
+            className="editbutton"
+            onClick={(e) => {
+              confirmAlert({
+                title: "Are you sure?",
+                message: `You are about to delete QS (${item.QSID}). This deletion is irreversible. Click Delete to continue or Cancel`,
+                buttons: [
+                  {
+                    label: "Cancel",
+                    onClick: () => console.log("cancelled"),
+                  },
+                  {
+                    label: "Delete",
+                    onClick: async () => {
+                      await Axios.delete("/deleteQS", {
+                        data: { id: item.QSID },
+                      })
+                        .then(toggleQSrefresh())
+                        .catch((err) => console.log(err));
+                    },
+                  },
+                ],
+                closeOnClickOutside: true,
+                closeOnEscape: true,
+              });
+            }}
+          >
+            Delete
+          </button>
+        </div>
       </tr>
     );
   });

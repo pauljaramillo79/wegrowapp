@@ -13,4 +13,15 @@ h3 {
 .saleslisttitle {
   font-family: "Roboto", sans-serif;
   color: rgb(68, 65, 162);
+  /* padding-bottom: 1rem; */
+}
+.refreshicon {
+  height: 25px;
+  cursor: pointer;
+}
+.salestitleline {
+  display: flex;
+  position: sticky;
+  top: 0;
+  background-color: white;
 }

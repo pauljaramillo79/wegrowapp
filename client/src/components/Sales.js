@@ -1,9 +1,13 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useContext } from "react";
 import Axios from "axios";
 import SalesTableSort from "./SalesTableSort";
 import "./Sales.css";
+import { ReactComponent as RefreshIcon } from "../assets/_images/refreshicon.svg";
+import { RefreshPositionsContext } from "../contexts/RefreshPositionsProvider";
 
 const Sales = () => {
+  const { toggleQSrefresh } = useContext(RefreshPositionsContext);
+
   // useEffect(() => {
   //   Axios.post("/sales").then((response) => console.log(response.data));
   // }, []);
@@ -59,7 +63,15 @@ const Sales = () => {
   };
   return (
     <div className="saleslist">
-      <h3 className="saleslisttitle">Sales List</h3>
+      <div className="salestitleline">
+        <h3 className="saleslisttitle">Sales List</h3>
+        <RefreshIcon
+          className="refreshicon"
+          onClick={(e) => {
+            toggleQSrefresh();
+          }}
+        />
+      </div>
       <SalesTableSort config={CONFIG} />{" "}
     </div>
   );

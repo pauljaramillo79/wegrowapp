@@ -1,11 +1,11 @@
 /* .sales-filter-QSDate input {
   width: 70px;
   width: 100%;
-}
+} 
 .sales-filter-QSID input {
-  width: 60px;
+  width: 40px;
   width: 100%;
-}
+} 
 .sales-filter-saleType input {
   width: 90px;
 }
@@ -37,6 +37,41 @@
 .sales-filter-porOfDestination input {
   width: 90px;
 } */
+.crudbuttons {
+  display: flex;
+}
+.react-confirm-alert-overlay {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+.react-confirm-alert-body {
+  text-align: center;
+  box-shadow: 3px 3px 30px rgb(0, 0, 0);
+  height: 200px;
+}
+.react-confirm-alert-body > h1 {
+  padding-bottom: 1.3rem;
+  color: rgb(68, 65, 162);
+}
+.react-confirm-alert-button-group {
+  justify-content: center;
+}
+.react-confirm-alert-button-group > button {
+  background-color: transparent;
+  color: rgb(68, 65, 162);
+  padding: 0.3rem 1.5rem;
+  border: none;
+  border: 2px solid rgb(68, 65, 162);
+  /* background-color: rgb(68, 65, 162); */
+  align-self: center;
+  border-radius: 3rem;
+  font-family: "Roboto", sans-serif;
+  font-size: 1rem;
+}
+.react-confirm-alert-button-group > button:hover {
+  cursor: pointer;
+  background-color: rgba(68, 65, 162, 0.75);
+  color: white;
+}
 .sales-filter input {
   width: 100%;
 }
