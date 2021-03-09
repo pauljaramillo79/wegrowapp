@@ -40,6 +40,12 @@ h2 {
   align-items: baseline;
   color: white;
 }
+.welcomemsg .cls-1 {
+  fill: white;
+  stroke: white;
+  stroke-miterlimit: 0;
+  stroke-width: 0;
+}
 
 .Logoheader {
   width: 2rem;
