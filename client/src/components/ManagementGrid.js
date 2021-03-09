@@ -4,6 +4,7 @@ import "../../node_modules/react-resizable/css/styles.css";
 import GridLayout from "react-grid-layout";
 import "./Grid.css";
 import MgmtKeyFigures from "./MgmtKeyFigures";
+import Donut from "./Donut";
 
 const ManagementGrid = () => {
   const initlayout = [
@@ -48,7 +49,7 @@ const ManagementGrid = () => {
             <MgmtKeyFigures />
           </div>
           <div id="graph" key="b">
-            Graph Here{" "}
+            <Donut />
           </div>
           {/* <div id="sales2" key="c"></div> */}
         </GridLayout>

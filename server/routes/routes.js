@@ -543,5 +543,18 @@ router.post("/keyfigures", (req, res) => {
     }
   );
 });
+router.post("/donut", (req, res) => {
+  db.query(
+    "SELECT trader, TRUNCATE(SUM(tradingProfit),2) AS profit FROM qsviewshort WHERE 2020 <= DATE_FORMAT(QSDate,'%Y') && saleComplete='sold' GROUP BY trader",
+    (err, results) => {
+      if (err) {
+        console.log(err);
+      }
+      if (results.length > 0) {
+        return res.status(200).send(results);
+      }
+    }
+  );
+});
 
 module.exports = router;
