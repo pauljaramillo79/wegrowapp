@@ -39,7 +39,7 @@ const SalesTableSort = (props) => {
         accesstoken = res.data.accesstoken;
         return await authAxios.post(
           "/sales",
-          {},
+          { userID: props.userID },
           {
             headers: {
               Authorization: `Bearer ${accesstoken}`,
@@ -69,12 +69,12 @@ const SalesTableSort = (props) => {
   const [postoedit, setPostoedit] = useState({});
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(async () => {
-    await authAxios.post("/sales").then((result) => {
+    await authAxios.post("/sales", { userID: props.userID }).then((result) => {
       setItems(result.data);
       setColumnNames(Object.keys(columns));
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [QSrefresh]);
+  }, [QSrefresh, props.userID]);
   const handleFilterTextChange = (e, column) => {
     setColumns({
       ...columns,

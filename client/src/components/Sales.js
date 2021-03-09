@@ -1,4 +1,4 @@
-import React, { useEffect, useContext } from "react";
+import React, { useEffect, useContext, useState } from "react";
 import Axios from "axios";
 import SalesTableSort from "./SalesTableSort";
 import "./Sales.css";
@@ -7,7 +7,16 @@ import { RefreshPositionsContext } from "../contexts/RefreshPositionsProvider";
 
 const Sales = () => {
   const { toggleQSrefresh } = useContext(RefreshPositionsContext);
-
+  const [traders, setTraders] = useState();
+  const [userID, setUserID] = useState(
+    JSON.parse(localStorage.getItem("WGusercode"))
+  );
+  useEffect(() => {
+    Axios.post("/traders").then((response) => {
+      console.log(response.data);
+      setTraders(response.data);
+    });
+  }, []);
   // useEffect(() => {
   //   Axios.post("/sales").then((response) => console.log(response.data));
   // }, []);
@@ -65,6 +74,22 @@ const Sales = () => {
     <div className="saleslist">
       <div className="salestitleline">
         <h3 className="saleslisttitle">Sales List</h3>
+        <select onChange={(e) => setUserID(e.target.value)}>
+          <option value="all">All</option>
+          {traders
+            ? traders.map((trader) => {
+                if (trader.trader === userID) {
+                  return (
+                    <option selected value={trader.trader}>
+                      {trader.trader}
+                    </option>
+                  );
+                } else {
+                  return <option value={trader.trader}>{trader.trader}</option>;
+                }
+              })
+            : "reload"}
+        </select>
         <RefreshIcon
           className="refreshicon"
           onClick={(e) => {
@@ -72,7 +97,7 @@ const Sales = () => {
           }}
         />
       </div>
-      <SalesTableSort config={CONFIG} />{" "}
+      <SalesTableSort config={CONFIG} userID={userID} />{" "}
     </div>
   );
 };

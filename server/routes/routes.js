@@ -245,8 +245,11 @@ router.post("/positions", authenticateToken, async (req, res) => {
   );
 });
 router.post("/sales", authenticateToken, async (req, res) => {
+  let userID = req.body.userID;
   db.query(
-    "SELECT DATE_FORMAT(QSDate,'%m/%d/%Y') AS QSDate,  QSID, saleType, KTP AS WGP, KTS AS WGS, abbreviation, supplier, customer, packingSize, marks, trader, beginning, finish, portOfLoad, portOfDestination, quantity, incoterms, paymentTerm, materialCost, FreightTotal, freightCompany, oFreight, priceBeforeInterest, tradingProfit, tradingMargin, (percentageMargin*100) AS percentageMargin, netback, saleComplete FROM qsviewshort ORDER BY QSID Desc LIMIT 300",
+    `SELECT DATE_FORMAT(QSDate,'%m/%d/%Y') AS QSDate,  QSID, saleType, KTP AS WGP, KTS AS WGS, abbreviation, supplier, customer, packingSize, marks, trader, beginning, finish, portOfLoad, portOfDestination, quantity, incoterms, paymentTerm, materialCost, FreightTotal, freightCompany, oFreight, priceBeforeInterest, tradingProfit, tradingMargin, (percentageMargin*100) AS percentageMargin, netback, saleComplete FROM qsviewshort ${
+      userID !== "all" ? `WHERE trader='${userID}'` : ""
+    }  ORDER BY QSID Desc LIMIT 300 `,
     //WHERE DATE_FORMAT(QSDate,'%Y')>(YEAR(CURDATE())-2)
     (err, results) => {
       if (err) {
@@ -297,6 +300,19 @@ router.post("/POLS", (req, res) => {
 router.post("/PODS", (req, res) => {
   db.query(
     "SELECT PODID, portOfDestination AS POD FROM PODList",
+    (err, results) => {
+      if (err) {
+        console.log(err);
+      }
+      if (results.length > 0) {
+        return res.status(200).send(results);
+      }
+    }
+  );
+});
+router.post("/traders", (req, res) => {
+  db.query(
+    "SELECT traderID, tCode AS trader FROM traderList WHERE active='y'",
     (err, results) => {
       if (err) {
         console.log(err);
