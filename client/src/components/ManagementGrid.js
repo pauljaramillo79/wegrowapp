@@ -10,7 +10,7 @@ import NivoPie from "./NivoPie";
 const ManagementGrid = () => {
   const initlayout = [
     { i: "a", x: 0, y: 0, w: 5, h: 11, isDraggable: true, isResizable: false },
-    { i: "b", x: 21, y: 0, w: 10, h: 12 },
+    { i: "b", x: 5, y: 0, w: 15, h: 8, isDraggable: true, isResizable: false },
     // { i: "c", x: 0, y: 12, w: 21, h: 8 },
   ];
   const getFromLS = (key) => {
