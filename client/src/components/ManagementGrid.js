@@ -5,6 +5,7 @@ import GridLayout from "react-grid-layout";
 import "./Grid.css";
 import MgmtKeyFigures from "./MgmtKeyFigures";
 import Donut from "./Donut";
+import NivoPie from "./NivoPie";
 
 const ManagementGrid = () => {
   const initlayout = [
@@ -49,7 +50,7 @@ const ManagementGrid = () => {
             <MgmtKeyFigures />
           </div>
           <div id="graph" key="b">
-            <Donut />
+            <NivoPie />
           </div>
           {/* <div id="sales2" key="c"></div> */}
         </GridLayout>

@@ -545,7 +545,20 @@ router.post("/keyfigures", (req, res) => {
 });
 router.post("/donut", (req, res) => {
   db.query(
-    "SELECT trader, TRUNCATE(SUM(tradingProfit),2) AS profit FROM qsviewshort WHERE 2020 <= DATE_FORMAT(QSDate,'%Y') && saleComplete='sold' GROUP BY trader",
+    "SELECT trader AS id, trader AS label, TRUNCATE(SUM(tradingMargin),2) AS value FROM qsviewshort WHERE DATE_FORMAT(QSDate,'%Y')=2020 && saleComplete='sold' GROUP BY trader ORDER BY value ASC",
+    (err, results) => {
+      if (err) {
+        console.log(err);
+      }
+      if (results.length > 0) {
+        return res.status(200).send(results);
+      }
+    }
+  );
+});
+router.post("/donutqty", (req, res) => {
+  db.query(
+    "SELECT trader AS id, trader AS label, TRUNCATE(SUM(quantity),2) AS value FROM qsviewshort WHERE 2020 <= DATE_FORMAT(QSDate,'%Y') && saleComplete='sold' GROUP BY trader ORDER BY value ASC",
     (err, results) => {
       if (err) {
         console.log(err);
