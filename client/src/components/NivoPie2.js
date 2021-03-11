@@ -2,28 +2,30 @@ import Axios from "axios";
 import React, { useState, useEffect } from "react";
 import { ResponsivePie } from "@nivo/pie";
 
-const NivoPie = () => {
+const NivoPie2 = () => {
   const [data, setData] = useState();
   const [data1, setData1] = useState();
 
   useEffect(async () => {
-    await Axios.post("/donut").then((response) => {
+    await Axios.post("/pieprofitbycountry").then((response) => {
       setData(response.data);
     });
-    await Axios.post("/donutqty").then((response) => {
+    await Axios.post("/pievolumebycountry").then((response) => {
       setData1(response.data);
     });
   }, []);
 
   return (
     <>
-      <h3>Profit and Volume, by Trader</h3>
+      <h3>Profit and Volume, by Country</h3>
       <div style={{ height: "100%", display: "flex" }}>
         {data && data1 ? (
           <>
             <ResponsivePie
               data={data}
-              margin={{ top: 40, right: 0, bottom: 40, left: 20 }}
+              id="country"
+              value="profit"
+              margin={{ top: 40, right: 20, bottom: 40, left: 40 }}
               innerRadius={0.5}
               padAngle={0.7}
               cornerRadius={3}
@@ -31,13 +33,15 @@ const NivoPie = () => {
               valueFormat=">-$,"
               startAngle={-90}
               endAngle={270}
-              radialLabelsSkipAngle={10}
-              sliceLabelsSkipAngle={10}
+              radialLabelsSkipAngle={20}
+              sliceLabelsSkipAngle={25}
               sliceLabelsTextColor="white"
             />
             <ResponsivePie
               data={data1}
-              margin={{ top: 40, right: 20, bottom: 40, left: 0 }}
+              id="country"
+              value="quantity"
+              margin={{ top: 40, right: 40, bottom: 40, left: 0 }}
               innerRadius={0.5}
               padAngle={0.7}
               cornerRadius={3}
@@ -45,27 +49,16 @@ const NivoPie = () => {
               valueFormat=">-,"
               startAngle={-90}
               endAngle={270}
-              radialLabelsSkipAngle={10}
-              sliceLabelsSkipAngle={10}
+              radialLabelsSkipAngle={15}
+              sliceLabelsSkipAngle={15}
               sliceLabelsTextColor="white"
             />
           </>
         ) : (
           ""
         )}
-        {/* <ResponsivePie
-          data={data}
-          margin={{ top: 40, right: 20, bottom: 40, left: 0 }}
-          innerRadius={0.5}
-          padAngle={0.7}
-          cornerRadius={3}
-          colors={{ scheme: "blues" }}
-          valueFormat=">-$,"
-          startAngle={-90}
-          endAngle={270}
-        /> */}
       </div>
     </>
   );
 };
-export default NivoPie;
+export default NivoPie2;
