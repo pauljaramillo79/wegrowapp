@@ -571,7 +571,7 @@ router.post("/donutqty", (req, res) => {
 });
 router.post("/barsalesperyear", (req, res) => {
   db.query(
-    "SELECT DATE_FORMAT(QSDate,'%Y') AS year, TRUNCATE(SUM(quantity),2) AS quantity, TRUNCATE(SUM(tradingMargin),0) AS profit FROM weGrow.qsviewshort WHERE saleComplete='sold' GROUP BY year ORDER BY year ASC",
+    "SELECT DATE_FORMAT(QSDate,'%Y') AS year, TRUNCATE(SUM(quantity),2) AS quantity, TRUNCATE(SUM(tradingMargin),0) AS profit FROM qsviewshort WHERE saleComplete='sold' GROUP BY year ORDER BY year ASC",
     (err, results) => {
       if (err) {
         console.log(err);
@@ -584,7 +584,7 @@ router.post("/barsalesperyear", (req, res) => {
 });
 router.post("/pieprofitbycountry", (req, res) => {
   db.query(
-    "SELECT country, country AS label, TRUNCATE(SUM(tradingMargin),0) AS profit FROM quotationsheet INNER JOIN PODlist ON PODList.PODID = quotationsheet.PODID WHERE 2020 <= DATE_FORMAT(QSDate,'%Y') && saleComplete=-1 GROUP BY country ORDER BY profit ASC",
+    "SELECT country, country AS label, TRUNCATE(SUM(tradingMargin),0) AS profit FROM quotationsheet INNER JOIN PODList ON PODList.PODID = quotationsheet.PODID WHERE 2020 <= DATE_FORMAT(QSDate,'%Y') && saleComplete=-1 GROUP BY country ORDER BY profit ASC",
     (err, results) => {
       if (err) {
         console.log(err);
@@ -597,7 +597,7 @@ router.post("/pieprofitbycountry", (req, res) => {
 });
 router.post("/pievolumebycountry", (req, res) => {
   db.query(
-    "SELECT country, country AS label, TRUNCATE(SUM(quantity),0) AS quantity FROM quotationsheet INNER JOIN PODlist ON PODList.PODID = quotationsheet.PODID WHERE 2020 <= DATE_FORMAT(QSDate,'%Y') && saleComplete=-1 GROUP BY country ORDER BY quantity ASC",
+    "SELECT country, country AS label, TRUNCATE(SUM(quantity),0) AS quantity FROM quotationsheet INNER JOIN PODList ON PODList.PODID = quotationsheet.PODID WHERE 2020 <= DATE_FORMAT(QSDate,'%Y') && saleComplete=-1 GROUP BY country ORDER BY quantity ASC",
     (err, results) => {
       if (err) {
         console.log(err);
