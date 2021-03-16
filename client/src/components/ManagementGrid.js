@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "../../node_modules/react-grid-layout/css/styles.css";
 import "../../node_modules/react-resizable/css/styles.css";
 import GridLayout from "react-grid-layout";
@@ -9,14 +9,24 @@ import NivoPie from "./NivoPie";
 import NivoBar from "./NivoBar";
 import NivoBar2 from "./NivoBar2";
 import NivoPie2 from "./NivoPie2";
+import Axios from "axios";
+import WaterfallChart from "./WaterFall";
 
 const ManagementGrid = () => {
+  const [data, setData] = useState();
+  useEffect(() => {
+    Axios.post("/waterfallprofit").then((response) => {
+      setData(response.data);
+      console.log(response.data);
+    });
+  }, []);
   const initlayout = [
     { i: "a", x: 0, y: 0, w: 4, h: 11, isDraggable: true, isResizable: false },
     { i: "b", x: 4, y: 0, w: 14, h: 7, isDraggable: true, isResizable: false },
     { i: "c", x: 18, y: 0, w: 14, h: 7, isDraggable: true, isResizable: false },
     { i: "d", x: 18, y: 7, w: 14, h: 7, isDraggable: true, isResizable: false },
     { i: "e", x: 4, y: 7, w: 14, h: 7, isDraggable: true, isResizable: false },
+    { i: "f", x: 4, y: 14, w: 14, h: 7, isDraggable: true, isResizable: false },
     // { i: "c", x: 0, y: 12, w: 21, h: 8 },
   ];
   const getFromLS = (key) => {
@@ -66,6 +76,10 @@ const ManagementGrid = () => {
           </div>
           <div id="graph1" key="e">
             <NivoPie2 />
+          </div>
+          <div id="graph1" key="f">
+            <h3>Profit Waterfall Chart, 2020</h3>
+            <WaterfallChart data={data ? data : ""} />
           </div>
           {/* <div id="sales2" key="c"></div> */}
         </GridLayout>

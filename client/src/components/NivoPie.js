@@ -17,7 +17,7 @@ const NivoPie = () => {
 
   return (
     <>
-      <h3>Profit and Volume, by Trader</h3>
+      <h3 style={{ display: "sticky" }}>Profit and Volume, by Trader</h3>
       <div style={{ height: "100%", display: "flex" }}>
         {data && data1 ? (
           <>

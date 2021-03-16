@@ -527,6 +527,11 @@ router.delete("/deleteQS", (req, res) => {
   let id = req.body.id;
   db.query(`DELETE FROM quotationsheet WHERE QSID=${id}`);
 });
+router.delete("/deletePosition", (req, res) => {
+  let WGP = req.body.WGP;
+  db.query(`DELETE FROM positions WHERE KTP=${WGP}`);
+});
+
 router.post("/keyfigures", (req, res) => {
   let currentyear = moment().format("YYYY");
   let lastyear = Number(currentyear) - 2;
@@ -598,6 +603,20 @@ router.post("/pieprofitbycountry", (req, res) => {
 router.post("/pievolumebycountry", (req, res) => {
   db.query(
     "SELECT country, country AS label, TRUNCATE(SUM(quantity),0) AS quantity FROM quotationsheet INNER JOIN PODList ON PODList.PODID = quotationsheet.PODID WHERE 2020 <= DATE_FORMAT(QSDate,'%Y') && saleComplete=-1 GROUP BY country ORDER BY quantity ASC",
+    (err, results) => {
+      if (err) {
+        console.log(err);
+      }
+      if (results.length > 0) {
+        return res.status(200).send(results);
+      }
+    }
+  );
+});
+
+router.post("/waterfallprofit", (req, res) => {
+  db.query(
+    "SELECT DATE_FORMAT(QSDate, '%b') AS category, TRUNCATE(SUM(tradingMargin),0) AS amount FROM quotationsheet WHERE 2020 = DATE_FORMAT(QSDate,'%Y') && saleComplete=-1 GROUP BY category ORDER BY AVG(MONTH(QSDate)) ASC",
     (err, results) => {
       if (err) {
         console.log(err);

@@ -13,7 +13,7 @@ const NivoBar = () => {
   }, []);
   return (
     <>
-      <h3>Volume Sales per Year</h3>
+      <h3 style={{ display: "sticky" }}>Volume Sales per Year</h3>
       <div style={{ height: "100%", display: "flex" }}>
         {data ? (
           <ResponsiveBar

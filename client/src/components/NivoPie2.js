@@ -17,7 +17,9 @@ const NivoPie2 = () => {
 
   return (
     <>
-      <h3>Profit and Volume, by Country</h3>
+      <h3 style={{ display: "absolute", top: 0 }}>
+        Profit and Volume, by Country
+      </h3>
       <div style={{ height: "100%", display: "flex" }}>
         {data && data1 ? (
           <>
