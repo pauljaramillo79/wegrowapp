@@ -3,7 +3,7 @@ import PositionsTableSort from "./PositionsTableSort";
 import "./Positions.css";
 import Axios from "axios";
 
-const Positions = () => {
+const Positions = (props) => {
   //   useEffect(() => {
   //     Axios.post("/positions").then((result) => console.log(result.data));
   //   }, []);
@@ -33,7 +33,13 @@ const Positions = () => {
   return (
     <div className="positionslist">
       <h3 className="positionslisttitle">Positions List</h3>
-      <PositionsTableSort config={CONFIG} />
+      <PositionsTableSort
+        config={CONFIG}
+        showEditModal={props.showEditModal}
+        hideEditModal={props.hideEditModal}
+        modalState={props.modalState}
+        postoedit={props.postoedit}
+      />
     </div>
   );
 };

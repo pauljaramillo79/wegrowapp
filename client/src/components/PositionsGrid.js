@@ -7,13 +7,42 @@ import Home from "./Home";
 import PositionReport from "./PositionReport";
 import Positions from "./Positions";
 import PositionAdd from "./PositionAdd";
+import PositionModal from "./PositionModal";
+import "./PositionsTableSort.css";
+
+import { Responsive, WidthProvider } from "react-grid-layout";
+
+const ResponsiveGridLayout = WidthProvider(Responsive);
 
 const PositionsGrid = () => {
-  const initlayout = [
-    { i: "a", x: 0, y: 0, w: 21, h: 12 },
-    { i: "b", x: 21, y: 0, w: 10, h: 12 },
-    { i: "c", x: 0, y: 12, w: 21, h: 8 },
-  ];
+  const initlayout = {
+    lg: [
+      { i: "a", x: 0, y: 0, w: 21, h: 12 },
+      { i: "b", x: 21, y: 0, w: 10, h: 12 },
+      { i: "c", x: 0, y: 12, w: 21, h: 8 },
+    ],
+    md: [
+      { i: "a", x: 0, y: 0, w: 21, h: 12 },
+      { i: "b", x: 21, y: 0, w: 10, h: 12 },
+      { i: "c", x: 0, y: 12, w: 21, h: 8 },
+    ],
+    sm: [
+      { i: "a", x: 0, y: 0, w: 21, h: 12 },
+      { i: "b", x: 21, y: 0, w: 10, h: 12 },
+      { i: "c", x: 0, y: 12, w: 21, h: 8 },
+    ],
+    xs: [
+      { i: "a", x: 0, y: 0, w: 21, h: 12 },
+      { i: "b", x: 21, y: 0, w: 10, h: 12 },
+      { i: "c", x: 0, y: 12, w: 21, h: 8 },
+    ],
+    xxs: [
+      { i: "a", x: 0, y: 0, w: 21, h: 12 },
+      { i: "b", x: 21, y: 0, w: 10, h: 12 },
+      { i: "c", x: 0, y: 12, w: 21, h: 8 },
+    ],
+  };
+  // const [layouts, setLayouts] = useState(originalLayout);
   const getFromLS = (key) => {
     let ls = {};
     if (global.localStorage) {
@@ -31,23 +60,44 @@ const PositionsGrid = () => {
       );
     }
   };
-  const onLayoutChange = (layout) => {
-    saveToLS("layout", layout);
-    setLayout(layout);
+  const onLayoutChange = (layout, layouts) => {
+    console.log(layout, layouts);
+    saveToLS("layouts", layouts);
+    setLayouts(layouts);
   };
-  const originalLayout = getFromLS("layout") || initlayout;
-  const [layout, setLayout] = useState(originalLayout);
+  const originalLayout = getFromLS("layouts") || initlayout;
+  const [layouts, setLayouts] = useState(originalLayout);
 
+  //MODAL
+  const [modalState, setModalState] = useState(false);
+  const [postoedit, setPostoedit] = useState({});
+  const showEditModal = (e, positem) => {
+    console.log(positem);
+    setModalState(true);
+    setPostoedit(positem);
+  };
+  const hideEditModal = () => {
+    setModalState(false);
+  };
   return (
     <>
       <div className="gridcontainer">
-        <GridLayout
+        <PositionModal
+          show={modalState}
+          handleClose={hideEditModal}
+          positiontoedit={postoedit}
+        />
+        <ResponsiveGridLayout
           className="layout"
-          layout={layout}
-          cols={36}
+          breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
+          layouts={layouts}
+          cols={{ lg: 36, md: 36, sm: 36, xs: 36, xxs: 2 }}
+          // cols={36}
           rowHeight={30}
-          width={1860}
-          onLayoutChange={onLayoutChange}
+          // width={1860}
+          onLayoutChange={(layout, layouts) => {
+            onLayoutChange(layout, layouts);
+          }}
           margin={[20, 20]}
         >
           <div id="sales1" key="a">
@@ -57,9 +107,14 @@ const PositionsGrid = () => {
             <PositionAdd />
           </div>
           <div id="sales2" key="c">
-            <Positions />
+            <Positions
+              showEditModal={showEditModal}
+              hideEditModal={hideEditModal}
+              modalState={modalState}
+              postoedit={postoedit}
+            />
           </div>
-        </GridLayout>
+        </ResponsiveGridLayout>
       </div>
     </>
   );

@@ -5,7 +5,7 @@ import "./Sales.css";
 import { ReactComponent as RefreshIcon } from "../assets/_images/refreshicon.svg";
 import { RefreshPositionsContext } from "../contexts/RefreshPositionsProvider";
 
-const Sales = () => {
+const Sales = (props) => {
   const { toggleQSrefresh } = useContext(RefreshPositionsContext);
   const [traders, setTraders] = useState();
   const [userID, setUserID] = useState(
@@ -97,7 +97,14 @@ const Sales = () => {
           }}
         />
       </div>
-      <SalesTableSort config={CONFIG} userID={userID} />{" "}
+      <SalesTableSort
+        config={CONFIG}
+        userID={userID}
+        showEditModal={props.showEditModal}
+        hideEditModal={props.hideEditModal}
+        QSmodalState={props.QSmodalState}
+        QStoedit={props.QStoedit}
+      />{" "}
     </div>
   );
 };

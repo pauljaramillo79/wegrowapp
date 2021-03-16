@@ -3,14 +3,14 @@ import React, { useState, useEffect, useContext } from "react";
 import Axios from "axios";
 import _ from "lodash";
 import "./css/screen.css";
-import "./PositionsTableSort.css";
-import PositionModal from "../components/PositionModal";
 import { AuthContext } from "../App";
 import { RefreshPositionsContext } from "../contexts/RefreshPositionsProvider";
+import { confirmAlert } from "react-confirm-alert";
+import "react-confirm-alert/src/react-confirm-alert.css";
 
 const PositionsTableSort = (props) => {
   const { state } = useContext(AuthContext);
-  const { posrefresh } = useContext(RefreshPositionsContext);
+  const { posrefresh, togglePosrefresh } = useContext(RefreshPositionsContext);
   // Get token values from UseContext and Local Storage
   let accesstoken = state.accesstoken;
   let refreshtoken = JSON.parse(localStorage.getItem("refreshtoken"));
@@ -47,14 +47,14 @@ const PositionsTableSort = (props) => {
       return Promise.reject(error.response);
     }
   );
-  const showEditModal = (e, positem) => {
-    console.log(positem);
-    setModalState(true);
-    setPostoedit(positem);
-  };
-  const hideEditModal = () => {
-    setModalState(false);
-  };
+  // const showEditModal = (e, positem) => {
+  //   console.log(positem);
+  //   setModalState(true);
+  //   setPostoedit(positem);
+  // };
+  // const hideEditModal = () => {
+  //   setModalState(false);
+  // };
   // useState
   const [items, setItems] = useState([]);
   const [sort, setSort] = useState(
@@ -62,8 +62,8 @@ const PositionsTableSort = (props) => {
   );
   const [columns, setColumns] = useState(props.config.columns);
   const [columnNames, setColumnNames] = useState([]);
-  const [modalState, setModalState] = useState(false);
-  const [postoedit, setPostoedit] = useState({});
+  // const [modalState, setModalState] = useState(false);
+  // const [postoedit, setPostoedit] = useState({});
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(async () => {
     await authAxios.post("/positions").then((result) => {
@@ -173,14 +173,47 @@ const PositionsTableSort = (props) => {
     rows.push(
       <tr id={idx} key={idx}>
         {cell(item)}
-        <button
-          className="editbutton"
-          onClick={(e) => {
-            showEditModal(e, item);
-          }}
-        >
-          Edit
-        </button>
+        <div className="crudbuttons">
+          <button
+            className="editbutton"
+            onClick={(e) => {
+              props.showEditModal(e, item);
+            }}
+          >
+            Edit
+          </button>
+          <button
+            className="editbutton"
+            onClick={(e) => {
+              confirmAlert({
+                title: "Are you sure?",
+                message: `You are about to delete position (${item.WGP}) for ${item.abbreviation} from ${item.companyCode}. This deletion is irreversible. Click Delete to confirm or Cancel to exit.`,
+                buttons: [
+                  {
+                    label: "Cancel",
+                    onClick: () => {
+                      console.log("cancelled");
+                    },
+                  },
+                  {
+                    label: "Delete",
+                    onClick: async () => {
+                      await Axios.delete("/deletePosition", {
+                        data: { WGP: item.WGP },
+                      })
+                        .then(togglePosrefresh())
+                        .catch((err) => console.log(err));
+                    },
+                  },
+                ],
+                closeOnClickOutside: true,
+                closeOnEscape: true,
+              });
+            }}
+          >
+            Delete
+          </button>
+        </div>
       </tr>
     );
   });
@@ -209,12 +242,12 @@ const PositionsTableSort = (props) => {
   });
 
   return (
-    <>
-      <PositionModal
-        show={modalState}
-        handleClose={hideEditModal}
-        positiontoedit={postoedit}
-      />
+    <div>
+      {/* <PositionModal
+        show={props.modalState}
+        handleClose={props.hideEditModal}
+        positiontoedit={props.postoedit}
+      /> */}
       <table cellSpacing="0" className="tablesorter">
         <thead>
           <tr>
@@ -228,7 +261,7 @@ const PositionsTableSort = (props) => {
         </thead>
         <tbody>{rows}</tbody>
       </table>
-    </>
+    </div>
   );
 };
 

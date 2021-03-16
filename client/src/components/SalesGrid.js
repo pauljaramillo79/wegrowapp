@@ -6,6 +6,9 @@ import "./Grid.css";
 import Sales from "./Sales";
 import SalesQS from "./SalesQS";
 
+import QSEditModal from "./QSEditModal";
+import "./PositionsTableSort.css";
+
 const SalesGrid = () => {
   const initlayout = [
     { i: "a", x: 0, y: 0, w: 21, h: 12 },
@@ -35,10 +38,25 @@ const SalesGrid = () => {
   };
   const originalLayout = getFromLS("layout") || initlayout;
   const [layout, setLayout] = useState(originalLayout);
-
+  //MODAL
+  const [QSmodalState, setQSModalState] = useState(false);
+  const [QStoedit, setQStoedit] = useState({});
+  const showEditModal = (e, positem) => {
+    console.log(positem);
+    setQSModalState(true);
+    setQStoedit(positem);
+  };
+  const hideEditModal = () => {
+    setQSModalState(false);
+  };
   return (
     <>
       <div className="gridcontainer">
+        <QSEditModal
+          show={QSmodalState}
+          handleClose={hideEditModal}
+          QStoedit={QStoedit}
+        />
         <GridLayout
           className="layout"
           layout={layout}
@@ -49,7 +67,12 @@ const SalesGrid = () => {
           margin={[20, 20]}
         >
           <div id="sales1" key="a">
-            <Sales />
+            <Sales
+              showEditModal={showEditModal}
+              hideEditModal={hideEditModal}
+              QSmodalState={QSmodalState}
+              QStoedit={QStoedit}
+            />
           </div>
           <div id="sales2" key="b">
             <SalesQS />

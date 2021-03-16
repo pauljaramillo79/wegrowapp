@@ -50,14 +50,14 @@ const SalesTableSort = (props) => {
       return Promise.reject(error.response);
     }
   );
-  const showEditModal = (e, positem) => {
-    console.log(positem);
-    setModalState(true);
-    setPostoedit(positem);
-  };
-  const hideEditModal = () => {
-    setModalState(false);
-  };
+  // const showEditModal = (e, positem) => {
+  //   console.log(positem);
+  //   setModalState(true);
+  //   setPostoedit(positem);
+  // };
+  // const hideEditModal = () => {
+  //   setModalState(false);
+  // };
   // useState
   const [items, setItems] = useState([]);
   const [sort, setSort] = useState(
@@ -65,8 +65,8 @@ const SalesTableSort = (props) => {
   );
   const [columns, setColumns] = useState(props.config.columns);
   const [columnNames, setColumnNames] = useState([]);
-  const [modalState, setModalState] = useState(false);
-  const [postoedit, setPostoedit] = useState({});
+  // const [modalState, setModalState] = useState(false);
+  // const [postoedit, setPostoedit] = useState({});
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(async () => {
     await authAxios.post("/sales", { userID: props.userID }).then((result) => {
@@ -226,7 +226,7 @@ const SalesTableSort = (props) => {
           <button
             className="editbutton"
             onClick={(e) => {
-              showEditModal(e, item);
+              props.showEditModal(e, item);
             }}
           >
             Edit
@@ -289,12 +289,12 @@ const SalesTableSort = (props) => {
   });
 
   return (
-    <>
-      <PositionModal
+    <div>
+      {/* <PositionModal
         show={modalState}
         handleClose={hideEditModal}
         positiontoedit={postoedit}
-      />
+      /> */}
       <table cellSpacing="0" className="tablesorter">
         <thead>
           <tr>
@@ -308,7 +308,7 @@ const SalesTableSort = (props) => {
         </thead>
         <tbody>{rows}</tbody>
       </table>
-    </>
+    </div>
   );
 };
 
