@@ -148,20 +148,20 @@ const PositionsTableSort = (props) => {
     return columnNames.map(function (c, i) {
       if (c === "quantity") {
         return (
-          <td id={c + "-" + x.id} key={c + "-" + x.id}>
+          <td className="canceldrag" id={c + "-" + x.id} key={c + "-" + x.id}>
             {x[c].toFixed(2)}
           </td>
         );
       }
       if (c === "FOB") {
         return (
-          <td id={c + "-" + x.id} key={c + "-" + x.id}>
+          <td className="canceldrag" id={c + "-" + x.id} key={c + "-" + x.id}>
             {"$" + x[c].toFixed(2)}
           </td>
         );
       } else {
         return (
-          <td id={c + "-" + x.id} key={c + "-" + x.id}>
+          <td className="canceldrag" id={c + "-" + x.id} key={c + "-" + x.id}>
             {x[c]}
           </td>
         );
@@ -178,6 +178,7 @@ const PositionsTableSort = (props) => {
             className="editbutton"
             onClick={(e) => {
               props.showEditModal(e, item);
+              console.log(item);
             }}
           >
             Edit
@@ -231,6 +232,7 @@ const PositionsTableSort = (props) => {
     return (
       <td className={"filter-" + c}>
         <input
+          className="canceldrag"
           type="text"
           value={columns[c].filterText}
           onChange={(e) => {

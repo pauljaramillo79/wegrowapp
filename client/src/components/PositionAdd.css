@@ -32,6 +32,18 @@
   margin-left: 0;
   flex: 4;
   flex-basis: 80%;
+  font-family: "Roboto", sans-serif;
+}
+#positionaddform textarea {
+  margin-top: 0.6rem;
+  margin-left: 0;
+  flex: 4;
+  flex-basis: 80%;
+  height: 20vh;
+  resize: none;
+  overflow-y: auto;
+  font-family: "Roboto", sans-serif;
+  font-size: 0.95rem;
 }
 #positionaddform button {
   margin-top: 1.5rem;

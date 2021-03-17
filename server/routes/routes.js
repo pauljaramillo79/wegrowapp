@@ -351,7 +351,8 @@ router.post("/paymentterms", (req, res) => {
 });
 router.post("/productlist", (req, res) => {
   db.query(
-    "SELECT productID, abbreviation, supplierlist.supplierID, companyCode AS supplier FROM productList INNER JOIN prodNames ON productList.productName = prodNames.prodNameID INNER JOIN supplierlist ON productList.supplierID = supplierlist.supplierID ORDER BY productID ASC",
+    // "SELECT productID, abbreviation, supplierlist.supplierID, companyCode AS supplier, prodGroupID FROM productList INNER JOIN prodNames ON productList.productName = prodNames.prodNameID INNER JOIN supplierlist ON productList.supplierID = supplierlist.supplierID ORDER BY productID ASC",
+    "SELECT productID, abbreviation, supplierlist.supplierID, companyCode AS supplier, prodNames.prodGroupID, productGroup FROM productList INNER JOIN (prodNames INNER JOIN productGroups ON prodNames.prodGroupID = productGroups.prodGroupID) ON productList.productName = prodNames.prodNameID INNER JOIN supplierlist ON productList.supplierID = supplierlist.supplierID ORDER BY productID ASC;",
     (err, results) => {
       if (err) {
         console.log(err);
@@ -385,17 +386,19 @@ router.post("/addposition", (req, res) => {
     WGP,
     supplier,
     product,
+    productgroup,
     quantitylow,
     quantityhigh,
     FOB,
     from,
     to,
-  } = req.body.postoadd;
-  from = moment(from).format("MMMM");
-  to = moment(to).format("MMMM");
+    notes,
+  } = req.body.posData;
+  from = moment(from).format("D-MMMM");
+  to = moment(to).format("D-MMMM");
   positiondate = moment(new Date()).format("YYYY-MM-DD HH:mm:ss");
   db.query(
-    "INSERT INTO positions (KTP, supplier, productID, quantityLow, quantityHigh, FOBCost, shipmentStart, shipmentEnd, positionDate) VALUES (?,?,?,?,?,?,?,?,?);",
+    "INSERT INTO positions (KTP, supplier, productID, quantityLow, quantityHigh, FOBCost, shipmentStart, shipmentEnd, positionDate, prodGroupID, notes) VALUES (?,?,?,?,?,?,?,?,?,?,?);",
     [
       WGP,
       supplier,
@@ -406,6 +409,8 @@ router.post("/addposition", (req, res) => {
       from,
       to,
       positiondate,
+      productgroup,
+      notes,
     ],
     (err) => {
       if (err) {
@@ -416,6 +421,20 @@ router.post("/addposition", (req, res) => {
           success: true,
           message: "Succesfully added position",
         });
+      }
+    }
+  );
+});
+router.post("/positiontoedit", (req, res) => {
+  let id = req.body.id;
+  db.query(
+    `SELECT KTP AS WGP, positions.productID, abbreviation AS product, productList.supplierID, companyCode AS supplier, prodNames.prodGroupID, productGroup, quantityLow, quantityHigh, FOBCost, shipmentStart, shipmentEnd, positions.notes FROM positions INNER JOIN ((productList INNER JOIN (prodNames INNER JOIN productGroups ON prodNames.prodGroupID=productGroups.prodGroupID) ON productName = prodNameID) INNER JOIN supplierlist ON productList.supplierID=supplierlist.supplierID)ON positions.productID = productList.productID WHERE KTP = ${id}`,
+    (err, results) => {
+      if (err) {
+        console.log(err);
+      }
+      if (results.length > 0) {
+        return res.status(200).send(results);
       }
     }
   );
@@ -523,6 +542,8 @@ router.post("/saveQS", (req, res) => {
     }
   );
 });
+
+// ------- DELETE ---------
 router.delete("/deleteQS", (req, res) => {
   let id = req.body.id;
   db.query(`DELETE FROM quotationsheet WHERE QSID=${id}`);

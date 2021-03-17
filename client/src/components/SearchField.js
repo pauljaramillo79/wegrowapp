@@ -9,27 +9,52 @@ const SearchField = ({
   placeholder,
   otherName,
   otherID,
+  thirdName,
+  thirdID,
   setProdSupplier,
+  resetfield,
+  setResetfield,
 }) => {
   const [data, setData] = useState();
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState();
   const [show, setShow] = useState(false);
 
+  // Load Data
   const loadData = () => {
     Axios.post(searchURL).then((response) => {
       setData(response.data);
-      // console.log(response.data);
     });
   };
+
+  // Handle Change
   const handleChange = (e) => {
+    setResetfield(false);
     setShow(true);
     setSearchTerm(e.target.value);
   };
+
+  // Filter Use Effect
   useEffect(() => {
     if (data) {
       const results = data.filter((item) => {
-        if (otherName && otherID) {
+        if (otherName && otherID && thirdID) {
+          if (searchTerm !== "") {
+            return (
+              item[searchName] +
+              item[searchID] +
+              item[otherName] +
+              item[otherID] +
+              item[thirdName] +
+              item[thirdID]
+            )
+              .toLowerCase()
+              .includes(searchTerm);
+          } else {
+            setShow(false);
+          }
+        }
+        if (otherName && otherID && !thirdID) {
           if (searchTerm !== "") {
             return (
               item[searchName] +
@@ -43,11 +68,16 @@ const SearchField = ({
             setShow(false);
           }
         } else {
-          return (item[searchName] + item[searchID])
-            .toLowerCase()
-            .includes(searchTerm);
+          if (searchTerm !== "") {
+            return (item[searchName] + item[searchID])
+              .toLowerCase()
+              .includes(searchTerm);
+          } else {
+            setShow(false);
+          }
         }
       });
+      // console.log(results);
       setSearchResults(results);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -55,16 +85,16 @@ const SearchField = ({
   return (
     <>
       <input
-        // /className="searchfield"
         placeholder={placeholder}
         type="text"
-        value={searchTerm}
+        value={resetfield ? "" : searchTerm}
         onFocus={loadData}
         onChange={handleChange}
-        onDoubleClick={(e) => {
-          e.target.select();
-        }}
+        // onDoubleClick={(e) => {
+        //   e.target.select();
+        // }}
         required
+        className="canceldrag"
       />
       <div className="flexbreak"></div>
       <div className="presearchresults"></div>
@@ -74,7 +104,38 @@ const SearchField = ({
               //   Object.entries(item).map((i, key) => console.log(i[1]));
               //   console.log(item);
               //   console.log(Object.keys(item));
-              if (otherID && otherName) {
+              if (otherID && otherName && thirdName && thirdID) {
+                return (
+                  <ul
+                    className={show ? "searchresults" : "QSsearchresults-hide"}
+                  >
+                    <li
+                      onClick={(e) => {
+                        setProdSupplier(
+                          item[searchID],
+                          item[otherID],
+                          item[thirdID],
+                          item[searchName],
+                          item[otherName],
+                          item[thirdName]
+                        );
+                        setSearchTerm(
+                          item[searchID] +
+                            " - " +
+                            item[searchName] +
+                            " - " +
+                            item[otherName] +
+                            " - " +
+                            item[thirdName]
+                        );
+                      }}
+                    >
+                      {item[searchID]} - {item[searchName]} - {item[otherName]}
+                    </li>
+                  </ul>
+                );
+              }
+              if (otherID && otherName && !thirdName && !thirdID) {
                 return (
                   <ul
                     className={show ? "searchresults" : "QSsearchresults-hide"}

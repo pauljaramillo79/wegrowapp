@@ -6,15 +6,29 @@ import Axios from "axios";
 
 const PositionAdd = () => {
   const { posrefresh, togglePosrefresh } = useContext(RefreshPositionsContext);
-  const postoaddInit = {
+  const posDataInit = {
     WGP: "",
     product: "",
     supplier: "",
+    productgroup: "",
     quantitylow: "",
     quantityhigh: "",
     FOB: "",
     from: "",
     to: "",
+    notes: "",
+  };
+  const posValuesInit = {
+    WGP: "",
+    product: "",
+    supplier: "",
+    productgroup: "",
+    quantitylow: "",
+    quantityhigh: "",
+    FOB: "",
+    from: "",
+    to: "",
+    notes: "",
   };
   const posaddErrorsInit = {
     WGP: "",
@@ -23,8 +37,9 @@ const PositionAdd = () => {
     to: "",
     general: "",
   };
-
-  const [postoadd, setPostoadd] = useState(postoaddInit);
+  const [resetfield, setResetfield] = useState(true);
+  const [posData, setPosData] = useState(posDataInit);
+  const [posValues, setPosValues] = useState(posValuesInit);
   const [posaddErrors, setPosaddErrors] = useState(posaddErrorsInit);
   const handlePosChange = (e) => {
     e.preventDefault();
@@ -33,17 +48,31 @@ const PositionAdd = () => {
       WGP: "",
       general: "",
     });
-    setPostoadd({
-      ...postoadd,
+    setPosData({
+      ...posData,
       [e.target.name]: e.target.value,
     });
-    console.log(postoadd);
+    // console.log(postoadd);
   };
-  const setProdSupplier = (prodID, supplierID) => {
-    setPostoadd({
-      ...postoadd,
+  const setProdSupplier = (
+    prodID,
+    supplierID,
+    prodgroupID,
+    prodName,
+    supplierName,
+    productGroup
+  ) => {
+    setPosData({
+      ...posData,
       product: prodID,
       supplier: supplierID,
+      productgroup: prodgroupID,
+    });
+    setPosValues({
+      ...posValues,
+      product: prodName,
+      supplier: supplierName,
+      productgroup: productGroup,
     });
   };
   const handlePosAddValidation = (e) => {
@@ -57,9 +86,7 @@ const PositionAdd = () => {
             ...posaddErrors,
             [field]: "Only numerical values.",
           });
-        } else if (
-          Number(postoadd.quantityhigh) < Number(postoadd.quantitylow)
-        ) {
+        } else if (Number(posData.quantityhigh) < Number(posData.quantitylow)) {
           setPosaddErrors({
             ...posaddErrors,
             [field]: "QuantityL must be equal or smaller than QuantityH.",
@@ -74,9 +101,7 @@ const PositionAdd = () => {
             ...posaddErrors,
             [field]: "Only numerical values.",
           });
-        } else if (
-          Number(postoadd.quantityhigh) < Number(postoadd.quantitylow)
-        ) {
+        } else if (Number(posData.quantityhigh) < Number(posData.quantitylow)) {
           setPosaddErrors({
             ...posaddErrors,
             [field]: "QuantityH must be larger than QuantityL.",
@@ -93,10 +118,10 @@ const PositionAdd = () => {
   const addPosition = (e) => {
     e.preventDefault();
     if (Object.values(posaddErrors).every((x) => x === "")) {
-      Axios.post("/checkposition", { WGP: postoadd.WGP })
+      Axios.post("/checkposition", { WGP: posData.WGP })
         .then((response) => {
           if (response.data.msg === "OK") {
-            Axios.post("/addposition", { postoadd }).then(togglePosrefresh());
+            Axios.post("/addposition", { posData }).then(togglePosrefresh());
           } else {
             setPosaddErrors({
               ...posaddErrors,
@@ -113,7 +138,9 @@ const PositionAdd = () => {
         general: "Please review items in red.",
       });
     }
-    setPostoadd(postoaddInit);
+    setPosData(posDataInit);
+    setPosValues(posValuesInit);
+    setResetfield(true);
   };
   return (
     <div className="positionadd">
@@ -123,14 +150,15 @@ const PositionAdd = () => {
           <label htmlFor="">WGP:</label>
           <input
             name="WGP"
-            value={postoadd.WGP}
+            value={posData.WGP}
             type="text"
             onChange={handlePosChange}
             placeholder="WGP..."
-            onDoubleClick={(e) => {
-              e.target.select();
-            }}
+            // onDoubleClick={(e) => {
+            //   e.target.select();
+            // }}
             required
+            className="canceldrag"
           />
         </div>
         <span className="posadderror">{posaddErrors.WGP}</span>
@@ -143,15 +171,36 @@ const PositionAdd = () => {
             searchID={"productID"}
             otherName={"supplier"}
             otherID={"supplierID"}
+            thirdName={"productGroup"}
+            thirdID={"prodGroupID"}
             placeholder={"Product..."}
             setProdSupplier={setProdSupplier}
+            resetfield={resetfield}
+            setResetfield={setResetfield}
+            className="canceldrag"
+
             // value={postoadd.product}
           />
         </div>
-        {/* <div className="form-group">
+
+        <div className="form-group">
           <label htmlFor="">Supplier:</label>
-          <input readOnly placeholder="Supplier..." value={postoadd.supplier} />
-        </div> */}
+          <input
+            readOnly
+            placeholder="Supplier..."
+            value={posValues.supplier}
+            className="canceldrag"
+          />
+        </div>
+        <div className="form-group">
+          <label htmlFor="">ProdGroup:</label>
+          <input
+            readOnly
+            placeholder="ProductGroup..."
+            value={posValues.productgroup}
+            className="canceldrag"
+          />
+        </div>
         <div className="form-group">
           <label htmlFor="">QuantityL:</label>
           <input
@@ -159,12 +208,13 @@ const PositionAdd = () => {
             type="text"
             placeholder="Quantity Low..."
             onChange={handlePosChange}
-            value={postoadd.quantitylow}
+            value={posData.quantitylow}
             onBlur={handlePosAddValidation}
-            onDoubleClick={(e) => {
-              e.target.select();
-            }}
+            // onDoubleClick={(e) => {
+            //   e.target.select();
+            // }}
             required
+            className="canceldrag"
           />
         </div>
         <span className="posadderror">{posaddErrors.quantitylow}</span>
@@ -176,12 +226,13 @@ const PositionAdd = () => {
             type="text"
             placeholder="Quantity High..."
             onChange={handlePosChange}
-            value={postoadd.quantityhigh}
+            value={posData.quantityhigh}
             onBlur={handlePosAddValidation}
-            onDoubleClick={(e) => {
-              e.target.select();
-            }}
+            // onDoubleClick={(e) => {
+            //   e.target.select();
+            // }}
             required
+            className="canceldrag"
           />
         </div>
         <span className="posadderror">{posaddErrors.quantityhigh}</span>
@@ -192,11 +243,12 @@ const PositionAdd = () => {
             name="FOB"
             placeholder="FOB..."
             onChange={handlePosChange}
-            value={postoadd.FOB}
-            onDoubleClick={(e) => {
-              e.target.select();
-            }}
+            value={posData.FOB}
+            // onDoubleClick={(e) => {
+            //   e.target.select();
+            // }}
             required
+            className="canceldrag"
           />
         </div>
         <div className="form-group">
@@ -206,11 +258,12 @@ const PositionAdd = () => {
             type="date"
             placeholder="From..."
             onChange={handlePosChange}
-            value={postoadd.from}
-            onDoubleClick={(e) => {
-              e.target.select();
-            }}
+            value={posData.from}
+            // onDoubleClick={(e) => {
+            //   e.target.select();
+            // }}
             required
+            className="canceldrag"
           />
         </div>
         <div className="form-group">
@@ -220,12 +273,25 @@ const PositionAdd = () => {
             type="date"
             placeholder="To..."
             onChange={handlePosChange}
-            value={postoadd.to}
-            onDoubleClick={(e) => {
-              e.target.select();
-            }}
+            value={posData.to}
+            // onDoubleClick={(e) => {
+            //   e.target.select();
+            // }}
             required
+            className="canceldrag"
           />
+        </div>
+        <div className="form-group">
+          <label htmlFor="">Notes:</label>
+          <textarea
+            // onDoubleClick={(e) => {
+            //   e.target.select();
+            // }}
+            name="notes"
+            className="canceldrag"
+            onChange={handlePosChange}
+            value={posData.notes}
+          ></textarea>
         </div>
         <button>Add</button>
         <span className="posadderror">{posaddErrors.general}</span>

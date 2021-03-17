@@ -1,11 +1,24 @@
 import React, { useState, useEffect } from "react";
 import "./PositionModal.css";
+import Axios from "axios";
 
 const PositionModal = ({ handleClose, show, positiontoedit }) => {
   const showHideClassName = show ? "modal display-block" : "modal display-none";
+
+  const positionid = positiontoedit.WGP;
+  const [posEditInit, setPosEditInit] = useState();
+
+  useEffect(() => {
+    if (positionid) {
+      Axios.post("/positiontoedit", { id: positionid }).then((response) => {
+        setPosEditInit(response.data[0]);
+        console.log(response.data[0]);
+      });
+    }
+  }, [show]);
   const postoeditinit = {
-    KTP: positiontoedit.KTP,
-    abbreviation: positiontoedit.abbreviation,
+    WGP: positiontoedit.WGP,
+    supplier: positiontoedit.abbreviation,
     companyCode: positiontoedit.companyCode,
     quantity: positiontoedit.quantity,
     FOB: positiontoedit.FOB,
@@ -14,6 +27,7 @@ const PositionModal = ({ handleClose, show, positiontoedit }) => {
 
   useEffect(() => {
     setPostoedit(postoeditinit);
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [show]);
 
@@ -34,39 +48,63 @@ const PositionModal = ({ handleClose, show, positiontoedit }) => {
         <form className="positionModalForm" action="">
           <h2>Edit Position</h2>
           <div className="form-group">
-            <label htmlFor="">Position Number:</label>
+            <label htmlFor="">WGP:</label>
             <input
-              name="KTP"
+              name="WGP"
               type="text"
-              value={postoedit.KTP}
-              onChange={handleInputChange}
+              value={posEditInit ? posEditInit.WGP : ""}
+              // onChange={handleInputChange}
+              className="canceldrag"
             />
           </div>
           <div className="form-group">
             <label htmlFor="">Product:</label>
             <input
-              name="abbreviation"
+              name="product"
               type="text"
-              value={postoedit.abbreviation}
+              value={posEditInit ? posEditInit.product : ""}
               onChange={handleInputChange}
+              className="canceldrag"
             />
           </div>
           <div className="form-group">
             <label htmlFor="">Supplier:</label>
             <input
-              name="companyCode"
+              name="supplier"
               type="text"
-              value={postoedit.companyCode}
-              onChange={handleInputChange}
+              value={posEditInit ? posEditInit.supplier : ""}
+              className="canceldrag"
+              readOnly
             />
           </div>
           <div className="form-group">
-            <label htmlFor="">Quantity:</label>
+            <label htmlFor="">Prod Group:</label>
             <input
-              name="quantity"
+              name="productgroup"
               type="text"
-              value={postoedit.quantity}
+              value={posEditInit ? posEditInit.productGroup : ""}
+              className="canceldrag"
+              readOnly
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="">QuantityL:</label>
+            <input
+              name="quantityLow"
+              type="text"
+              value={posEditInit ? posEditInit.quantityLow : ""}
               onChange={handleInputChange}
+              className="canceldrag"
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="">QuantityH:</label>
+            <input
+              name="quantityHigh"
+              type="text"
+              value={posEditInit ? posEditInit.quantityHigh : ""}
+              onChange={handleInputChange}
+              className="canceldrag"
             />
           </div>
           <div className="form-group">
@@ -74,9 +112,27 @@ const PositionModal = ({ handleClose, show, positiontoedit }) => {
             <input
               name="FOB"
               type="text"
-              value={postoedit.FOB}
+              value={posEditInit ? posEditInit.FOBCost : ""}
               onChange={handleInputChange}
+              className="canceldrag"
             />
+          </div>
+
+          <div className="form-group">
+            <label>From:</label>
+            <input
+              name="from"
+              type="date"
+              value={posEditInit ? posEditInit.shipmentStart : ""}
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="">Notes:</label>
+            <textarea
+              name="notes"
+              className="canceldrag"
+              value={posEditInit ? posEditInit.notes : ""}
+            ></textarea>
           </div>
 
           <button className="confirmbutton" type="submit" onClick={handleClose}>

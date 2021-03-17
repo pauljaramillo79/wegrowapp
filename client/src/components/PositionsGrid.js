@@ -99,6 +99,7 @@ const PositionsGrid = () => {
             onLayoutChange(layout, layouts);
           }}
           margin={[20, 20]}
+          draggableCancel=".canceldrag"
         >
           <div id="sales1" key="a">
             <PositionReport />
