@@ -164,7 +164,7 @@ const PositionsTableSort = (props) => {
       if (c === "Start" || c === "End") {
         return (
           <td className="canceldrag" id={c + "-" + x.id} key={c + "-" + x.id}>
-            {moment(x[c]).format("DD-MMM-YYYY")}
+            {moment(x[c]).format("DD-MMM-YYYY").toString()}
           </td>
         );
       } else {
