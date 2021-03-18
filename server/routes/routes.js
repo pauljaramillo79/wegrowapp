@@ -459,6 +459,8 @@ router.post("/positionupdate", (req, res) => {
   db.query(sqlquery, (err, results) => {
     if (err) {
       console.log(err);
+    } else {
+      res.sendStatus(200);
     }
     // if (results.length > 0) {
     //   console.log(results);
