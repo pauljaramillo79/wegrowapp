@@ -15,7 +15,8 @@ const SalesTableSort = (props) => {
   const { state } = useContext(AuthContext);
   const { QSrefresh, toggleQSrefresh } = useContext(RefreshPositionsContext);
   // Get token values from UseContext and Local Storage
-  let accesstoken = state.accesstoken;
+  // let accesstoken = state.accesstoken;
+  let accesstoken = JSON.parse(localStorage.getItem("accesstoken"));
   let refreshtoken = JSON.parse(localStorage.getItem("refreshtoken"));
   // Declare custom axios calls for authorization and refreshing token
   const authAxios = Axios.create({

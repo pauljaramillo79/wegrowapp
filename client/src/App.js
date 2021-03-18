@@ -32,6 +32,10 @@ const reducer = (state, action) => {
         "refreshtoken",
         JSON.stringify(action.payload.refreshtoken)
       );
+      localStorage.setItem(
+        "accesstoken",
+        JSON.stringify(action.payload.accesstoken)
+      );
       localStorage.setItem("isAuthenticated", true);
       return {
         ...state,

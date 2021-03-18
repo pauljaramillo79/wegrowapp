@@ -10,7 +10,8 @@ const PositionReport = () => {
   const { state } = useContext(AuthContext);
   const { posrefresh } = useContext(RefreshPositionsContext);
   // Get token values from UseContext and Local Storage
-  let accesstoken = state.accesstoken;
+  // let accesstoken = state.accesstoken;
+  let accesstoken = JSON.parse(localStorage.getItem("accesstoken"));
   let refreshtoken = JSON.parse(localStorage.getItem("refreshtoken"));
   // Declare custom axios calls for authorization and refreshing token
   const authAxios = Axios.create({
@@ -58,7 +59,6 @@ const PositionReport = () => {
   const [gdata, setGdata] = useState({});
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(async () => {
-    console.log(moment.tz());
     await authAxios
       .post("/positionreport")
       .then((result) => {

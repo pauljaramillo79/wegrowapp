@@ -1,9 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import "./PositionModal.css";
 import Axios from "axios";
 import moment from "moment";
+import { RefreshPositionsContext } from "../contexts/RefreshPositionsProvider";
 
 const PositionModal = ({ handleClose, show, positiontoedit }) => {
+  const { posrefresh, togglePosrefresh } = useContext(RefreshPositionsContext);
+
   const showHideClassName = show ? "modal display-block" : "modal display-none";
 
   const positionid = positiontoedit.WGP;
@@ -16,7 +19,11 @@ const PositionModal = ({ handleClose, show, positiontoedit }) => {
       Axios.post("/positiontoedit", { id: positionid }).then((response) => {
         setPosEditInit(response.data[0]);
         setPosOriginal(response.data[0]);
-        console.log(response.data[0]);
+        setPosChanges({
+          id: response.data[0].positionID,
+          WGP: response.data[0].WGP,
+        });
+        // console.log(response.data[0]);
       });
     }
   }, [show]);
@@ -64,11 +71,16 @@ const PositionModal = ({ handleClose, show, positiontoedit }) => {
     }
   }, [posEditInit]);
 
+  const cleanup = () => {
+    setPosChanges({});
+    togglePosrefresh();
+  };
+
   const updatePosition = async (e) => {
     e.preventDefault();
     handleClose(e);
     await Axios.post("/positionupdate", { poschanges: posChanges }).then(
-      setPosChanges({})
+      cleanup()
     );
   };
   return (

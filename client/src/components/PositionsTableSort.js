@@ -13,7 +13,8 @@ const PositionsTableSort = (props) => {
   const { state } = useContext(AuthContext);
   const { posrefresh, togglePosrefresh } = useContext(RefreshPositionsContext);
   // Get token values from UseContext and Local Storage
-  let accesstoken = state.accesstoken;
+  // let accesstoken = state.accesstoken;
+  let accesstoken = JSON.parse(localStorage.getItem("accesstoken"));
   let refreshtoken = JSON.parse(localStorage.getItem("refreshtoken"));
   // Declare custom axios calls for authorization and refreshing token
   const authAxios = Axios.create({
@@ -186,7 +187,7 @@ const PositionsTableSort = (props) => {
             className="editbutton"
             onClick={(e) => {
               props.showEditModal(e, item);
-              console.log(item);
+              // console.log(item);
             }}
           >
             Edit

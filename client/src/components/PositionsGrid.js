@@ -72,7 +72,7 @@ const PositionsGrid = () => {
   const [modalState, setModalState] = useState(false);
   const [postoedit, setPostoedit] = useState({});
   const showEditModal = (e, positem) => {
-    console.log(positem);
+    // console.log(positem);
     setModalState(true);
     setPostoedit(positem);
   };
@@ -103,10 +103,10 @@ const PositionsGrid = () => {
           draggableCancel=".canceldrag"
         >
           <div id="sales1" key="a">
-            <PositionReport />
+            <PositionReport key="positionreport" />
           </div>
           <div id="sales2" key="b">
-            <PositionAdd />
+            <PositionAdd key="positionadd" />
           </div>
           <div id="sales2" key="c">
             <Positions
@@ -114,6 +114,7 @@ const PositionsGrid = () => {
               hideEditModal={hideEditModal}
               modalState={modalState}
               postoedit={postoedit}
+              key="positions"
             />
           </div>
         </ResponsiveGridLayout>

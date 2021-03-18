@@ -39,6 +39,7 @@ const Positions = (props) => {
         hideEditModal={props.hideEditModal}
         modalState={props.modalState}
         postoedit={props.postoedit}
+        key="positionstablesort"
       />
     </div>
   );
