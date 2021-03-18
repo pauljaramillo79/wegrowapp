@@ -3,6 +3,7 @@ import Axios from "axios";
 import { AuthContext } from "../App";
 import "./PositionReport.css";
 import { RefreshPositionsContext } from "../contexts/RefreshPositionsProvider";
+import moment from "moment";
 
 const PositionReport = () => {
   const { state } = useContext(AuthContext);
@@ -124,8 +125,8 @@ const PositionReport = () => {
                             {x.Price.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                           </td>
                           <td>{x.Supplier}</td>
-                          <td>{x.Start}</td>
-                          <td>{x.End}</td>
+                          <td>{moment(x.Start).format("DD-MMM-YYYY")}</td>
+                          <td>{moment(x.End).format("DD-MMM-YYYY")}</td>
                           <td className="fig">
                             {"$" +
                               (

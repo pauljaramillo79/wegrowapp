@@ -1,17 +1,21 @@
 import React, { useState, useEffect } from "react";
 import "./PositionModal.css";
 import Axios from "axios";
+import moment from "moment";
 
 const PositionModal = ({ handleClose, show, positiontoedit }) => {
   const showHideClassName = show ? "modal display-block" : "modal display-none";
 
   const positionid = positiontoedit.WGP;
   const [posEditInit, setPosEditInit] = useState();
+  const [posOriginal, setPosOriginal] = useState();
+  const [posChanges, setPosChanges] = useState();
 
   useEffect(() => {
     if (positionid) {
       Axios.post("/positiontoedit", { id: positionid }).then((response) => {
         setPosEditInit(response.data[0]);
+        setPosOriginal(response.data[0]);
         console.log(response.data[0]);
       });
     }
@@ -23,29 +27,54 @@ const PositionModal = ({ handleClose, show, positiontoedit }) => {
     quantity: positiontoedit.quantity,
     FOB: positiontoedit.FOB,
   };
-  const [postoedit, setPostoedit] = useState({});
+  // const [postoedit, setPostoedit] = useState({});
 
-  useEffect(() => {
-    setPostoedit(postoeditinit);
+  // useEffect(() => {
+  //   setPostoedit(postoeditinit);
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [show]);
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [show]);
 
   const handleInputChange = (e) => {
     e.preventDefault();
-    setPostoedit({
-      ...postoedit,
+    setPosEditInit({
+      ...posEditInit,
       [e.target.name]: e.target.value,
     });
   };
-  const handleSubmit = (e) => {
+  const handleLocalClose = (e) => {
     e.preventDefault();
-    handleClose();
+    handleClose(e);
+    setPosChanges({});
+  };
+  const compareObjects = (obj1, obj2) => {
+    for (let key of Object.keys(obj1)) {
+      if (obj1[key] !== obj2[key]) {
+        setPosChanges({
+          ...posChanges,
+          [key]: obj1[key],
+        });
+        console.log(posChanges);
+      }
+    }
+  };
+  useEffect(() => {
+    if (posEditInit && posOriginal) {
+      compareObjects(posEditInit, posOriginal);
+    }
+  }, [posEditInit]);
+
+  const updatePosition = async (e) => {
+    e.preventDefault();
+    handleClose(e);
+    await Axios.post("/positionupdate", { poschanges: posChanges }).then(
+      setPosChanges({})
+    );
   };
   return (
     <div className={showHideClassName}>
       <section className="modal-main">
-        <form className="positionModalForm" action="">
+        <form className="positionModalForm" onSubmit={updatePosition}>
           <h2>Edit Position</h2>
           <div className="form-group">
             <label htmlFor="">WGP:</label>
@@ -53,7 +82,7 @@ const PositionModal = ({ handleClose, show, positiontoedit }) => {
               name="WGP"
               type="text"
               value={posEditInit ? posEditInit.WGP : ""}
-              // onChange={handleInputChange}
+              onChange={handleInputChange}
               className="canceldrag"
             />
           </div>
@@ -110,7 +139,7 @@ const PositionModal = ({ handleClose, show, positiontoedit }) => {
           <div className="form-group">
             <label htmlFor="">FOB:</label>
             <input
-              name="FOB"
+              name="FOBCost"
               type="text"
               value={posEditInit ? posEditInit.FOBCost : ""}
               onChange={handleInputChange}
@@ -123,7 +152,27 @@ const PositionModal = ({ handleClose, show, positiontoedit }) => {
             <input
               name="from"
               type="date"
-              value={posEditInit ? posEditInit.shipmentStart : ""}
+              value={
+                posEditInit
+                  ? moment(posEditInit.shipmentStart).format("YYYY-MM-DD")
+                  : ""
+              }
+              onChange={handleInputChange}
+              className="canceldrag"
+            />
+          </div>
+          <div className="form-group">
+            <label>To:</label>
+            <input
+              name="to"
+              type="date"
+              value={
+                posEditInit
+                  ? moment(posEditInit.shipmentEnd).format("YYYY-MM-DD")
+                  : ""
+              }
+              onChange={handleInputChange}
+              className="canceldrag"
             />
           </div>
           <div className="form-group">
@@ -132,13 +181,19 @@ const PositionModal = ({ handleClose, show, positiontoedit }) => {
               name="notes"
               className="canceldrag"
               value={posEditInit ? posEditInit.notes : ""}
+              onChange={handleInputChange}
+              className="canceldrag"
             ></textarea>
           </div>
 
-          <button className="confirmbutton" type="submit" onClick={handleClose}>
+          <button
+            className="confirmbutton"
+            type="submit"
+            // onSubmit={(e) => updatePosition(e)}
+          >
             Save Edits
           </button>
-          <button className="cancelbutton" onClick={handleClose}>
+          <button className="cancelbutton" onClick={handleLocalClose}>
             Cancel
           </button>
         </form>

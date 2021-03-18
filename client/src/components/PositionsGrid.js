@@ -76,7 +76,8 @@ const PositionsGrid = () => {
     setModalState(true);
     setPostoedit(positem);
   };
-  const hideEditModal = () => {
+  const hideEditModal = (e) => {
+    e.preventDefault();
     setModalState(false);
   };
   return (

@@ -7,6 +7,7 @@ import { AuthContext } from "../App";
 import { RefreshPositionsContext } from "../contexts/RefreshPositionsProvider";
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
+import moment from "moment";
 
 const PositionsTableSort = (props) => {
   const { state } = useContext(AuthContext);
@@ -157,6 +158,13 @@ const PositionsTableSort = (props) => {
         return (
           <td className="canceldrag" id={c + "-" + x.id} key={c + "-" + x.id}>
             {"$" + x[c].toFixed(2)}
+          </td>
+        );
+      }
+      if (c === "Start" || c === "End") {
+        return (
+          <td className="canceldrag" id={c + "-" + x.id} key={c + "-" + x.id}>
+            {moment(x[c]).format("DD-MMM-YYYY")}
           </td>
         );
       } else {

@@ -394,8 +394,10 @@ router.post("/addposition", (req, res) => {
     to,
     notes,
   } = req.body.posData;
-  from = moment(from).format("D-MMMM");
-  to = moment(to).format("D-MMMM");
+  // from = moment(from).format("D-MMMM");
+  from = moment(from).format("YYYY-MM-DD");
+  // to = moment(to).format("D-MMMM");
+  to = moment(to).format("YYYY-MM-DD");
   positiondate = moment(new Date()).format("YYYY-MM-DD HH:mm:ss");
   db.query(
     "INSERT INTO positions (KTP, supplier, productID, quantityLow, quantityHigh, FOBCost, shipmentStart, shipmentEnd, positionDate, prodGroupID, notes) VALUES (?,?,?,?,?,?,?,?,?,?,?);",
@@ -438,6 +440,9 @@ router.post("/positiontoedit", (req, res) => {
       }
     }
   );
+});
+router.post("/positionupdate", (req, res) => {
+  console.log(req.body.poschanges);
 });
 router.post("/saveQS", (req, res) => {
   console.log(req.body);
