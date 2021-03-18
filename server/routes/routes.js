@@ -222,18 +222,21 @@ router.post("/changepassword", authenticateToken, async (req, res) => {
   );
 });
 router.post("/positionreport", authenticateToken, async (req, res) => {
-  await db.query("SELECT * FROM positionreport", (err, results) => {
-    if (err) {
-      console.log(err);
+  await db.query(
+    "SELECT KTP, product, Supplier, Price, DATE_FORMAT(Start,'%Y-%m-%d') AS Start, DATE_FORMAT(End,'%Y-%m-%d') AS End, quantity, Sold, Inventory, year, productGroup FROM positionreport",
+    (err, results) => {
+      if (err) {
+        console.log(err);
+      }
+      if (results.length > 0) {
+        return res.status(200).send(results);
+      }
     }
-    if (results.length > 0) {
-      return res.status(200).send(results);
-    }
-  });
+  );
 });
 router.post("/positions", authenticateToken, async (req, res) => {
   db.query(
-    "SELECT KTP AS WGP,positionID AS id, abbreviation, companyCode, packaging, shipmentStart AS Start, shipmentEnd AS End, FOBCost AS FOB, quantityLow AS quantity, year FROM positionsview",
+    "SELECT KTP AS WGP,positionID AS id, abbreviation, companyCode, packaging, shipmentStart AS Start, DATE_FORMAT(shipmentEnd,'%Y-%m-%d') AS End, FOBCost AS FOB, quantityLow AS quantity, year FROM positionsview",
     (err, results) => {
       if (err) {
         console.log(err);

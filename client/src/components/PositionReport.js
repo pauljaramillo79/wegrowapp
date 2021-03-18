@@ -127,11 +127,11 @@ const PositionReport = () => {
                             {x.Price.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                           </td>
                           <td>{x.Supplier}</td>
-                          <td>{x.Start}</td>
                           <td>
-                            {moment(x.End)
-                              .format("DD-MMM-YYYY")
-                              .toLocaleString()}
+                            {moment(x.Start).format("DD-MMM-YYYY").toString()}
+                          </td>
+                          <td>
+                            {moment(x.End).format("DD-MMM-YYYY").toString()}
                           </td>
                           <td className="fig">
                             {"$" +
