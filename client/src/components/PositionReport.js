@@ -128,10 +128,14 @@ const PositionReport = () => {
                           </td>
                           <td>{x.Supplier}</td>
                           <td>
-                            {moment(x.Start).format("DD-MMM-YYYY").toString()}
+                            {moment(x.Start)
+                              .format("DD-MMM-YYYY")
+                              .toLocaleString()}
                           </td>
                           <td>
-                            {moment(x.End).format("DD-MMM-YYYY").toString()}
+                            {moment(x.End)
+                              .format("DD-MMM-YYYY")
+                              .toLocaleString()}
                           </td>
                           <td className="fig">
                             {"$" +
