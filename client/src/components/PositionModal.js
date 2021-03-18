@@ -71,17 +71,17 @@ const PositionModal = ({ handleClose, show, positiontoedit }) => {
     }
   }, [posEditInit]);
 
-  const cleanup = () => {
-    setPosChanges({});
-    togglePosrefresh();
+  const cleanup = async () => {
+    await setPosChanges({});
+    await togglePosrefresh();
   };
 
   const updatePosition = async (e) => {
     e.preventDefault();
     handleClose(e);
-    await Axios.post("/positionupdate", { poschanges: posChanges }).then(
-      cleanup()
-    );
+    await Axios.post("/positionupdate", {
+      poschanges: posChanges,
+    }).then((response) => cleanup());
   };
   return (
     <div className={showHideClassName}>
