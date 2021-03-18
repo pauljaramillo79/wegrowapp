@@ -450,16 +450,18 @@ router.post("/positionupdate", (req, res) => {
   let quantityLow = req.body.poschanges.quantityLow || "";
   let quantityHigh = req.body.poschanges.quantityHigh || "";
 
-  let sqlquery = `UPDATE positions SET ${WGP !== "" ? `KTP='${WGP}'` : ""} ${
+  let sqlquery = `UPDATE positions SET ${WGP !== "" ? `KTP='${WGP}'` : ""}${
     quantityLow !== "" ? `, quantityLow='${quantityLow}'` : ""
-  } ${
+  }${
     quantityHigh !== "" ? `, quantityHigh='${quantityHigh}'` : ""
   } WHERE positionID=${id}`;
 
   db.query(sqlquery, (err, results) => {
     if (err) {
       console.log(err);
-    } else {
+    }
+    if (results) {
+      // console.log(results.affectedRows);
       res.sendStatus(200);
     }
     // if (results.length > 0) {
