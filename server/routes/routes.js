@@ -236,7 +236,7 @@ router.post("/positionreport", authenticateToken, async (req, res) => {
 });
 router.post("/positions", authenticateToken, async (req, res) => {
   db.query(
-    "SELECT KTP AS WGP,positionID AS id, abbreviation, companyCode, packaging, shipmentStart AS Start, DATE_FORMAT(shipmentEnd,'%Y-%m-%d') AS End, FOBCost AS FOB, quantityLow AS quantity, year FROM positionsview",
+    "SELECT KTP AS WGP,positionID AS id, abbreviation, companyCode, packaging, shipmentStart AS Start, DATE_FORMAT(shipmentEnd,'%Y-%m-%d') AS End, FOBCost AS FOB, quantityHigh AS quantity, year FROM positionsview",
     (err, results) => {
       if (err) {
         console.log(err);
@@ -433,7 +433,7 @@ router.post("/addposition", (req, res) => {
 router.post("/positiontoedit", (req, res) => {
   let id = req.body.id;
   db.query(
-    `SELECT KTP AS WGP, positions.productID, abbreviation AS product, productList.supplierID, companyCode AS supplier, prodNames.prodGroupID, productGroup, quantityLow, quantityHigh, FOBCost, shipmentStart, shipmentEnd, positions.notes FROM positions INNER JOIN ((productList INNER JOIN (prodNames INNER JOIN productGroups ON prodNames.prodGroupID=productGroups.prodGroupID) ON productName = prodNameID) INNER JOIN supplierlist ON productList.supplierID=supplierlist.supplierID)ON positions.productID = productList.productID WHERE KTP = ${id}`,
+    `SELECT positionID, KTP AS WGP, positions.productID, abbreviation AS product, productList.supplierID, companyCode AS supplier, prodNames.prodGroupID, productGroup, quantityLow, quantityHigh, FOBCost, shipmentStart, shipmentEnd, positions.notes FROM positions INNER JOIN ((productList INNER JOIN (prodNames INNER JOIN productGroups ON prodNames.prodGroupID=productGroups.prodGroupID) ON productName = prodNameID) INNER JOIN supplierlist ON productList.supplierID=supplierlist.supplierID)ON positions.productID = productList.productID WHERE KTP = ${id}`,
     (err, results) => {
       if (err) {
         console.log(err);
@@ -445,7 +445,31 @@ router.post("/positiontoedit", (req, res) => {
   );
 });
 router.post("/positionupdate", (req, res) => {
+  let id = req.body.poschanges.id;
+  let WGP = req.body.poschanges.WGP || "";
+  let quantityLow = req.body.poschanges.quantityLow || "";
+  let quantityHigh = req.body.poschanges.quantityHigh || "";
+
+  let sqlquery = `UPDATE positions SET ${WGP !== "" ? `KTP='${WGP}'` : ""} ${
+    quantityLow !== "" ? `, quantityLow='${quantityLow}'` : ""
+  } ${
+    quantityHigh !== "" ? `, quantityHigh='${quantityHigh}'` : ""
+  } WHERE positionID=${id}`;
+
+  db.query(sqlquery, (err, results) => {
+    if (err) {
+      console.log(err);
+    }
+    // if (results.length > 0) {
+    //   console.log(results);
+    // }
+  });
+  console.log(sqlquery);
   console.log(req.body.poschanges);
+  console.log(id);
+  // `SELECT DATE_FORMAT(QSDate,'%m/%d/%Y') AS QSDate,  QSID, saleType, KTP AS WGP, KTS AS WGS, abbreviation, supplier, customer, packingSize, marks, trader, beginning, finish, portOfLoad, portOfDestination, quantity, incoterms, paymentTerm, materialCost, FreightTotal, freightCompany, oFreight, priceBeforeInterest, tradingProfit, tradingMargin, (percentageMargin*100) AS percentageMargin, netback, saleComplete FROM qsviewshort ${
+  //   userID !== "all" ? `WHERE trader='${userID}'` : ""
+  // }  ORDER BY QSID Desc LIMIT 300 `,
 });
 router.post("/saveQS", (req, res) => {
   console.log(req.body);
