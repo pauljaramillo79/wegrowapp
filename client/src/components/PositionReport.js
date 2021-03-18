@@ -4,6 +4,7 @@ import { AuthContext } from "../App";
 import "./PositionReport.css";
 import { RefreshPositionsContext } from "../contexts/RefreshPositionsProvider";
 import moment from "moment";
+import tz from "moment-timezone";
 
 const PositionReport = () => {
   const { state } = useContext(AuthContext);
@@ -57,6 +58,7 @@ const PositionReport = () => {
   const [gdata, setGdata] = useState({});
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(async () => {
+    console.log(moment.tz());
     await authAxios
       .post("/positionreport")
       .then((result) => {
