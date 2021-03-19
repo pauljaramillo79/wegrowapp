@@ -87,8 +87,8 @@ const PositionModal = ({ handleClose, show, positiontoedit }) => {
     });
     setPosChanges({
       ...posChanges,
-      product: id1,
-      supplier: id2,
+      productID: id1,
+      supplierID: id2,
       productGroupID: id3,
     });
   };

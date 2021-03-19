@@ -25,6 +25,7 @@ const SalesQS = () => {
     CADintrate: 0.03,
     CADdays: 15,
     paymentTerm: "",
+    shipmentType: 1,
     quantity: 0,
     materialcost: 0,
     pcommission: 0,
@@ -68,6 +69,7 @@ const SalesQS = () => {
     CADintrate: "3.00%",
     CADdays: "15",
     paymentTerm: "",
+    shipmentType: "Container",
     quantity: "",
     materialcost: "0.00",
     pcommission: "0.00",
@@ -362,7 +364,7 @@ const SalesQS = () => {
   }, [QSData.quantity, QSData.priceafterint, QSData.totalcost]);
   const addQS = (e) => {
     e.preventDefault();
-    Axios.post("/saveQS", { QSData }).then(toggleQSrefresh());
+    Axios.post("/saveQS", { QSData }).then((response) => toggleQSrefresh());
   };
   return (
     <div className="salesQS">
@@ -564,7 +566,7 @@ const SalesQS = () => {
             <div className="form-group">
               <label htmlFor="">Incoterms:</label>
               <input
-                placeholder="...Incoterms"
+                placeholder="Incoterms..."
                 onChange={handleChange}
                 name="incoterms"
                 value={QSValues.incoterms}
@@ -588,10 +590,10 @@ const SalesQS = () => {
               />
             </div>
             <div className="form-group">
-              <label htmlFor="">CAD Interest:</label>
+              <label htmlFor="">Inc. Interest:</label>
               <input
                 value={QSValues.CADintrate}
-                placeholder="...Interest rate"
+                placeholder="Interest rate..."
                 type="text"
                 name="CADintrate"
                 onDoubleClick={(e) => {
@@ -603,13 +605,13 @@ const SalesQS = () => {
               />
             </div>
             <div className="form-group">
-              <label htmlFor="">CAD Days:</label>
+              <label htmlFor="">Inc. Days:</label>
               <input
                 value={QSValues.CADdays}
                 name="CADdays"
                 onChange={QtyChange}
                 type="text"
-                placeholder="...Days"
+                placeholder="Days..."
                 onDoubleClick={(e) => {
                   e.target.select();
                 }}
@@ -617,29 +619,75 @@ const SalesQS = () => {
               />
             </div>
           </fieldset>
-          <fieldset>
-            <legend>Freight</legend>
-            <div className="form-group">
-              <label htmlFor="">Freight ID:</label>
-              <input type="text" />
-            </div>
-            <div className="form-group">
-              <label htmlFor="">Freight Total:</label>
-              <input type="text" />
-            </div>
-            <div className="form-group">
-              <label htmlFor="">Shipping Line:</label>
-              <input type="text" />
-            </div>
-            <div className="form-group">
-              <label htmlFor="">Payload:</label>
-              <input type="text" />
-            </div>
-            <div className="form-group">
-              <label htmlFor="">Inspection Cost:</label>
-              <input type="text" />
-            </div>
-          </fieldset>
+
+          <div id="shipmenttyperadio" className="form-group">
+            {/* <p> */}
+            <input
+              name="shipmenttype"
+              type="radio"
+              defaultChecked
+              required
+              onClick={(e) => {
+                setQSData({ ...QSData, shipmentType: 1 });
+                setQSValues({ ...QSValues, shipmentType: "Container" });
+              }}
+            />
+            <label htmlFor="">Container</label>
+            {/* </p>
+
+            <p> */}
+            <input
+              name="shipmenttype"
+              type="radio"
+              required
+              onClick={(e) => {
+                setQSData({ ...QSData, shipmentType: 2 });
+                setQSValues({ ...QSValues, shipmentType: "Breakbulk" });
+              }}
+            />
+            <label htmlFor="">Breakbulk</label>
+            <input
+              name="shipmenttype"
+              type="radio"
+              required
+              onClick={(e) => {
+                setQSData({ ...QSData, shipmentType: 3 });
+                setQSValues({ ...QSValues, shipmentType: "Distribution" });
+              }}
+            />
+            <label htmlFor="">Distribution</label>
+            {/* </p> */}
+          </div>
+
+          {QSData && QSData.shipmentType === 1 ? (
+            <fieldset>
+              <legend>Freight</legend>
+              <div className="form-group">
+                <label htmlFor="">Freight ID:</label>
+                <input type="text" />
+              </div>
+              <div className="form-group">
+                <label htmlFor="">Freight Total:</label>
+                <input type="text" />
+              </div>
+              <div className="form-group">
+                <label htmlFor="">Shipping Line:</label>
+                <input type="text" />
+              </div>
+              <div className="form-group">
+                <label htmlFor="">Payload:</label>
+                <input type="text" />
+              </div>
+              <div className="form-group">
+                <label htmlFor="">Inspection Cost:</label>
+                <input type="text" />
+              </div>
+            </fieldset>
+          ) : QSData && QSData.shipmentType == 2 ? (
+            "hello"
+          ) : (
+            ""
+          )}
         </section>
         <section id="salesQS-3">
           <fieldset id="salesQS-3-fieldset">
