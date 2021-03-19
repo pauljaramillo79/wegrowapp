@@ -14,6 +14,7 @@ const SearchField = ({
   setProdSupplier,
   resetfield,
   setResetfield,
+  value,
 }) => {
   const [data, setData] = useState();
   const [searchTerm, setSearchTerm] = useState("");
@@ -39,7 +40,7 @@ const SearchField = ({
     if (data) {
       const results = data.filter((item) => {
         if (otherName && otherID && thirdID) {
-          if (searchTerm !== "") {
+          if (searchTerm && searchTerm !== "") {
             return (
               item[searchName] +
               item[searchID] +
@@ -49,13 +50,13 @@ const SearchField = ({
               item[thirdID]
             )
               .toLowerCase()
-              .includes(searchTerm);
+              .includes(searchTerm.toLowerCase());
           } else {
             setShow(false);
           }
         }
         if (otherName && otherID && !thirdID) {
-          if (searchTerm !== "") {
+          if (searchTerm && searchTerm !== "") {
             return (
               item[searchName] +
               item[searchID] +
@@ -63,15 +64,15 @@ const SearchField = ({
               item[otherID]
             )
               .toLowerCase()
-              .includes(searchTerm);
+              .includes(searchTerm.toLowerCase());
           } else {
             setShow(false);
           }
         } else {
-          if (searchTerm !== "") {
+          if (searchTerm && searchTerm !== "") {
             return (item[searchName] + item[searchID])
               .toLowerCase()
-              .includes(searchTerm);
+              .includes(searchTerm.toLowerCase());
           } else {
             setShow(false);
           }
@@ -87,7 +88,7 @@ const SearchField = ({
       <input
         placeholder={placeholder}
         type="text"
-        value={resetfield ? "" : searchTerm}
+        value={resetfield ? "" : searchTerm || value}
         onFocus={loadData}
         onChange={handleChange}
         // onDoubleClick={(e) => {
@@ -98,7 +99,7 @@ const SearchField = ({
       />
       <div className="flexbreak"></div>
       <div className="presearchresults"></div>
-      <ul className="searchresults">
+      <ul className={show ? "searchresults" : "QSsearchresults-hide"}>
         {searchResults
           ? searchResults.map((item) => {
               //   Object.entries(item).map((i, key) => console.log(i[1]));
@@ -106,55 +107,52 @@ const SearchField = ({
               //   console.log(Object.keys(item));
               if (otherID && otherName && thirdName && thirdID) {
                 return (
-                  <ul
-                    className={show ? "searchresults" : "QSsearchresults-hide"}
+                  // <ul className={show ? "searchresults" : "QSsearchresults-hide"}>
+                  <li
+                    onClick={(e) => {
+                      setProdSupplier(
+                        item[searchID],
+                        item[otherID],
+                        item[thirdID],
+                        item[searchName],
+                        item[otherName],
+                        item[thirdName]
+                      );
+                      // setSearchTerm(
+                      //   item[searchID] +
+                      //     " - " +
+                      //     item[searchName] +
+                      //     " - " +
+                      //     item[otherName] +
+                      //     " - " +
+                      //     item[thirdName]
+                      // );
+                      setSearchTerm(null);
+                    }}
                   >
-                    <li
-                      onClick={(e) => {
-                        setProdSupplier(
-                          item[searchID],
-                          item[otherID],
-                          item[thirdID],
-                          item[searchName],
-                          item[otherName],
-                          item[thirdName]
-                        );
-                        setSearchTerm(
-                          item[searchID] +
-                            " - " +
-                            item[searchName] +
-                            " - " +
-                            item[otherName] +
-                            " - " +
-                            item[thirdName]
-                        );
-                      }}
-                    >
-                      {item[searchID]} - {item[searchName]} - {item[otherName]}
-                    </li>
-                  </ul>
+                    {item[searchID]} - {item[searchName]} - {item[otherName]}
+                  </li>
+                  // </ul>
                 );
               }
               if (otherID && otherName && !thirdName && !thirdID) {
                 return (
-                  <ul
-                    className={show ? "searchresults" : "QSsearchresults-hide"}
+                  // <ul className={show ? "searchresults" : "QSsearchresults-hide"}>
+                  <li
+                    onClick={(e) => {
+                      setProdSupplier(item[searchID], item[otherID]);
+                      setSearchTerm(
+                        item[searchID] +
+                          " - " +
+                          item[searchName] +
+                          " - " +
+                          item[otherName]
+                      );
+                    }}
                   >
-                    <li
-                      onClick={(e) => {
-                        setProdSupplier(item[searchID], item[otherID]);
-                        setSearchTerm(
-                          item[searchID] +
-                            " - " +
-                            item[searchName] +
-                            " - " +
-                            item[otherName]
-                        );
-                      }}
-                    >
-                      {item[searchID]} - {item[searchName]} - {item[otherName]}
-                    </li>
-                  </ul>
+                    {item[searchID]} - {item[searchName]} - {item[otherName]}
+                  </li>
+                  // </ul>
                 );
               } else {
                 return (

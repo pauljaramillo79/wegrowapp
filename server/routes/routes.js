@@ -417,11 +417,12 @@ router.post("/addposition", (req, res) => {
       productgroup,
       notes,
     ],
-    (err) => {
+    (err, results) => {
       if (err) {
         console.log(err);
-      } else {
-        console.log("Added position");
+      }
+      if (results) {
+        // console.log("Added position");
         return res.json({
           success: true,
           message: "Succesfully added position",
@@ -433,7 +434,7 @@ router.post("/addposition", (req, res) => {
 router.post("/positiontoedit", (req, res) => {
   let id = req.body.id;
   db.query(
-    `SELECT positionID, KTP AS WGP, positions.productID, abbreviation AS product, productList.supplierID, companyCode AS supplier, prodNames.prodGroupID, productGroup, quantityLow, quantityHigh, FOBCost, shipmentStart, shipmentEnd, positions.notes FROM positions INNER JOIN ((productList INNER JOIN (prodNames INNER JOIN productGroups ON prodNames.prodGroupID=productGroups.prodGroupID) ON productName = prodNameID) INNER JOIN supplierlist ON productList.supplierID=supplierlist.supplierID)ON positions.productID = productList.productID WHERE KTP = ${id}`,
+    `SELECT positionID, KTP AS WGP, positions.productID, abbreviation AS product, productList.supplierID, companyCode AS supplier, prodNames.prodGroupID, productGroup, quantityLow, quantityHigh, FOBCost, shipmentStart, shipmentEnd, positions.notes AS notes FROM positions INNER JOIN ((productList INNER JOIN (prodNames INNER JOIN productGroups ON prodNames.prodGroupID=productGroups.prodGroupID) ON productName = prodNameID) INNER JOIN supplierlist ON productList.supplierID=supplierlist.supplierID)ON positions.productID = productList.productID WHERE KTP = ${id}`,
     (err, results) => {
       if (err) {
         console.log(err);
@@ -447,13 +448,26 @@ router.post("/positiontoedit", (req, res) => {
 router.post("/positionupdate", (req, res) => {
   let id = req.body.poschanges.id;
   let WGP = req.body.poschanges.WGP || "";
+  let product = req.body.poschanges.product || "";
+  let supplier = req.body.poschanges.supplier || "";
+  let productGroupID = req.body.poschanges.productGroupID || "";
   let quantityLow = req.body.poschanges.quantityLow || "";
   let quantityHigh = req.body.poschanges.quantityHigh || "";
+  let FOBCost = req.body.poschanges.FOBCost || "";
+  let shipmentStart = req.body.poschanges.shipmentStart || "";
+  let shipmentEnd = req.body.poschanges.shipmentEnd || "";
+  let notes = req.body.poschanges.notes || "";
 
   let sqlquery = `UPDATE positions SET ${WGP !== "" ? `KTP='${WGP}'` : ""}${
-    quantityLow !== "" ? `, quantityLow='${quantityLow}'` : ""
-  }${
+    product !== "" ? `, productID='${product}'` : ""
+  }${supplier !== "" ? `, supplier='${supplier}'` : ""}${
+    productGroupID !== "" ? `, prodGroupID='${productGroupID}'` : ""
+  }${quantityLow !== "" ? `, quantityLow='${quantityLow}'` : ""}${
     quantityHigh !== "" ? `, quantityHigh='${quantityHigh}'` : ""
+  }${FOBCost !== "" ? `, FOBCost='${FOBCost}'` : ""}${
+    shipmentStart !== "" ? `, shipmentStart='${shipmentStart}'` : ""
+  }${shipmentEnd !== "" ? `, shipmentEnd='${shipmentEnd}'` : ""}${
+    notes !== "" ? `, notes='${notes}'` : ""
   } WHERE positionID=${id}`;
 
   db.query(sqlquery, (err, results) => {

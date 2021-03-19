@@ -79,7 +79,7 @@ const WaterfallChart = (props: IProps) => {
       data={data}
       keys={["subTotal", "amount"]}
       indexBy={"category"}
-      margin={{ top: 10, right: 0, bottom: 75, left: 40 }}
+      margin={{ top: 15, right: 0, bottom: 75, left: 40 }}
       padding={0.3}
       colors={({ id, data }) => (id === "subTotal" ? transparent : data.color)}
       borderColor={{ from: "color", modifiers: [["darker", 1.6]] }}

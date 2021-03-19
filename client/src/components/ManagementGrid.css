@@ -1,0 +1,8 @@
+.mgmtchart h3 {
+  position: fixed;
+  left: 0;
+  padding-left: 1rem;
+  padding-top: 0.7rem;
+  z-index: -10;
+  /* padding-bottom: 1rem; */
+}

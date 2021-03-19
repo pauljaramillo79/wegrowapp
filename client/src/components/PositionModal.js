@@ -3,6 +3,7 @@ import "./PositionModal.css";
 import Axios from "axios";
 import moment from "moment";
 import { RefreshPositionsContext } from "../contexts/RefreshPositionsProvider";
+import SearchField from "./SearchField";
 
 const PositionModal = ({ handleClose, show, positiontoedit }) => {
   const { posrefresh, togglePosrefresh } = useContext(RefreshPositionsContext);
@@ -13,6 +14,7 @@ const PositionModal = ({ handleClose, show, positiontoedit }) => {
   const [posEditInit, setPosEditInit] = useState();
   const [posOriginal, setPosOriginal] = useState();
   const [posChanges, setPosChanges] = useState();
+  const [resetfield, setResetfield] = useState(false);
 
   useEffect(() => {
     if (positionid) {
@@ -27,13 +29,13 @@ const PositionModal = ({ handleClose, show, positiontoedit }) => {
       });
     }
   }, [show]);
-  const postoeditinit = {
-    WGP: positiontoedit.WGP,
-    supplier: positiontoedit.abbreviation,
-    companyCode: positiontoedit.companyCode,
-    quantity: positiontoedit.quantity,
-    FOB: positiontoedit.FOB,
-  };
+  // const postoeditinit = {
+  //   WGP: positiontoedit.WGP,
+  //   supplier: positiontoedit.abbreviation,
+  //   companyCode: positiontoedit.companyCode,
+  //   quantity: positiontoedit.quantity,
+  //   FOB: positiontoedit.FOB,
+  // };
   // const [postoedit, setPostoedit] = useState({});
 
   // useEffect(() => {
@@ -76,6 +78,21 @@ const PositionModal = ({ handleClose, show, positiontoedit }) => {
     await togglePosrefresh();
   };
 
+  const handleProductChange = (id1, id2, id3, name1, name2, name3) => {
+    setPosEditInit({
+      ...posEditInit,
+      product: name1,
+      supplier: name2,
+      productGroup: name3,
+    });
+    setPosChanges({
+      ...posChanges,
+      product: id1,
+      supplier: id2,
+      productGroupID: id3,
+    });
+  };
+
   const updatePosition = async (e) => {
     e.preventDefault();
     handleClose(e);
@@ -93,37 +110,51 @@ const PositionModal = ({ handleClose, show, positiontoedit }) => {
             <input
               name="WGP"
               type="text"
-              value={posEditInit ? posEditInit.WGP : ""}
+              value={posEditInit ? posEditInit.WGP || "" : ""}
               onChange={handleInputChange}
               className="canceldrag"
             />
           </div>
           <div className="form-group">
             <label htmlFor="">Product:</label>
-            <input
+            <SearchField
+              className="searchfield canceldrag"
+              searchURL={"/productlist"}
+              searchName={"abbreviation"}
+              searchID={"productID"}
+              otherName={"supplier"}
+              otherID={"supplierID"}
+              thirdName={"productGroup"}
+              thirdID={"prodGroupID"}
+              resetfield={resetfield}
+              setResetfield={setResetfield}
+              value={posEditInit ? posEditInit.product || "" : ""}
+              setProdSupplier={handleProductChange}
+            />
+            {/* <input
               name="product"
               type="text"
-              value={posEditInit ? posEditInit.product : ""}
+              value={posEditInit ? posEditInit.product || "" : ""}
               onChange={handleInputChange}
               className="canceldrag"
-            />
+            /> */}
           </div>
           <div className="form-group">
             <label htmlFor="">Supplier:</label>
             <input
               name="supplier"
               type="text"
-              value={posEditInit ? posEditInit.supplier : ""}
+              value={posEditInit ? posEditInit.supplier || "" : ""}
               className="canceldrag"
               readOnly
             />
           </div>
           <div className="form-group">
-            <label htmlFor="">Prod Group:</label>
+            <label htmlFor="">ProdGroup:</label>
             <input
               name="productgroup"
               type="text"
-              value={posEditInit ? posEditInit.productGroup : ""}
+              value={posEditInit ? posEditInit.productGroup || "" : ""}
               className="canceldrag"
               readOnly
             />
@@ -133,7 +164,7 @@ const PositionModal = ({ handleClose, show, positiontoedit }) => {
             <input
               name="quantityLow"
               type="text"
-              value={posEditInit ? posEditInit.quantityLow : ""}
+              value={posEditInit ? posEditInit.quantityLow || "" : ""}
               onChange={handleInputChange}
               className="canceldrag"
             />
@@ -143,7 +174,7 @@ const PositionModal = ({ handleClose, show, positiontoedit }) => {
             <input
               name="quantityHigh"
               type="text"
-              value={posEditInit ? posEditInit.quantityHigh : ""}
+              value={posEditInit ? posEditInit.quantityHigh || "" : ""}
               onChange={handleInputChange}
               className="canceldrag"
             />
@@ -153,7 +184,7 @@ const PositionModal = ({ handleClose, show, positiontoedit }) => {
             <input
               name="FOBCost"
               type="text"
-              value={posEditInit ? posEditInit.FOBCost : ""}
+              value={posEditInit ? posEditInit.FOBCost || "" : ""}
               onChange={handleInputChange}
               className="canceldrag"
             />
@@ -162,11 +193,11 @@ const PositionModal = ({ handleClose, show, positiontoedit }) => {
           <div className="form-group">
             <label>From:</label>
             <input
-              name="from"
+              name="shipmentStart"
               type="date"
               value={
                 posEditInit
-                  ? moment(posEditInit.shipmentStart).format("YYYY-MM-DD")
+                  ? moment(posEditInit.shipmentStart).format("YYYY-MM-DD") || ""
                   : ""
               }
               onChange={handleInputChange}
@@ -176,11 +207,11 @@ const PositionModal = ({ handleClose, show, positiontoedit }) => {
           <div className="form-group">
             <label>To:</label>
             <input
-              name="to"
+              name="shipmentEnd"
               type="date"
               value={
                 posEditInit
-                  ? moment(posEditInit.shipmentEnd).format("YYYY-MM-DD")
+                  ? moment(posEditInit.shipmentEnd).format("YYYY-MM-DD") || ""
                   : ""
               }
               onChange={handleInputChange}
@@ -192,7 +223,7 @@ const PositionModal = ({ handleClose, show, positiontoedit }) => {
             <textarea
               name="notes"
               className="canceldrag"
-              value={posEditInit ? posEditInit.notes : ""}
+              value={posEditInit ? posEditInit.notes || "" : ""}
               onChange={handleInputChange}
               className="canceldrag"
             ></textarea>

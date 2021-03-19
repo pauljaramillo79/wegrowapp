@@ -121,7 +121,9 @@ const PositionAdd = () => {
       Axios.post("/checkposition", { WGP: posData.WGP })
         .then((response) => {
           if (response.data.msg === "OK") {
-            Axios.post("/addposition", { posData }).then(togglePosrefresh());
+            Axios.post("/addposition", { posData }).then((response) =>
+              togglePosrefresh()
+            );
           } else {
             setPosaddErrors({
               ...posaddErrors,
@@ -165,7 +167,7 @@ const PositionAdd = () => {
         <div className="form-group">
           <label htmlFor="">Product:</label>
           <SearchField
-            className="searchfield"
+            className="searchfield canceldrag"
             searchURL={"/productlist"}
             searchName={"abbreviation"}
             searchID={"productID"}
@@ -177,7 +179,8 @@ const PositionAdd = () => {
             setProdSupplier={setProdSupplier}
             resetfield={resetfield}
             setResetfield={setResetfield}
-            className="canceldrag"
+            value={posValues ? posValues.product || "" : ""}
+            // className="canceldrag"
 
             // value={postoadd.product}
           />

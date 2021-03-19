@@ -11,6 +11,7 @@ import NivoBar2 from "./NivoBar2";
 import NivoPie2 from "./NivoPie2";
 import Axios from "axios";
 import WaterfallChart from "./WaterFall";
+import "./ManagementGrid.css";
 
 const ManagementGrid = () => {
   const [data, setData] = useState();
@@ -65,19 +66,19 @@ const ManagementGrid = () => {
           <div id="keyfigures" key="a">
             <MgmtKeyFigures />
           </div>
-          <div id="graph" key="b">
+          <div className="mgmtchart" id="graph" key="b">
             <NivoPie />
           </div>
-          <div id="graph1" key="c">
+          <div className="mgmtchart" id="graph1" key="c">
             <NivoBar />
           </div>
-          <div id="graph1" key="d">
+          <div className="mgmtchart" id="graph2" key="d">
             <NivoBar2 />
           </div>
-          <div id="graph1" key="e">
+          <div className="mgmtchart" id="graph3" key="e">
             <NivoPie2 />
           </div>
-          <div id="graph1" key="f">
+          <div className="mgmtchart" id="graph4" key="f">
             <h3>Profit Waterfall Chart, 2020</h3>
             <WaterfallChart data={data ? data : ""} />
           </div>
