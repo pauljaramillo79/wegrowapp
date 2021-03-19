@@ -51,6 +51,7 @@ const reducer = (state, action) => {
       localStorage.removeItem("WGuserID");
       localStorage.removeItem("isAuthenticated");
       localStorage.removeItem("refreshtoken");
+      localStorage.removeItem("accesstoken");
       // localStorage.clear();
       return {
         ...state,

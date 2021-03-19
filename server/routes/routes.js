@@ -596,11 +596,25 @@ router.post("/saveQS", (req, res) => {
 // ------- DELETE ---------
 router.delete("/deleteQS", (req, res) => {
   let id = req.body.id;
-  db.query(`DELETE FROM quotationsheet WHERE QSID=${id}`);
+  db.query(`DELETE FROM quotationsheet WHERE QSID=${id}`, (err, results) => {
+    if (err) {
+      console.log(err);
+    }
+    if (results) {
+      res.sendStatus(200);
+    }
+  });
 });
 router.delete("/deletePosition", (req, res) => {
   let WGP = req.body.WGP;
-  db.query(`DELETE FROM positions WHERE KTP=${WGP}`);
+  db.query(`DELETE FROM positions WHERE KTP=${WGP}`, (err, results) => {
+    if (err) {
+      console.log(err);
+    }
+    if (results) {
+      res.sendStatus(200);
+    }
+  });
 });
 
 router.post("/keyfigures", (req, res) => {

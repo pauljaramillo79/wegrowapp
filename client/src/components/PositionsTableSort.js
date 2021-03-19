@@ -211,7 +211,7 @@ const PositionsTableSort = (props) => {
                       await Axios.delete("/deletePosition", {
                         data: { WGP: item.WGP },
                       })
-                        .then(togglePosrefresh())
+                        .then((response) => togglePosrefresh())
                         .catch((err) => console.log(err));
                     },
                   },

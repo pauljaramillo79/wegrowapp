@@ -249,7 +249,7 @@ const SalesTableSort = (props) => {
                       await Axios.delete("/deleteQS", {
                         data: { id: item.QSID },
                       })
-                        .then(toggleQSrefresh())
+                        .then((response) => toggleQSrefresh())
                         .catch((err) => console.log(err));
                     },
                   },
