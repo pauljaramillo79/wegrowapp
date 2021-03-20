@@ -1,6 +1,6 @@
 .react-grid-item {
   background-color: white;
-  border-radius: 0.5rem;
+  border-radius: 1rem;
   padding: 1rem;
   box-shadow: 3px 3px 10px rgb(170, 170, 170);
 }

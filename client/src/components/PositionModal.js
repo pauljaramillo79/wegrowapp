@@ -17,7 +17,7 @@ const PositionModal = ({ handleClose, show, positiontoedit }) => {
   const [resetfield, setResetfield] = useState(false);
 
   useEffect(() => {
-    if (positionid) {
+    if (positionid && show) {
       Axios.post("/positiontoedit", { id: positionid }).then((response) => {
         setPosEditInit(response.data[0]);
         setPosOriginal(response.data[0]);

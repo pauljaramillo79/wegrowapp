@@ -40,6 +40,8 @@
   padding-bottom: 0.3rem;
   display: flex;
   flex-wrap: wrap;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
 }
 .salesQS-form .form-group label {
   flex: 1;
