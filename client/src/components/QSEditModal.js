@@ -104,6 +104,11 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
   const formatPercent = (e) => {
     makepercent(e.target.value, e.target.name);
   };
+  const createemail = (e) => {
+    e.preventDefault();
+    window.location.href =
+      "mailto:user@example.com?subject=Subject&body=message%20goes%20here";
+  };
   return show ? (
     <div className={showHideClassName}>
       <section className="modal-main">
@@ -664,7 +669,7 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
               >
                 Save Edits
               </button>
-              <button className="cancelbutton" onClick={handleClose}>
+              <button className="cancelbutton" onClick={createemail}>
                 Save Edits and Offer
               </button>
               <button className="cancelbutton" onClick={handleClose}>
