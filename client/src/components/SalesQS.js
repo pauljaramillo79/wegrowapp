@@ -1044,12 +1044,12 @@ const SalesQS = () => {
             </section>
           </fieldset>
 
-          <button type="button" onClick={(e) => console.log("prepareoffer")}>
-            Offer
+          <button type="button" onClick={(e) => console.log("Cancel")}>
+            Clear
           </button>
-          <button type="submit">Save</button>
+          <button type="submit">Save and New</button>
           <button type="submit" onClick={(e) => console.log("prepare offer")}>
-            Offer and Save
+            Save and Offer
           </button>
         </section>
       </form>
