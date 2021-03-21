@@ -99,79 +99,87 @@ const SearchField = ({
       />
       <div className="flexbreak"></div>
       <div className="presearchresults"></div>
-      <ul className={show ? "searchresults" : "QSsearchresults-hide"}>
-        {searchResults
-          ? searchResults.map((item) => {
-              //   Object.entries(item).map((i, key) => console.log(i[1]));
-              //   console.log(item);
-              //   console.log(Object.keys(item));
-              if (otherID && otherName && thirdName && thirdID) {
-                return (
-                  // <ul className={show ? "searchresults" : "QSsearchresults-hide"}>
-                  <li
-                    onClick={(e) => {
-                      setProdSupplier(
-                        item[searchID],
-                        item[otherID],
-                        item[thirdID],
-                        item[searchName],
-                        item[otherName],
-                        item[thirdName]
-                      );
-                      // setSearchTerm(
-                      //   item[searchID] +
-                      //     " - " +
-                      //     item[searchName] +
-                      //     " - " +
-                      //     item[otherName] +
-                      //     " - " +
-                      //     item[thirdName]
-                      // );
-                      setSearchTerm(null);
-                    }}
-                  >
-                    {item[searchID]} - {item[searchName]} - {item[otherName]}
-                  </li>
-                  // </ul>
-                );
-              }
-              if (otherID && otherName && !thirdName && !thirdID) {
-                return (
-                  // <ul className={show ? "searchresults" : "QSsearchresults-hide"}>
-                  <li
-                    onClick={(e) => {
-                      setProdSupplier(item[searchID], item[otherID]);
-                      setSearchTerm(
-                        item[searchID] +
-                          " - " +
-                          item[searchName] +
-                          " - " +
-                          item[otherName]
-                      );
-                    }}
-                  >
-                    {item[searchID]} - {item[searchName]} - {item[otherName]}
-                  </li>
-                  // </ul>
-                );
-              } else {
-                return (
-                  <>
+      <span className="QSsearchresults-container">
+        <ul className={show ? "searchresults" : "QSsearchresults-hide"}>
+          {searchResults
+            ? searchResults.map((item) => {
+                //   Object.entries(item).map((i, key) => console.log(i[1]));
+                //   console.log(item);
+                //   console.log(Object.keys(item));
+                if (otherID && otherName && thirdName && thirdID) {
+                  return (
+                    // <ul className={show ? "searchresults" : "QSsearchresults-hide"}>
                     <li
                       onClick={(e) => {
-                        setSearchTerm(
-                          item[searchID] + " - " + item[searchName]
+                        setProdSupplier(
+                          item[searchID],
+                          item[otherID],
+                          item[thirdID],
+                          item[searchName],
+                          item[otherName],
+                          item[thirdName]
                         );
+                        // setSearchTerm(
+                        //   item[searchID] +
+                        //     " - " +
+                        //     item[searchName] +
+                        //     " - " +
+                        //     item[otherName] +
+                        //     " - " +
+                        //     item[thirdName]
+                        // );
+                        setSearchTerm(null);
                       }}
                     >
-                      {item[searchID]} - {item[searchName]}
+                      {item[searchID]} - {item[searchName]} - {item[otherName]}
                     </li>
-                  </>
-                );
-              }
-            })
-          : ""}
-      </ul>
+                    // </ul>
+                  );
+                }
+                if (otherID && otherName && !thirdName && !thirdID) {
+                  return (
+                    // <ul className={show ? "searchresults" : "QSsearchresults-hide"}>
+                    <li
+                      onClick={(e) => {
+                        setProdSupplier(
+                          item[searchID],
+                          item[otherID],
+                          item[searchName],
+                          item[otherName]
+                        );
+                        // setSearchTerm(
+                        //   item[searchID] +
+                        //     " - " +
+                        //     item[searchName] +
+                        //     " - " +
+                        //     item[otherName]
+                        // );
+                        setSearchTerm(null);
+                      }}
+                    >
+                      {item[searchID]} - {item[searchName]} - {item[otherName]}
+                    </li>
+                    // </ul>
+                  );
+                } else {
+                  return (
+                    <>
+                      <li
+                        onClick={(e) => {
+                          setSearchTerm(
+                            item[searchID] + " - " + item[searchName]
+                          );
+                        }}
+                      >
+                        {item[searchID]} - {item[searchName]}
+                      </li>
+                    </>
+                  );
+                }
+              })
+            : ""}
+        </ul>
+      </span>
     </>
   );
 };

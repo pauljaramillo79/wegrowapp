@@ -73,3 +73,11 @@
   max-height: 30vh;
   overflow-y: auto;
 }
+.positionModalForm .presearchresults {
+  flex: 1;
+  flex-basis: 15%;
+}
+.positionModalForm .QSsearchresults-container {
+  flex: 4;
+  flex-basis: 40%;
+}

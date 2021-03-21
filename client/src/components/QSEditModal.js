@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./QSEditModal.css";
 import Axios from "axios";
+import SearchField from "./SearchField";
 
 const QSEditModal = ({ handleClose, show, QStoedit }) => {
   const showHideClassName = show
@@ -10,6 +11,8 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
 
   const [QSeditable, setQSeditable] = useState();
   const [QSoriginal, setQSoriginal] = useState();
+  const [resetfield, setResetfield] = useState(false);
+
   // const postoeditinit = {
   //   KTP: QStoedit.KTP,
   //   abbreviation: QStoedit.abbreviation,
@@ -106,8 +109,17 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
   };
   const createemail = (e) => {
     e.preventDefault();
-    window.location.href =
-      "mailto:user@example.com?subject=Subject&body=message%20goes%20here";
+    let Subject = `WeGrow - FIRM OFFER - ${QSeditable.quantity}mt - ${QSeditable.product} - ${QSeditable.customer}`;
+    let Message = `<p>Dear Paul</p>`;
+    window.location.href = `mailto:user@example.com?subject=${Subject}&body=${Message}`;
+  };
+  const handleProductChange = (id1, id2, id3, name1, name2, name3) => {
+    setQSeditable({
+      ...QSeditable,
+      product: name1,
+      supplier: name2,
+      productgroup: name3,
+    });
   };
   return show ? (
     <div className={showHideClassName}>
@@ -167,12 +179,26 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
               </div>
               <div className="form-group">
                 <label htmlFor="">Product:</label>
-                <input
+                <SearchField
+                  className="searchfield"
+                  searchURL={"/productlist"}
+                  searchName={"abbreviation"}
+                  searchID={"productID"}
+                  otherName={"supplier"}
+                  otherID={"supplierID"}
+                  thirdName={"productGroup"}
+                  thirdID={"prodGroupID"}
+                  value={QSeditable ? QSeditable.product || "" : ""}
+                  resetfield={resetfield}
+                  setResetfield={setResetfield}
+                  setProdSupplier={handleProductChange}
+                />
+                {/* <input
                   name="product"
                   type="text"
                   required
                   value={QSeditable ? QSeditable.product || "" : ""}
-                />
+                /> */}
               </div>
               <div className="form-group">
                 <label htmlFor="">Supplier:</label>

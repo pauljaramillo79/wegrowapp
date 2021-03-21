@@ -26,7 +26,13 @@
 }
 .QSModalForm .form-group {
   width: 100%;
+  display: flex;
+  flex-direction: row;
+  /* justify-content: space-between; */
+  padding-bottom: 1rem;
+  flex-wrap: wrap;
 }
+
 .QSModalForm input {
   flex: 1;
   flex-basis: 40%;
@@ -55,6 +61,30 @@
 }
 .QSModalForm .shipmentType {
   margin-bottom: 0.6rem;
+}
+.QSModalForm .searchresults {
+  position: absolute;
+  flex: 4;
+  top: -20px;
+  left: -15px;
+  width: 300px;
+  background-color: white;
+  border: solid 1px black;
+  max-height: 30vh;
+  overflow-y: auto;
+  padding-left: 0.3rem;
+  padding-right: 0;
+}
+.QSModalForm .searchresults li {
+  width: 100%;
+}
+.QSModalForm .presearchresults {
+  flex: 1;
+  flex-basis: 20%;
+}
+.QSModalForm .QSsearchresults-container {
+  position: relative;
+  display: flex;
 }
 #editQS-1 {
   flex: 1;

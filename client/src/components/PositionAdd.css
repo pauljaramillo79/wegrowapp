@@ -64,3 +64,12 @@
   margin-left: 20%;
   /* margin-bottom: 0.5rem; */
 }
+#positionaddform .presearchresults {
+  /* width: 100px; */
+  flex: 1;
+  flex-basis: 10%;
+}
+#positionaddform .QSsearchresults-container {
+  flex: 4;
+  flex-basis: 40%;
+}

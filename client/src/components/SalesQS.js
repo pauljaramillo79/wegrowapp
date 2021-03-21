@@ -684,9 +684,9 @@ const SalesQS = () => {
               </div>
             </fieldset>
           ) : QSData && QSData.shipmentType == 2 ? (
-            "hello"
+            "Under Construction"
           ) : (
-            ""
+            "Under Construction Too :)"
           )}
         </section>
         <section id="salesQS-3">
