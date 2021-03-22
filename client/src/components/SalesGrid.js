@@ -11,8 +11,8 @@ import "./PositionsTableSort.css";
 
 const SalesGrid = () => {
   const initlayout = [
-    { i: "a", x: 0, y: 0, w: 21, h: 12 },
-    { i: "b", x: 21, y: 0, w: 10, h: 12 },
+    { i: "a", x: 0, y: 13, w: 35, h: 6 },
+    { i: "b", x: 0, y: 0, w: 29, h: 13 },
     // { i: "c", x: 0, y: 12, w: 21, h: 8 },
   ];
   const getFromLS = (key) => {
