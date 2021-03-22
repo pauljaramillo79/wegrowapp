@@ -24,6 +24,7 @@ const SearchField = ({
   // Load Data
   const loadData = () => {
     Axios.post(searchURL).then((response) => {
+      // console.log(response.data);
       setData(response.data);
     });
   };
@@ -41,6 +42,7 @@ const SearchField = ({
       const results = data.filter((item) => {
         if (otherName && otherID && thirdID) {
           if (searchTerm && searchTerm !== "") {
+            console.log("im here");
             return (
               item[searchName] +
               item[searchID] +
@@ -78,7 +80,6 @@ const SearchField = ({
           }
         }
       });
-      // console.log(results);
       setSearchResults(results);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -103,6 +104,7 @@ const SearchField = ({
         <ul className={show ? "searchresults" : "QSsearchresults-hide"}>
           {searchResults
             ? searchResults.map((item) => {
+                // console.log(item);
                 //   Object.entries(item).map((i, key) => console.log(i[1]));
                 //   console.log(item);
                 //   console.log(Object.keys(item));
@@ -113,10 +115,10 @@ const SearchField = ({
                       onClick={(e) => {
                         setProdSupplier(
                           item[searchID],
-                          item[otherID],
-                          item[thirdID],
                           item[searchName],
+                          item[otherID],
                           item[otherName],
+                          item[thirdID],
                           item[thirdName]
                         );
                         // setSearchTerm(
@@ -143,8 +145,8 @@ const SearchField = ({
                       onClick={(e) => {
                         setProdSupplier(
                           item[searchID],
-                          item[otherID],
                           item[searchName],
+                          item[otherID],
                           item[otherName]
                         );
                         // setSearchTerm(
@@ -163,17 +165,19 @@ const SearchField = ({
                   );
                 } else {
                   return (
-                    <>
-                      <li
-                        onClick={(e) => {
-                          setSearchTerm(
-                            item[searchID] + " - " + item[searchName]
-                          );
-                        }}
-                      >
-                        {item[searchID]} - {item[searchName]}
-                      </li>
-                    </>
+                    // <>
+                    <li
+                      onClick={async (e) => {
+                        setProdSupplier(item[searchID], item[searchName]);
+                        // setSearchTerm(
+                        //   item[searchID] + " - " + item[searchName]
+                        // );
+                        setSearchTerm(null);
+                      }}
+                    >
+                      {item[searchID]} - {item[searchName]}
+                    </li>
+                    // </>
                   );
                 }
               })

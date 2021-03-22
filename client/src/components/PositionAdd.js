@@ -56,10 +56,10 @@ const PositionAdd = () => {
   };
   const setProdSupplier = (
     prodID,
-    supplierID,
-    prodgroupID,
     prodName,
+    supplierID,
     supplierName,
+    prodgroupID,
     productGroup
   ) => {
     setPosData({

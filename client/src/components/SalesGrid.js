@@ -65,6 +65,7 @@ const SalesGrid = () => {
           width={1860}
           onLayoutChange={onLayoutChange}
           margin={[20, 20]}
+          draggableCancel=".canceldrag"
         >
           <div id="sales1" key="a">
             <Sales

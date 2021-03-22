@@ -4,10 +4,13 @@ import moment from "moment";
 import QSSearchField from "./QSSearchField";
 import Axios from "axios";
 import { RefreshPositionsContext } from "../contexts/RefreshPositionsProvider";
+import SearchField from "./SearchField";
 
 const SalesQS = () => {
   const { toggleQSrefresh } = useContext(RefreshPositionsContext);
   const QSDataInit = {
+    KTP: "",
+    KTS: "",
     saleType: "",
     QSDate: moment().format("yyyy-MM-DD"),
     abbreviation: "",
@@ -50,8 +53,11 @@ const SalesQS = () => {
     turnover: 0,
     pctmargin: 0,
     netback: 0,
+    saleComplete: 0,
   };
   const QSValuesInit = {
+    KTP: "",
+    KTS: "",
     saleType: "",
     QSDate: moment().format("yyyy-MM-DD"),
     abbreviation: "",
@@ -94,9 +100,26 @@ const SalesQS = () => {
     turnover: "0.00",
     pctmargin: "0.00",
     netback: "0.00",
+    saleComplete: 0,
   };
   const [QSData, setQSData] = useState(QSDataInit);
   const [QSValues, setQSValues] = useState(QSValuesInit);
+  const [positionsddown, setPositionsddown] = useState();
+  const [resetfield, setResetfield] = useState(false);
+  const [sold, setSold] = useState(false);
+
+  const handleSold = () => {
+    setSold(!sold);
+  };
+  useEffect(() => {
+    if (sold) {
+      setQSData({ ...QSData, saleComplete: -1 });
+    }
+    if (!sold) {
+      setQSData({ ...QSData, saleComplete: 0 });
+    }
+  }, [sold]);
+
   const setQSFields = (ID1, ID2, Field1, Field2, name1, name2) => {
     if (ID2 === "" && Field2 === "" && name2 === "") {
       setQSData({
@@ -365,20 +388,71 @@ const SalesQS = () => {
   const addQS = (e) => {
     e.preventDefault();
     Axios.post("/saveQS", { QSData }).then((response) => toggleQSrefresh());
+    setQSData(QSDataInit);
+    setQSValues(QSValuesInit);
+  };
+  // useEffect(() => {
+  //   Axios.post("/positiondropdown").then((response) => {
+  //     // console.log(response.data);
+  //     setPositionsddown(response.data);
+  //   });
+  // }, []);
+
+  const loadPositions = () => {
+    Axios.post("/positiondropdown").then((response) => {
+      // console.log(response.data);
+      setPositionsddown(response.data);
+    });
+  };
+  const setPosition = (val) => {
+    let position = positionsddown[val];
+    setQSValues({
+      ...QSValues,
+      abbreviation: position.product,
+      supplier: position.Supplier,
+      from: position.start,
+      to: position.end,
+      KTP: position.KTP,
+      materialcost: Number(position.Price.replace("$", "").replace(",", "")),
+    });
+    setQSData({
+      ...QSData,
+      abbreviation: position.productID,
+      supplier: position.supplier,
+      from: position.start,
+      to: position.end,
+      KTP: position.KTP,
+      materialcost: Number(position.Price.replace("$", "").replace(",", "")),
+    });
   };
   return (
     <div className="salesQS">
       <h3 className="saleslisttitle">Quotation Sheet</h3>
+
       <form className="salesQS-form" onSubmit={(e) => addQS(e)}>
         <section id="salesQS-1">
           <div className="form-group">
             <label htmlFor="">QS Date:</label>
-            <input readOnly value={QSValues.QSDate} type="date" />
+            <input
+              readOnly
+              className="canceldrag"
+              value={QSValues.QSDate}
+              type="date"
+            />
+          </div>
+          <div className="form-group">
+            <label>WGP:</label>
+            <input
+              name="KTP"
+              value={QSValues ? QSValues.KTP || "" : ""}
+              onChange={handleChange}
+              className="canceldrag"
+            ></input>
           </div>
           <fieldset>
             <legend>Sale Type</legend>
             {/* <div className="form-group"> */}
-            <p>
+            <div className="saletype-group">
               <input
                 name="saletype"
                 type="radio"
@@ -389,10 +463,8 @@ const SalesQS = () => {
                 }}
               />
               <label htmlFor="">Back-to-back</label>
-            </p>
-            {/* </div> */}
-            {/* <div className="form-group"> */}
-            <p>
+            </div>
+            <div className="saletype-group">
               <input
                 name="saletype"
                 type="radio"
@@ -400,11 +472,37 @@ const SalesQS = () => {
                 onClick={(e) => {
                   setQSData({ ...QSData, saleType: 2 });
                   setQSValues({ ...QSValues, saleType: "Position" });
+                  loadPositions();
                 }}
               />
               <label htmlFor="">Position</label>
-              {/* </div> */}
-            </p>
+              {QSData && QSData.saleType === 2 ? (
+                <select
+                  className="WGPSelect"
+                  onChange={(e) => setPosition(e.target.value)}
+                >
+                  <option>Select...</option>
+                  {positionsddown
+                    ? positionsddown.map((pos, i) => {
+                        return (
+                          <option value={i}>
+                            {pos.KTP +
+                              " - " +
+                              pos.product +
+                              " - " +
+                              pos.Supplier}
+                          </option>
+                        );
+                      })
+                    : ""}
+                  {/* <option>P500320 - T-MAP - Cashmere</option>
+                <option>B</option>
+                <option>C</option> */}
+                </select>
+              ) : (
+                ""
+              )}
+            </div>
           </fieldset>
 
           <fieldset>
@@ -424,8 +522,25 @@ const SalesQS = () => {
                 otherID={"supplierID"}
                 placeholder={"Product..."}
                 setQSFields={setQSFields}
+                value={QSValues ? QSValues.abbreviation || "" : ""}
+                resetfield={resetfield}
+                setResetfield={setResetfield}
                 required
               />
+              {/* <SearchField
+                className="searchfield"
+                searchURL={"/productlist"}
+                searchName={"abbreviation"}
+                searchID={"productID"}
+                otherName={"supplier"}
+                otherID={"supplierID"}
+                placeholder={"Product..."}
+                resetfield={resetfield}
+                setResetfield={setResetfield}
+                setProdSupplier={setQSFields}
+                value={QSValues ? QSValues.abbreviation || "" : ""}
+                required
+              /> */}
             </div>
 
             <div className="form-group">
@@ -447,12 +562,13 @@ const SalesQS = () => {
                 searchID={"customerID"}
                 placeholder={"Customer..."}
                 setQSFields={setQSFields}
+                value={QSValues ? QSValues.customer || "" : ""}
                 required
               />
             </div>
             <div className="form-group">
               <label htmlFor="">Contact:</label>
-              <input type="text" />
+              <input className="canceldrag" type="text" />
             </div>
           </fieldset>
           <fieldset>
@@ -468,6 +584,7 @@ const SalesQS = () => {
                 onDoubleClick={(e) => {
                   e.target.select();
                 }}
+                className="canceldrag"
                 required
               />
             </div>
@@ -482,6 +599,7 @@ const SalesQS = () => {
                 onDoubleClick={(e) => {
                   e.target.select();
                 }}
+                className="canceldrag"
                 required
               />
             </div>
@@ -499,6 +617,7 @@ const SalesQS = () => {
                 onDoubleClick={(e) => {
                   e.target.select();
                 }}
+                className="canceldrag"
                 required
               />
             </div>
@@ -512,6 +631,7 @@ const SalesQS = () => {
                 onDoubleClick={(e) => {
                   e.target.select();
                 }}
+                className="canceldrag"
                 required
               />
             </div>
@@ -525,6 +645,7 @@ const SalesQS = () => {
                 searchID={"POLID"}
                 placeholder={"POL..."}
                 setQSFields={setQSFields}
+                value={QSValues ? QSValues.POL || "" : ""}
                 required
               />
             </div>
@@ -537,17 +658,50 @@ const SalesQS = () => {
                 searchID={"PODID"}
                 placeholder={"POD..."}
                 setQSFields={setQSFields}
+                value={QSValues ? QSValues.POD || "" : ""}
                 required
               />
             </div>
           </fieldset>
         </section>
         <section id="salesQS-2">
+          {/* <div className="form-group">
+            <label>WGP:</label>
+            <input
+              name="KTP"
+              value={QSValues ? QSValues.KTP || "" : ""}
+              onChange={handleChange}
+              className="canceldrag"
+            ></input>
+          </div> */}
+          <div className="soldcheckbox">
+            <input
+              className="canceldrag"
+              type="checkbox"
+              checked={sold}
+              onClick={handleSold}
+            />
+            <label>Sold</label>
+          </div>
+          <div className="form-group">
+            <label>WGS:</label>
+            <input
+              name="KTS"
+              value={QSValues ? QSValues.KTS || "" : ""}
+              onChange={handleChange}
+              className="canceldrag"
+            ></input>
+          </div>
           <fieldset>
             <legend>In Charge</legend>
             <div className="form-group">
               <label htmlFor="">Trader:</label>
-              <input value={QSValues.TIC} type="text" readOnly />
+              <input
+                className="canceldrag"
+                value={QSValues.TIC}
+                type="text"
+                readOnly
+              />
             </div>
             <div className="form-group">
               <label htmlFor="">Traffic:</label>
@@ -558,6 +712,7 @@ const SalesQS = () => {
                 searchID={"trafficID"}
                 placeholder={"Traffic..."}
                 setQSFields={setQSFields}
+                value={QSValues ? QSValues.traffic || "" : ""}
               />
             </div>
           </fieldset>
@@ -574,6 +729,7 @@ const SalesQS = () => {
                 onDoubleClick={(e) => {
                   e.target.select();
                 }}
+                className="canceldrag"
                 required
               />
             </div>
@@ -586,6 +742,7 @@ const SalesQS = () => {
                 searchID={"paytermID"}
                 placeholder={"Payment terms..."}
                 setQSFields={setQSFields}
+                value={QSValues ? QSValues.paymentTerm || "" : ""}
                 required
               />
             </div>
@@ -596,11 +753,12 @@ const SalesQS = () => {
                 placeholder="Interest rate..."
                 type="text"
                 name="CADintrate"
-                onDoubleClick={(e) => {
-                  e.target.select();
-                }}
+                // onDoubleClick={(e) => {
+                //   e.target.select();
+                // }}
                 onChange={PercentageChange}
                 onBlur={PercentageBlur}
+                className="canceldrag"
                 required
               />
             </div>
@@ -612,9 +770,10 @@ const SalesQS = () => {
                 onChange={QtyChange}
                 type="text"
                 placeholder="Days..."
-                onDoubleClick={(e) => {
-                  e.target.select();
-                }}
+                // onDoubleClick={(e) => {
+                //   e.target.select();
+                // }}
+                className="canceldrag"
                 required
               />
             </div>
@@ -696,15 +855,15 @@ const SalesQS = () => {
               <div className="form-group">
                 <label htmlFor="">Quantity:</label>
                 <input
-                  className="QSfig2"
+                  className="QSfig2 canceldrag"
                   name="quantity"
                   value={QSValues.quantity}
                   onChange={QtyChange}
                   type="text"
                   placeholder="MT"
-                  onDoubleClick={(e) => {
-                    e.target.select();
-                  }}
+                  // onDoubleClick={(e) => {
+                  //   e.target.select();
+                  // }}
                   onBlur={QtyBlur}
                   required
                 />
@@ -714,10 +873,10 @@ const SalesQS = () => {
                 <div className="form-group">
                   <label htmlFor="">Material Cost:</label>
                   <input
-                    className="QSfig"
-                    onDoubleClick={(e) => {
-                      e.target.select();
-                    }}
+                    className="QSfig canceldrag"
+                    // onDoubleClick={(e) => {
+                    //   e.target.select();
+                    // }}
                     type="text"
                     placeholder="...Material Cost pmt"
                     onChange={QtyChange}
@@ -730,10 +889,10 @@ const SalesQS = () => {
                 <div className="form-group">
                   <label htmlFor="">P Commission:</label>
                   <input
-                    className="QSfig"
-                    onDoubleClick={(e) => {
-                      e.target.select();
-                    }}
+                    className="QSfig canceldrag"
+                    // onDoubleClick={(e) => {
+                    //   e.target.select();
+                    // }}
                     type="text"
                     placeholder="...P Commission pmt"
                     name="pcommission"
@@ -746,10 +905,10 @@ const SalesQS = () => {
                 <div className="form-group">
                   <label htmlFor="">P Finance Cost:</label>
                   <input
-                    className="QSfig"
-                    onDoubleClick={(e) => {
-                      e.target.select();
-                    }}
+                    className="QSfig canceldrag"
+                    // onDoubleClick={(e) => {
+                    //   e.target.select();
+                    // }}
                     type="text"
                     placeholder="...P Finance Cost pmt"
                     name="pfinancecost"
@@ -762,11 +921,11 @@ const SalesQS = () => {
                 <div className="form-group">
                   <label htmlFor="">S Finance Cost:</label>
                   <input
-                    className="QSfig"
+                    className="QSfig canceldrag"
                     value={QSValues.sfinancecost}
-                    onDoubleClick={(e) => {
-                      e.target.select();
-                    }}
+                    // onDoubleClick={(e) => {
+                    //   e.target.select();
+                    // }}
                     name="sfinancecost"
                     placeholder="...S Finance Cost pmt"
                     onChange={QtyChange}
@@ -778,11 +937,11 @@ const SalesQS = () => {
                 <div className="form-group">
                   <label htmlFor="">Freight (pmt):</label>
                   <input
-                    className="QSfig"
+                    className="QSfig canceldrag"
                     value={QSValues.freightpmt}
-                    onDoubleClick={(e) => {
-                      e.target.select();
-                    }}
+                    // onDoubleClick={(e) => {
+                    //   e.target.select();
+                    // }}
                     name="freightpmt"
                     placeholder="...Freight pmt"
                     onChange={QtyChange}
@@ -794,11 +953,11 @@ const SalesQS = () => {
                 <div className="form-group">
                   <label htmlFor="">Insurance Cost:</label>
                   <input
-                    className="QSfig"
+                    className="QSfig canceldrag"
                     value={QSValues.insurance}
-                    onDoubleClick={(e) => {
-                      e.target.select();
-                    }}
+                    // onDoubleClick={(e) => {
+                    //   e.target.select();
+                    // }}
                     name="insurance"
                     placeholder="...Insurance Cost pmt"
                     onChange={QtyChange}
@@ -810,11 +969,11 @@ const SalesQS = () => {
                 <div className="form-group">
                   <label htmlFor="">Inspection Cost:</label>
                   <input
-                    className="QSfig"
+                    className="QSfig canceldrag"
                     value={QSValues.inspectionpmt}
-                    onDoubleClick={(e) => {
-                      e.target.select();
-                    }}
+                    // onDoubleClick={(e) => {
+                    //   e.target.select();
+                    // }}
                     name="inspectionpmt"
                     placeholder="...Inspection Cost pmt"
                     onChange={QtyChange}
@@ -826,11 +985,11 @@ const SalesQS = () => {
                 <div className="form-group">
                   <label htmlFor="">S Commission:</label>
                   <input
-                    className="QSfig"
+                    className="QSfig canceldrag"
                     value={QSValues.scommission}
-                    onDoubleClick={(e) => {
-                      e.target.select();
-                    }}
+                    // onDoubleClick={(e) => {
+                    //   e.target.select();
+                    // }}
                     name="scommission"
                     placeholder="...S Commission pmt"
                     onChange={QtyChange}
@@ -842,11 +1001,11 @@ const SalesQS = () => {
                 <div className="form-group">
                   <label htmlFor="">Interest Cost:</label>
                   <input
-                    className="QSfig"
+                    className="QSfig canceldrag"
                     value={QSValues.interestcost}
-                    onDoubleClick={(e) => {
-                      e.target.select();
-                    }}
+                    // onDoubleClick={(e) => {
+                    //   e.target.select();
+                    // }}
                     name="interestcost"
                     placeholder="...Interest Cost pmt"
                     onChange={QtyChange}
@@ -858,11 +1017,11 @@ const SalesQS = () => {
                 <div className="form-group">
                   <label htmlFor="">Legal:</label>
                   <input
-                    className="QSfig"
+                    className="QSfig canceldrag"
                     value={QSValues.legal}
-                    onDoubleClick={(e) => {
-                      e.target.select();
-                    }}
+                    // onDoubleClick={(e) => {
+                    //   e.target.select();
+                    // }}
                     name="legal"
                     placeholder="...Legal Cost pmt"
                     onChange={QtyChange}
@@ -874,11 +1033,11 @@ const SalesQS = () => {
                 <div className="form-group">
                   <label htmlFor="">Pallets:</label>
                   <input
-                    className="QSfig"
+                    className="QSfig canceldrag"
                     value={QSValues.pallets}
-                    onDoubleClick={(e) => {
-                      e.target.select();
-                    }}
+                    // onDoubleClick={(e) => {
+                    //   e.target.select();
+                    // }}
                     name="pallets"
                     placeholder="...Pallets Cost pmt"
                     onChange={QtyChange}
@@ -890,11 +1049,11 @@ const SalesQS = () => {
                 <div className="form-group">
                   <label htmlFor="">Other:</label>
                   <input
-                    className="QSfig"
+                    className="QSfig canceldrag"
                     value={QSValues.other}
-                    onDoubleClick={(e) => {
-                      e.target.select();
-                    }}
+                    // onDoubleClick={(e) => {
+                    //   e.target.select();
+                    // }}
                     name="other"
                     placeholder="...Other Costs pmt"
                     onChange={QtyChange}
@@ -907,7 +1066,7 @@ const SalesQS = () => {
               <div className="form-group">
                 <label htmlFor="">Total Cost:</label>
                 <input
-                  className="QSfig2"
+                  className="QSfig2 canceldrag"
                   readOnly
                   value={QSValues.totalcost}
                   type="text"
@@ -921,13 +1080,13 @@ const SalesQS = () => {
                 <div className="form-group">
                   <label htmlFor="">Interest Rate:</label>
                   <input
-                    className="QSfig"
+                    className="QSfig canceldrag"
                     value={QSValues.interestrate}
                     placeholder="...Interest Rate"
                     name="interestrate"
-                    onDoubleClick={(e) => {
-                      e.target.select();
-                    }}
+                    // onDoubleClick={(e) => {
+                    //   e.target.select();
+                    // }}
                     onChange={PercentageChange}
                     onBlur={PercentageBlur}
                     type="text"
@@ -937,14 +1096,14 @@ const SalesQS = () => {
                 <div className="form-group">
                   <label htmlFor="">Interest Days:</label>
                   <input
-                    className="QSfig"
+                    className="QSfig canceldrag"
                     value={QSValues.interestdays}
                     name="interestdays"
                     onChange={QtyChange}
                     placeholder="...Interest Days"
-                    onDoubleClick={(e) => {
-                      e.target.select();
-                    }}
+                    // onDoubleClick={(e) => {
+                    //   e.target.select();
+                    // }}
                     type="text"
                     required
                   />
@@ -954,11 +1113,11 @@ const SalesQS = () => {
                 <div className="form-group">
                   <label htmlFor="">Price Before Int.:</label>
                   <input
-                    className="QSfig"
+                    className="QSfig canceldrag"
                     value={QSValues.pricebeforeint}
-                    onDoubleClick={(e) => {
-                      e.target.select();
-                    }}
+                    // onDoubleClick={(e) => {
+                    //   e.target.select();
+                    // }}
                     name="pricebeforeint"
                     placeholder="...Price Before Int pmt"
                     onChange={QtyChange}
@@ -970,7 +1129,7 @@ const SalesQS = () => {
                 <div className="form-group">
                   <label htmlFor="">Sales Interest:</label>
                   <input
-                    className="QSfig"
+                    className="QSfig canceldrag"
                     value={QSValues.salesinterest}
                     readOnly
                     type="text"
@@ -982,7 +1141,7 @@ const SalesQS = () => {
                 <label htmlFor="">Price After Int.:</label>
                 <input
                   readOnly
-                  className="QSfig2"
+                  className="QSfig2 canceldrag"
                   value={QSValues.priceafterint}
                   type="text"
                   required
@@ -994,7 +1153,7 @@ const SalesQS = () => {
                   <label htmlFor="">Profit:</label>
                   <input
                     readOnly
-                    className="QSfig"
+                    className="QSfig canceldrag"
                     value={QSValues.profit}
                     type="text"
                     required
@@ -1004,7 +1163,7 @@ const SalesQS = () => {
                   <label htmlFor="">Margin:</label>
                   <input
                     readOnly
-                    className="QSfig"
+                    className="QSfig canceldrag"
                     value={QSValues.margin}
                     type="text"
                     required
@@ -1014,7 +1173,7 @@ const SalesQS = () => {
                   <label htmlFor="">Turnover:</label>
                   <input
                     readOnly
-                    className="QSfig"
+                    className="QSfig canceldrag"
                     value={QSValues.turnover}
                     type="text"
                     required
@@ -1024,7 +1183,7 @@ const SalesQS = () => {
                   <label htmlFor="">% Margin:</label>
                   <input
                     readOnly
-                    className="QSfig"
+                    className="QSfig canceldrag"
                     value={QSValues.pctmargin}
                     type="text"
                     required
@@ -1034,7 +1193,7 @@ const SalesQS = () => {
                   <label htmlFor="">Netback:</label>
                   <input
                     readOnly
-                    className="QSfig"
+                    className="QSfig canceldrag"
                     value={QSValues.netback}
                     type="text"
                     required

@@ -489,9 +489,24 @@ router.post("/positionupdate", (req, res) => {
   //   userID !== "all" ? `WHERE trader='${userID}'` : ""
   // }  ORDER BY QSID Desc LIMIT 300 `,
 });
+router.post("/positiondropdown", (req, res) => {
+  db.query(
+    "SELECT positionreport.KTP, positionreport.product, positionreport.Supplier, positionreport.Price, DATE_FORMAT(positionreport.Start,'%Y-%m-%d') AS start, DATE_FORMAT(positionreport.End,'%Y-%m-%d') AS end, positionreport.quantity, positionreport.inventory, productID, positions.supplier FROM positionreport INNER JOIN positions ON positions.KTP = positionreport.KTP ",
+    (err, results) => {
+      if (err) {
+        console.log(err);
+      }
+      if (results.length > 0) {
+        return res.status(200).send(results);
+      }
+    }
+  );
+});
 router.post("/saveQS", (req, res) => {
   console.log(req.body);
   let {
+    KTS,
+    KTP,
     saleType,
     QSDate,
     abbreviation,
@@ -533,10 +548,13 @@ router.post("/saveQS", (req, res) => {
     turnover,
     pctmargin,
     netback,
+    saleComplete,
   } = req.body.QSData;
   db.query(
-    "INSERT INTO quotationsheet (saleTypeID, QSDate, productID, supplierID, customerID, packingSize, marks, `from`, `to`, POLID, PODID, traderID, trafficID, incoterms, pTermID, quantity, materialCost, pAgentCommission, pFinancialCostP, sFinancialCost, oFreight, insuranceCost, inspectionCost, sAgentCommission, interestCost, interestRate, interestPeriod, legal, pallets, others, totalCost, saleInterestRate, salePaymentPeriod, priceBeforeInterest, saleInterest, priceAfterInterest, tradingProfit, tradingMargin, salesTurnover, percentageMargin, netback) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);",
+    "INSERT INTO quotationsheet (KTS, KTP, saleTypeID, QSDate, productID, supplierID, customerID, packingSize, marks, `from`, `to`, POLID, PODID, traderID, trafficID, incoterms, pTermID, quantity, materialCost, pAgentCommission, pFinancialCostP, sFinancialCost, oFreight, insuranceCost, inspectionCost, sAgentCommission, interestCost, interestRate, interestPeriod, legal, pallets, others, totalCost, saleInterestRate, salePaymentPeriod, priceBeforeInterest, saleInterest, priceAfterInterest, tradingProfit, tradingMargin, salesTurnover, percentageMargin, netback, saleComplete) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);",
     [
+      KTS,
+      KTP,
       saleType,
       QSDate,
       abbreviation,
@@ -578,6 +596,7 @@ router.post("/saveQS", (req, res) => {
       turnover,
       pctmargin,
       netback,
+      saleComplete,
     ],
     (err) => {
       if (err) {

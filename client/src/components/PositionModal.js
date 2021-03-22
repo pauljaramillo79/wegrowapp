@@ -78,7 +78,7 @@ const PositionModal = ({ handleClose, show, positiontoedit }) => {
     await togglePosrefresh();
   };
 
-  const handleProductChange = (id1, id2, id3, name1, name2, name3) => {
+  const handleProductChange = (id1, name1, id2, name2, id3, name3) => {
     setPosEditInit({
       ...posEditInit,
       product: name1,

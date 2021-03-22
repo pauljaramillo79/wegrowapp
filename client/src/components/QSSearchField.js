@@ -10,6 +10,9 @@ const QSSearchField = ({
   otherName,
   otherID,
   setQSFields,
+  resetfield,
+  setResetfield,
+  value,
 }) => {
   const [data, setData] = useState();
   const [searchValue, setSearchValue] = useState("");
@@ -27,13 +30,14 @@ const QSSearchField = ({
     setShow(true);
     setSearchValue(e.target.value);
     setSearchTerm(e.target.value);
+    // setResetfield(false);
   };
 
   useEffect(() => {
     if (data) {
       const results = data.filter((item) => {
         if (otherName && otherID) {
-          if (searchTerm !== "") {
+          if (searchTerm && searchTerm !== "") {
             return (
               item[searchName] +
               item[searchID] +
@@ -47,7 +51,7 @@ const QSSearchField = ({
             setQSFields("", "", searchName, otherName, "", "");
           }
         } else {
-          if (searchTerm !== "") {
+          if (searchTerm && searchTerm !== "") {
             return (item[searchName] + item[searchID])
               .toLowerCase()
               .includes(searchTerm.toLowerCase());
@@ -67,12 +71,13 @@ const QSSearchField = ({
         // /className="searchfield"
         placeholder={placeholder}
         type="text"
-        value={searchValue}
+        value={resetfield ? "" : searchValue || value}
         onFocus={loadData}
         onChange={handleChange}
         onDoubleClick={(e) => {
           e.target.select();
         }}
+        className="canceldrag"
         required
       />
       <div className="flexbreak"></div>
@@ -122,8 +127,11 @@ const QSSearchField = ({
                             // item[searchName],
                             // item[otherName]
                           );
-                          setSearchValue(item[searchName]);
+                          // setSearchValue(item[searchName]);
+                          setSearchValue(null);
                           setSearchTerm(item[searchName]);
+                          // setSearchTerm(null);
+
                           setShow(false);
                         }}
                       >
@@ -160,8 +168,11 @@ const QSSearchField = ({
                             // item[searchName],
                             // item[otherName]
                           );
-                          setSearchValue(item[searchName]);
+                          // setSearchValue(item[searchName]);
+                          setSearchValue(null);
+
                           setSearchTerm(item[searchName]);
+                          // setSearchTerm(null);
                           setShow(false);
                         }}
                       >

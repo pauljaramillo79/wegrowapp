@@ -13,7 +13,7 @@ const Sales = (props) => {
   );
   useEffect(() => {
     Axios.post("/traders").then((response) => {
-      console.log(response.data);
+      // console.log(response.data);
       setTraders(response.data);
     });
   }, []);

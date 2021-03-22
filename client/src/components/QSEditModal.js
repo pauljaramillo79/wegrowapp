@@ -12,6 +12,7 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
   const [QSeditable, setQSeditable] = useState();
   const [QSoriginal, setQSoriginal] = useState();
   const [resetfield, setResetfield] = useState(false);
+  const [QSedits, setQSedits] = useState();
 
   // const postoeditinit = {
   //   KTP: QStoedit.KTP,
@@ -41,6 +42,10 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
       ...QSeditable,
       [e.target.name]: e.target.value,
     });
+    setQSedits({
+      ...QSedits,
+      [e.target.name]: e.target.value,
+    });
 
     // setPostoedit({
     //   ...postoedit,
@@ -54,6 +59,12 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
       setQSeditable({
         ...QSeditable,
         [e.target.name]: e.target.value,
+      });
+      setQSedits({
+        ...QSedits,
+        [e.target.name]: e.target.value.includes("$")
+          ? e.target.value.replace("$", "")
+          : e.target.value,
       });
     }
   };
@@ -113,12 +124,68 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
     let Message = `<p>Dear Paul</p>`;
     window.location.href = `mailto:user@example.com?subject=${Subject}&body=${Message}`;
   };
-  const handleProductChange = (id1, id2, id3, name1, name2, name3) => {
+  const handleProductChange = (id1, name1, id2, name2, id3, name3) => {
     setQSeditable({
       ...QSeditable,
       product: name1,
       supplier: name2,
       productgroup: name3,
+    });
+    setQSedits({
+      ...QSedits,
+      product: id1,
+      supplier: id2,
+      productgroup: id3,
+    });
+  };
+  const handleCustomerChange = (id1, name1) => {
+    setQSeditable({
+      ...QSeditable,
+      customer: name1,
+    });
+    setQSedits({
+      ...QSedits,
+      customer: id1,
+    });
+  };
+  const handlePOLChange = (id1, name1) => {
+    setQSeditable({
+      ...QSeditable,
+      POL: name1,
+    });
+    setQSedits({
+      ...QSedits,
+      POL: id1,
+    });
+  };
+  const handlePODChange = (id1, name1) => {
+    setQSeditable({
+      ...QSeditable,
+      POD: name1,
+    });
+    setQSedits({
+      ...QSedits,
+      POD: id1,
+    });
+  };
+  const handleTrafficChange = (id1, name1) => {
+    setQSeditable({
+      ...QSeditable,
+      traffic: name1,
+    });
+    setQSedits({
+      ...QSedits,
+      traffic: id1,
+    });
+  };
+  const handlePaytermChange = (id1, name1) => {
+    setQSeditable({
+      ...QSeditable,
+      paymentterms: name1,
+    });
+    setQSedits({
+      ...QSedits,
+      paymentterms: id1,
     });
   };
   return show ? (
@@ -211,12 +278,22 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
               </div>
               <div className="form-group">
                 <label htmlFor="">Customer:</label>
-                <input
+                <SearchField
+                  className="searchfield"
+                  searchURL={"/customers"}
+                  searchID={"customerID"}
+                  searchName={"customer"}
+                  value={QSeditable ? QSeditable.customer || "" : ""}
+                  resetfield={resetfield}
+                  setResetfield={setResetfield}
+                  setProdSupplier={handleCustomerChange}
+                />
+                {/* <input
                   name="customer"
                   type="text"
                   required
                   value={QSeditable ? QSeditable.customer || "" : ""}
-                />
+                /> */}
               </div>
               <div className="form-group">
                 <label htmlFor="">Contact:</label>
@@ -270,21 +347,41 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
               </div>
               <div className="form-group">
                 <label htmlFor="">POL:</label>
-                <input
+                <SearchField
+                  className="searchfield"
+                  searchURL={"/POLS"}
+                  searchID={"POLID"}
+                  searchName={"POL"}
+                  value={QSeditable ? QSeditable.POL || "" : ""}
+                  resetfield={resetfield}
+                  setResetfield={setResetfield}
+                  setProdSupplier={handlePOLChange}
+                />
+                {/* <input
                   name="POL"
                   type="text"
                   required
                   value={QSeditable ? QSeditable.POL || "" : ""}
-                />
+                /> */}
               </div>
               <div className="form-group">
                 <label htmlFor="">POD:</label>
-                <input
+                <SearchField
+                  className="searchfield"
+                  searchURL={"/PODS"}
+                  searchID={"PODID"}
+                  searchName={"POD"}
+                  value={QSeditable ? QSeditable.POD || "" : ""}
+                  resetfield={resetfield}
+                  setResetfield={setResetfield}
+                  setProdSupplier={handlePODChange}
+                />
+                {/* <input
                   name="POD"
                   type="text"
                   required
                   value={QSeditable ? QSeditable.POD || "" : ""}
-                />
+                /> */}
               </div>
             </fieldset>
           </section>
@@ -303,12 +400,22 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
               </div>
               <div className="form-group">
                 <label htmlFor="">Traffic:</label>
-                <input
+                <SearchField
+                  className="searchfield"
+                  searchURL={"/trafficmgrs"}
+                  searchID={"trafficID"}
+                  searchName={"traffic"}
+                  value={QSeditable ? QSeditable.traffic || "" : ""}
+                  resetfield={resetfield}
+                  setResetfield={setResetfield}
+                  setProdSupplier={handleTrafficChange}
+                />
+                {/* <input
                   name="traffic"
                   type="text"
                   required
                   value={QSeditable ? QSeditable.traffic || "" : ""}
-                />
+                /> */}
               </div>
             </fieldset>
             <fieldset>
@@ -325,12 +432,22 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
               </div>
               <div className="form-group">
                 <label htmlFor="">Payment Terms:</label>
-                <input
+                <SearchField
+                  className="searchfield"
+                  searchURL={"/paymentterms"}
+                  searchID={"paytermID"}
+                  searchName={"paymentTerm"}
+                  value={QSeditable ? QSeditable.paymentterms || "" : ""}
+                  resetfield={resetfield}
+                  setResetfield={setResetfield}
+                  setProdSupplier={handlePaytermChange}
+                />
+                {/* <input
                   name="paymentterms"
                   type="text"
                   required
                   value={QSeditable ? QSeditable.paymentterms || "" : ""}
-                />
+                /> */}
               </div>
               <div className="form-group">
                 <label htmlFor="">Inc. Interest:</label>
