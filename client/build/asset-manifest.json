@@ -1,28 +1,28 @@
 {
   "files": {
-    "main.css": "/static/css/main.5a7ba7bb.chunk.css",
-    "main.js": "/static/js/main.da710a16.chunk.js",
-    "main.js.map": "/static/js/main.da710a16.chunk.js.map",
-    "runtime-main.js": "/static/js/runtime-main.5db8edd7.js",
-    "runtime-main.js.map": "/static/js/runtime-main.5db8edd7.js.map",
+    "main.css": "/static/css/main.375717d5.chunk.css",
+    "main.js": "/static/js/main.87d21b05.chunk.js",
+    "main.js.map": "/static/js/main.87d21b05.chunk.js.map",
+    "runtime-main.js": "/static/js/runtime-main.52a5196d.js",
+    "runtime-main.js.map": "/static/js/runtime-main.52a5196d.js.map",
     "static/css/2.69419529.chunk.css": "/static/css/2.69419529.chunk.css",
-    "static/js/2.f507e51b.chunk.js": "/static/js/2.f507e51b.chunk.js",
-    "static/js/2.f507e51b.chunk.js.map": "/static/js/2.f507e51b.chunk.js.map",
-    "static/js/3.25b31870.chunk.js": "/static/js/3.25b31870.chunk.js",
-    "static/js/3.25b31870.chunk.js.map": "/static/js/3.25b31870.chunk.js.map",
+    "static/js/2.b499e21b.chunk.js": "/static/js/2.b499e21b.chunk.js",
+    "static/js/2.b499e21b.chunk.js.map": "/static/js/2.b499e21b.chunk.js.map",
+    "static/js/3.5e5dc34b.chunk.js": "/static/js/3.5e5dc34b.chunk.js",
+    "static/js/3.5e5dc34b.chunk.js.map": "/static/js/3.5e5dc34b.chunk.js.map",
     "index.html": "/index.html",
     "static/css/2.69419529.chunk.css.map": "/static/css/2.69419529.chunk.css.map",
-    "static/css/main.5a7ba7bb.chunk.css.map": "/static/css/main.5a7ba7bb.chunk.css.map",
-    "static/js/2.f507e51b.chunk.js.LICENSE.txt": "/static/js/2.f507e51b.chunk.js.LICENSE.txt",
+    "static/css/main.375717d5.chunk.css.map": "/static/css/main.375717d5.chunk.css.map",
+    "static/js/2.b499e21b.chunk.js.LICENSE.txt": "/static/js/2.b499e21b.chunk.js.LICENSE.txt",
     "static/media/logo-simple.141867a7.svg": "/static/media/logo-simple.141867a7.svg",
     "static/media/logo-web.9bf617b0.svg": "/static/media/logo-web.9bf617b0.svg",
-    "static/media/refreshicon.38d01fab.svg": "/static/media/refreshicon.38d01fab.svg"
+    "static/media/refreshicon.svg": "/static/media/refreshicon.38d01fab.svg"
   },
   "entrypoints": [
-    "static/js/runtime-main.5db8edd7.js",
+    "static/js/runtime-main.52a5196d.js",
     "static/css/2.69419529.chunk.css",
-    "static/js/2.f507e51b.chunk.js",
-    "static/css/main.5a7ba7bb.chunk.css",
-    "static/js/main.da710a16.chunk.js"
+    "static/js/2.b499e21b.chunk.js",
+    "static/css/main.375717d5.chunk.css",
+    "static/js/main.87d21b05.chunk.js"
   ]
 }
