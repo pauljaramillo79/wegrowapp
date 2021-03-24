@@ -326,7 +326,28 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
   //       QSeditable.other,
   //     ]
   //   : [];
-
+  useEffect(() => {
+    setQSeditable({
+      ...QSeditable,
+      interestcost:
+        "$" +
+        (
+          (Number(QSeditable.includedrate.toString().replace("%", "")) *
+            Number(QSeditable.includedperiod) *
+            Number(QSeditable.pricebeforeint.toString().replace("$", ""))) /
+          365 /
+          100
+        ).toFixed(2),
+    });
+    setQSedits({
+      interestcost:
+        (Number(QSeditable.includedrate.toString().replace("%", "")) *
+          Number(QSeditable.includedperiod) *
+          Number(QSeditable.pricebeforeint.toString().replace("$", ""))) /
+        365 /
+        100,
+    });
+  }, [QSeditable.includedrate, QSeditable.includedperiod]);
   useEffect(() => {
     setQSeditable({
       ...QSeditable,
@@ -379,28 +400,7 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
   ]);
 
   // Calculate Interestcost
-  useEffect(() => {
-    setQSeditable({
-      ...QSeditable,
-      interestcost:
-        "$" +
-        (
-          (Number(QSeditable.includedrate.toString().replace("%", "")) *
-            Number(QSeditable.includedperiod) *
-            Number(QSeditable.pricebeforeint.toString().replace("$", ""))) /
-          365 /
-          100
-        ).toFixed(2),
-    });
-    setQSedits({
-      interestcost:
-        (Number(QSeditable.includedrate.toString().replace("%", "")) *
-          Number(QSeditable.includedperiod) *
-          Number(QSeditable.pricebeforeint.toString().replace("$", ""))) /
-        365 /
-        100,
-    });
-  }, [QSeditable.includedrate, QSeditable.includedperiod]);
+
   return show ? (
     <div className={showHideClassName}>
       <section className="modal-main">
