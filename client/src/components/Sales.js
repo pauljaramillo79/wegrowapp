@@ -11,6 +11,8 @@ const Sales = (props) => {
   const [userID, setUserID] = useState(
     JSON.parse(localStorage.getItem("WGusercode"))
   );
+  const [limit, setLimit] = useState(300);
+
   useEffect(() => {
     Axios.post("/traders").then((response) => {
       // console.log(response.data);
@@ -74,6 +76,11 @@ const Sales = (props) => {
     <div className="saleslist">
       <div className="salestitleline">
         <h3 className="saleslisttitle">Sales List</h3>
+        <select onChange={(e) => setLimit(e.target.value)}>
+          <option value={300}>300</option>
+          <option value={1000}>1000</option>
+          <option value={"no limit"}>no limit</option>
+        </select>
         <select onChange={(e) => setUserID(e.target.value)}>
           <option value="all">All</option>
           {traders
@@ -100,6 +107,7 @@ const Sales = (props) => {
       <SalesTableSort
         config={CONFIG}
         userID={userID}
+        limit={limit}
         showEditModal={props.showEditModal}
         hideEditModal={props.hideEditModal}
         QSmodalState={props.QSmodalState}

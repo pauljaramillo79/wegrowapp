@@ -37,6 +37,7 @@ const reducer = (state, action) => {
         JSON.stringify(action.payload.accesstoken)
       );
       localStorage.setItem("isAuthenticated", true);
+      localStorage.setItem("role", action.payload.role);
       return {
         ...state,
         isAuthenticated: true,
@@ -52,6 +53,7 @@ const reducer = (state, action) => {
       localStorage.removeItem("isAuthenticated");
       localStorage.removeItem("refreshtoken");
       localStorage.removeItem("accesstoken");
+      localStorage.removeItem("role");
       // localStorage.clear();
       return {
         ...state,

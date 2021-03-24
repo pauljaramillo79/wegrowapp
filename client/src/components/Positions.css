@@ -14,3 +14,7 @@ h3 {
   font-family: "Roboto", sans-serif;
   color: rgb(68, 65, 162);
 }
+.positionstitleline {
+  display: flex;
+  width: 100%;
+}

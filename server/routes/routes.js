@@ -108,8 +108,14 @@ router.post("/login", async (req, res) => {
               const usercode = results[0].tCode;
               const userID = results[0].traderID;
               const firstlogin = results[0].firstlogin;
+              const role = results[0].roleID;
               let accesstoken = jwt.sign(
-                { username: username, user: user, usercode: usercode },
+                {
+                  username: username,
+                  user: user,
+                  usercode: usercode,
+                  role: role,
+                },
                 process.env.ACCESS_TOKEN_SECRET,
                 // "123",
                 {
@@ -117,7 +123,12 @@ router.post("/login", async (req, res) => {
                 }
               );
               let refreshtoken = jwt.sign(
-                { username: username, user: user, usercode: usercode },
+                {
+                  username: username,
+                  user: user,
+                  usercode: usercode,
+                  role: role,
+                },
                 process.env.REFRESH_TOKEN_SECRET,
                 // "123",
                 {
@@ -133,6 +144,7 @@ router.post("/login", async (req, res) => {
                 usercode: usercode,
                 userID: userID,
                 firstlogin: firstlogin,
+                role: role,
               });
             }
           });
@@ -249,10 +261,11 @@ router.post("/positions", authenticateToken, async (req, res) => {
 });
 router.post("/sales", authenticateToken, async (req, res) => {
   let userID = req.body.userID;
+  let limit = req.body.limit;
   db.query(
     `SELECT DATE_FORMAT(QSDate,'%m/%d/%Y') AS QSDate,  QSID, saleType, KTP AS WGP, KTS AS WGS, abbreviation, supplier, customer, packingSize, marks, trader, beginning, finish, portOfLoad, portOfDestination, quantity, incoterms, paymentTerm, materialCost, FreightTotal, freightCompany, oFreight, priceBeforeInterest, tradingProfit, tradingMargin, (percentageMargin*100) AS percentageMargin, netback, saleComplete FROM qsviewshort ${
       userID !== "all" ? `WHERE trader='${userID}'` : ""
-    }  ORDER BY QSID Desc LIMIT 300 `,
+    }  ORDER BY QSID Desc ${limit !== "no limit" ? `LIMIT ${limit}` : ""} `,
     //WHERE DATE_FORMAT(QSDate,'%Y')>(YEAR(CURDATE())-2)
     (err, results) => {
       if (err) {

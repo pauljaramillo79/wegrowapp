@@ -28,7 +28,9 @@ const ChangePwdModal = ({
   const [errorsCPwd, setErrorsPwd] = useState(initchangePwdErrors);
 
   //dynamically show or hide modal based on whether show prop is true or false. Show is a prop coming from Login.js
-  const showHideClassName = show ? "modal display-block" : "modal display-none";
+  const showHideClassName = show
+    ? "modal chngpwdmodal display-block"
+    : "modal chngpwdmodal display-none";
 
   // callback function to give focus to first input field when modal becomes visible
   const focusinput = useCallback((inputField) => {
@@ -126,7 +128,7 @@ const ChangePwdModal = ({
   };
   return (
     <div className={showHideClassName}>
-      <section className="modal-main">
+      <section id="chpwdmodal" className="modal-main">
         <h1>Welcome {name}!</h1>
         <h2>Seems like its the first time you are logging in.</h2>
         <p>Please take a minute to change your Password</p>

@@ -2,6 +2,8 @@ import React from "react";
 import "./Nav.css";
 import { NavLink } from "react-router-dom";
 const Nav = () => {
+  const role = JSON.parse(localStorage.getItem("role"));
+  // console.log(role);
   return (
     <div id="navbarcontainer">
       {/* <button>Management</button>
@@ -9,11 +11,15 @@ const Nav = () => {
       <button>Sales</button>
       <button>Logistics</button> */}
       <ul id="navbar">
-        <li>
-          <NavLink activeClassName="navbaractive" to="/management">
-            Management
-          </NavLink>
-        </li>
+        {role === 1 || role === 2 ? (
+          <li>
+            <NavLink activeClassName="navbaractive" to="/management">
+              Management
+            </NavLink>
+          </li>
+        ) : (
+          ""
+        )}
         <li>
           <NavLink activeClassName="navbaractive" to="/analysis">
             Analysis
@@ -45,11 +51,15 @@ const Nav = () => {
             Knowledge
           </NavLink>
         </li>
-        <li>
-          <NavLink activeClassName="navbaractive" to="/admin">
-            Admin
-          </NavLink>
-        </li>
+        {role === 1 ? (
+          <li>
+            <NavLink activeClassName="navbaractive" to="/admin">
+              Admin
+            </NavLink>
+          </li>
+        ) : (
+          ""
+        )}
       </ul>
     </div>
   );

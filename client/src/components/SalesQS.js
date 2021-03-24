@@ -11,7 +11,7 @@ const SalesQS = () => {
   const QSDataInit = {
     KTP: "",
     KTS: "",
-    saleType: "",
+    saleType: 1,
     QSDate: moment().format("yyyy-MM-DD"),
     abbreviation: "",
     supplier: "",
@@ -58,7 +58,7 @@ const SalesQS = () => {
   const QSValuesInit = {
     KTP: "",
     KTS: "",
-    saleType: "",
+    saleType: "Back-to-back",
     QSDate: moment().format("yyyy-MM-DD"),
     abbreviation: "",
     supplier: "",
@@ -90,7 +90,7 @@ const SalesQS = () => {
     pallets: "0.00",
     other: "0.00",
     totalcost: "0.00",
-    interestrate: "0.00",
+    interestrate: "0.00%",
     interestdays: "0",
     pricebeforeint: "0.00",
     salesinterest: "0.00",
@@ -154,16 +154,28 @@ const SalesQS = () => {
     });
   };
   const PercentageChange = (e) => {
-    const isdecimalnumber = RegExp("^[0-9.,]+$"); //RegExp("^[0-9\b]+$")
+    const isdecimalnumber = RegExp("^[0-9.,%]+$"); //RegExp("^[0-9\b]+$")
     if (isdecimalnumber.test(e.target.value) || e.target.value === "") {
-      setQSData({
-        ...QSData,
-        [e.target.name]: Number(e.target.value).toFixed(2) / 100,
-      });
-      setQSValues({
-        ...QSValues,
-        [e.target.name]: e.target.value,
-      });
+      if (e.target.value.toString().includes("%")) {
+        setQSData({
+          ...QSData,
+          [e.target.name]:
+            Number(e.target.value.replace("%", "")).toFixed(2) / 100,
+        });
+        setQSValues({
+          ...QSValues,
+          [e.target.name]: e.target.value.replace("%", ""),
+        });
+      } else {
+        setQSData({
+          ...QSData,
+          [e.target.name]: Number(e.target.value).toFixed(2) / 100,
+        });
+        setQSValues({
+          ...QSValues,
+          [e.target.name]: e.target.value,
+        });
+      }
     }
   };
   const PercentageBlur = (e) => {
@@ -226,13 +238,13 @@ const SalesQS = () => {
     });
     // }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [QSData.interestdays, QSData.interestrate]);
+  }, [QSData.interestdays, QSData.interestrate, QSData.pricebeforeint]);
   //Update total cost
   useEffect(() => {
     setQSValues({
       ...QSValues,
       totalcost: Number(
-        QSData.materialcost +
+        Number(QSData.materialcost) +
           QSData.pcommission +
           QSData.pfinancecost +
           QSData.sfinancecost +
@@ -250,7 +262,7 @@ const SalesQS = () => {
       ...QSData,
       totalcost: Number(
         (
-          QSData.materialcost +
+          Number(QSData.materialcost) +
           QSData.pcommission +
           QSData.pfinancecost +
           QSData.sfinancecost +
@@ -281,19 +293,19 @@ const SalesQS = () => {
     QSData.other,
   ]);
   //Update price after interest
-  useEffect(() => {
-    setQSData({
-      ...QSData,
-      priceafterint: QSData.pricebeforeint + QSData.salesinterest,
-    });
-    setQSValues({
-      ...QSValues,
-      priceafterint: Number(
-        QSData.pricebeforeint + QSData.salesinterest
-      ).toFixed(2),
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [QSData.pricebeforeint, QSData.salesinterest]);
+  // useEffect(() => {
+  //   setQSData({
+  //     ...QSData,
+  //     priceafterint: QSData.pricebeforeint + QSData.salesinterest,
+  //   });
+  //   setQSValues({
+  //     ...QSValues,
+  //     priceafterint: Number(
+  //       QSData.pricebeforeint + QSData.salesinterest
+  //     ).toFixed(2),
+  //   });
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [QSData.pricebeforeint, QSData.salesinterest]);
   //Update Included Interest Cost
   useEffect(() => {
     setQSData({
@@ -306,13 +318,12 @@ const SalesQS = () => {
       ),
       salesinterest: Number(
         (
-          (QSData.interestrate *
+          (Number(QSData.interestrate) *
             Number(QSData.interestdays) *
             Number(QSData.pricebeforeint)) /
           365
         ).toFixed(4)
       ),
-      priceafterint: QSData.pricebeforeint + QSData.salesinterest,
     });
     setQSValues({
       ...QSValues,
@@ -320,19 +331,112 @@ const SalesQS = () => {
         (QSData.CADintrate * QSData.CADdays * QSData.pricebeforeint) / 365
       ).toFixed(2),
       salesinterest: Number(
-        (QSData.interestrate *
+        (Number(QSData.interestrate) *
           Number(QSData.interestdays) *
           Number(QSData.pricebeforeint)) /
           365
-      ).toFixed(2),
-      priceafterint: Number(
-        QSData.pricebeforeint + QSData.salesinterest
       ).toFixed(2),
     });
 
     // }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [QSData.CADdays, QSData.CADintrate, QSData.pricebeforeint]);
+  }, [
+    QSData.CADdays,
+    QSData.CADintrate,
+    // QSData.pricebeforeint,
+    // QSData.salesinterest,
+  ]);
+
+  useEffect(() => {
+    if (QSData.interestrate === 0 || QSData.interestdays === 0) {
+      setQSData({
+        ...QSData,
+        interestcost: Number(
+          (
+            (QSData.CADintrate * QSData.CADdays * QSData.pricebeforeint) /
+            365
+          ).toFixed(4)
+        ),
+        salesinterest: Number(
+          (
+            (Number(QSData.interestrate) *
+              Number(QSData.interestdays) *
+              Number(QSData.pricebeforeint)) /
+            365
+          ).toFixed(4)
+        ),
+
+        priceafterint:
+          Number(QSData.pricebeforeint) + Number(QSData.salesinterest),
+      });
+      setQSValues({
+        ...QSValues,
+        interestcost: Number(
+          (QSData.CADintrate * QSData.CADdays * QSData.pricebeforeint) / 365
+        ).toFixed(2),
+        salesinterest: Number(
+          (Number(QSData.interestrate) *
+            Number(QSData.interestdays) *
+            Number(QSData.pricebeforeint)) /
+            365
+        ).toFixed(2),
+        priceafterint: Number(
+          Number(QSData.pricebeforeint) + Number(QSData.salesinterest)
+        ).toFixed(2),
+      });
+    } else {
+      setQSData({
+        ...QSData,
+        interestcost: Number(
+          (
+            (QSData.CADintrate * QSData.CADdays * QSData.pricebeforeint) /
+            365
+          ).toFixed(4)
+        ),
+        salesinterest: Number(
+          (
+            (Number(QSData.interestrate) *
+              Number(QSData.interestdays) *
+              Number(QSData.pricebeforeint)) /
+            365
+          ).toFixed(4)
+        ),
+
+        // priceafterint:
+        //   Number(QSData.pricebeforeint) + Number(QSData.salesinterest),
+      });
+      setQSValues({
+        ...QSValues,
+        interestcost: Number(
+          (QSData.CADintrate * QSData.CADdays * QSData.pricebeforeint) / 365
+        ).toFixed(2),
+        salesinterest: Number(
+          (Number(QSData.interestrate) *
+            Number(QSData.interestdays) *
+            Number(QSData.pricebeforeint)) /
+            365
+        ).toFixed(2),
+        // priceafterint: Number(
+        //   Number(QSData.pricebeforeint) + Number(QSData.salesinterest)
+        // ).toFixed(2),
+      });
+    }
+  }, [QSData.pricebeforeint]);
+
+  useEffect(() => {
+    setQSData({
+      ...QSData,
+      priceafterint:
+        Number(QSData.pricebeforeint) + Number(QSData.salesinterest),
+    });
+    setQSValues({
+      ...QSValues,
+      priceafterint: Number(
+        Number(QSData.pricebeforeint) + Number(QSData.salesinterest)
+      ).toFixed(2),
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [QSData.salesinterest]);
 
   //Update economics
   useEffect(() => {
@@ -390,6 +494,7 @@ const SalesQS = () => {
     Axios.post("/saveQS", { QSData }).then((response) => toggleQSrefresh());
     setQSData(QSDataInit);
     setQSValues(QSValuesInit);
+    // createemail();
   };
   // useEffect(() => {
   //   Axios.post("/positiondropdown").then((response) => {
@@ -413,7 +518,9 @@ const SalesQS = () => {
       from: position.start,
       to: position.end,
       KTP: position.KTP,
-      materialcost: Number(position.Price.replace("$", "").replace(",", "")),
+      materialcost: Number(
+        position.Price.replace("$", "").replace(",", "")
+      ).toFixed(2),
     });
     setQSData({
       ...QSData,
@@ -424,6 +531,11 @@ const SalesQS = () => {
       KTP: position.KTP,
       materialcost: Number(position.Price.replace("$", "").replace(",", "")),
     });
+  };
+  const createemail = () => {
+    let Subject = `WeGrow - FIRM OFFER - ${QSValues.quantity}mt - ${QSValues.abbreviation} - ${QSValues.customer}`;
+    let Message = `Product:   ${QSValues.abbreviation}%0dQuantity:  ${QSValues.quantity} metric tons +/-10% at Seller's option %0dPrice:  ${QSValues.priceafterint} pmt ${QSValues.incoterms} ${QSValues.POD}`;
+    window.location.href = `mailto:user@example.com?subject=${Subject}&body=${Message}`;
   };
   return (
     <div className="salesQS">

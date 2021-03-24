@@ -40,7 +40,7 @@ const SalesTableSort = (props) => {
         accesstoken = res.data.accesstoken;
         return await authAxios.post(
           "/sales",
-          { userID: props.userID },
+          { userID: props.userID, limit: props.limit },
           {
             headers: {
               Authorization: `Bearer ${accesstoken}`,
@@ -70,12 +70,15 @@ const SalesTableSort = (props) => {
   // const [postoedit, setPostoedit] = useState({});
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(async () => {
-    await authAxios.post("/sales", { userID: props.userID }).then((result) => {
-      setItems(result.data);
-      setColumnNames(Object.keys(columns));
-    });
+    console.log(props.limit);
+    await authAxios
+      .post("/sales", { userID: props.userID, limit: props.limit })
+      .then((result) => {
+        setItems(result.data);
+        setColumnNames(Object.keys(columns));
+      });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [QSrefresh, props.userID]);
+  }, [QSrefresh, props.userID, props.limit]);
   const handleFilterTextChange = (e, column) => {
     setColumns({
       ...columns,
@@ -153,13 +156,21 @@ const SalesTableSort = (props) => {
       if (c === "quantity") {
         if (x[c]) {
           return (
-            <td id={c + "-" + x.QSID} key={c + "-" + x.QSID}>
+            <td
+              className="canceldrag"
+              id={c + "-" + x.QSID}
+              key={c + "-" + x.QSID}
+            >
               {x[c].toFixed(2)}
             </td>
           );
         } else {
           return (
-            <td id={c + "-" + x.QSID} key={c + "-" + x.QSID}>
+            <td
+              className="canceldrag"
+              id={c + "-" + x.QSID}
+              key={c + "-" + x.QSID}
+            >
               {"na"}
             </td>
           );
@@ -175,13 +186,21 @@ const SalesTableSort = (props) => {
       ) {
         if (x[c]) {
           return (
-            <td id={c + "-" + x.QSID} key={c + "-" + x.QSID}>
+            <td
+              className="canceldrag"
+              id={c + "-" + x.QSID}
+              key={c + "-" + x.QSID}
+            >
               {"$" + x[c].toFixed(2)}
             </td>
           );
         } else {
           return (
-            <td id={c + "-" + x.QSID} key={c + "-" + x.QSID}>
+            <td
+              className="canceldrag"
+              id={c + "-" + x.QSID}
+              key={c + "-" + x.QSID}
+            >
               {""}
             </td>
           );
@@ -190,13 +209,21 @@ const SalesTableSort = (props) => {
       if (c === "percentageMargin") {
         if (x[c]) {
           return (
-            <td id={c + "-" + x.QSID} key={c + "-" + x.QSID}>
+            <td
+              className="canceldrag"
+              id={c + "-" + x.QSID}
+              key={c + "-" + x.QSID}
+            >
               {x[c].toFixed(2) + "%"}
             </td>
           );
         } else {
           return (
-            <td id={c + "-" + x.QSID} key={c + "-" + x.QSID}>
+            <td
+              className="canceldrag"
+              id={c + "-" + x.QSID}
+              key={c + "-" + x.QSID}
+            >
               {""}
             </td>
           );
@@ -204,13 +231,21 @@ const SalesTableSort = (props) => {
       } else {
         if (x[c]) {
           return (
-            <td id={c + "-" + x.QSID} key={c + "-" + x.QSID}>
+            <td
+              className="canceldrag"
+              id={c + "-" + x.QSID}
+              key={c + "-" + x.QSID}
+            >
               {x[c]}
             </td>
           );
         } else {
           return (
-            <td id={c + "-" + x.QSID} key={c + "-" + x.QSID}>
+            <td
+              className="canceldrag"
+              id={c + "-" + x.QSID}
+              key={c + "-" + x.QSID}
+            >
               {""}
             </td>
           );
@@ -268,7 +303,10 @@ const SalesTableSort = (props) => {
   const header = columnNames.map((c) => {
     return (
       <>
-        <th onClick={sortColumn(c)} className={"header " + sortClass(c)}>
+        <th
+          onClick={sortColumn(c)}
+          className={"header canceldrag " + sortClass(c)}
+        >
           {columns[c].name}
         </th>
       </>
@@ -277,7 +315,7 @@ const SalesTableSort = (props) => {
 
   const filterInputs = columnNames.map((c) => {
     return (
-      <td className="sales-filter">
+      <td className="sales-filter canceldrag">
         <input
           type="text"
           value={columns[c].filterText}

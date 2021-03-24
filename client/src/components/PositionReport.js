@@ -5,10 +5,11 @@ import "./PositionReport.css";
 import { RefreshPositionsContext } from "../contexts/RefreshPositionsProvider";
 import moment from "moment";
 import tz from "moment-timezone";
+import { ReactComponent as RefreshIcon } from "../assets/_images/refreshicon.svg";
 
 const PositionReport = () => {
   const { state } = useContext(AuthContext);
-  const { posrefresh } = useContext(RefreshPositionsContext);
+  const { posrefresh, togglePosrefresh } = useContext(RefreshPositionsContext);
   // Get token values from UseContext and Local Storage
   // let accesstoken = state.accesstoken;
   let accesstoken = JSON.parse(localStorage.getItem("accesstoken"));
@@ -74,7 +75,15 @@ const PositionReport = () => {
 
   return (
     <div className="positionreport">
-      <h3 className="positionreporttitle">Position Report</h3>
+      <div className="positionreporttitleline">
+        <h3 className="positionreporttitle">Position Report</h3>
+        <RefreshIcon
+          className="refreshicon"
+          onClick={(e) => {
+            togglePosrefresh();
+          }}
+        />
+      </div>
       <table id="positionreporttable">
         <thead>
           <tr>
@@ -121,7 +130,9 @@ const PositionReport = () => {
                               .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                           </td>
                           <td className="fig">
-                            {x.Inventory.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                            {x.Inventory.toFixed(2)
+                              .toString()
+                              .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                           </td>
                           <td className="fig">
                             {x.Price.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}

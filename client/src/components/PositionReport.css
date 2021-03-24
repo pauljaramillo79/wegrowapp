@@ -49,3 +49,6 @@
 .product {
   /* background-color: rgb(228, 236, 204); */
 }
+.positionreporttitleline {
+  display: flex;
+}
