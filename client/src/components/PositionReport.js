@@ -130,7 +130,8 @@ const PositionReport = () => {
                               .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                           </td>
                           <td className="fig">
-                            {x.Inventory.toFixed(2)
+                            {Number(x.Inventory)
+                              .toFixed(2)
                               .toString()
                               .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                           </td>
