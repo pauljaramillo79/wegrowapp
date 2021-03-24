@@ -145,3 +145,7 @@
 .salesQS-form .soldcheckbox label {
   margin-left: 1rem;
 }
+#QSbuttons {
+  display: flex;
+  justify-content: flex-end;
+}

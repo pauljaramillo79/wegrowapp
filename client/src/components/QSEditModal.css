@@ -3,7 +3,7 @@
 }
 .QSmodal .modal-main {
   width: 90%;
-  height: 75%;
+  height: 80%;
 }
 .QSmodal h2 {
   padding-top: 0.5rem;
@@ -129,4 +129,14 @@
 #editQS-3-col2 fieldset {
   display: flex;
   flex-direction: column;
+}
+.WGPSelect2 {
+  overflow: hidden;
+  white-space: nowrap;
+  width: 140px;
+  margin-left: 1rem;
+}
+.WGPSelect2 option {
+  overflow: hidden;
+  white-space: nowrap;
 }

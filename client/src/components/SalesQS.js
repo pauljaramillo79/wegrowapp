@@ -11,7 +11,7 @@ const SalesQS = () => {
   const QSDataInit = {
     KTP: "",
     KTS: "",
-    saleType: 1,
+    saleType: "",
     QSDate: moment().format("yyyy-MM-DD"),
     abbreviation: "",
     supplier: "",
@@ -58,7 +58,7 @@ const SalesQS = () => {
   const QSValuesInit = {
     KTP: "",
     KTS: "",
-    saleType: "Back-to-back",
+    saleType: "",
     QSDate: moment().format("yyyy-MM-DD"),
     abbreviation: "",
     supplier: "",
@@ -489,11 +489,14 @@ const SalesQS = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [QSData.quantity, QSData.priceafterint, QSData.totalcost]);
-  const addQS = (e) => {
+
+  //SAVE QS
+  const addQS = async (e) => {
     e.preventDefault();
-    Axios.post("/saveQS", { QSData }).then((response) => toggleQSrefresh());
-    setQSData(QSDataInit);
-    setQSValues(QSValuesInit);
+    await Axios.post("/saveQS", { QSData }).then((response) => {
+      toggleQSrefresh();
+    });
+    await clearQSData();
     // createemail();
   };
   // useEffect(() => {
@@ -537,6 +540,12 @@ const SalesQS = () => {
     let Message = `Product:   ${QSValues.abbreviation}%0dQuantity:  ${QSValues.quantity} metric tons +/-10% at Seller's option %0dPrice:  ${QSValues.priceafterint} pmt ${QSValues.incoterms} ${QSValues.POD}`;
     window.location.href = `mailto:user@example.com?subject=${Subject}&body=${Message}`;
   };
+  const clearQSData = () => {
+    setQSValues(QSValuesInit);
+    setQSData(QSDataInit);
+    setSold(false);
+  };
+
   return (
     <div className="salesQS">
       <h3 className="saleslisttitle">Quotation Sheet</h3>
@@ -568,6 +577,7 @@ const SalesQS = () => {
               <input
                 name="saletype"
                 type="radio"
+                checked={QSData && QSData.saleType === 1 ? true : false}
                 required
                 onClick={(e) => {
                   setQSData({ ...QSData, saleType: 1 });
@@ -580,6 +590,7 @@ const SalesQS = () => {
               <input
                 name="saletype"
                 type="radio"
+                checked={QSData && QSData.saleType === 2 ? true : false}
                 required
                 onClick={(e) => {
                   setQSData({ ...QSData, saleType: 2 });
@@ -789,6 +800,7 @@ const SalesQS = () => {
           <div className="soldcheckbox">
             <input
               className="canceldrag"
+              name="saleComplete"
               type="checkbox"
               checked={sold}
               onClick={handleSold}
@@ -1314,14 +1326,20 @@ const SalesQS = () => {
               </fieldset>
             </section>
           </fieldset>
-
-          <button type="button" onClick={(e) => console.log("Cancel")}>
-            Clear
-          </button>
-          <button type="submit">Save and New</button>
-          <button type="submit" onClick={(e) => console.log("prepare offer")}>
+          <div id="QSbuttons">
+            <button
+              type="button"
+              onClick={(e) => {
+                clearQSData();
+              }}
+            >
+              Clear
+            </button>
+            <button type="submit">Save and New</button>
+            {/* <button type="submit" onClick={(e) => console.log("prepare offer")}>
             Save and Offer
-          </button>
+          </button> */}
+          </div>
         </section>
       </form>
     </div>

@@ -9,10 +9,35 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
     : "modal QSmodal display-none";
   const QSID = QStoedit.QSID;
 
-  const [QSeditable, setQSeditable] = useState();
-  const [QSoriginal, setQSoriginal] = useState();
+  const QSeditableInit = {
+    includedrate: "",
+    includedperiod: "",
+    quantity: "",
+    materialcost: "",
+    pcommission: "",
+    pfinancecost: "",
+    sfinancecost: "",
+    freightpmt: "",
+    insurancecost: "",
+    inspectioncost: "",
+    scommission: "",
+    interestcost: "",
+    legal: "",
+    pallets: "",
+    other: "",
+    interestrate: "",
+    interestdays: "",
+    pricebeforeint: "",
+    salesinterest: "",
+    priceafterint: "",
+  };
+
+  const [QSeditable, setQSeditable] = useState(QSeditableInit);
+  const [QSoriginal, setQSoriginal] = useState(null);
   const [resetfield, setResetfield] = useState(false);
   const [QSedits, setQSedits] = useState();
+  const [positions, setPositions] = useState();
+  const [sold, setSold] = useState();
 
   // const postoeditinit = {
   //   KTP: QStoedit.KTP,
@@ -28,6 +53,7 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
       Axios.post("/QStoedit", { id: QSID }).then((response) => {
         setQSeditable(response.data[0]);
         setQSoriginal(response.data[0]);
+        setSold(response.data[0].saleComplete);
         console.log(response.data);
       });
     }
@@ -65,6 +91,22 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
         [e.target.name]: e.target.value.includes("$")
           ? e.target.value.replace("$", "")
           : e.target.value,
+      });
+    }
+  };
+  const handlePctInputChange = (e) => {
+    e.preventDefault();
+    const ispercent = RegExp("^[0-9.%]+$");
+    if (ispercent.test(e.target.value)) {
+      setQSeditable({
+        ...QSeditable,
+        [e.target.name]: e.target.value,
+      });
+      setQSedits({
+        ...QSedits,
+        [e.target.name]: e.target.value.includes("%")
+          ? Number(e.target.value.replace("%", "")) / 100
+          : Number(e.target.value) / 100,
       });
     }
   };
@@ -188,6 +230,177 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
       paymentterms: id1,
     });
   };
+  const closeandclear = () => {
+    setQSedits(null);
+    setQSeditable(QSeditableInit);
+    handleClose();
+  };
+  const loadPositions = () => {
+    Axios.post("/positiondropdown").then((response) => {
+      // console.log(response.data);
+      setPositions(response.data);
+    });
+  };
+  const setPosition = (val) => {
+    let position = positions[val];
+    console.log(position);
+    setQSeditable({
+      ...QSeditable,
+      KTP: position.KTP,
+      product: position.product,
+      supplier: position.Supplier,
+      from: position.start,
+      to: position.end,
+      materialcost: position.Price,
+    });
+    setQSedits({
+      ...QSedits,
+      KTP: position.KTP,
+      product: position.product,
+      supplier: position.Supplier,
+      from: position.start,
+      to: position.end,
+      materialcost: position.Price,
+    });
+  };
+  const handleSold = () => {
+    setSold(!sold);
+  };
+  useEffect(() => {
+    if (sold) {
+      setQSeditable({ ...QSeditable, saleComplete: -1 });
+      setQSedits({ ...QSedits, saleComplete: -1 });
+    }
+    if (!sold) {
+      setQSeditable({ ...QSeditable, saleComplete: 0 });
+      setQSedits({ ...QSedits, saleComplete: 0 });
+    }
+  }, [sold]);
+  // const deps = QSeditable
+  //   ? [
+  //       QSeditable.interestdays,
+  //       QSeditable.interestrate,
+  //       QSeditable.pricebeforeint,
+  //     ]
+  //   : [];
+
+  useEffect(() => {
+    setQSeditable({
+      ...QSeditable,
+      salesinterest:
+        "$" +
+        (
+          ((Number(QSeditable.interestrate.replace("%", "")) / 100) *
+            Number(QSeditable.interestdays) *
+            Number(QSeditable.pricebeforeint.replace("$", ""))) /
+          365
+        ).toFixed(2),
+    });
+    setQSedits({
+      ...QSedits,
+      salesinterest:
+        ((Number(QSeditable.interestrate.replace("%", "")) / 100) *
+          Number(QSeditable.interestdays) *
+          Number(QSeditable.pricebeforeint.replace("$", ""))) /
+        365,
+    });
+  }, [
+    QSeditable.interestdays,
+    QSeditable.interestrate,
+    QSeditable.pricebeforeint,
+  ]);
+
+  // const deps2 = QSeditable
+  //   ? [
+  //       QSeditable.materialcost,
+  //       QSeditable.pcommission,
+  //       QSeditable.pfinancecost,
+  //       QSeditable.sfinancecost,
+  //       QSeditable.freightpmt,
+  //       QSeditable.insurancecost,
+  //       QSeditable.inspectioncost,
+  //       QSeditable.scommission,
+  //       QSeditable.interestcost,
+  //       QSeditable.legal,
+  //       QSeditable.pallets,
+  //       QSeditable.other,
+  //     ]
+  //   : [];
+
+  useEffect(() => {
+    setQSeditable({
+      ...QSeditable,
+      totalcost:
+        "$" +
+        (
+          Number(QSeditable.materialcost.replace("$", "")) +
+          Number(QSeditable.pcommission.replace("$", "")) +
+          Number(QSeditable.pfinancecost.replace("$", "")) +
+          Number(QSeditable.sfinancecost.replace("$", "")) +
+          Number(QSeditable.freightpmt.replace("$", "")) +
+          Number(QSeditable.insurancecost.replace("$", "")) +
+          Number(QSeditable.inspectioncost.replace("$", "")) +
+          Number(QSeditable.scommission.replace("$", "")) +
+          Number(QSeditable.interestcost.replace("$", "")) +
+          Number(QSeditable.legal.replace("$", "")) +
+          Number(QSeditable.pallets.replace("$", "")) +
+          Number(QSeditable.other.replace("$", ""))
+        ).toFixed(2),
+    });
+    setQSedits({
+      ...QSedits,
+      totalcost:
+        Number(QSeditable.materialcost.replace("$", "")) +
+        Number(QSeditable.pcommission.replace("$", "")) +
+        Number(QSeditable.pfinancecost.replace("$", "")) +
+        Number(QSeditable.sfinancecost.replace("$", "")) +
+        Number(QSeditable.freightpmt.replace("$", "")) +
+        Number(QSeditable.insurancecost.replace("$", "")) +
+        Number(QSeditable.inspectioncost.replace("$", "")) +
+        Number(QSeditable.scommission.replace("$", "")) +
+        Number(QSeditable.interestcost.replace("$", "")) +
+        Number(QSeditable.legal.replace("$", "")) +
+        Number(QSeditable.pallets.replace("$", "")) +
+        Number(QSeditable.other.replace("$", "")),
+    });
+  }, [
+    QSeditable.materialcost,
+    QSeditable.pcommission,
+    QSeditable.pfinancecost,
+    QSeditable.sfinancecost,
+    QSeditable.freightpmt,
+    QSeditable.insurancecost,
+    QSeditable.inspectioncost,
+    QSeditable.scommission,
+    QSeditable.interestcost,
+    QSeditable.legal,
+    QSeditable.pallets,
+    QSeditable.other,
+  ]);
+
+  // Calculate Interestcost
+  useEffect(() => {
+    setQSeditable({
+      ...QSeditable,
+      interestcost:
+        "$" +
+        (
+          (Number(QSeditable.includedrate.toString().replace("%", "")) *
+            Number(QSeditable.includedperiod) *
+            Number(QSeditable.pricebeforeint.toString().replace("$", ""))) /
+          365 /
+          100
+        ).toFixed(2),
+    });
+    setQSedits({
+      interestcost:
+        (Number(QSeditable.includedrate.toString().replace("%", "")) *
+          Number(QSeditable.includedperiod) *
+          Number(QSeditable.pricebeforeint.toString().replace("$", ""))) /
+        365 /
+        100,
+    });
+  }, [QSeditable.includedrate, QSeditable.includedperiod]);
   return show ? (
     <div className={showHideClassName}>
       <section className="modal-main">
@@ -201,11 +414,21 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
                 type="date"
                 readOnly
                 value={QSeditable ? QSeditable.QSDate || "" : ""}
+                className="canceldrag"
               />
+            </div>
+            <div className="form-group">
+              <label>WGP:</label>
+              <input
+                name="KTP"
+                value={QSeditable ? QSeditable.KTP || "" : ""}
+                onChange={handleInputChange}
+                className="canceldrag"
+              ></input>
             </div>
             <fieldset>
               <legend>Sale Type</legend>
-              <p>
+              <div>
                 <input
                   type="radio"
                   name="saleTypeID"
@@ -215,10 +438,14 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
                       ? true || ""
                       : false
                   }
+                  onClick={(e) => {
+                    setQSeditable({ ...QSeditable, saleTypeID: 1 });
+                    setQSedits({ ...QSedits, saleTypeID: 1 });
+                  }}
                 />
                 <label htmlFor="">Back-to-back</label>
-              </p>
-              <p>
+              </div>
+              <div>
                 <input
                   type="radio"
                   name="saleTypeID"
@@ -228,9 +455,37 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
                       ? true || ""
                       : false
                   }
+                  onClick={(e) => {
+                    setQSeditable({ ...QSeditable, saleTypeID: 2 });
+                    setQSedits({ ...QSedits, saleTypeID: 2 });
+                  }}
                 />
                 <label htmlFor="">Position</label>
-              </p>
+                {QSeditable && QSeditable.saleTypeID === 2 ? (
+                  <select
+                    className="WGPSelect2"
+                    onClick={loadPositions}
+                    onChange={(e) => setPosition(e.target.value)}
+                  >
+                    <option>Select...</option>
+                    {QSeditable && positions
+                      ? positions.map((pos, i) => {
+                          return (
+                            <option value={i}>
+                              {pos.KTP +
+                                " - " +
+                                pos.product +
+                                " - " +
+                                pos.Supplier}
+                            </option>
+                          );
+                        })
+                      : ""}
+                  </select>
+                ) : (
+                  ""
+                )}
+              </div>
             </fieldset>
             <fieldset>
               <legend>General</legend>
@@ -386,6 +641,25 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
             </fieldset>
           </section>
           <section id="editQS-2">
+            <div className="soldcheckbox" style={{ marginBottom: "1rem" }}>
+              <input
+                className="canceldrag"
+                name="saleComplete"
+                type="checkbox"
+                checked={sold}
+                onClick={handleSold}
+              />
+              <label>Sold</label>
+            </div>
+            <div className="form-group">
+              <label>WGS:</label>
+              <input
+                name="KTS"
+                value={QSeditable ? QSeditable.KTS || "" : ""}
+                onChange={handleInputChange}
+                className="canceldrag"
+              ></input>
+            </div>
             <fieldset>
               <legend>In Charge</legend>
               <div className="form-group">
@@ -456,7 +730,7 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
                   type="text"
                   required
                   value={QSeditable ? QSeditable.includedrate || "" : ""}
-                  onChange={handleInputChange}
+                  onChange={handlePctInputChange}
                   onBlur={formatPercent}
                 />
               </div>
@@ -671,6 +945,7 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
                     name="totalcost"
                     type="text"
                     required
+                    readOnly
                     value={QSeditable ? QSeditable.totalcost || "" : ""}
                     onChange={handleQInputChange}
                     onBlur={formatCurrency}
@@ -688,7 +963,7 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
                       type="text"
                       required
                       value={QSeditable ? QSeditable.interestrate || "" : ""}
-                      onChange={handleInputChange}
+                      onChange={handlePctInputChange}
                       onBlur={formatPercent}
                     />
                   </div>
@@ -815,7 +1090,7 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
               <button className="cancelbutton" onClick={createemail}>
                 Save Edits and Offer
               </button>
-              <button className="cancelbutton" onClick={handleClose}>
+              <button className="cancelbutton" onClick={closeandclear}>
                 Cancel
               </button>
             </div>
