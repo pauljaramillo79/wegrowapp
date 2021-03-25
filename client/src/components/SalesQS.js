@@ -347,8 +347,101 @@ const SalesQS = () => {
     // QSData.salesinterest,
   ]);
 
+  // useEffect(() => {
+  //   if (QSData.interestrate === 0 || QSData.interestdays === 0) {
+  //     setQSData({
+  //       ...QSData,
+  //       interestcost: Number(
+  //         (
+  //           (QSData.CADintrate * QSData.CADdays * QSData.pricebeforeint) /
+  //           365
+  //         ).toFixed(4)
+  //       ),
+  //       salesinterest: Number(
+  //         (
+  //           (Number(QSData.interestrate) *
+  //             Number(QSData.interestdays) *
+  //             Number(QSData.pricebeforeint)) /
+  //           365
+  //         ).toFixed(4)
+  //       ),
+
+  //       priceafterint:
+  //         Number(QSData.pricebeforeint) + Number(QSData.salesinterest),
+  //     });
+  //     setQSValues({
+  //       ...QSValues,
+  //       interestcost: Number(
+  //         (QSData.CADintrate * QSData.CADdays * QSData.pricebeforeint) / 365
+  //       ).toFixed(2),
+  //       salesinterest: Number(
+  //         (Number(QSData.interestrate) *
+  //           Number(QSData.interestdays) *
+  //           Number(QSData.pricebeforeint)) /
+  //           365
+  //       ).toFixed(2),
+  //       priceafterint: Number(
+  //         Number(QSData.pricebeforeint) + Number(QSData.salesinterest)
+  //       ).toFixed(2),
+  //     });
+  //   } else {
+  //     setQSData({
+  //       ...QSData,
+  //       interestcost: Number(
+  //         (
+  //           (QSData.CADintrate * QSData.CADdays * QSData.pricebeforeint) /
+  //           365
+  //         ).toFixed(4)
+  //       ),
+  //       salesinterest: Number(
+  //         (
+  //           (Number(QSData.interestrate) *
+  //             Number(QSData.interestdays) *
+  //             Number(QSData.pricebeforeint)) /
+  //           365
+  //         ).toFixed(4)
+  //       ),
+
+  //       // priceafterint:
+  //       //   Number(QSData.pricebeforeint) + Number(QSData.salesinterest),
+  //     });
+  //     setQSValues({
+  //       ...QSValues,
+  //       interestcost: Number(
+  //         (QSData.CADintrate * QSData.CADdays * QSData.pricebeforeint) / 365
+  //       ).toFixed(2),
+  //       salesinterest: Number(
+  //         (Number(QSData.interestrate) *
+  //           Number(QSData.interestdays) *
+  //           Number(QSData.pricebeforeint)) /
+  //           365
+  //       ).toFixed(2),
+  //       // priceafterint: Number(
+  //       //   Number(QSData.pricebeforeint) + Number(QSData.salesinterest)
+  //       // ).toFixed(2),
+  //     });
+  //   }
+  // }, [QSData.pricebeforeint]);
+
   useEffect(() => {
-    if (QSData.interestrate === 0 || QSData.interestdays === 0) {
+    setQSData({
+      ...QSData,
+
+      priceafterint:
+        Number(QSData.pricebeforeint) + Number(QSData.salesinterest),
+    });
+    setQSValues({
+      ...QSValues,
+      priceafterint: Number(
+        Number(QSData.pricebeforeint) + Number(QSData.salesinterest)
+      ).toFixed(2),
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [QSData.salesinterest]);
+
+  //Update economics
+  useEffect(() => {
+    if (QSData.quantity !== 0 && QSData.pricebeforeint !== 0) {
       setQSData({
         ...QSData,
         interestcost: Number(
@@ -365,9 +458,29 @@ const SalesQS = () => {
             365
           ).toFixed(4)
         ),
-
         priceafterint:
           Number(QSData.pricebeforeint) + Number(QSData.salesinterest),
+        profit: Number((QSData.pricebeforeint - QSData.totalcost).toFixed(4)),
+        margin: Number(
+          (
+            (QSData.pricebeforeint - QSData.totalcost) *
+            QSData.quantity
+          ).toFixed(4)
+        ),
+        turnover: Number((QSData.quantity * QSData.pricebeforeint).toFixed(4)),
+        pctmargin: Number(
+          (
+            (QSData.pricebeforeint - QSData.totalcost) /
+            QSData.pricebeforeint
+          ).toFixed(4)
+        ),
+        netback: Number(
+          (
+            QSData.pricebeforeint -
+            QSData.totalcost +
+            QSData.materialcost
+          ).toFixed(4)
+        ),
       });
       setQSValues({
         ...QSValues,
@@ -383,112 +496,30 @@ const SalesQS = () => {
         priceafterint: Number(
           Number(QSData.pricebeforeint) + Number(QSData.salesinterest)
         ).toFixed(2),
-      });
-    } else {
-      setQSData({
-        ...QSData,
-        interestcost: Number(
-          (
-            (QSData.CADintrate * QSData.CADdays * QSData.pricebeforeint) /
-            365
-          ).toFixed(4)
-        ),
-        salesinterest: Number(
-          (
-            (Number(QSData.interestrate) *
-              Number(QSData.interestdays) *
-              Number(QSData.pricebeforeint)) /
-            365
-          ).toFixed(4)
-        ),
-
-        // priceafterint:
-        //   Number(QSData.pricebeforeint) + Number(QSData.salesinterest),
-      });
-      setQSValues({
-        ...QSValues,
-        interestcost: Number(
-          (QSData.CADintrate * QSData.CADdays * QSData.pricebeforeint) / 365
-        ).toFixed(2),
-        salesinterest: Number(
-          (Number(QSData.interestrate) *
-            Number(QSData.interestdays) *
-            Number(QSData.pricebeforeint)) /
-            365
-        ).toFixed(2),
-        // priceafterint: Number(
-        //   Number(QSData.pricebeforeint) + Number(QSData.salesinterest)
-        // ).toFixed(2),
-      });
-    }
-  }, [QSData.pricebeforeint]);
-
-  useEffect(() => {
-    setQSData({
-      ...QSData,
-      priceafterint:
-        Number(QSData.pricebeforeint) + Number(QSData.salesinterest),
-    });
-    setQSValues({
-      ...QSValues,
-      priceafterint: Number(
-        Number(QSData.pricebeforeint) + Number(QSData.salesinterest)
-      ).toFixed(2),
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [QSData.salesinterest]);
-
-  //Update economics
-  useEffect(() => {
-    if (QSData.quantity !== 0 && QSData.priceafterint !== 0) {
-      setQSData({
-        ...QSData,
-        profit: Number((QSData.priceafterint - QSData.totalcost).toFixed(4)),
+        profit: Number(QSData.pricebeforeint - QSData.totalcost).toFixed(2),
         margin: Number(
-          ((QSData.priceafterint - QSData.totalcost) * QSData.quantity).toFixed(
-            4
-          )
-        ),
-        turnover: Number((QSData.quantity * QSData.priceafterint).toFixed(4)),
-        pctmargin: Number(
-          (
-            (QSData.priceafterint - QSData.totalcost) /
-            QSData.priceafterint
-          ).toFixed(4)
-        ),
-        netback: Number(
-          (
-            QSData.priceafterint -
-            QSData.totalcost +
-            QSData.materialcost
-          ).toFixed(4)
-        ),
-      });
-      setQSValues({
-        ...QSValues,
-        profit: Number(QSData.priceafterint - QSData.totalcost).toFixed(2),
-        margin: Number(
-          (QSData.priceafterint - QSData.totalcost) * QSData.quantity
+          (QSData.pricebeforeint - QSData.totalcost) * QSData.quantity
         )
           .toFixed(2)
           .replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-        turnover: Number(QSData.quantity * QSData.priceafterint)
+        turnover: Number(QSData.quantity * QSData.pricebeforeint)
           .toFixed(2)
           .replace(/\B(?=(\d{3})+(?!\d))/g, ","),
         pctmargin:
           Number(
-            ((QSData.priceafterint - QSData.totalcost) / QSData.priceafterint) *
+            ((QSData.pricebeforeint - QSData.totalcost) /
+              QSData.pricebeforeint) *
               100
           ).toFixed(2) + "%",
         netback: Number(
-          QSData.priceafterint - QSData.totalcost + QSData.materialcost
+          QSData.pricebeforeint - QSData.totalcost + QSData.materialcost
         )
           .toFixed(2)
           .replace(/\B(?=(\d{3})+(?!\d))/g, ","),
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [QSData.quantity, QSData.priceafterint, QSData.totalcost]);
+  }, [QSData.quantity, QSData.pricebeforeint, QSData.totalcost]);
 
   //SAVE QS
   const addQS = async (e) => {

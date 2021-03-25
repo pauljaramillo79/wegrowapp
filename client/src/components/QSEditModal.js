@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import "./QSEditModal.css";
 import Axios from "axios";
 import SearchField from "./SearchField";
+import { RefreshPositionsContext } from "../contexts/RefreshPositionsProvider";
 
 const QSEditModal = ({ handleClose, show, QStoedit }) => {
+  const { toggleQSrefresh } = useContext(RefreshPositionsContext);
   const showHideClassName = show
     ? "modal QSmodal display-block"
     : "modal QSmodal display-none";
@@ -25,6 +27,8 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
     legal: "",
     pallets: "",
     other: "",
+    totalcost: "",
+    // totalcost: "",
     interestrate: "",
     interestdays: "",
     pricebeforeint: "",
@@ -304,6 +308,7 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
           Number(QSeditable.pricebeforeint.replace("$", ""))) /
         365,
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     QSeditable.interestdays,
     QSeditable.interestrate,
@@ -340,6 +345,7 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
         ).toFixed(2),
     });
     setQSedits({
+      ...QSedits,
       interestcost:
         (Number(QSeditable.includedrate.toString().replace("%", "")) *
           Number(QSeditable.includedperiod) *
@@ -348,6 +354,224 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
         100,
     });
   }, [QSeditable.includedrate, QSeditable.includedperiod]);
+
+  useEffect(() => {
+    if (
+      Number(QSeditable.interestrate.replace("%", "")) === 0 ||
+      QSeditable.interestdays === 0
+    ) {
+      setQSeditable({
+        ...QSeditable,
+        interestcost:
+          "$" +
+          (
+            (Number(QSeditable.includedrate.toString().replace("%", "")) *
+              Number(QSeditable.includedperiod) *
+              Number(QSeditable.pricebeforeint.toString().replace("$", ""))) /
+            365 /
+            100
+          ).toFixed(2),
+        salesinterest:
+          "$" +
+          (
+            (Number(QSeditable.interestrate.replace("%", "")) *
+              Number(QSeditable.interestdays) *
+              Number(QSeditable.pricebeforeint.replace("$", ""))) /
+            365 /
+            100
+          ).toFixed(2),
+        priceafterint:
+          "$" +
+          (
+            Number(QSeditable.pricebeforeint.replace("$", "")) +
+            Number(QSeditable.salesinterest.replace("$", ""))
+          ).toFixed(2),
+      });
+      setQSedits({
+        ...QSedits,
+        interestcost:
+          (Number(QSeditable.includedrate.toString().replace("%", "")) *
+            Number(QSeditable.includedperiod) *
+            Number(QSeditable.pricebeforeint.toString().replace("$", ""))) /
+          365 /
+          100,
+        salesinterest:
+          (Number(QSeditable.interestrate.replace("%", "")) *
+            Number(QSeditable.interestdays) *
+            Number(QSeditable.pricebeforeint.replace("$", ""))) /
+          365 /
+          100,
+        priceafterint:
+          Number(QSeditable.pricebeforeint.replace("$", "")) +
+          Number(QSeditable.salesinterest.replace("$", "")),
+      });
+    } else {
+      setQSeditable({
+        ...QSeditable,
+        interestcost:
+          "$" +
+          (
+            (Number(QSeditable.includedrate.toString().replace("%", "")) *
+              Number(QSeditable.includedperiod) *
+              Number(QSeditable.pricebeforeint.toString().replace("$", ""))) /
+            365 /
+            100
+          ).toFixed(2),
+        //
+        salesinterest:
+          "$" +
+          (
+            (Number(QSeditable.interestrate.replace("%", "")) *
+              Number(QSeditable.interestdays) *
+              Number(QSeditable.pricebeforeint.replace("$", ""))) /
+            365 /
+            100
+          ).toFixed(2),
+        priceafterint:
+          "$" +
+          (
+            Number(QSeditable.pricebeforeint.replace("$", "")) +
+            Number(QSeditable.salesinterest.replace("$", ""))
+          ).toFixed(2),
+      });
+      setQSedits({
+        ...QSedits,
+        interestcost:
+          (Number(QSeditable.includedrate.toString().replace("%", "")) *
+            Number(QSeditable.includedperiod) *
+            Number(QSeditable.pricebeforeint.toString().replace("$", ""))) /
+          365 /
+          100,
+        salesinterest:
+          (Number(QSeditable.interestrate.replace("%", "")) *
+            Number(QSeditable.interestdays) *
+            Number(QSeditable.pricebeforeint.replace("$", ""))) /
+          365 /
+          100,
+      });
+    }
+  }, [QSeditable.pricebeforeint]);
+  useEffect(() => {
+    setQSeditable({
+      ...QSeditable,
+      priceafterint:
+        "$" +
+        (
+          Number(QSeditable.pricebeforeint.replace("$", "")) +
+          Number(QSeditable.salesinterest.replace("$", ""))
+        ).toFixed(2),
+    });
+    setQSedits({
+      ...QSedits,
+      priceafterint:
+        Number(QSeditable.pricebeforeint.replace("$", "")) +
+        Number(QSeditable.salesinterest.replace("$", "")),
+    });
+  }, [QSeditable.salesinterest]);
+  useEffect(() => {
+    setQSeditable({
+      ...QSeditable,
+      interestcost:
+        "$" +
+        (
+          (Number(QSeditable.includedrate.toString().replace("%", "")) *
+            Number(QSeditable.includedperiod) *
+            Number(QSeditable.pricebeforeint.toString().replace("$", ""))) /
+          365 /
+          100
+        ).toFixed(2),
+      salesinterest:
+        "$" +
+        (
+          (Number(QSeditable.interestrate.replace("%", "")) *
+            Number(QSeditable.interestdays) *
+            Number(QSeditable.pricebeforeint.replace("$", ""))) /
+          365 /
+          100
+        ).toFixed(2),
+      priceafterint:
+        "$" +
+        (
+          Number(QSeditable.pricebeforeint.replace("$", "")) +
+          Number(QSeditable.salesinterest.replace("$", ""))
+        ).toFixed(2),
+      profit:
+        "$" +
+        (
+          Number(QSeditable.pricebeforeint.replace("$", "")) -
+          Number(QSeditable.totalcost.replace("$", ""))
+        ).toFixed(2),
+      margin:
+        "$" +
+        (
+          (Number(QSeditable.pricebeforeint.replace("$", "")) -
+            Number(QSeditable.totalcost.replace("$", ""))) *
+          Number(QSeditable.quantity)
+        )
+          .toFixed(2)
+          .replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+      turnover:
+        "$" +
+        (
+          Number(QSeditable.quantity) *
+          Number(QSeditable.pricebeforeint.replace("$", ""))
+        )
+          .toFixed(2)
+          .replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+      pctmargin:
+        (
+          ((Number(QSeditable.pricebeforeint.replace("$", "")) -
+            Number(QSeditable.totalcost.replace("$", ""))) /
+            Number(QSeditable.pricebeforeint.replace("$", ""))) *
+          100
+        ).toFixed(2) + "%",
+      netback:
+        "$" +
+        (
+          Number(QSeditable.pricebeforeint.replace("$", "")) -
+          Number(QSeditable.totalcost.replace("$", "")) +
+          Number(QSeditable.materialcost.replace("$", ""))
+        )
+          .toFixed(2)
+          .replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+    });
+    setQSedits({
+      interestcost:
+        (Number(QSeditable.includedrate.toString().replace("%", "")) *
+          Number(QSeditable.includedperiod) *
+          Number(QSeditable.pricebeforeint.toString().replace("$", ""))) /
+        365 /
+        100,
+      salesinterest:
+        (Number(QSeditable.interestrate.replace("%", "")) *
+          Number(QSeditable.interestdays) *
+          Number(QSeditable.pricebeforeint.replace("$", ""))) /
+        365 /
+        100,
+      priceafterint:
+        Number(QSeditable.pricebeforeint.replace("$", "")) +
+        Number(QSeditable.salesinterest.replace("$", "")),
+      profit:
+        Number(QSeditable.pricebeforeint.replace("$", "")) -
+        Number(QSeditable.totalcost.replace("$", "")),
+      margin:
+        (Number(QSeditable.pricebeforeint.replace("$", "")) -
+          Number(QSeditable.totalcost.replace("$", ""))) *
+        Number(QSeditable.quantity),
+      turnover:
+        Number(QSeditable.quantity) *
+        Number(QSeditable.pricebeforeint.replace("$", "")),
+      pctmargin:
+        ((Number(QSeditable.pricebeforeint.replace("$", "")) -
+          Number(QSeditable.totalcost.replace("$", ""))) /
+          Number(QSeditable.pricebeforeint.replace("$", ""))) *
+        100,
+      netback:
+        Number(QSeditable.pricebeforeint.replace("$", "")) -
+        Number(QSeditable.totalcost.replace("$", "")) +
+        Number(QSeditable.materialcost.replace("$", "")),
+    });
+  }, [QSeditable.quantity, QSeditable.pricebefore, QSeditable.totalcost]);
   useEffect(() => {
     setQSeditable({
       ...QSeditable,
@@ -398,14 +622,24 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
     QSeditable.pallets,
     QSeditable.other,
   ]);
-
-  // Calculate Interestcost
-
+  const updateQS = async (e) => {
+    e.preventDefault();
+    await Axios.post("/updateQS", { QSedits }).then((response) => {
+      toggleQSrefresh();
+    });
+    await handleClose();
+  };
   return show ? (
     <div className={showHideClassName}>
       <section className="modal-main">
         <h2>Edit Quotation Sheet</h2>
-        <form className="QSModalForm" action="">
+        <form
+          className="QSModalForm"
+          action=""
+          onSubmit={(e) => {
+            updateQS(e);
+          }}
+        >
           <section id="edtQS-1">
             <div className="form-group">
               <label htmlFor="">QS Date:</label>
@@ -552,7 +786,7 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
               </div>
               <div className="form-group">
                 <label htmlFor="">Contact:</label>
-                <input name="contact" type="text" required />
+                <input name="contact" type="text" />
               </div>
             </fieldset>
             <fieldset>
@@ -746,34 +980,34 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
               </div>
             </fieldset>
             <div className="shipmentType">
-              <input type="radio" name="shipmenttype" required />
+              <input type="radio" name="shipmenttype" />
               <label htmlFor="">Container</label>
-              <input type="radio" name="shipmenttype" required />
+              <input type="radio" name="shipmenttype" />
               <label htmlFor="">Breakbulk</label>
-              <input type="radio" name="shipmenttype" required />
+              <input type="radio" name="shipmenttype" />
               <label htmlFor="">Distribution</label>
             </div>
             <fieldset>
               <legend>Freight</legend>
               <div className="form-group">
                 <label htmlFor="">Freight ID:</label>
-                <input name="freightID" type="text" required />
+                <input name="freightID" type="text" />
               </div>
               <div className="form-group">
                 <label htmlFor="">Freight Total:</label>
-                <input name="freighttotal" type="text" required />
+                <input name="freighttotal" type="text" />
               </div>
               <div className="form-group">
                 <label htmlFor="">Shipping Line:</label>
-                <input name="shippingline" type="text" required />
+                <input name="shippingline" type="text" />
               </div>
               <div className="form-group">
                 <label htmlFor="">Inspection Cost:</label>
-                <input name="inspectiontotal" type="text" required />
+                <input name="inspectiontotal" type="text" />
               </div>
               <div className="form-group">
                 <label htmlFor="">Freight ID:</label>
-                <input name="freightID" type="text" required />
+                <input name="freightID" type="text" />
               </div>
             </fieldset>
           </section>
@@ -1083,7 +1317,7 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
               <button
                 className="confirmbutton"
                 type="submit"
-                onClick={handleClose}
+                // onClick={handleClose}
               >
                 Save Edits
               </button>

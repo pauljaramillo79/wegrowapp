@@ -640,6 +640,11 @@ router.post("/QStoedit", (req, res) => {
   );
 });
 
+router.post("/updateQS", (req, res) => {
+  console.log(req.body);
+  res.sendStatus(200);
+});
+
 // ------- DELETE ---------
 router.delete("/deleteQS", (req, res) => {
   let id = req.body.id;
