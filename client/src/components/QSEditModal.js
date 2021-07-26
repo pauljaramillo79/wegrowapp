@@ -450,6 +450,7 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
           100,
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [QSeditable.pricebeforeint]);
   useEffect(() => {
     setQSeditable({
@@ -467,6 +468,7 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
         Number(QSeditable.pricebeforeint.replace("$", "")) +
         Number(QSeditable.salesinterest.replace("$", "")),
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [QSeditable.salesinterest]);
   useEffect(() => {
     setQSeditable({
@@ -571,6 +573,7 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
         Number(QSeditable.totalcost.replace("$", "")) +
         Number(QSeditable.materialcost.replace("$", "")),
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [QSeditable.quantity, QSeditable.pricebefore, QSeditable.totalcost]);
   useEffect(() => {
     setQSeditable({
@@ -608,6 +611,7 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
         Number(QSeditable.pallets.replace("$", "")) +
         Number(QSeditable.other.replace("$", "")),
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     QSeditable.materialcost,
     QSeditable.pcommission,

@@ -8,6 +8,7 @@ import PositionReport from "./PositionReport";
 import Positions from "./Positions";
 import PositionAdd from "./PositionAdd";
 import PositionModal from "./PositionModal";
+import AddProductModal from "./AddProductModal";
 import "./PositionsTableSort.css";
 
 import { Responsive, WidthProvider } from "react-grid-layout";
@@ -68,21 +69,33 @@ const PositionsGrid = () => {
   const originalLayout = getFromLS("layouts") || initlayout;
   const [layouts, setLayouts] = useState(originalLayout);
 
-  //MODAL
+  //MODALS
   const [modalState, setModalState] = useState(false);
+  const [addprodmodalstate, setAddprodmodalstate] = useState(false);
   const [postoedit, setPostoedit] = useState({});
   const showEditModal = (e, positem) => {
     // console.log(positem);
     setModalState(true);
     setPostoedit(positem);
   };
+  const showAddProdModal = (e) => {
+    setAddprodmodalstate(true);
+  };
   const hideEditModal = (e) => {
     e.preventDefault();
     setModalState(false);
   };
+  const hideAddProdModal = (e) => {
+    e.preventDefault();
+    setAddprodmodalstate(false);
+  };
   return (
     <>
       <div className="gridcontainer">
+        <AddProductModal
+          showAddProd={addprodmodalstate}
+          handleClose={hideAddProdModal}
+        />
         <PositionModal
           show={modalState}
           handleClose={hideEditModal}
@@ -102,13 +115,13 @@ const PositionsGrid = () => {
           margin={[20, 20]}
           draggableCancel=".canceldrag"
         >
-          <div id="sales1" key="a">
+          <div id="positions1" key="a">
             <PositionReport key="positionreport" />
           </div>
-          <div id="sales2" key="b">
-            <PositionAdd key="positionadd" />
+          <div id="positions2" key="b">
+            <PositionAdd key="positionadd" showAddProd={showAddProdModal} />
           </div>
-          <div id="sales2" key="c">
+          <div id="positions2" key="c">
             <Positions
               showEditModal={showEditModal}
               hideEditModal={hideEditModal}

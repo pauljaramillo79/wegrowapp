@@ -15,6 +15,7 @@ const SearchField = ({
   resetfield,
   setResetfield,
   value,
+  showAddProd,
 }) => {
   const [data, setData] = useState();
   const [searchTerm, setSearchTerm] = useState("");
@@ -42,7 +43,6 @@ const SearchField = ({
       const results = data.filter((item) => {
         if (otherName && otherID && thirdID) {
           if (searchTerm && searchTerm !== "") {
-            console.log("im here");
             return (
               item[searchName] +
               item[searchID] +
@@ -102,6 +102,11 @@ const SearchField = ({
       <div className="presearchresults"></div>
       <span className="QSsearchresults-container">
         <ul className={show ? "searchresults" : "QSsearchresults-hide"}>
+          {searchID === "productID" ? (
+            <li onClick={showAddProd}>...Add New Product</li>
+          ) : (
+            ""
+          )}
           {searchResults
             ? searchResults.map((item) => {
                 // console.log(item);

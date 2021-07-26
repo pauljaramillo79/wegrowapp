@@ -51,6 +51,27 @@ const PositionModal = ({ handleClose, show, positiontoedit }) => {
       [e.target.name]: e.target.value,
     });
   };
+  const handleIntInputChange = (e) => {
+    e.preventDefault();
+    const isinteger = RegExp("^[0-9]+$");
+    if (isinteger.test(e.target.value) || e.target.value === "") {
+      setPosEditInit({
+        ...posEditInit,
+        [e.target.name]: e.target.value,
+      });
+    }
+  };
+
+  const handleQInputChange = (e) => {
+    e.preventDefault();
+    const isnumerical = RegExp("^[0-9.]+$");
+    if (isnumerical.test(e.target.value) || e.target.value === "") {
+      setPosEditInit({
+        ...posEditInit,
+        [e.target.name]: e.target.value,
+      });
+    }
+  };
   const handleLocalClose = (e) => {
     e.preventDefault();
     handleClose(e);
@@ -111,7 +132,7 @@ const PositionModal = ({ handleClose, show, positiontoedit }) => {
               name="WGP"
               type="text"
               value={posEditInit ? posEditInit.WGP || "" : ""}
-              onChange={handleInputChange}
+              onChange={handleIntInputChange}
               className="canceldrag"
             />
           </div>
@@ -165,7 +186,7 @@ const PositionModal = ({ handleClose, show, positiontoedit }) => {
               name="quantityLow"
               type="text"
               value={posEditInit ? posEditInit.quantityLow || "" : ""}
-              onChange={handleInputChange}
+              onChange={handleQInputChange}
               className="canceldrag"
             />
           </div>
@@ -175,7 +196,7 @@ const PositionModal = ({ handleClose, show, positiontoedit }) => {
               name="quantityHigh"
               type="text"
               value={posEditInit ? posEditInit.quantityHigh || "" : ""}
-              onChange={handleInputChange}
+              onChange={handleQInputChange}
               className="canceldrag"
             />
           </div>

@@ -4,7 +4,7 @@ import SearchField from "./SearchField";
 import { RefreshPositionsContext } from "../contexts/RefreshPositionsProvider";
 import Axios from "axios";
 
-const PositionAdd = () => {
+const PositionAdd = ({ showAddProd }) => {
   const { posrefresh, togglePosrefresh } = useContext(RefreshPositionsContext);
   const posDataInit = {
     WGP: "",
@@ -52,7 +52,36 @@ const PositionAdd = () => {
       ...posData,
       [e.target.name]: e.target.value,
     });
-    // console.log(postoadd);
+  };
+  const handleIntPosChange = (e) => {
+    e.preventDefault();
+    const isinteger = RegExp("^[0-9]+$");
+    if (isinteger.test(e.target.value) || e.target.value === "") {
+      setPosaddErrors({
+        ...posaddErrors,
+        WGP: "",
+        general: "",
+      });
+      setPosData({
+        ...posData,
+        [e.target.name]: e.target.value,
+      });
+    }
+  };
+  const handleQPosChange = (e) => {
+    e.preventDefault();
+    const isinteger = RegExp("^[0-9.]+$");
+    if (isinteger.test(e.target.value) || e.target.value === "") {
+      setPosaddErrors({
+        ...posaddErrors,
+        WGP: "",
+        general: "",
+      });
+      setPosData({
+        ...posData,
+        [e.target.name]: e.target.value,
+      });
+    }
   };
   const setProdSupplier = (
     prodID,
@@ -154,7 +183,7 @@ const PositionAdd = () => {
             name="WGP"
             value={posData.WGP}
             type="text"
-            onChange={handlePosChange}
+            onChange={handleIntPosChange}
             placeholder="WGP..."
             // onDoubleClick={(e) => {
             //   e.target.select();
@@ -167,6 +196,7 @@ const PositionAdd = () => {
         <div className="form-group">
           <label htmlFor="">Product:</label>
           <SearchField
+            showAddProd={showAddProd}
             className="searchfield canceldrag"
             searchURL={"/productlist"}
             searchName={"abbreviation"}
@@ -210,7 +240,7 @@ const PositionAdd = () => {
             name="quantitylow"
             type="text"
             placeholder="Quantity Low..."
-            onChange={handlePosChange}
+            onChange={handleQPosChange}
             value={posData.quantitylow}
             onBlur={handlePosAddValidation}
             // onDoubleClick={(e) => {
@@ -228,7 +258,7 @@ const PositionAdd = () => {
             name="quantityhigh"
             type="text"
             placeholder="Quantity High..."
-            onChange={handlePosChange}
+            onChange={handleQPosChange}
             value={posData.quantityhigh}
             onBlur={handlePosAddValidation}
             // onDoubleClick={(e) => {
