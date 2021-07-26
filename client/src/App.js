@@ -11,17 +11,22 @@ import Nav from "./components/Nav";
 import { RefreshPositionsProvider } from "./contexts/RefreshPositionsProvider";
 import ManagementGrid from "./components/ManagementGrid";
 
+// Export Auth Context to be used in Login.js
 export const AuthContext = createContext();
 
+// Define initial state vlues when opening app. Grab values from local storage if available otherwise set to default unlogged values.
 const initialState = {
   isAuthenticated: JSON.parse(localStorage.getItem("isAuthenticated")) || false,
   user: JSON.parse(localStorage.getItem("user")) || null,
   accesstoken: null,
   refreshtoken: JSON.parse(localStorage.getItem("refreshtoken")) || null,
 };
+
+// Reducer that tells app what to do when LOGOUT and LOGIN cases are called from other components
 const reducer = (state, action) => {
   switch (action.type) {
     case "LOGIN":
+      // When successful Login, this sets values for user, WGusercode, WGuserID, refreshtoken, accesstoken, isAuthenticated and role
       localStorage.setItem("user", JSON.stringify(action.payload.user));
       localStorage.setItem(
         "WGusercode",
@@ -47,6 +52,7 @@ const reducer = (state, action) => {
         accesstoken: action.payload.accesstoken,
       };
     case "LOGOUT":
+      // when successful Logout, this removes all auth values from local storage
       localStorage.removeItem("user");
       localStorage.removeItem("WGusercode");
       localStorage.removeItem("WGuserID");

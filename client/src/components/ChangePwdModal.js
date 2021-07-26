@@ -25,6 +25,8 @@ const ChangePwdModal = ({
     newpassword: "",
     cnewpassword: "",
   };
+
+  // array to hold errors borne from filling the change pwd form. Form will only submit if all elements of error array are ""
   const [errorsCPwd, setErrorsPwd] = useState(initchangePwdErrors);
 
   //dynamically show or hide modal based on whether show prop is true or false. Show is a prop coming from Login.js
@@ -45,6 +47,8 @@ const ChangePwdModal = ({
       [e.target.name]: e.target.value,
     });
   };
+
+  // handle form validation. Throw errors into errorsCPwd if input values not valid.
   const handleCPValidation = (e) => {
     const field = e.target.name;
     const value = e.target.value;
@@ -89,6 +93,7 @@ const ChangePwdModal = ({
         break;
     }
   };
+
   const handlePwdChange = (e) => {
     e.preventDefault();
     // console.log("submitting");

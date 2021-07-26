@@ -39,6 +39,7 @@ const Login = () => {
       password: data.password,
     })
       .then((response) => {
+        // open change pwd modal if user is first time loggin in
         if (response.data.firstlogin === "y") {
           setName(response.data.user);
           setModalState(true);
