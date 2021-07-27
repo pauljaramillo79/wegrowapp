@@ -76,7 +76,7 @@
   transition: transform 0.2s ease;
   /* margin: 1rem; */
 }
-&:nth-child(6n-1) {
+.tradercard:nth-child(6n-1) {
   margin-left: 2%;
   margin-right: 2%;
 }
