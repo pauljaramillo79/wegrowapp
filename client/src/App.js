@@ -10,6 +10,7 @@ import Register from "./components/Register";
 import Nav from "./components/Nav";
 import { RefreshPositionsProvider } from "./contexts/RefreshPositionsProvider";
 import ManagementGrid from "./components/ManagementGrid";
+import Admin from "./components/Admin";
 
 // Export Auth Context to be used in Login.js
 export const AuthContext = createContext();
@@ -98,6 +99,9 @@ function App() {
                   </Route>
                   <Route path="/management">
                     <ManagementGrid />
+                  </Route>
+                  <Route path="/admin">
+                    <Admin />
                   </Route>
                 </Switch>
               </Router>
