@@ -224,8 +224,7 @@ router.post("/changepassword", authenticateToken, async (req, res) => {
             );
             res.json({
               success: true,
-              msg:
-                "Password change was successful. Please log in again with your new password.",
+              msg: "Password change was successful. Please log in again with your new password.",
             });
           }
         });
@@ -365,6 +364,16 @@ router.post("/paymentterms", (req, res) => {
     }
   );
 });
+router.post("/prodnames", (req, res) => {
+  db.query("SELECT prodNameID, abbreviation FROM prodNames", (err, results) => {
+    if (err) {
+      console.log(err);
+    }
+    if (results.length > 0) {
+      return res.status(200).send(results);
+    }
+  });
+});
 router.post("/productlist", (req, res) => {
   db.query(
     // "SELECT productID, abbreviation, supplierlist.supplierID, companyCode AS supplier, prodGroupID FROM productList INNER JOIN prodNames ON productList.productName = prodNames.prodNameID INNER JOIN supplierlist ON productList.supplierID = supplierlist.supplierID ORDER BY productID ASC",
@@ -387,8 +396,7 @@ router.post("/checkposition", (req, res) => {
     }
     if (results.length > 0) {
       return res.json({
-        msg:
-          "Position number must be unique. This position number already exists",
+        msg: "Position number must be unique. This position number already exists",
       });
     } else {
       return res.json({
@@ -760,6 +768,72 @@ router.post("/waterfallprofit", (req, res) => {
       }
       if (results.length > 0) {
         return res.status(200).send(results);
+      }
+    }
+  );
+});
+
+// ADMIN ROUTES
+
+router.post("/traderslist", (req, res) => {
+  db.query(
+    "SELECT traderID, tCode, tName, tLastName, userName, active, role FROM traderList INNER JOIN roles ON traderList.roleID=roles.roleID ORDER BY active ASC, tLastName ASC",
+    (err, results) => {
+      if (err) {
+        console.log(err);
+      }
+      if (results.length > 0) {
+        return res.status(200).send(results);
+      }
+    }
+  );
+});
+router.post("/roles", (req, res) => {
+  db.query("SELECT roleID, role FROM roles", (err, results) => {
+    if (err) {
+      console.log(err);
+    }
+    if (results.length > 0) {
+      return res.status(200).send(results);
+    }
+  });
+});
+router.post("/updatetrader", (req, res) => {
+  let { traderID, tCode, tName, tLastName, userName, active, role } =
+    req.body.selectedtrader;
+
+  db.query(
+    "UPDATE traderList SET tCode=?, tName=?, tLastName=?, userName=?, active=?, roleID=? WHERE traderID=?",
+    [tCode, tName, tLastName, userName, active, role, traderID],
+    (err) => {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log("Trader Updated");
+        return res.json({
+          success: true,
+          message: "Succesfully edited Trader",
+        });
+      }
+    }
+  );
+});
+
+router.post("/addNewTrader", async (req, res) => {
+  let { tCode, tName, tLastName, userName, active, role } = req.body.newtrader;
+  let hashedPassword = await bcrypt.hash("W3lc0m3@WG!", 8);
+  db.query(
+    "INSERT INTO traderList (tCode, tName, tLastName, userName, active, roleID, password) VALUES (?,?,?,?,?,?,?)",
+    [tCode, tName, tLastName, userName, active, role, hashedPassword],
+    (err) => {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log("Added Trader");
+        return res.json({
+          success: true,
+          message: "Succesfully added New Trader",
+        });
       }
     }
   );
