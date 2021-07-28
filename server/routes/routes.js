@@ -775,6 +775,7 @@ router.post("/waterfallprofit", (req, res) => {
 
 // ADMIN ROUTES
 
+// TRADER LIST
 router.post("/traderslist", (req, res) => {
   db.query(
     "SELECT traderID, tCode, tName, tLastName, userName, active, role FROM traderList INNER JOIN roles ON traderList.roleID=roles.roleID ORDER BY active ASC, tLastName ASC",
@@ -833,6 +834,96 @@ router.post("/addNewTrader", async (req, res) => {
         return res.json({
           success: true,
           message: "Succesfully added New Trader",
+        });
+      }
+    }
+  );
+});
+
+// CUSTOMER LIST
+
+router.post("/customerlist", (req, res) => {
+  db.query(
+    "SELECT customerID, companyCode, companyName, country, city, streetAddress, website FROM customerList ORDER BY companyCode ASC",
+    (err, results) => {
+      if (err) {
+        console.log(err);
+      }
+      if (results.length > 0) {
+        return res.status(200).send(results);
+      }
+    }
+  );
+});
+
+router.post("/updatecustomer", (req, res) => {
+  let {
+    customerID,
+    companyCode,
+    companyName,
+    country,
+    city,
+    streetAddress,
+    website,
+  } = req.body.selectedcustomer;
+  db.query(
+    "UPDATE customerList SET companyCode=?, companyName=?, country=?, city=?, streetAddress=?, website=? WHERE customerID=?",
+    [
+      companyCode,
+      companyName,
+      country,
+      city,
+      streetAddress,
+      website,
+      customerID,
+    ],
+    (err) => {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log("Customer Updated");
+        return res.json({
+          success: true,
+          message: "Succesfully edited Customer",
+        });
+      }
+    }
+  );
+});
+
+router.post("/addNewCustomer", async (req, res) => {
+  let { companyCode, companyName, country, city, streetAddress, website } =
+    req.body.newcustomer;
+  db.query(
+    "INSERT INTO customerList (companyCode, companyName, country, city, streetAddress, website) VALUES (?,?,?,?,?,?)",
+    [companyCode, companyName, country, city, streetAddress, website],
+    (err) => {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log("Added Customer");
+        return res.json({
+          success: true,
+          message: "Succesfully added New Customer",
+        });
+      }
+    }
+  );
+});
+
+router.post("/deleteCustomer", async (req, res) => {
+  customerID = req.body.selectedcustomer.customerID;
+  db.query(
+    "DELETE FROM customerList WHERE (customerID = ?)",
+    [customerID],
+    (err) => {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log("Deleted Customer");
+        return res.json({
+          success: true,
+          message: "Succesfully deleted Customer",
         });
       }
     }

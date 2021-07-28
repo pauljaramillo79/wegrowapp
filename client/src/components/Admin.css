@@ -31,7 +31,7 @@
 
 .adminresults {
   display: flex;
-  flex-basis: 59%;
+  flex-basis: 55%;
   background-color: white;
   padding: 1rem;
   flex-direction: row;
@@ -40,18 +40,22 @@
   flex-flow: row wrap;
   justify-content: flex-start;
   height: 90vh;
-  overflow-x: hidden;
+
   /* flex-flow: wrap; */
 }
 .adminedit {
   display: flex;
-  flex-basis: 30%;
+  flex-basis: 33%;
   padding: 2rem;
   padding-left: 4rem;
   flex-direction: column;
 }
+.editCustomer {
+  margin-bottom: 1rem;
+}
 
-.editTrader fieldset {
+.editTrader fieldset,
+.editCustomer fieldset {
   border: 1px solid black;
   border-style: groove;
   padding-left: 2rem;
@@ -59,11 +63,22 @@
   padding-bottom: 1rem;
   border-radius: 1rem;
 }
-.editTrader fieldset legend {
+.editTrader fieldset legend,
+.editCustomer fieldset legend {
   font-weight: bold;
   font-size: 1rem;
 }
-.tradercard {
+.traderlistresults,
+.customerlistresults {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  height: 85vh;
+  overflow-x: hidden;
+  /* margin: 0; */
+}
+.tradercard,
+.customercard {
   display: flex;
   flex-direction: column;
   /* flex-basis: 16%; */
@@ -74,13 +89,27 @@
   padding: 1rem;
   border-radius: 1rem;
   transition: transform 0.2s ease;
+  overflow-x: hidden;
   /* margin: 1rem; */
 }
-.tradercard:nth-child(6n-1) {
+.customercard:active:hover,
+.tradercard:active:hover {
+  background-color: rgb(207, 207, 207);
+}
+.tradercard h4 {
+  border-bottom: dashed 1px black;
+}
+.customercard {
+  font-size: 0.85rem;
+  height: 170px;
+}
+
+&:nth-child(6n-1) {
   margin-left: 2%;
   margin-right: 2%;
 }
-.tradercard:hover {
+.tradercard:hover,
+.customercard:hover {
   cursor: pointer;
   transform: scale(1.05);
   background-color: rgb(226, 226, 226);
@@ -93,7 +122,8 @@
 .traderrole {
   font-size: 0.8rem;
 }
-.edittrader-form-group {
+.edittrader-form-group,
+.editcustomer-form-group {
   display: flex;
   flex-direction: row;
   padding: 0.5rem;
@@ -101,6 +131,11 @@
 .edittrader-form-group label {
   display: flex;
   flex-basis: 20%;
+  padding: 0.5rem 0;
+}
+.editcustomer-form-group label {
+  display: flex;
+  flex-basis: 25%;
   padding: 0.5rem 0;
 }
 .edittrader-form-group input,
@@ -111,11 +146,25 @@
   padding: 0.5rem 1rem;
   border-radius: 0.6rem;
 }
+.editcustomer-form-group input,
+.editcustomer-form-group textarea {
+  display: flex;
+  flex-basis: 70%;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.6rem;
+  font-family: "Roboto", sans-serif;
+  font-size: 0.9rem;
+}
+.editcustomer-form-group textarea {
+  height: 100px;
+}
 .edittrader-form-group .activeradio {
   flex-basis: 20%;
   margin: 0.5rem 0;
 }
-.editTrader button {
+.editTrader button,
+.editCustomer button {
   margin-top: 1.5rem;
   width: 95%;
   padding: 0.5rem 1rem;
@@ -124,9 +173,48 @@
   border: none;
   color: white;
 }
-.editTrader button:hover {
+.editTrader button:hover,
+.editCustomer button:hover {
   background-color: rgb(123, 120, 219);
   cursor: pointer;
+}
+
+.customercountry {
+  margin-bottom: 0.3rem;
+  font-size: 0.8rem;
+}
+.customercard ul {
+  margin-top: 0.5rem;
+}
+.customercard ul li {
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 0.3rem;
+}
+.addresslabel {
+  display: flex;
+  flex-basis: 24%;
+  font-size: 0.8rem;
+  line-height: 0.9rem;
+}
+.addressfield {
+  display: flex;
+  flex-basis: 76%;
+  font-size: 0.6rem;
+  line-height: 0.9rem;
+}
+.customercardtopline {
+  display: flex;
+  flex-direction: row;
+  border-bottom: dashed black 1px;
+  justify-content: space-between;
+}
+.adminsearchbar {
+  padding: 0.3rem 1rem;
+  margin-bottom: 0.5rem;
+  margin-left: 1rem;
+  border-radius: 1rem;
+  width: 30%;
 }
 
 /* .tradercard:after {
