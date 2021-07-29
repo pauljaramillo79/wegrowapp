@@ -930,4 +930,95 @@ router.post("/deleteCustomer", async (req, res) => {
   );
 });
 
+// PRODNAMES LIST
+
+router.post("/prodnameslist", (req, res) => {
+  db.query(
+    "SELECT productGroups.prodGroupID, productGroup, abbreviation, prodCatName, prodNames.prodCatNameID FROM prodNames INNER JOIN productGroups ON prodNames.prodGroupID = productGroups.prodGroupID INNER JOIN prodCatNames ON prodNames.prodCatNameID=prodCatNames.prodCatNameID ORDER BY productGroups.prodGroupID ASC, prodCatName ASC",
+    (err, results) => {
+      if (err) {
+        console.log(err);
+      }
+      if (results.length > 0) {
+        return res.status(200).send(results);
+      }
+    }
+  );
+});
+
+router.post("/selectgroupedprods", (req, res) => {
+  let selectedprod = req.body.selectedprod;
+  console.log(selectedprod);
+  db.query(
+    "SELECT abbreviation, prodGroupID FROM prodNames INNER JOIN prodCatNames ON prodNames.prodCatNameID = prodCatNames.prodCatNameID WHERE prodCatNames.prodCatName = ?",
+    [selectedprod],
+    (err, results) => {
+      if (err) {
+        console.log(err);
+      }
+      if (results.length > 0) {
+        return res.status(200).send(results);
+      }
+    }
+  );
+});
+router.post("/addNewProdGroup", async (req, res) => {
+  let { productGroup } = req.body.newprodgroup;
+  db.query(
+    "INSERT IGNORE INTO productGroups (productGroup) VALUES (?)",
+    [productGroup],
+    (err, results) => {
+      if (err) {
+        console.log(err);
+      } else if (results.affectedRows == "0") {
+        console.log("Group Already Exists");
+        return res.json({
+          success: false,
+          message: "Product Group Already Exists",
+        });
+      } else {
+        console.log(results.affectedRows);
+        console.log("Added Product Group");
+        return res.json({
+          success: true,
+          message: "Succesfully added New Product Group",
+        });
+      }
+    }
+  );
+});
+router.post("/selectprodgroup", (req, res) => {
+  let productGroup = req.body.productGroup;
+  // console.log(selectedprod);
+  db.query(
+    "SELECT prodGroupID, productGroup FROM productGroups WHERE productGroup = ?",
+    [productGroup],
+    (err, results) => {
+      if (err) {
+        console.log(err);
+      }
+      if (results.length > 0) {
+        return res.status(200).send(results);
+      }
+    }
+  );
+});
+router.post("/updateprodgroup", (req, res) => {
+  let { productGroup, prodGroupID } = req.body.selectedprodgroup1;
+  db.query(
+    "UPDATE productGroups SET productGroup=? WHERE prodGroupID=?",
+    [productGroup, prodGroupID],
+    (err) => {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log("Product Group Update");
+        return res.json({
+          success: true,
+          message: "Succesfully edited Product Group",
+        });
+      }
+    }
+  );
+});
 module.exports = router;
