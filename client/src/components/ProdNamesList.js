@@ -6,7 +6,9 @@ const ProdNamesList = ({
   searchcode,
   handleProductClick,
   addNewProdGroup,
+  addNewProdCatName,
   updateList,
+  updateList2,
   handleProdGroupClick, // setSelectedgprods,
 }) => {
   const [listdata, setListdata] = useState([]);
@@ -32,9 +34,10 @@ const ProdNamesList = ({
       const rep = response.data.groupBy("productGroup");
 
       setGdata(rep);
+      console.log("called this too");
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [updateList]);
+  }, [updateList, updateList2]);
 
   // const handleProductClick = (prod) => {
   //   // console.log(prod);
@@ -60,8 +63,9 @@ const ProdNamesList = ({
           />,
         ];
       })}
-      <div className="prodgroupcard" onClick={addNewProdGroup}>
-        + Add New Group
+      <div className="prodgroupcard prodaddcard">
+        <p onClick={addNewProdGroup}>+ Add New Group</p>
+        <p onClick={addNewProdCatName}>+ Add New ProdCatName</p>
       </div>
     </div>
   );

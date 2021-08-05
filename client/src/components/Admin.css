@@ -56,7 +56,9 @@
 
 .editTrader fieldset,
 .editCustomer fieldset,
-.editProdGroup fieldset {
+.editProdGroup fieldset,
+.editProdCatName fieldset,
+.editProdName fieldset {
   border: 1px solid black;
   border-style: groove;
   padding-left: 2rem;
@@ -66,7 +68,9 @@
 }
 .editTrader fieldset legend,
 .editCustomer fieldset legend,
-.editProdGroup fieldset legend {
+.editProdGroup fieldset legend,
+.editProdCatName fieldset legend,
+.editProdName fieldset legend {
   font-weight: bold;
   font-size: 1rem;
 }
@@ -127,7 +131,9 @@
 }
 .edittrader-form-group,
 .editcustomer-form-group,
-.editprodgroup-form-group {
+.editprodgroup-form-group,
+.editprodcatname-form-group,
+.editprodname-form-group {
   display: flex;
   flex-direction: row;
   padding: 0.5rem;
@@ -138,7 +144,9 @@
   padding: 0.5rem 0;
 }
 .editcustomer-form-group label,
-.editprodgroup-form-group label {
+.editprodgroup-form-group label,
+.editprodcatname-form-group label,
+.editprodname-form-group label {
   display: flex;
   flex-basis: 25%;
   padding: 0.5rem 0;
@@ -153,7 +161,10 @@
 }
 .editcustomer-form-group input,
 .editcustomer-form-group textarea,
-.editprodgroup-form-group input {
+.editprodgroup-form-group input,
+.editprodcatname-form-group input,
+.editprodname-form-group input,
+.prodnamesearch {
   display: flex;
   flex-basis: 70%;
   border: none;
@@ -161,6 +172,11 @@
   border-radius: 0.6rem;
   font-family: "Roboto", sans-serif;
   font-size: 0.9rem;
+}
+.prodnamesearchv {
+  display: flex;
+  flex-direction: column;
+  flex-basis: 70%;
 }
 .editcustomer-form-group textarea {
   height: 100px;
@@ -171,7 +187,9 @@
 }
 .editTrader button,
 .editCustomer button,
-.editProdGroup button {
+.editProdGroup button,
+.editProdCatName button,
+.editProdName button {
   margin-top: 1.5rem;
   width: 95%;
   padding: 0.5rem 1rem;
@@ -182,7 +200,9 @@
 }
 .editTrader button:hover,
 .editCustomer button:hover,
-.editProdGroup button:hover {
+.editProdGroup button:hover,
+.editProdCatName button:hover,
+.editProdName button:hover {
   background-color: rgb(123, 120, 219);
   cursor: pointer;
 }
@@ -251,6 +271,16 @@
 }
 .selectedprodgroup {
   padding-left: 2rem;
+}
+.prodaddcard {
+  flex-basis: 30%;
+}
+.prodnameadmin:hover {
+  text-decoration: underline;
+  cursor: pointer;
+}
+.prodnameadmin:active:hover {
+  font-weight: bold;
 }
 /* .tradercard:after {
   width: 16%;

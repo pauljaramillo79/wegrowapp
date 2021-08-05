@@ -7,8 +7,6 @@ const ProdNamesCard = ({
   handleProductClick,
   handleProdGroupClick,
 }) => {
-  const [selectedprod, setSelectedprod] = useState();
-
   return (
     <div className="prodgroupcard">
       <h4
@@ -20,16 +18,9 @@ const ProdNamesCard = ({
         {group}
       </h4>
       {Object.entries(data).map((j, k) => {
-        // prod = Object.keys(data)[k];
-        // console.log(Object.entries(data)[k]);
         return [
           <p
             className="productlink"
-            //   name={Object.keys(data)[k]}
-            // onClick={(e) => {
-            //   e.preventDefault();
-            //   handleClick(prod);
-            // }}
             onClick={(e) => {
               e.preventDefault();
               handleProductClick(Object.keys(data)[k]);

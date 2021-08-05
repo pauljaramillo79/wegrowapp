@@ -16,6 +16,7 @@ const SearchField = ({
   setResetfield,
   value,
   showAddProd,
+  // vertical,
 }) => {
   const [data, setData] = useState();
   const [searchTerm, setSearchTerm] = useState("");
@@ -98,7 +99,7 @@ const SearchField = ({
         required
         className="canceldrag"
       />
-      <div className="flexbreak"></div>
+      <div className={"flexbreak"}></div>
       <div className="presearchresults"></div>
       <span className="QSsearchresults-container">
         <ul className={show ? "searchresults" : "QSsearchresults-hide"}>
