@@ -54,3 +54,33 @@
   position: sticky;
   top: 0;
 }
+/* .postooltip {
+  border: solid 1px rgb(68, 65, 162) !important;
+  font-family: "Roboto", sans-serif !important;
+  background-color: white !important;
+  border-radius: 0.5rem !important;
+  opacity: 1 !important;
+} */
+
+.postooltipsource {
+  position: relative;
+}
+.postooltip {
+  position: absolute;
+  z-index: 50;
+  background-color: white;
+  border: rgb(68, 65, 162) 1px solid;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  width: 600px;
+  top: 19px;
+  left: 80%;
+}
+.posmatchitem {
+  display: flex;
+  flex-direction: row;
+}
+.posmatchitem p,
+.posmatchitem h4 {
+  flex-basis: 20%;
+}

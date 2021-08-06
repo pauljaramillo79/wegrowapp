@@ -679,7 +679,7 @@ router.delete("/deletePosition", (req, res) => {
 
 router.post("/keyfigures", (req, res) => {
   let currentyear = moment().format("YYYY");
-  let lastyear = Number(currentyear) - 2;
+  let lastyear = Number(currentyear) - 1;
   db.query(
     "SELECT DATE_FORMAT(QSDate, '%Y') AS Year, SUM(quantity) AS Sales, SUM(salesTurnover) AS Revenue,  SUM(tradingMargin) AS Margin, SUM(tradingMargin)/SUM(quantity) AS Profit, COUNT(salesTurnover) AS Operations FROM quotationsheet WHERE ? <= DATE_FORMAT(QSDate, '%Y') && saleComplete=-1 GROUP BY DATE_FORMAT(QSDate,'%Y')",
     [lastyear],
@@ -688,6 +688,8 @@ router.post("/keyfigures", (req, res) => {
         console.log(err);
       }
       if (results.length > 0) {
+        console.log(lastyear);
+
         return res.status(200).send(results);
       }
     }
@@ -695,7 +697,7 @@ router.post("/keyfigures", (req, res) => {
 });
 router.post("/donut", (req, res) => {
   db.query(
-    "SELECT trader AS id, trader AS label, TRUNCATE(SUM(tradingMargin),2) AS value FROM qsviewshort WHERE DATE_FORMAT(QSDate,'%Y')=2020 && saleComplete='sold' GROUP BY trader ORDER BY value ASC",
+    "SELECT trader AS id, trader AS label, TRUNCATE(SUM(tradingMargin),2) AS value FROM qsviewshort WHERE DATE_FORMAT(QSDate,'%Y')=2021 && saleComplete='sold' GROUP BY trader ORDER BY value ASC",
     (err, results) => {
       if (err) {
         console.log(err);
@@ -708,7 +710,7 @@ router.post("/donut", (req, res) => {
 });
 router.post("/donutqty", (req, res) => {
   db.query(
-    "SELECT trader AS id, trader AS label, TRUNCATE(SUM(quantity),2) AS value FROM qsviewshort WHERE 2020 <= DATE_FORMAT(QSDate,'%Y') && saleComplete='sold' GROUP BY trader ORDER BY value ASC",
+    "SELECT trader AS id, trader AS label, TRUNCATE(SUM(quantity),2) AS value FROM qsviewshort WHERE 2021 <= DATE_FORMAT(QSDate,'%Y') && saleComplete='sold' GROUP BY trader ORDER BY value ASC",
     (err, results) => {
       if (err) {
         console.log(err);
@@ -734,7 +736,7 @@ router.post("/barsalesperyear", (req, res) => {
 });
 router.post("/pieprofitbycountry", (req, res) => {
   db.query(
-    "SELECT country, country AS label, TRUNCATE(SUM(tradingMargin),0) AS profit FROM quotationsheet INNER JOIN PODList ON PODList.PODID = quotationsheet.PODID WHERE 2020 <= DATE_FORMAT(QSDate,'%Y') && saleComplete=-1 GROUP BY country ORDER BY profit ASC",
+    "SELECT country, country AS label, TRUNCATE(SUM(tradingMargin),0) AS profit FROM quotationsheet INNER JOIN PODList ON PODList.PODID = quotationsheet.PODID WHERE 2021 <= DATE_FORMAT(QSDate,'%Y') && saleComplete=-1 GROUP BY country ORDER BY profit ASC",
     (err, results) => {
       if (err) {
         console.log(err);
@@ -747,7 +749,7 @@ router.post("/pieprofitbycountry", (req, res) => {
 });
 router.post("/pievolumebycountry", (req, res) => {
   db.query(
-    "SELECT country, country AS label, TRUNCATE(SUM(quantity),0) AS quantity FROM quotationsheet INNER JOIN PODList ON PODList.PODID = quotationsheet.PODID WHERE 2020 <= DATE_FORMAT(QSDate,'%Y') && saleComplete=-1 GROUP BY country ORDER BY quantity ASC",
+    "SELECT country, country AS label, TRUNCATE(SUM(quantity),0) AS quantity FROM quotationsheet INNER JOIN PODList ON PODList.PODID = quotationsheet.PODID WHERE 2021 <= DATE_FORMAT(QSDate,'%Y') && saleComplete=-1 GROUP BY country ORDER BY quantity ASC",
     (err, results) => {
       if (err) {
         console.log(err);
@@ -761,7 +763,7 @@ router.post("/pievolumebycountry", (req, res) => {
 
 router.post("/waterfallprofit", (req, res) => {
   db.query(
-    "SELECT DATE_FORMAT(QSDate, '%b') AS category, TRUNCATE(SUM(tradingMargin),0) AS amount FROM quotationsheet WHERE 2020 = DATE_FORMAT(QSDate,'%Y') && saleComplete=-1 GROUP BY category ORDER BY AVG(MONTH(QSDate)) ASC",
+    "SELECT DATE_FORMAT(QSDate, '%b') AS category, TRUNCATE(SUM(tradingMargin),0) AS amount FROM quotationsheet WHERE 2021 = DATE_FORMAT(QSDate,'%Y') && saleComplete=-1 GROUP BY category ORDER BY AVG(MONTH(QSDate)) ASC",
     (err, results) => {
       if (err) {
         console.log(err);
@@ -950,7 +952,7 @@ router.post("/selectgroupedprods", (req, res) => {
   let selectedprod = req.body.selectedprod;
   console.log(selectedprod);
   db.query(
-    "SELECT abbreviation, prodGroupID FROM prodNames INNER JOIN prodCatNames ON prodNames.prodCatNameID = prodCatNames.prodCatNameID WHERE prodCatNames.prodCatName = ?",
+    "SELECT abbreviation, prodNameID, prodGroupID FROM prodNames INNER JOIN prodCatNames ON prodNames.prodCatNameID = prodCatNames.prodCatNameID WHERE prodCatNames.prodCatName = ?",
     [selectedprod],
     (err, results) => {
       if (err) {
@@ -1021,4 +1023,143 @@ router.post("/updateprodgroup", (req, res) => {
     }
   );
 });
+router.post("/selectedprodcatname", (req, res) => {
+  let prodCatName = req.body.prodcatname;
+  db.query(
+    "SELECT prodCatNameID, prodCatName FROM prodCatNames WHERE prodCatName=?",
+    [prodCatName],
+    (err, results) => {
+      if (err) {
+        console.log(err);
+      }
+      if (results.length > 0) {
+        return res.status(200).send(results);
+      }
+    }
+  );
+});
+router.post("/updateprodcatname", (req, res) => {
+  let { prodCatNameID, prodCatName } = req.body.selectedprodcatname;
+  db.query(
+    "UPDATE prodCatNames SET prodCatName=? WHERE prodCatNameID=?",
+    [prodCatName, prodCatNameID],
+    (err) => {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log("Product Cat Name Updated");
+        return res.json({
+          success: true,
+          message: "Succesfully edited Product Category Name",
+        });
+      }
+    }
+  );
+});
+router.post("/addNewProdCatName", (req, res) => {
+  let { prodCatName } = req.body.newprodcatname;
+  db.query(
+    "INSERT IGNORE INTO prodCatNames (prodCatName) VALUES (?)",
+    [prodCatName],
+    (err, results) => {
+      if (err) {
+        console.log(err);
+      } else if (results.affectedRows == "0") {
+        console.log("ProdCatName Already Exists");
+        return res.json({
+          success: false,
+          message: "Product Category Already Exists",
+        });
+      } else {
+        console.log("Added Product Category Name");
+        return res.json({
+          success: true,
+          message: "Successfully added New Product Category Name",
+        });
+      }
+    }
+  );
+});
+
+//ProdNames
+
+router.post("/selectprodname", (req, res) => {
+  let prodNameID = req.body.prodnameID;
+  console.log(prodNameID);
+  db.query(
+    "SELECT *, prodCatName, productGroup FROM prodNames INNER JOIN prodCatNames ON prodNames.prodCatNameID = prodCatNames.prodCatNameID INNER JOIN productGroups ON productGroups.prodGroupID = prodNames.prodGroupID WHERE prodNameID=?",
+    [prodNameID],
+    (err, results) => {
+      if (err) {
+        console.log(err);
+      }
+      if (results.length > 0) {
+        return res.status(200).send(results);
+      }
+    }
+  );
+});
+
+router.post("/prodcatnameslist", (req, res) => {
+  db.query(
+    "SELECT prodCatNameID, prodCatName FROM prodCatNames ORDER BY prodCatNameID ASC",
+    (err, results) => {
+      if (err) {
+        console.log(err);
+      }
+      if (results.length > 0) {
+        return res.status(200).send(results);
+      }
+    }
+  );
+});
+router.post("/prodgroups", (req, res) => {
+  db.query(
+    "SELECT prodGroupID, productGroup FROM productGroups ORDER BY prodGroupID ASC",
+    (err, results) => {
+      if (err) {
+        console.log(err);
+      }
+      if (results.length > 0) {
+        return res.status(200).send(results);
+      }
+    }
+  );
+});
+router.post("/updateprodname", (req, res) => {
+  let { abbreviation, prodName, prodCatNameID, prodGroupID, prodNameID } =
+    req.body.selectedprodname;
+  db.query(
+    "UPDATE prodNames SET abbreviation=?, prodName=?, prodCatNameID=?, prodGroupID=? WHERE prodNameID=?",
+    [abbreviation, prodName, prodCatNameID, prodGroupID, prodNameID],
+    (err) => {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log("Product Name Info Updated");
+        return res.json({
+          success: true,
+          message: "Succesfully edited Product Name Info",
+        });
+      }
+    }
+  );
+});
+
+router.post("/posmatching", (req, res) => {
+  let posnumber = req.body.posnumber;
+  db.query(
+    "SELECT tCode, KTS, quantity, companyCode, saleComplete, tradingProfit  FROM quotationsheet INNER JOIN customerList ON quotationsheet.customerID = customerList.customerID INNER JOIN traderList ON quotationsheet.traderID = traderList.traderID WHERE KTP = ? AND saleComplete=-1 ORDER BY tradingProfit DESC",
+    [posnumber],
+    (err, results) => {
+      if (err) {
+        console.log(err);
+      }
+      if (results.length > 0) {
+        return res.status(200).send(results);
+      }
+    }
+  );
+});
+
 module.exports = router;

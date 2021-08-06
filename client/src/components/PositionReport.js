@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import Axios from "axios";
 import { AuthContext } from "../App";
 import "./PositionReport.css";
@@ -6,8 +6,13 @@ import { RefreshPositionsContext } from "../contexts/RefreshPositionsProvider";
 import moment from "moment";
 import tz from "moment-timezone";
 import { ReactComponent as RefreshIcon } from "../assets/_images/refreshicon.svg";
+import PosMatchingToolTip from "./PosMatchingToolTip";
+// import ReactTooltip from "react-tooltip";
 
 const PositionReport = () => {
+  const [posmatchnumber, setPosmatchnumber] = useState(0);
+
+  // const [matchingdata, setMatchingdata] = useState();
   const { state } = useContext(AuthContext);
   const { posrefresh, togglePosrefresh } = useContext(RefreshPositionsContext);
   // Get token values from UseContext and Local Storage
@@ -47,6 +52,10 @@ const PositionReport = () => {
       return Promise.reject(error.response);
     }
   );
+
+  const getPosMatchingData = (x) => {
+    setPosmatchnumber(x);
+  };
 
   // eslint-disable-next-line no-extend-native
   Array.prototype.groupBy = function (key) {
@@ -118,11 +127,25 @@ const PositionReport = () => {
                   </tr>,
                   j[1].map((x) => {
                     u = u + Number(x.Inventory);
-
                     return (
                       <>
                         <tr>
-                          <td>{x.KTP}</td>
+                          <td
+                            className="postooltipsource"
+                            onMouseOver={(e) => {
+                              getPosMatchingData(x.KTP);
+                            }}
+                            onMouseLeave={(e) => {
+                              setPosmatchnumber(0);
+                            }}
+                          >
+                            {x.KTP}
+                            <PosMatchingToolTip
+                              posnumber={x.KTP}
+                              posmatchnumber={posmatchnumber}
+                            />
+                          </td>
+
                           <td className="fig">
                             {x.quantity
                               .toFixed(2)
@@ -173,7 +196,6 @@ const PositionReport = () => {
                   </tr>,
                 ];
               }),
-              ,
             ];
           })}
         </tbody>
