@@ -8,10 +8,12 @@ const PosMatchingToolTip = ({ posnumber, posmatchnumber }) => {
   const [posmatchdata, setPosmatchdata] = useState();
 
   useEffect(() => {
-    Axios.post("/posmatching", { posnumber: posnumber }).then((response) => {
-      setPosmatchdata(response.data);
-    });
-  }, []);
+    if (posnumber === posmatchnumber) {
+      Axios.post("/posmatching", { posnumber: posnumber }).then((response) => {
+        setPosmatchdata(response.data);
+      });
+    }
+  }, [posmatchnumber]);
 
   return (
     <span className={showHidePosTooltip}>
@@ -34,7 +36,7 @@ const PosMatchingToolTip = ({ posnumber, posmatchnumber }) => {
                 <p>{item.tradingProfit}</p>
               </li>
             ))
-          : ""}
+          : "No matching sales found"}
       </ul>
     </span>
   );

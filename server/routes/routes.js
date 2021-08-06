@@ -1152,11 +1152,15 @@ router.post("/posmatching", (req, res) => {
     "SELECT tCode, KTS, quantity, companyCode, saleComplete, tradingProfit  FROM quotationsheet INNER JOIN customerList ON quotationsheet.customerID = customerList.customerID INNER JOIN traderList ON quotationsheet.traderID = traderList.traderID WHERE KTP = ? AND saleComplete=-1 ORDER BY tradingProfit DESC",
     [posnumber],
     (err, results) => {
+      console.log(results);
       if (err) {
         console.log(err);
       }
       if (results.length > 0) {
         return res.status(200).send(results);
+      }
+      if (results.length == 0) {
+        return res.status(204).send("204 No Content");
       }
     }
   );
