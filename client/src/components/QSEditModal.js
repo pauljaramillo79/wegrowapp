@@ -179,9 +179,9 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
     });
     setQSedits({
       ...QSedits,
-      product: id1,
-      supplier: id2,
-      productgroup: id3,
+      productID: id1,
+      supplierID: id2,
+      // productgroupID: id3,
     });
   };
   const handleCustomerChange = (id1, name1) => {
@@ -191,7 +191,7 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
     });
     setQSedits({
       ...QSedits,
-      customer: id1,
+      customerID: id1,
     });
   };
   const handlePOLChange = (id1, name1) => {
@@ -201,7 +201,7 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
     });
     setQSedits({
       ...QSedits,
-      POL: id1,
+      POLID: id1,
     });
   };
   const handlePODChange = (id1, name1) => {
@@ -211,7 +211,7 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
     });
     setQSedits({
       ...QSedits,
-      POD: id1,
+      PODID: id1,
     });
   };
   const handleTrafficChange = (id1, name1) => {
@@ -221,7 +221,7 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
     });
     setQSedits({
       ...QSedits,
-      traffic: id1,
+      trafficID: id1,
     });
   };
   const handlePaytermChange = (id1, name1) => {
@@ -231,7 +231,7 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
     });
     setQSedits({
       ...QSedits,
-      paymentterms: id1,
+      pTermID: id1,
     });
   };
   const closeandclear = () => {
@@ -260,11 +260,11 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
     setQSedits({
       ...QSedits,
       KTP: position.KTP,
-      product: position.product,
-      supplier: position.Supplier,
+      productID: position.productID,
+      supplierID: position.supplierID,
       from: position.start,
       to: position.end,
-      materialcost: position.Price,
+      materialcost: position.Price.replace("$", ""),
     });
   };
   const handleSold = () => {
@@ -538,6 +538,7 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
           .replace(/\B(?=(\d{3})+(?!\d))/g, ","),
     });
     setQSedits({
+      ...QSedits,
       interestcost:
         (Number(QSeditable.includedrate.toString().replace("%", "")) *
           Number(QSeditable.includedperiod) *
@@ -628,7 +629,7 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
   ]);
   const updateQS = async (e) => {
     e.preventDefault();
-    await Axios.post("/updateQS", { QSedits }).then((response) => {
+    await Axios.post("/updateQS", { QSedits, QSID }).then((response) => {
       toggleQSrefresh();
     });
     await handleClose();
@@ -1027,7 +1028,7 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
                     type="text"
                     required
                     value={QSeditable ? QSeditable.quantity || "" : ""}
-                    onChange={handleInputChange}
+                    onChange={handleQInputChange}
                   />
                 </div>
                 <fieldset>
@@ -1057,7 +1058,7 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
                     />
                   </div>
                   <div className="form-group">
-                    <label htmlFor="">P Finance Costt:</label>
+                    <label htmlFor="">P Finance Cost:</label>
                     <input
                       className="QSfig"
                       name="pfinancecost"
@@ -1325,9 +1326,9 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
               >
                 Save Edits
               </button>
-              <button className="cancelbutton" onClick={createemail}>
+              {/* <button className="cancelbutton" onClick={createemail}>
                 Save Edits and Offer
-              </button>
+              </button> */}
               <button className="cancelbutton" onClick={closeandclear}>
                 Cancel
               </button>
