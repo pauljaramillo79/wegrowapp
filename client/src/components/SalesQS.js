@@ -208,6 +208,20 @@ const SalesQS = () => {
       setQSData({ ...QSData, [e.target.name]: 0 });
     }
   };
+  const handleCNumInputChange = (e) => {
+    e.preventDefault();
+    const isInteger = RegExp("^[0-9]+$");
+    if (isInteger.test(e.target.value) || e.target.value == "") {
+      setQSValues({
+        ...QSValues,
+        [e.target.name]: e.target.value,
+      });
+      setQSData({
+        ...QSData,
+        [e.target.name]: e.target.value,
+      });
+    }
+  };
 
   // Update sales interest
   useEffect(() => {
@@ -596,8 +610,9 @@ const SalesQS = () => {
             <label>WGP:</label>
             <input
               name="KTP"
+              placeholder="5000..."
               value={QSValues ? QSValues.KTP || "" : ""}
-              onChange={handleChange}
+              onChange={handleCNumInputChange}
               className="canceldrag"
             ></input>
           </div>
@@ -842,8 +857,9 @@ const SalesQS = () => {
             <label>WGS:</label>
             <input
               name="KTS"
+              placeholder="5000..."
               value={QSValues ? QSValues.KTS || "" : ""}
-              onChange={handleChange}
+              onChange={handleCNumInputChange}
               className="canceldrag"
             ></input>
           </div>
