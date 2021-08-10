@@ -313,7 +313,7 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
             Number(
               QSeditable.pricebeforeint.replace("$", "").replace(",", "")
             )) /
-          365
+          360
         ).toFixed(2),
     });
     setQSedits({
@@ -322,7 +322,7 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
         ((Number(QSeditable.interestrate.replace("%", "")) / 100) *
           Number(QSeditable.interestdays) *
           Number(QSeditable.pricebeforeint.replace("$", "").replace(",", ""))) /
-        365,
+        360,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
@@ -361,7 +361,7 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
                 .replace("$", "")
                 .replace(",", "")
             )) /
-          365 /
+          360 /
           100
         ).toFixed(2),
     });
@@ -376,7 +376,7 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
               .replace("$", "")
               .replace(",", "")
           )) /
-        365 /
+        360 /
         100,
     });
   }, [QSeditable.includedrate, QSeditable.includedperiod]);
@@ -399,7 +399,7 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
                   .replace("$", "")
                   .replace(",", "")
               )) /
-            365 /
+            360 /
             100
           ).toFixed(2),
         salesinterest:
@@ -410,7 +410,7 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
               Number(
                 QSeditable.pricebeforeint.replace("$", "").replace(",", "")
               )) /
-            365 /
+            360 /
             100
           ).toFixed(2),
         priceafterint:
@@ -432,7 +432,7 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
                 .replace("$", "")
                 .replace(",", "")
             )) /
-          365 /
+          360 /
           100,
         salesinterest:
           (Number(QSeditable.interestrate.replace("%", "")) *
@@ -440,7 +440,7 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
             Number(
               QSeditable.pricebeforeint.replace("$", "").replace(",", "")
             )) /
-          365 /
+          360 /
           100,
         priceafterint:
           Number(QSeditable.pricebeforeint.replace("$", "").replace(",", "")) +
@@ -460,7 +460,7 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
                   .replace("$", "")
                   .replace(",", "")
               )) /
-            365 /
+            360 /
             100
           ).toFixed(2),
         //
@@ -472,7 +472,7 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
               Number(
                 QSeditable.pricebeforeint.replace("$", "").replace(",", "")
               )) /
-            365 /
+            360 /
             100
           ).toFixed(2),
         priceafterint:
@@ -494,7 +494,7 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
                 .replace("$", "")
                 .replace(",", "")
             )) /
-          365 /
+          360 /
           100,
         salesinterest:
           (Number(QSeditable.interestrate.replace("%", "")) *
@@ -502,7 +502,7 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
             Number(
               QSeditable.pricebeforeint.replace("$", "").replace(",", "")
             )) /
-          365 /
+          360 /
           100,
       });
     }
@@ -540,7 +540,7 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
                 .replace("$", "")
                 .replace(",", "")
             )) /
-          365 /
+          360 /
           100
         ).toFixed(2),
       salesinterest:
@@ -551,7 +551,7 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
             Number(
               QSeditable.pricebeforeint.replace("$", "").replace(",", "")
             )) /
-          365 /
+          360 /
           100
         ).toFixed(2),
       priceafterint:
@@ -615,13 +615,13 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
               .replace("$", "")
               .replace(",", "")
           )) /
-        365 /
+        360 /
         100,
       salesinterest:
         (Number(QSeditable.interestrate.replace("%", "")) *
           Number(QSeditable.interestdays) *
           Number(QSeditable.pricebeforeint.replace("$", "").replace(",", ""))) /
-        365 /
+        360 /
         100,
       priceafterint:
         Number(QSeditable.pricebeforeint.replace("$", "").replace(",", "")) +
@@ -703,6 +703,8 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
     e.preventDefault();
     await Axios.post("/updateQS", { QSedits, QSID }).then((response) => {
       toggleQSrefresh();
+      setQSeditable(QSeditableInit);
+      setQSedits("");
     });
     await handleClose();
   };
