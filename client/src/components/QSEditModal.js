@@ -82,6 +82,20 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
     //   [e.target.name]: e.target.value,
     // });
   };
+  const handleCNumInputChange = (e) => {
+    e.preventDefault();
+    const isInteger = RegExp("^[0-9]+$");
+    if (isInteger.test(e.target.value) || e.target.value == "") {
+      setQSeditable({
+        ...QSeditable,
+        [e.target.name]: e.target.value,
+      });
+      setQSedits({
+        ...QSedits,
+        [e.target.name]: e.target.value,
+      });
+    }
+  };
   const handleQInputChange = (e) => {
     e.preventDefault();
     const isdecimalnumber = RegExp("^[0-9.,$]+$");
@@ -718,8 +732,9 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
               <label>WGP:</label>
               <input
                 name="KTP"
+                placeholder="5000..."
                 value={QSeditable ? QSeditable.KTP || "" : ""}
-                onChange={handleInputChange}
+                onChange={handleCNumInputChange}
                 className="canceldrag"
               ></input>
             </div>
@@ -952,8 +967,9 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
               <label>WGS:</label>
               <input
                 name="KTS"
+                placeholder="5000..."
                 value={QSeditable ? QSeditable.KTS || "" : ""}
-                onChange={handleInputChange}
+                onChange={handleCNumInputChange}
                 className="canceldrag"
               ></input>
             </div>
