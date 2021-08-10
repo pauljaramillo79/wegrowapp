@@ -237,7 +237,7 @@ const SalesQS = () => {
           (QSData.interestrate *
             Number(QSData.interestdays) *
             Number(QSData.pricebeforeint)) /
-          365
+          360
         ).toFixed(4)
       ),
     });
@@ -247,7 +247,7 @@ const SalesQS = () => {
         (QSData.interestrate *
           Number(QSData.interestdays) *
           Number(QSData.pricebeforeint)) /
-          365
+          360
       ).toFixed(2),
     });
     // }
@@ -327,7 +327,7 @@ const SalesQS = () => {
       interestcost: Number(
         (
           (QSData.CADintrate * QSData.CADdays * QSData.pricebeforeint) /
-          365
+          360
         ).toFixed(4)
       ),
       salesinterest: Number(
@@ -335,20 +335,20 @@ const SalesQS = () => {
           (Number(QSData.interestrate) *
             Number(QSData.interestdays) *
             Number(QSData.pricebeforeint)) /
-          365
+          360
         ).toFixed(4)
       ),
     });
     setQSValues({
       ...QSValues,
       interestcost: Number(
-        (QSData.CADintrate * QSData.CADdays * QSData.pricebeforeint) / 365
+        (QSData.CADintrate * QSData.CADdays * QSData.pricebeforeint) / 360
       ).toFixed(2),
       salesinterest: Number(
         (Number(QSData.interestrate) *
           Number(QSData.interestdays) *
           Number(QSData.pricebeforeint)) /
-          365
+          360
       ).toFixed(2),
     });
 
@@ -461,7 +461,7 @@ const SalesQS = () => {
         interestcost: Number(
           (
             (QSData.CADintrate * QSData.CADdays * QSData.pricebeforeint) /
-            365
+            360
           ).toFixed(4)
         ),
         salesinterest: Number(
@@ -469,7 +469,7 @@ const SalesQS = () => {
             (Number(QSData.interestrate) *
               Number(QSData.interestdays) *
               Number(QSData.pricebeforeint)) /
-            365
+            360
           ).toFixed(4)
         ),
         priceafterint:
@@ -499,13 +499,13 @@ const SalesQS = () => {
       setQSValues({
         ...QSValues,
         interestcost: Number(
-          (QSData.CADintrate * QSData.CADdays * QSData.pricebeforeint) / 365
+          (QSData.CADintrate * QSData.CADdays * QSData.pricebeforeint) / 360
         ).toFixed(2),
         salesinterest: Number(
           (Number(QSData.interestrate) *
             Number(QSData.interestdays) *
             Number(QSData.pricebeforeint)) /
-            365
+            360
         ).toFixed(2),
         priceafterint: Number(
           Number(QSData.pricebeforeint) + Number(QSData.salesinterest)
