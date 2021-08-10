@@ -187,10 +187,12 @@ const PositionReport = () => {
                       <h4>Total</h4>
                     </td>
                     <td className="fig">
-                      {u
-                        .toFixed(2)
-                        .toString()
-                        .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                      <h4>
+                        {u
+                          .toFixed(2)
+                          .toString()
+                          .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                      </h4>
                     </td>
                     <td colSpan={5}></td>
                   </tr>,
