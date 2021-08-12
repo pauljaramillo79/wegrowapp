@@ -83,11 +83,11 @@ const QSSearchField = ({
       <div className="flexbreak"></div>
       <span className="QSsearchresults-container">
         <ul className={show ? "QSsearchresults" : "QSsearchresults-hide"}>
-          {searchID === "productID" ? <li>...Add New Product</li> : ""}
+          {/* {searchID === "productID" ? <li>...Add New Product</li> : ""}
           {searchID === "customerID" ? <li>...Add New Customer</li> : ""}
           {searchID === "POLID" ? <li>...Add New Loadport</li> : ""}
           {searchID === "PODID" ? <li>...Add New Disport</li> : ""}
-          {searchID === "paytermID" ? <li>...Add New Payterm</li> : ""}
+          {searchID === "paytermID" ? <li>...Add New Payterm</li> : ""} */}
 
           {searchResults
             ? searchResults.map((item) => {

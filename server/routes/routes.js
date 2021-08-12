@@ -377,7 +377,7 @@ router.post("/prodnames", (req, res) => {
 router.post("/productlist", (req, res) => {
   db.query(
     // "SELECT productID, abbreviation, supplierlist.supplierID, companyCode AS supplier, prodGroupID FROM productList INNER JOIN prodNames ON productList.productName = prodNames.prodNameID INNER JOIN supplierlist ON productList.supplierID = supplierlist.supplierID ORDER BY productID ASC",
-    "SELECT productID, abbreviation, supplierlist.supplierID, companyCode AS supplier, prodNames.prodGroupID, productGroup FROM productList INNER JOIN (prodNames INNER JOIN productGroups ON prodNames.prodGroupID = productGroups.prodGroupID) ON productList.productName = prodNames.prodNameID INNER JOIN supplierlist ON productList.supplierID = supplierlist.supplierID ORDER BY productID ASC;",
+    "SELECT productID, abbreviation, supplierlist.supplierID, companyCode AS supplier, prodNames.prodGroupID, productGroup FROM productList INNER JOIN (prodNames INNER JOIN productGroups ON prodNames.prodGroupID = productGroups.prodGroupID) ON productList.productName = prodNames.prodNameID INNER JOIN supplierlist ON productList.supplierID = supplierlist.supplierID ORDER BY abbreviation ASC;",
     (err, results) => {
       if (err) {
         console.log(err);
@@ -519,6 +519,23 @@ router.post("/positiondropdown", (req, res) => {
       }
       if (results.length > 0) {
         return res.status(200).send(results);
+      }
+    }
+  );
+});
+router.post("/duplicateQS", (req, res) => {
+  QSID = req.body.QSID;
+  db.query(
+    `CREATE TEMPORARY TABLE tmptable SELECT * FROM quotationsheet WHERE (QSID='${QSID}'); ALTER TABLE tmptable CHANGE QSID QSID bigint; UPDATE tmptable SET QSID = NULL; INSERT INTO quotationsheet SELECT * FROM tmptable; DROP TABLE tmptable;`,
+    (err, results) => {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log("QS successfully copied");
+        return res.status(200).json({
+          success: true,
+          message: "Succesfully Copied QS",
+        });
       }
     }
   );
@@ -799,15 +816,19 @@ router.delete("/deletePosition", (req, res) => {
 router.post("/keyfigures", (req, res) => {
   let currentyear = moment().format("YYYY");
   let lastyear = Number(currentyear) - 1;
+  let startdate = req.body.startdate;
+  let enddate = req.body.enddate;
+  console.log(startdate, enddate);
   db.query(
-    "SELECT DATE_FORMAT(QSDate, '%Y') AS Year, SUM(quantity) AS Sales, SUM(salesTurnover) AS Revenue,  SUM(tradingMargin) AS Margin, SUM(tradingMargin)/SUM(quantity) AS Profit, COUNT(salesTurnover) AS Operations FROM quotationsheet WHERE ? <= DATE_FORMAT(QSDate, '%Y') && saleComplete=-1 GROUP BY DATE_FORMAT(QSDate,'%Y')",
-    [lastyear],
+    "SELECT DATE_FORMAT(QSDate, '%Y') AS Year, SUM(quantity) AS Sales, SUM(salesTurnover) AS Revenue,  SUM(tradingMargin) AS Margin, SUM(tradingMargin)/SUM(quantity) AS Profit, COUNT(salesTurnover) AS Operations FROM quotationsheet WHERE DATE_FORMAT(date(QSDate), '%Y-%m-%d') BETWEEN date(?) AND date(?) && saleComplete=-1 GROUP BY DATE_FORMAT(QSDate,'%Y')",
+    [startdate, enddate],
     (err, results) => {
       if (err) {
         console.log(err);
       }
       if (results.length > 0) {
-        console.log(lastyear);
+        // console.log(lastyear);
+        console.log(results);
 
         return res.status(200).send(results);
       }

@@ -6,6 +6,7 @@
 //     user: "admin",
 //     password: "MateoPatricio@2015",
 //     database: "weGrow",
+//     multipleStatements: true,
 //   },
 // };
 
@@ -18,5 +19,6 @@ module.exports = {
     password: process.env.RDS_PASSWORD,
     port: process.env.RDS_PORT,
     database: "ebdb",
+    multipleStatements: true,
   },
 };

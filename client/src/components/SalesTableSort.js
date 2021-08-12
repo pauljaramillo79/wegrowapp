@@ -12,6 +12,8 @@ import "react-confirm-alert/src/react-confirm-alert.css";
 import "./SalesTableSort.css";
 
 const SalesTableSort = (props) => {
+  const role = JSON.parse(localStorage.getItem("role"));
+
   const { state } = useContext(AuthContext);
   const { QSrefresh, toggleQSrefresh } = useContext(RefreshPositionsContext);
   // Get token values from UseContext and Local Storage
@@ -70,7 +72,7 @@ const SalesTableSort = (props) => {
   // const [postoedit, setPostoedit] = useState({});
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(async () => {
-    console.log(props.limit);
+    // console.log(props.limit);
     await authAxios
       .post("/sales", { userID: props.userID, limit: props.limit })
       .then((result) => {
@@ -79,6 +81,16 @@ const SalesTableSort = (props) => {
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [QSrefresh, props.userID, props.limit]);
+
+  const duplicateQS = (QSID) => {
+    Axios.post("duplicateQS", { QSID: QSID }).then(
+      (response) => {
+        toggleQSrefresh();
+      }
+      // toggleQSrefresh()
+    );
+  };
+
   const handleFilterTextChange = (e, column) => {
     setColumns({
       ...columns,
@@ -270,32 +282,45 @@ const SalesTableSort = (props) => {
           <button
             className="editbutton"
             onClick={(e) => {
-              confirmAlert({
-                title: "Are you sure?",
-                message: `You are about to delete QS (${item.QSID}). This deletion is irreversible. Click Delete to continue or Cancel`,
-                buttons: [
-                  {
-                    label: "Cancel",
-                    onClick: () => console.log("cancelled"),
-                  },
-                  {
-                    label: "Delete",
-                    onClick: async () => {
-                      await Axios.delete("/deleteQS", {
-                        data: { id: item.QSID },
-                      })
-                        .then((response) => toggleQSrefresh())
-                        .catch((err) => console.log(err));
-                    },
-                  },
-                ],
-                closeOnClickOutside: true,
-                closeOnEscape: true,
-              });
+              e.preventDefault();
+              duplicateQS(item.QSID);
             }}
           >
-            Delete
+            Duplicate
           </button>
+          {role === 1 || role === 2 ? (
+            <button
+              className="editbutton"
+              onClick={(e) => {
+                confirmAlert({
+                  title: "Are you sure?",
+                  message: `You are about to delete QS (${item.QSID}). This deletion is irreversible. Click Delete to continue or Cancel`,
+                  buttons: [
+                    {
+                      label: "Cancel",
+                      onClick: () => console.log("cancelled"),
+                    },
+                    {
+                      label: "Delete",
+                      onClick: async () => {
+                        await Axios.delete("/deleteQS", {
+                          data: { id: item.QSID },
+                        })
+                          .then((response) => toggleQSrefresh())
+                          .catch((err) => console.log(err));
+                      },
+                    },
+                  ],
+                  closeOnClickOutside: true,
+                  closeOnEscape: true,
+                });
+              }}
+            >
+              Delete
+            </button>
+          ) : (
+            ""
+          )}
         </div>
       </tr>
     );
