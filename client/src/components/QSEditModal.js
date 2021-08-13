@@ -667,10 +667,9 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
         Number(QSeditable.quantity) *
         Number(QSeditable.pricebeforeint.replace("$", "").replace(",", "")),
       pctmargin:
-        ((Number(QSeditable.pricebeforeint.replace("$", "").replace(",", "")) -
+        (Number(QSeditable.pricebeforeint.replace("$", "").replace(",", "")) -
           Number(QSeditable.totalcost.replace("$", ""))) /
-          Number(QSeditable.pricebeforeint.replace("$", "").replace(",", ""))) *
-        100,
+        Number(QSeditable.pricebeforeint.replace("$", "").replace(",", "")),
       netback:
         Number(QSeditable.pricebeforeint.replace("$", "").replace(",", "")) -
         Number(QSeditable.totalcost.replace("$", "")) +
