@@ -540,6 +540,19 @@ router.post("/duplicateQS", (req, res) => {
     }
   );
 });
+router.post("/QSIDList", (req, res) => {
+  db.query(
+    "SELECT QSID FROM quotationsheet ORDER BY QSID ASC",
+    (err, results) => {
+      if (err) {
+        console.log(err);
+      }
+      if (results.length > 0) {
+        return res.status(200).send(results);
+      }
+    }
+  );
+});
 router.post("/saveQS", (req, res) => {
   // console.log(req.body);
   let {
@@ -660,6 +673,9 @@ router.post("/QStoedit", (req, res) => {
       }
       if (results.length > 0) {
         res.status(200).send(results);
+      }
+      if (results.length == 0) {
+        res.status(204).send("Not found");
       }
     }
   );

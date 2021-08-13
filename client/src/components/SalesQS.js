@@ -769,7 +769,7 @@ const SalesQS = () => {
                   e.target.select();
                 }}
                 className="canceldrag"
-                required
+                // required
               />
             </div>
           </fieldset>

@@ -9,7 +9,37 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
   const showHideClassName = show
     ? "modal QSmodal display-block"
     : "modal QSmodal display-none";
-  const QSID = QStoedit.QSID;
+
+  const [QSID, setQSID] = useState();
+  const [QSIDtoedit, setQSIDtoedit] = useState();
+  const [QSIDList, setQSIDList] = useState([]);
+  const [QSindex, setQSindex] = useState();
+  const [QSload, setQSload] = useState(true);
+  // let QSID = QStoedit.QSID;
+
+  useEffect(() => {
+    if (show) {
+      Axios.post("/QSIDList").then((response) => {
+        // console.log(response.data);
+        const QSlist = [...new Set(response.data.map((item) => item.QSID))]; // [ 'A', 'B']
+        // console.log(QSlist);
+        setQSID(QStoedit.QSID);
+        setQSIDtoedit(QStoedit.QSID);
+        setQSIDList(QSlist);
+        console.log(QStoedit.QSID);
+        setQSload(!QSload);
+
+        // console.log(QSIDList[QSindex]);
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [show]);
+
+  useEffect(() => {
+    console.log(QSID);
+
+    setQSindex(QSIDList.indexOf(QSID));
+  }, [QSload]);
 
   const QSeditableInit = {
     includedrate: "",
@@ -54,17 +84,16 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
 
   useEffect(() => {
     if (show && QSID) {
+      console.log("current:" + QSID);
       Axios.post("/QStoedit", { id: QSID }).then((response) => {
         setQSeditable(response.data[0]);
         setQSoriginal(response.data[0]);
         setSold(response.data[0].saleComplete);
-        console.log(response.data);
+        // console.log(response.data);
       });
     }
-    // setPostoedit(postoeditinit);
-    // console.log(QSID);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [show]);
+  }, [show, QSID]);
 
   const handleInputChange = (e) => {
     e.preventDefault();
@@ -249,6 +278,7 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
     });
   };
   const closeandclear = () => {
+    // setQSID(null);
     setQSedits(null);
     setQSeditable(QSeditableInit);
     handleClose();
@@ -711,7 +741,45 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
   return show ? (
     <div className={showHideClassName}>
       <section className="modal-main">
-        <h2>Edit Quotation Sheet</h2>
+        <div className="QSeditmodaltitle">
+          <h2>Edit Quotation Sheet</h2>
+          <div>
+            <button>Prev</button>
+            <input
+              className="QSeditmodalsearch"
+              onKeyDown={(e) => {
+                if (show && e.key === "ArrowRight") {
+                  e.preventDefault();
+                  // QSID = QSID + 1;
+                  setQSID(QSIDList[QSindex + 1]);
+                  setQSIDtoedit(QSIDList[QSindex + 1]);
+                  setQSindex(QSindex + 1);
+                  // console.log(QSID);
+                }
+                if (show && e.key === "ArrowLeft") {
+                  e.preventDefault();
+                  // QSID = QSID + 1;
+                  setQSID(QSIDList[QSindex - 1]);
+                  setQSIDtoedit(QSIDList[QSindex - 1]);
+                  setQSindex(QSindex - 1);
+                  // console.log(QSID);
+                }
+                if (show && e.key === "Enter") {
+                  if (QSIDList.includes(Number(e.target.value))) {
+                    setQSID(Number(e.target.value));
+                  }
+                }
+              }}
+              value={QSIDtoedit ? QSIDtoedit || "" : ""}
+              onChange={(e) => {
+                e.preventDefault();
+                setQSIDtoedit(e.target.value);
+                setQSindex(QSIDList.indexOf(Number(e.target.value)));
+              }}
+            />
+            <button>Next</button>
+          </div>
+        </div>
         <form
           className="QSModalForm"
           action=""
