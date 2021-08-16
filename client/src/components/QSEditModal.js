@@ -594,13 +594,13 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
         "$" +
         (
           Number(QSeditable.pricebeforeint.replace("$", "").replace(",", "")) -
-          Number(QSeditable.totalcost.replace("$", ""))
+          Number(QSeditable.totalcost.replace("$", "").replace(",", ""))
         ).toFixed(2),
       margin:
         "$" +
         (
           (Number(QSeditable.pricebeforeint.replace("$", "").replace(",", "")) -
-            Number(QSeditable.totalcost.replace("$", ""))) *
+            Number(QSeditable.totalcost.replace("$", "").replace(",", ""))) *
           Number(QSeditable.quantity)
         )
           .toFixed(2)
@@ -618,7 +618,7 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
           ((Number(
             QSeditable.pricebeforeint.replace("$", "").replace(",", "")
           ) -
-            Number(QSeditable.totalcost.replace("$", ""))) /
+            Number(QSeditable.totalcost.replace("$", "").replace(",", ""))) /
             Number(
               QSeditable.pricebeforeint.replace("$", "").replace(",", "")
             )) *
@@ -628,7 +628,7 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
         "$" +
         (
           Number(QSeditable.pricebeforeint.replace("$", "").replace(",", "")) -
-          Number(QSeditable.totalcost.replace("$", "")) +
+          Number(QSeditable.totalcost.replace("$", "").replace(",", "")) +
           Number(QSeditable.materialcost.replace("$", "").replace(",", ""))
         )
           .toFixed(2)
@@ -658,21 +658,21 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
         Number(QSeditable.salesinterest.replace("$", "")),
       profit:
         Number(QSeditable.pricebeforeint.replace("$", "").replace(",", "")) -
-        Number(QSeditable.totalcost.replace("$", "")),
+        Number(QSeditable.totalcost.replace("$", "").replace(",", "")),
       margin:
         (Number(QSeditable.pricebeforeint.replace("$", "").replace(",", "")) -
-          Number(QSeditable.totalcost.replace("$", ""))) *
+          Number(QSeditable.totalcost.replace("$", "").replace(",", ""))) *
         Number(QSeditable.quantity),
       turnover:
         Number(QSeditable.quantity) *
         Number(QSeditable.pricebeforeint.replace("$", "").replace(",", "")),
       pctmargin:
         (Number(QSeditable.pricebeforeint.replace("$", "").replace(",", "")) -
-          Number(QSeditable.totalcost.replace("$", ""))) /
+          Number(QSeditable.totalcost.replace("$", "").replace(",", ""))) /
         Number(QSeditable.pricebeforeint.replace("$", "").replace(",", "")),
       netback:
         Number(QSeditable.pricebeforeint.replace("$", "").replace(",", "")) -
-        Number(QSeditable.totalcost.replace("$", "")) +
+        Number(QSeditable.totalcost.replace("$", "").replace(",", "")) +
         Number(QSeditable.materialcost.replace("$", "").replace(",", "")),
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -684,34 +684,34 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
         "$" +
         (
           Number(QSeditable.materialcost.replace("$", "").replace(",", "")) +
-          Number(QSeditable.pcommission.replace("$", "")) +
-          Number(QSeditable.pfinancecost.replace("$", "")) +
-          Number(QSeditable.sfinancecost.replace("$", "")) +
-          Number(QSeditable.freightpmt.replace("$", "")) +
-          Number(QSeditable.insurancecost.replace("$", "")) +
-          Number(QSeditable.inspectioncost.replace("$", "")) +
-          Number(QSeditable.scommission.replace("$", "")) +
-          Number(QSeditable.interestcost.replace("$", "")) +
-          Number(QSeditable.legal.replace("$", "")) +
-          Number(QSeditable.pallets.replace("$", "")) +
-          Number(QSeditable.other.replace("$", ""))
+          Number(QSeditable.pcommission.replace("$", "").replace(",", "")) +
+          Number(QSeditable.pfinancecost.replace("$", "").replace(",", "")) +
+          Number(QSeditable.sfinancecost.replace("$", "").replace(",", "")) +
+          Number(QSeditable.freightpmt.replace("$", "").replace(",", "")) +
+          Number(QSeditable.insurancecost.replace("$", "").replace(",", "")) +
+          Number(QSeditable.inspectioncost.replace("$", "").replace(",", "")) +
+          Number(QSeditable.scommission.replace("$", "").replace(",", "")) +
+          Number(QSeditable.interestcost.replace("$", "").replace(",", "")) +
+          Number(QSeditable.legal.replace("$", "").replace(",", "")) +
+          Number(QSeditable.pallets.replace("$", "").replace(",", "")) +
+          Number(QSeditable.other.replace("$", "").replace(",", ""))
         ).toFixed(2),
     });
     setQSedits({
       ...QSedits,
       totalcost:
         Number(QSeditable.materialcost.replace("$", "").replace(",", "")) +
-        Number(QSeditable.pcommission.replace("$", "")) +
-        Number(QSeditable.pfinancecost.replace("$", "")) +
-        Number(QSeditable.sfinancecost.replace("$", "")) +
-        Number(QSeditable.freightpmt.replace("$", "")) +
-        Number(QSeditable.insurancecost.replace("$", "")) +
-        Number(QSeditable.inspectioncost.replace("$", "")) +
-        Number(QSeditable.scommission.replace("$", "")) +
-        Number(QSeditable.interestcost.replace("$", "")) +
-        Number(QSeditable.legal.replace("$", "")) +
-        Number(QSeditable.pallets.replace("$", "")) +
-        Number(QSeditable.other.replace("$", "")),
+        Number(QSeditable.pcommission.replace("$", "").replace(",", "")) +
+        Number(QSeditable.pfinancecost.replace("$", "").replace(",", "")) +
+        Number(QSeditable.sfinancecost.replace("$", "").replace(",", "")) +
+        Number(QSeditable.freightpmt.replace("$", "").replace(",", "")) +
+        Number(QSeditable.insurancecost.replace("$", "").replace(",", "")) +
+        Number(QSeditable.inspectioncost.replace("$", "").replace(",", "")) +
+        Number(QSeditable.scommission.replace("$", "").replace(",", "")) +
+        Number(QSeditable.interestcost.replace("$", "").replace(",", "")) +
+        Number(QSeditable.legal.replace("$", "").replace(",", "")) +
+        Number(QSeditable.pallets.replace("$", "").replace(",", "")) +
+        Number(QSeditable.other.replace("$", "").replace(",", "")),
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
