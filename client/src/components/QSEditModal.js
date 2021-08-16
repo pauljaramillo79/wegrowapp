@@ -308,7 +308,7 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
       supplierID: position.supplierID,
       from: position.start,
       to: position.end,
-      materialcost: position.Price.replace("$", ""),
+      materialcost: position.Price.replace("$", "").replace(",", ""),
     });
   };
   const handleSold = () => {
