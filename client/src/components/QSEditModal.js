@@ -87,6 +87,7 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
       console.log("current:" + QSID);
       Axios.post("/QStoedit", { id: QSID }).then((response) => {
         setQSeditable(response.data[0]);
+        console.log(response.data[0]);
         setQSoriginal(response.data[0]);
         setSold(response.data[0].saleComplete);
         // console.log(response.data);
@@ -163,10 +164,12 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
   };
   const makecurrency = (num, field) => {
     if (num !== null && num !== "") {
-      if (num.toString().includes("$")) {
+      console.log(num.replace("$", ""));
+      if (num.toString().includes("$") || num.toString().includes(",")) {
         setQSeditable({
           ...QSeditable,
-          [field]: "$" + Number(num.replace("$", "")).toFixed(2),
+          [field]:
+            "$" + Number(num.replace("$", "").replace(",", "")).toFixed(2),
         });
       } else {
         setQSeditable({
@@ -699,19 +702,24 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
     });
     setQSedits({
       ...QSedits,
-      totalcost:
-        Number(QSeditable.materialcost.replace("$", "").replace(",", "")) +
-        Number(QSeditable.pcommission.replace("$", "").replace(",", "")) +
-        Number(QSeditable.pfinancecost.replace("$", "").replace(",", "")) +
-        Number(QSeditable.sfinancecost.replace("$", "").replace(",", "")) +
-        Number(QSeditable.freightpmt.replace("$", "").replace(",", "")) +
-        Number(QSeditable.insurancecost.replace("$", "").replace(",", "")) +
-        Number(QSeditable.inspectioncost.replace("$", "").replace(",", "")) +
-        Number(QSeditable.scommission.replace("$", "").replace(",", "")) +
-        Number(QSeditable.interestcost.replace("$", "").replace(",", "")) +
-        Number(QSeditable.legal.replace("$", "").replace(",", "")) +
-        Number(QSeditable.pallets.replace("$", "").replace(",", "")) +
-        Number(QSeditable.other.replace("$", "").replace(",", "")),
+      totalcost: Number(
+        Number(
+          QSeditable.materialcost.replace("$", "").replace(",", "") +
+            Number(QSeditable.pcommission.replace("$", "").replace(",", "")) +
+            Number(QSeditable.pfinancecost.replace("$", "").replace(",", "")) +
+            Number(QSeditable.sfinancecost.replace("$", "").replace(",", "")) +
+            Number(QSeditable.freightpmt.replace("$", "").replace(",", "")) +
+            Number(QSeditable.insurancecost.replace("$", "").replace(",", "")) +
+            Number(
+              QSeditable.inspectioncost.replace("$", "").replace(",", "")
+            ) +
+            Number(QSeditable.scommission.replace("$", "").replace(",", "")) +
+            Number(QSeditable.interestcost.replace("$", "").replace(",", "")) +
+            Number(QSeditable.legal.replace("$", "").replace(",", "")) +
+            Number(QSeditable.pallets.replace("$", "").replace(",", "")) +
+            Number(QSeditable.other.replace("$", "").replace(",", ""))
+        )
+      ),
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
