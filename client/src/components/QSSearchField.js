@@ -79,10 +79,10 @@ const QSSearchField = ({
 
   let currentIndex;
 
-  useEffect(() => {
-    console.log(searchID);
-    // listRefs.current = [];
-  }, [searchTerm]);
+  // useEffect(() => {
+  //   console.log(searchID);
+  //   // listRefs.current = [];
+  // }, [searchTerm]);
   return (
     <>
       <input
