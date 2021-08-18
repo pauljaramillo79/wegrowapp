@@ -9,12 +9,34 @@ import SalesQS from "./SalesQS";
 import QSEditModal from "./QSEditModal";
 import "./PositionsTableSort.css";
 
+import { Responsive, WidthProvider } from "react-grid-layout";
+
+const ResponsiveGridLayout = WidthProvider(Responsive);
+
 const SalesGrid = () => {
-  const initlayout = [
-    { i: "a", x: 0, y: 13, w: 35, h: 6 },
-    { i: "b", x: 0, y: 0, w: 29, h: 13 },
-    // { i: "c", x: 0, y: 12, w: 21, h: 8 },
-  ];
+  const initlayout = {
+    lg: [
+      { i: "a", x: 0, y: 13, w: 35, h: 6 },
+      { i: "b", x: 0, y: 0, w: 29, h: 13 },
+    ],
+    md: [
+      { i: "a", x: 0, y: 13, w: 35, h: 6 },
+      { i: "b", x: 0, y: 0, w: 29, h: 13 },
+    ],
+    sm: [
+      { i: "a", x: 0, y: 13, w: 35, h: 6 },
+      { i: "b", x: 0, y: 0, w: 29, h: 13 },
+    ],
+    xs: [
+      { i: "a", x: 0, y: 13, w: 35, h: 6 },
+      { i: "b", x: 0, y: 0, w: 29, h: 13 },
+    ],
+    xxs: [
+      { i: "a", x: 0, y: 13, w: 35, h: 6 },
+      { i: "b", x: 0, y: 0, w: 29, h: 13 },
+    ],
+  };
+
   const getFromLS = (key) => {
     let ls = {};
     if (global.localStorage) {
@@ -32,17 +54,17 @@ const SalesGrid = () => {
       );
     }
   };
-  const onLayoutChange = (layout) => {
-    saveToLS("layout", layout);
-    setLayout(layout);
+  const onLayoutChange = (layout, layouts) => {
+    saveToLS("layouts", layouts);
+    setLayouts(layouts);
   };
-  const originalLayout = getFromLS("layout") || initlayout;
-  const [layout, setLayout] = useState(originalLayout);
+  const originalLayout = getFromLS("layouts") || initlayout;
+  const [layouts, setLayouts] = useState(originalLayout);
   //MODAL
   const [QSmodalState, setQSModalState] = useState(false);
   const [QStoedit, setQStoedit] = useState({});
   const showEditModal = (e, positem) => {
-    console.log(positem);
+    // console.log(positem);
     setQSModalState(true);
     setQStoedit(positem);
   };
@@ -57,13 +79,25 @@ const SalesGrid = () => {
           handleClose={hideEditModal}
           QStoedit={QStoedit}
         />
-        <GridLayout
+        {/* <GridLayout
           className="layout"
           layout={layout}
           cols={36}
           rowHeight={30}
           width={1860}
           onLayoutChange={onLayoutChange}
+          margin={[20, 20]}
+          draggableCancel=".canceldrag"
+        > */}
+        <ResponsiveGridLayout
+          className="layout"
+          breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
+          layouts={layouts}
+          cols={{ lg: 36, md: 36, sm: 36, xs: 36, xxs: 2 }}
+          rowHeight={30}
+          onLayoutChange={(layout, layouts) => {
+            onLayoutChange(layout, layouts);
+          }}
           margin={[20, 20]}
           draggableCancel=".canceldrag"
         >
@@ -79,7 +113,8 @@ const SalesGrid = () => {
             <SalesQS />
           </div>
           {/* <div id="sales2" key="c"></div> */}
-        </GridLayout>
+        </ResponsiveGridLayout>
+        {/* </GridLayout> */}
       </div>
     </>
   );
