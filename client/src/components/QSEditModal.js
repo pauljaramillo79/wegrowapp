@@ -90,6 +90,36 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
         console.log(response.data[0]);
         setQSoriginal(response.data[0]);
         setSold(response.data[0].saleComplete);
+        setQSedits({
+          ...QSedits,
+          totalcost: Number(
+            response.data[0].totalcost.replace("$", "").replace(",", "")
+          ),
+          interestcost: Number(
+            response.data[0].interestcost.replace("$", "").replace(",", "")
+          ),
+          salesinterest: Number(
+            response.data[0].salesinterest.replace("$", "").replace(",", "")
+          ),
+          priceafterint: Number(
+            response.data[0].priceafterint.replace("$", "").replace(",", "")
+          ),
+          profit: Number(
+            response.data[0].profit.replace("$", "").replace(",", "")
+          ),
+          margin: Number(
+            response.data[0].margin.replace("$", "").replace(",", "")
+          ),
+          turnover: Number(
+            response.data[0].turnover.replace("$", "").replace(",", "")
+          ),
+          pctmargin: Number(
+            response.data[0].pctmargin.replace("%", "").replace(",", "") / 100
+          ),
+          netback: Number(
+            response.data[0].netback.replace("$", "").replace(",", "")
+          ),
+        });
         // console.log(response.data);
       });
     }
@@ -164,7 +194,7 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
   };
   const makecurrency = (num, field) => {
     if (num !== null && num !== "") {
-      console.log(num.replace("$", ""));
+      // console.log(num.replace("$", ""));
       if (num.toString().includes("$") || num.toString().includes(",")) {
         setQSeditable({
           ...QSeditable,
@@ -282,9 +312,11 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
   };
   const closeandclear = () => {
     // setQSID(null);
-    setQSedits(null);
+
     setQSeditable(QSeditableInit);
+
     handleClose();
+    setQSedits(null);
   };
   const loadPositions = () => {
     Axios.post("/positiondropdown").then((response) => {
@@ -334,6 +366,36 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
   //       QSeditable.pricebeforeint,
   //     ]
   //   : [];
+
+  useEffect(() => {
+    if (QSeditable.freightTotal && QSeditable.payload) {
+      if (
+        Number(QSeditable.freightTotal.replace("$", "").replace(",", "")) > 0 &&
+        Number(QSeditable.payload) > 0
+      ) {
+        setQSeditable({
+          ...QSeditable,
+          freightpmt:
+            "$" +
+            (
+              Number(
+                QSeditable.freightTotal.replace("$", "").replace(",", "")
+              ) / Number(QSeditable.payload)
+            ).toFixed(2),
+        });
+        setQSedits({
+          ...QSedits,
+          freightTotal: Number(
+            QSeditable.freightTotal.replace("$", "").replace(",", "")
+          ),
+          payload: Number(QSeditable.payload),
+          freightpmt:
+            Number(QSeditable.freightTotal.replace("$", "").replace(",", "")) /
+            Number(QSeditable.payload),
+        });
+      }
+    }
+  }, [QSeditable.freightTotal, QSeditable.payload]);
 
   useEffect(() => {
     setQSeditable({
@@ -702,24 +764,19 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
     });
     setQSedits({
       ...QSedits,
-      totalcost: Number(
-        Number(
-          QSeditable.materialcost.replace("$", "").replace(",", "") +
-            Number(QSeditable.pcommission.replace("$", "").replace(",", "")) +
-            Number(QSeditable.pfinancecost.replace("$", "").replace(",", "")) +
-            Number(QSeditable.sfinancecost.replace("$", "").replace(",", "")) +
-            Number(QSeditable.freightpmt.replace("$", "").replace(",", "")) +
-            Number(QSeditable.insurancecost.replace("$", "").replace(",", "")) +
-            Number(
-              QSeditable.inspectioncost.replace("$", "").replace(",", "")
-            ) +
-            Number(QSeditable.scommission.replace("$", "").replace(",", "")) +
-            Number(QSeditable.interestcost.replace("$", "").replace(",", "")) +
-            Number(QSeditable.legal.replace("$", "").replace(",", "")) +
-            Number(QSeditable.pallets.replace("$", "").replace(",", "")) +
-            Number(QSeditable.other.replace("$", "").replace(",", ""))
-        )
-      ),
+      totalcost:
+        Number(QSeditable.materialcost.replace("$", "").replace(",", "")) +
+        Number(QSeditable.pcommission.replace("$", "").replace(",", "")) +
+        Number(QSeditable.pfinancecost.replace("$", "").replace(",", "")) +
+        Number(QSeditable.sfinancecost.replace("$", "").replace(",", "")) +
+        Number(QSeditable.freightpmt.replace("$", "").replace(",", "")) +
+        Number(QSeditable.insurancecost.replace("$", "").replace(",", "")) +
+        Number(QSeditable.inspectioncost.replace("$", "").replace(",", "")) +
+        Number(QSeditable.scommission.replace("$", "").replace(",", "")) +
+        Number(QSeditable.interestcost.replace("$", "").replace(",", "")) +
+        Number(QSeditable.legal.replace("$", "").replace(",", "")) +
+        Number(QSeditable.pallets.replace("$", "").replace(",", "")) +
+        Number(QSeditable.other.replace("$", "").replace(",", "")),
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
@@ -1151,19 +1208,32 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
               </div>
               <div className="form-group">
                 <label htmlFor="">Freight Total:</label>
-                <input name="freighttotal" type="text" />
+                <input
+                  name="freightTotal"
+                  className="QSfig"
+                  type="text"
+                  value={QSeditable ? QSeditable.freightTotal || "" : ""}
+                  onChange={handleQInputChange}
+                  onBlur={formatCurrency}
+                />
               </div>
               <div className="form-group">
                 <label htmlFor="">Shipping Line:</label>
                 <input name="shippingline" type="text" />
               </div>
               <div className="form-group">
-                <label htmlFor="">Inspection Cost:</label>
-                <input name="inspectiontotal" type="text" />
+                <label htmlFor="">Payload:</label>
+                <input
+                  name="payload"
+                  className="QSfig"
+                  type="text"
+                  value={QSeditable ? QSeditable.payload || "" : ""}
+                  onChange={handleQInputChange}
+                />
               </div>
               <div className="form-group">
-                <label htmlFor="">Freight ID:</label>
-                <input name="freightID" type="text" />
+                <label htmlFor="">Inspection Cost:</label>
+                <input name="intpectiontotal" type="text" />
               </div>
             </fieldset>
           </section>

@@ -29,6 +29,8 @@ const SalesQS = () => {
     CADdays: 10,
     paymentTerm: "",
     shipmentType: 1,
+    freightTotal: 0,
+    payload: 0,
     quantity: 0,
     materialcost: 0,
     pcommission: 0,
@@ -76,6 +78,8 @@ const SalesQS = () => {
     CADdays: "10",
     paymentTerm: "",
     shipmentType: "Container",
+    freightTotal: "0.00",
+    payload: "0.00",
     quantity: "",
     materialcost: "0.00",
     pcommission: "0.00",
@@ -222,6 +226,19 @@ const SalesQS = () => {
       });
     }
   };
+
+  useEffect(() => {
+    if (QSData.freightTotal > 0 && QSData.payload > 0) {
+      setQSValues({
+        ...QSValues,
+        freightpmt: (QSData.freightTotal / QSData.payload).toFixed(2),
+      });
+      setQSData({
+        ...QSData,
+        freightpmt: QSData.freightTotal / QSData.payload,
+      });
+    }
+  }, [QSData.freightTotal, QSData.payload]);
 
   // Update sales interest
   useEffect(() => {
@@ -998,7 +1015,14 @@ const SalesQS = () => {
               </div>
               <div className="form-group">
                 <label htmlFor="">Freight Total:</label>
-                <input type="text" />
+                <input
+                  type="text"
+                  name="freightTotal"
+                  className="QSfig2 canceldrag"
+                  value={QSValues.freightTotal}
+                  onChange={QtyChange}
+                  onBlur={QtyBlur}
+                />
               </div>
               <div className="form-group">
                 <label htmlFor="">Shipping Line:</label>
@@ -1006,7 +1030,14 @@ const SalesQS = () => {
               </div>
               <div className="form-group">
                 <label htmlFor="">Payload:</label>
-                <input type="text" />
+                <input
+                  type="text"
+                  name="payload"
+                  className="QSfig2 canceldrag"
+                  value={QSValues.payload}
+                  onChange={QtyChange}
+                  onBlur={QtyBlur}
+                />
               </div>
               <div className="form-group">
                 <label htmlFor="">Inspection Cost:</label>
