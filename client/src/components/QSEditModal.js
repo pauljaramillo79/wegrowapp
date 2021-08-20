@@ -359,13 +359,9 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
       setQSedits({ ...QSedits, saleComplete: 0 });
     }
   }, [sold]);
-  // const deps = QSeditable
-  //   ? [
-  //       QSeditable.interestdays,
-  //       QSeditable.interestrate,
-  //       QSeditable.pricebeforeint,
-  //     ]
-  //   : [];
+
+  // FREIGHT UPDATE ////////
+  //////////////////////////
 
   useEffect(() => {
     if (QSeditable.freightTotal && QSeditable.payload) {
@@ -397,7 +393,11 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
     }
   }, [QSeditable.freightTotal, QSeditable.payload]);
 
+  // SALES INTEREST UPDATE //////////
+  ///////////////////////////////////
+
   useEffect(() => {
+    console.log("calculating here");
     setQSeditable({
       ...QSeditable,
       salesinterest:
@@ -426,67 +426,33 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
     QSeditable.pricebeforeint,
   ]);
 
-  // const deps2 = QSeditable
-  //   ? [
-  //       QSeditable.materialcost,
-  //       QSeditable.pcommission,
-  //       QSeditable.pfinancecost,
-  //       QSeditable.sfinancecost,
-  //       QSeditable.freightpmt,
-  //       QSeditable.insurancecost,
-  //       QSeditable.inspectioncost,
-  //       QSeditable.scommission,
-  //       QSeditable.interestcost,
-  //       QSeditable.legal,
-  //       QSeditable.pallets,
-  //       QSeditable.other,
-  //     ]
-  //   : [];
   useEffect(() => {
     setQSeditable({
       ...QSeditable,
       interestcost:
-        "$" +
-        (
-          (Number(QSeditable.includedrate.toString().replace("%", "")) *
-            Number(QSeditable.includedperiod) *
-            Number(
-              QSeditable.pricebeforeint
-                .toString()
-                .replace("$", "")
-                .replace(",", "")
-            )) /
-          360 /
-          100
-        ).toFixed(2),
+        Number(QSeditable.includedrate.toString().replace("%", "") > 0) &&
+        Number(QSeditable.includedperiod) > 0
+          ? "$" +
+            (
+              (Number(QSeditable.includedrate.toString().replace("%", "")) *
+                Number(QSeditable.includedperiod) *
+                Number(
+                  QSeditable.pricebeforeint
+                    .toString()
+                    .replace("$", "")
+                    .replace(",", "")
+                )) /
+              360 /
+              100
+            ).toFixed(2)
+          : "$" + Number(0).toFixed(2),
     });
     setQSedits({
       ...QSedits,
       interestcost:
-        (Number(QSeditable.includedrate.toString().replace("%", "")) *
-          Number(QSeditable.includedperiod) *
-          Number(
-            QSeditable.pricebeforeint
-              .toString()
-              .replace("$", "")
-              .replace(",", "")
-          )) /
-        360 /
-        100,
-    });
-  }, [QSeditable.includedrate, QSeditable.includedperiod]);
-
-  useEffect(() => {
-    if (
-      Number(QSeditable.interestrate.replace("%", "")) === 0 ||
-      QSeditable.interestdays === 0
-    ) {
-      setQSeditable({
-        ...QSeditable,
-        interestcost:
-          "$" +
-          (
-            (Number(QSeditable.includedrate.toString().replace("%", "")) *
+        Number(QSeditable.includedrate.toString().replace("%", "") > 0) &&
+        Number(QSeditable.includedperiod) > 0
+          ? (Number(QSeditable.includedrate.toString().replace("%", "")) *
               Number(QSeditable.includedperiod) *
               Number(
                 QSeditable.pricebeforeint
@@ -496,7 +462,38 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
               )) /
             360 /
             100
-          ).toFixed(2),
+          : 0,
+    });
+  }, [
+    QSeditable.includedrate,
+    QSeditable.includedperiod,
+    QSeditable.pricebeforeint,
+  ]);
+
+  useEffect(() => {
+    if (
+      Number(QSeditable.interestrate.replace("%", "")) === 0 ||
+      QSeditable.interestdays === 0
+    ) {
+      setQSeditable({
+        ...QSeditable,
+        interestcost:
+          Number(QSeditable.includedrate.toString().replace("%", "") > 0) &&
+          Number(QSeditable.includedperiod) > 0
+            ? "$" +
+              (
+                (Number(QSeditable.includedrate.toString().replace("%", "")) *
+                  Number(QSeditable.includedperiod) *
+                  Number(
+                    QSeditable.pricebeforeint
+                      .toString()
+                      .replace("$", "")
+                      .replace(",", "")
+                  )) /
+                360 /
+                100
+              ).toFixed(2)
+            : "$" + Number(0).toFixed(2),
         salesinterest:
           "$" +
           (
@@ -519,16 +516,19 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
       setQSedits({
         ...QSedits,
         interestcost:
-          (Number(QSeditable.includedrate.toString().replace("%", "")) *
-            Number(QSeditable.includedperiod) *
-            Number(
-              QSeditable.pricebeforeint
-                .toString()
-                .replace("$", "")
-                .replace(",", "")
-            )) /
-          360 /
-          100,
+          Number(QSeditable.includedrate.toString().replace("%", "") > 0) &&
+          Number(QSeditable.includedperiod) > 0
+            ? (Number(QSeditable.includedrate.toString().replace("%", "")) *
+                Number(QSeditable.includedperiod) *
+                Number(
+                  QSeditable.pricebeforeint
+                    .toString()
+                    .replace("$", "")
+                    .replace(",", "")
+                )) /
+              360 /
+              100
+            : 0,
         salesinterest:
           (Number(QSeditable.interestrate.replace("%", "")) *
             Number(QSeditable.interestdays) *
@@ -545,19 +545,22 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
       setQSeditable({
         ...QSeditable,
         interestcost:
-          "$" +
-          (
-            (Number(QSeditable.includedrate.toString().replace("%", "")) *
-              Number(QSeditable.includedperiod) *
-              Number(
-                QSeditable.pricebeforeint
-                  .toString()
-                  .replace("$", "")
-                  .replace(",", "")
-              )) /
-            360 /
-            100
-          ).toFixed(2),
+          Number(QSeditable.includedrate.toString().replace("%", "") > 0) &&
+          Number(QSeditable.includedperiod) > 0
+            ? "$" +
+              (
+                (Number(QSeditable.includedrate.toString().replace("%", "")) *
+                  Number(QSeditable.includedperiod) *
+                  Number(
+                    QSeditable.pricebeforeint
+                      .toString()
+                      .replace("$", "")
+                      .replace(",", "")
+                  )) /
+                360 /
+                100
+              ).toFixed(2)
+            : "$" + Number(0).toFixed(2),
         //
         salesinterest:
           "$" +
@@ -581,16 +584,19 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
       setQSedits({
         ...QSedits,
         interestcost:
-          (Number(QSeditable.includedrate.toString().replace("%", "")) *
-            Number(QSeditable.includedperiod) *
-            Number(
-              QSeditable.pricebeforeint
-                .toString()
-                .replace("$", "")
-                .replace(",", "")
-            )) /
-          360 /
-          100,
+          Number(QSeditable.includedrate.toString().replace("%", "") > 0) &&
+          Number(QSeditable.includedperiod) > 0
+            ? (Number(QSeditable.includedrate.toString().replace("%", "")) *
+                Number(QSeditable.includedperiod) *
+                Number(
+                  QSeditable.pricebeforeint
+                    .toString()
+                    .replace("$", "")
+                    .replace(",", "")
+                )) /
+              360 /
+              100
+            : 0,
         salesinterest:
           (Number(QSeditable.interestrate.replace("%", "")) *
             Number(QSeditable.interestdays) *
@@ -625,19 +631,22 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
     setQSeditable({
       ...QSeditable,
       interestcost:
-        "$" +
-        (
-          (Number(QSeditable.includedrate.toString().replace("%", "")) *
-            Number(QSeditable.includedperiod) *
-            Number(
-              QSeditable.pricebeforeint
-                .toString()
-                .replace("$", "")
-                .replace(",", "")
-            )) /
-          360 /
-          100
-        ).toFixed(2),
+        Number(QSeditable.includedrate.toString().replace("%", "") > 0) &&
+        Number(QSeditable.includedperiod) > 0
+          ? "$" +
+            (
+              (Number(QSeditable.includedrate.toString().replace("%", "")) *
+                Number(QSeditable.includedperiod) *
+                Number(
+                  QSeditable.pricebeforeint
+                    .toString()
+                    .replace("$", "")
+                    .replace(",", "")
+                )) /
+              360 /
+              100
+            ).toFixed(2)
+          : "$" + Number(0).toFixed(2),
       salesinterest:
         "$" +
         (
@@ -666,14 +675,14 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
         (
           (Number(QSeditable.pricebeforeint.replace("$", "").replace(",", "")) -
             Number(QSeditable.totalcost.replace("$", "").replace(",", ""))) *
-          Number(QSeditable.quantity)
+          Number(QSeditable.quantity.replace(",", ""))
         )
           .toFixed(2)
           .replace(/\B(?=(\d{3})+(?!\d))/g, ","),
       turnover:
         "$" +
         (
-          Number(QSeditable.quantity) *
+          Number(QSeditable.quantity.replace(",", "")) *
           Number(QSeditable.pricebeforeint.replace("$", "").replace(",", ""))
         )
           .toFixed(2)
@@ -702,16 +711,19 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
     setQSedits({
       ...QSedits,
       interestcost:
-        (Number(QSeditable.includedrate.toString().replace("%", "")) *
-          Number(QSeditable.includedperiod) *
-          Number(
-            QSeditable.pricebeforeint
-              .toString()
-              .replace("$", "")
-              .replace(",", "")
-          )) /
-        360 /
-        100,
+        Number(QSeditable.includedrate.toString().replace("%", "") > 0) &&
+        Number(QSeditable.includedperiod) > 0
+          ? (Number(QSeditable.includedrate.toString().replace("%", "")) *
+              Number(QSeditable.includedperiod) *
+              Number(
+                QSeditable.pricebeforeint
+                  .toString()
+                  .replace("$", "")
+                  .replace(",", "")
+              )) /
+            360 /
+            100
+          : 0,
       salesinterest:
         (Number(QSeditable.interestrate.replace("%", "")) *
           Number(QSeditable.interestdays) *
@@ -727,9 +739,9 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
       margin:
         (Number(QSeditable.pricebeforeint.replace("$", "").replace(",", "")) -
           Number(QSeditable.totalcost.replace("$", "").replace(",", ""))) *
-        Number(QSeditable.quantity),
+        Number(QSeditable.quantity.replace(",", "")),
       turnover:
-        Number(QSeditable.quantity) *
+        Number(QSeditable.quantity.replace(",", "")) *
         Number(QSeditable.pricebeforeint.replace("$", "").replace(",", "")),
       pctmargin:
         (Number(QSeditable.pricebeforeint.replace("$", "").replace(",", "")) -
@@ -801,6 +813,7 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
         setQSeditable(QSeditableInit);
       })
       .catch(setQSedits({}));
+
     await handleClose();
   };
   return show ? (
