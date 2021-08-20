@@ -795,11 +795,12 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
   ]);
   const updateQS = async (e) => {
     e.preventDefault();
-    await Axios.post("/updateQS", { QSedits, QSID }).then((response) => {
-      toggleQSrefresh();
-      setQSeditable(QSeditableInit);
-      setQSedits("");
-    });
+    await Axios.post("/updateQS", { QSedits, QSID })
+      .then((response) => {
+        toggleQSrefresh();
+        setQSeditable(QSeditableInit);
+      })
+      .catch(setQSedits({}));
     await handleClose();
   };
   return show ? (

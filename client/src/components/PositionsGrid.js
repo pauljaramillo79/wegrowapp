@@ -62,7 +62,7 @@ const PositionsGrid = () => {
     }
   };
   const onLayoutChange = (layout, layouts) => {
-    console.log(layout, layouts);
+    // console.log(layout, layouts);
     saveToLS("layouts", layouts);
     setLayouts(layouts);
   };
