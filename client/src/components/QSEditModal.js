@@ -397,7 +397,6 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
   ///////////////////////////////////
 
   useEffect(() => {
-    console.log("calculating here");
     setQSeditable({
       ...QSeditable,
       salesinterest:
@@ -475,6 +474,7 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
       Number(QSeditable.interestrate.replace("%", "")) === 0 ||
       QSeditable.interestdays === 0
     ) {
+      console.log("over here");
       setQSeditable({
         ...QSeditable,
         interestcost:
@@ -542,6 +542,7 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
           Number(QSeditable.salesinterest.replace("$", "")),
       });
     } else {
+      console.log("calculating herrre");
       setQSeditable({
         ...QSeditable,
         interestcost:
@@ -609,6 +610,7 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [QSeditable.pricebeforeint]);
+
   useEffect(() => {
     setQSeditable({
       ...QSeditable,
@@ -753,7 +755,7 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
         Number(QSeditable.materialcost.replace("$", "").replace(",", "")),
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [QSeditable.quantity, QSeditable.pricebefore, QSeditable.totalcost]);
+  }, [QSeditable.quantity, QSeditable.pricebeforeint, QSeditable.totalcost]);
   useEffect(() => {
     setQSeditable({
       ...QSeditable,
