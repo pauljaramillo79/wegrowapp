@@ -6,6 +6,7 @@ import "./css/screen.css";
 import PositionModal from "./PositionModal";
 import { AuthContext } from "../App";
 import { RefreshPositionsContext } from "../contexts/RefreshPositionsProvider";
+import moment from "moment";
 
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
@@ -83,7 +84,10 @@ const SalesTableSort = (props) => {
   }, [QSrefresh, props.userID, props.limit]);
 
   const duplicateQS = (QSID) => {
-    Axios.post("duplicateQS", { QSID: QSID }).then(
+    Axios.post("duplicateQS", {
+      QSID: QSID,
+      QSDate: moment().format("yyyy-MM-DD"),
+    }).then(
       (response) => {
         toggleQSrefresh();
       }

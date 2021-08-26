@@ -11,6 +11,8 @@ import moment from "moment";
 
 const PositionsTableSort = (props) => {
   const { state } = useContext(AuthContext);
+  const role = JSON.parse(localStorage.getItem("role"));
+
   const { posrefresh, togglePosrefresh } = useContext(RefreshPositionsContext);
   // Get token values from UseContext and Local Storage
   // let accesstoken = state.accesstoken;
@@ -192,37 +194,41 @@ const PositionsTableSort = (props) => {
           >
             Edit
           </button>
-          <button
-            className="editbutton"
-            onClick={(e) => {
-              confirmAlert({
-                title: "Are you sure?",
-                message: `You are about to delete position (${item.WGP}) for ${item.abbreviation} from ${item.companyCode}. This deletion is irreversible. Click Delete to confirm or Cancel to exit.`,
-                buttons: [
-                  {
-                    label: "Cancel",
-                    onClick: () => {
-                      console.log("cancelled");
+          {role === 1 || role === 2 ? (
+            <button
+              className="editbutton"
+              onClick={(e) => {
+                confirmAlert({
+                  title: "Are you sure?",
+                  message: `You are about to delete position (${item.WGP}) for ${item.abbreviation} from ${item.companyCode}. This deletion is irreversible. Click Delete to confirm or Cancel to exit.`,
+                  buttons: [
+                    {
+                      label: "Cancel",
+                      onClick: () => {
+                        console.log("cancelled");
+                      },
                     },
-                  },
-                  {
-                    label: "Delete",
-                    onClick: async () => {
-                      await Axios.delete("/deletePosition", {
-                        data: { WGP: item.WGP },
-                      })
-                        .then((response) => togglePosrefresh())
-                        .catch((err) => console.log(err));
+                    {
+                      label: "Delete",
+                      onClick: async () => {
+                        await Axios.delete("/deletePosition", {
+                          data: { WGP: item.WGP },
+                        })
+                          .then((response) => togglePosrefresh())
+                          .catch((err) => console.log(err));
+                      },
                     },
-                  },
-                ],
-                closeOnClickOutside: true,
-                closeOnEscape: true,
-              });
-            }}
-          >
-            Delete
-          </button>
+                  ],
+                  closeOnClickOutside: true,
+                  closeOnEscape: true,
+                });
+              }}
+            >
+              Delete
+            </button>
+          ) : (
+            ""
+          )}
         </div>
       </tr>
     );
