@@ -361,30 +361,30 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
     }
   }, [sold]);
 
-  useEffect(() => {
-    if (
-      Number(QSeditable.quantity.replace(",", "")) > 0 &&
-      QSeditable.totalinspection
-    ) {
-      setQSeditable({
-        ...QSeditable,
-        inspectioncost:
-          "$" +
-          Number(
-            Number(
-              QSeditable.totalinspection.replace("$", "").replace(",", "")
-            ) / Number(QSeditable.quantity.replace(",", ""))
-          ).toFixed(2),
-      });
-      setQSedits({
-        ...QSedits,
-        inspectioncost: Number(
-          Number(QSeditable.totalinspection.replace("$", "").replace(",", "")) /
-            Number(QSeditable.quantity.replace(",", ""))
-        ),
-      });
-    }
-  }, [QSeditable.quantity, QSeditable.totalinspection]);
+  // useEffect(() => {
+  //   if (
+  //     Number(QSeditable.quantity &&
+  //     QSeditable.totalinspection
+  //   ) {
+  //     setQSeditable({
+  //       ...QSeditable,
+  //       inspectioncost:
+  //         "$" +
+  //         Number(
+  //           Number(
+  //             QSeditable.totalinspection.replace("$", "").replace(",", "")
+  //           ) / Number(QSeditable.quantity.replace(",", ""))
+  //         ).toFixed(2),
+  //     });
+  //     setQSedits({
+  //       ...QSedits,
+  //       inspectioncost: Number(
+  //         Number(QSeditable.totalinspection.replace("$", "").replace(",", "")) /
+  //           Number(QSeditable.quantity.replace(",", ""))
+  //       ),
+  //     });
+  //   }
+  // }, [QSeditable.quantity, QSeditable.totalinspection]);
 
   // FREIGHT UPDATE ////////
   //////////////////////////
