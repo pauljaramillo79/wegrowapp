@@ -245,6 +245,15 @@ const SalesQS = () => {
         ...QSData,
         inspectionpmt: QSData.totalinspection / QSData.quantity,
       });
+    } else {
+      setQSValues({
+        ...QSValues,
+        inspectionpmt: Number(0).toFixed(2),
+      });
+      setQSData({
+        ...QSData,
+        inspectionpmt: 0,
+      });
     }
   }, [QSData.quantity, QSData.totalinspection]);
 
@@ -360,13 +369,18 @@ const SalesQS = () => {
         insurance: (QSData.pricebeforeint * 0.07 * 1.1) / 100,
       });
     } else if (QSValues.incoterms === "CIP" || QSValues.incoterms === "CIF") {
+      console.log(
+        Number((QSData.pricebeforeint * 0.14 * 1.1) / 100).toFixed(2)
+      );
       setQSValues({
         ...QSValues,
-        insurance: (QSData.pricebeforeint * 0.14 * 1.1) / 100,
+        insurance: Number((QSData.pricebeforeint * 0.14 * 1.1) / 100).toFixed(
+          2
+        ),
       });
       setQSData({
         ...QSData,
-        insurance: (QSData.pricebeforeint * 0.14 * 1.1) / 100,
+        insurance: Number((QSData.pricebeforeint * 0.14 * 1.1) / 100),
       });
     } else {
       setQSValues({
@@ -468,44 +482,45 @@ const SalesQS = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [QSData.quantity, QSData.pricebeforeint, QSData.totalcost]);
 
-  // useEffect(() => {
-  //   if (
-  //     QSData.incoterms == "CPT" ||
-  //     QSData.incoterms == "DAP" ||
-  //     QSData.incoterms == "CFR"
-  //   ) {
-  //     setQSValues({
-  //       ...QSValues,
-  //       insurance: Number((QSData.pricebeforeint * 0.07 * 1.1) / 100).toFixed(
-  //         2
-  //       ),
-  //     });
-  //     setQSData({
-  //       ...QSData,
-  //       insurance: (QSData.pricebeforeint * 0.07 * 1.1) / 100,
-  //     });
-  //   } else if (QSValues.incoterms === "CIP" || QSValues.incoterms === "CIF") {
-  //     setQSValues({
-  //       ...QSValues,
-  //       insurance: Number((QSData.pricebeforeint * 0.14 * 1.1) / 100).toFixed(
-  //         2
-  //       ),
-  //     });
-  //     setQSData({
-  //       ...QSData,
-  //       insurance: (QSData.pricebeforeint * 0.14 * 1.1) / 100,
-  //     });
-  //   } else {
-  //     setQSValues({
-  //       ...QSValues,
-  //       insurance: Number(0).toFixed(2),
-  //     });
-  //     setQSData({
-  //       ...QSData,
-  //       insurance: 0,
-  //     });
-  //   }
-  // }, [QSData.pricebeforeint, QSData.incoterms]);
+  useEffect(() => {
+    if (
+      QSData.incoterms == "CPT" ||
+      QSData.incoterms == "DAP" ||
+      QSData.incoterms == "CFR"
+    ) {
+      setQSValues({
+        ...QSValues,
+        insurance: Number((QSData.pricebeforeint * 0.07 * 1.1) / 100).toFixed(
+          2
+        ),
+      });
+      setQSData({
+        ...QSData,
+        insurance: (QSData.pricebeforeint * 0.07 * 1.1) / 100,
+      });
+    } else if (QSValues.incoterms === "CIP" || QSValues.incoterms === "CIF") {
+      setQSValues({
+        ...QSValues,
+        insurance: Number((QSData.pricebeforeint * 0.14 * 1.1) / 100).toFixed(
+          2
+        ),
+      });
+      setQSData({
+        ...QSData,
+        insurance: (QSData.pricebeforeint * 0.14 * 1.1) / 100,
+      });
+    } else {
+      setQSValues({
+        ...QSValues,
+        insurance: Number(0).toFixed(2),
+      });
+      setQSData({
+        ...QSData,
+        insurance: 0,
+      });
+    }
+  }, [QSData.pricebeforeint, QSData.incoterms]);
+
   //Update total cost
   useEffect(() => {
     setQSValues({
