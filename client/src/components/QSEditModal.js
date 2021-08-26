@@ -349,6 +349,7 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
   const handleSold = () => {
     setSold(!sold);
   };
+
   useEffect(() => {
     if (sold) {
       setQSeditable({ ...QSeditable, saleComplete: -1 });
@@ -359,6 +360,31 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
       setQSedits({ ...QSedits, saleComplete: 0 });
     }
   }, [sold]);
+
+  useEffect(() => {
+    if (
+      Number(QSeditable.quantity.replace(",", "")) > 0 &&
+      QSeditable.totalinspection
+    ) {
+      setQSeditable({
+        ...QSeditable,
+        inspectioncost:
+          "$" +
+          Number(
+            Number(
+              QSeditable.totalinspection.replace("$", "").replace(",", "")
+            ) / Number(QSeditable.quantity.replace(",", ""))
+          ).toFixed(2),
+      });
+      setQSedits({
+        ...QSedits,
+        inspectioncost: Number(
+          Number(QSeditable.totalinspection.replace("$", "").replace(",", "")) /
+            Number(QSeditable.quantity.replace(",", ""))
+        ),
+      });
+    }
+  }, [QSeditable.quantity, QSeditable.totalinspection]);
 
   // FREIGHT UPDATE ////////
   //////////////////////////
@@ -474,7 +500,7 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
       Number(QSeditable.interestrate.replace("%", "")) === 0 ||
       QSeditable.interestdays === 0
     ) {
-      console.log("over here");
+      // console.log("over here");
       setQSeditable({
         ...QSeditable,
         interestcost:
@@ -629,6 +655,7 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [QSeditable.salesinterest]);
+
   useEffect(() => {
     setQSeditable({
       ...QSeditable,
@@ -1249,7 +1276,14 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
               </div>
               <div className="form-group">
                 <label htmlFor="">Inspection Cost:</label>
-                <input name="intpectiontotal" type="text" />
+                <input
+                  name="totalinspection"
+                  type="text"
+                  className="QSfig"
+                  value={QSeditable ? QSeditable.totalinspection || "" : ""}
+                  onChange={handleQInputChange}
+                  onBlur={formatCurrency}
+                />
               </div>
             </fieldset>
           </section>
