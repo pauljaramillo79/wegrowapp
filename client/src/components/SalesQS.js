@@ -4,6 +4,8 @@ import moment from "moment";
 import QSSearchField from "./QSSearchField";
 import Axios from "axios";
 import { RefreshPositionsContext } from "../contexts/RefreshPositionsProvider";
+import { confirmAlert } from "react-confirm-alert";
+import "react-confirm-alert/src/react-confirm-alert.css";
 
 const SalesQS = () => {
   const { toggleQSrefresh } = useContext(RefreshPositionsContext);
@@ -234,6 +236,38 @@ const SalesQS = () => {
       });
     }
   };
+
+  useEffect(() => {
+    if (QSValues.from && !QSValues.to) {
+      setQSValues({
+        ...QSValues,
+        to: QSValues.from,
+      });
+      setQSData({
+        ...QSData,
+        to: QSData.from,
+      });
+    }
+    if (QSValues.from && QSValues.to) {
+      let date1 = moment(QSValues.from);
+      let date2 = moment(QSValues.to);
+      console.log(date2.diff(date1, "days"));
+      if (date2.diff(date1, "days") < 0) {
+        confirmAlert({
+          title: "Check shipment dates",
+          message: `Delivery date (to) cannot be earlier than shipment date (from)`,
+          buttons: [
+            {
+              label: "OK",
+            },
+          ],
+          closeOnClickOutside: true,
+          closeOnEscape: true,
+        });
+      }
+      // console.log(moment(QSValues.from).diff(moment(QSValues.to)));
+    }
+  }, [QSValues.from, QSValues.to]);
 
   useEffect(() => {
     if (QSData.quantity > 0 && QSData.totalinspection > 0) {
