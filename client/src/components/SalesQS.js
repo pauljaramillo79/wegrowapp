@@ -1085,7 +1085,7 @@ const SalesQS = () => {
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="">Inspection Cost:</label>
+                <label htmlFor="">Total Inspection:</label>
                 <input
                   name="totalinspection"
                   className="QSfig2 canceldrag"

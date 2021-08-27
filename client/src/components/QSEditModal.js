@@ -1379,7 +1379,7 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="">Inspection Cost:</label>
+                <label htmlFor="">Total Inspection:</label>
                 <input
                   name="totalinspection"
                   type="text"
