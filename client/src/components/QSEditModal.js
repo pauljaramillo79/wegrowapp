@@ -26,7 +26,7 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
         setQSID(QStoedit.QSID);
         setQSIDtoedit(QStoedit.QSID);
         setQSIDList(QSlist);
-        console.log(QStoedit.QSID);
+        // console.log(QStoedit.QSID);
         setQSload(!QSload);
 
         // console.log(QSIDList[QSindex]);
@@ -36,7 +36,7 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
   }, [show]);
 
   useEffect(() => {
-    console.log(QSID);
+    // console.log(QSID);
 
     setQSindex(QSIDList.indexOf(QSID));
   }, [QSload]);
@@ -84,10 +84,10 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
 
   useEffect(() => {
     if (show && QSID) {
-      console.log("current:" + QSID);
+      // console.log("current:" + QSID);
       Axios.post("/QStoedit", { id: QSID }).then((response) => {
         setQSeditable(response.data[0]);
-        console.log(response.data[0]);
+        // console.log(response.data[0]);
         setQSoriginal(response.data[0]);
         setSold(response.data[0].saleComplete);
         setQSedits({
@@ -361,31 +361,6 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
     }
   }, [sold]);
 
-  // useEffect(() => {
-  //   if (
-  //     Number(QSeditable.quantity &&
-  //     QSeditable.totalinspection
-  //   ) {
-  //     setQSeditable({
-  //       ...QSeditable,
-  //       inspectioncost:
-  //         "$" +
-  //         Number(
-  //           Number(
-  //             QSeditable.totalinspection.replace("$", "").replace(",", "")
-  //           ) / Number(QSeditable.quantity.replace(",", ""))
-  //         ).toFixed(2),
-  //     });
-  //     setQSedits({
-  //       ...QSedits,
-  //       inspectioncost: Number(
-  //         Number(QSeditable.totalinspection.replace("$", "").replace(",", "")) /
-  //           Number(QSeditable.quantity.replace(",", ""))
-  //       ),
-  //     });
-  //   }
-  // }, [QSeditable.quantity, QSeditable.totalinspection]);
-
   // FREIGHT UPDATE ////////
   //////////////////////////
 
@@ -568,7 +543,6 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
           Number(QSeditable.salesinterest.replace("$", "")),
       });
     } else {
-      console.log("calculating herrre");
       setQSeditable({
         ...QSeditable,
         interestcost:
@@ -636,6 +610,36 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [QSeditable.pricebeforeint]);
+
+  // useEffect(() => {
+  //   if (QSeditable.quantity && QSeditable.totalinspection) {
+  //     console.log(
+  //       "$" +
+  //         Number(
+  //           Number(
+  //             QSeditable.totalinspection.replace("$", "").replace(",", "")
+  //           ) / Number(QSeditable.quantity.replace(",", ""))
+  //         ).toFixed(2)
+  //     );
+  //     setQSeditable({
+  //       ...QSeditable,
+  //       inspectioncost:
+  //         "$" +
+  //         Number(
+  //           Number(
+  //             QSeditable.totalinspection.replace("$", "").replace(",", "")
+  //           ) / Number(QSeditable.quantity.replace(",", ""))
+  //         ).toFixed(2),
+  //     });
+  //     setQSedits({
+  //       ...QSedits,
+  //       inspectioncost: Number(
+  //         Number(QSeditable.totalinspection.replace("$", "").replace(",", "")) /
+  //           Number(QSeditable.quantity.replace(",", ""))
+  //       ),
+  //     });
+  //   }
+  // }, [QSeditable.quantity, QSeditable.totalinspection]);
 
   useEffect(() => {
     setQSeditable({
@@ -783,6 +787,101 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [QSeditable.quantity, QSeditable.pricebeforeint, QSeditable.totalcost]);
+
+  useEffect(() => {
+    if (QSeditable.quantity && QSeditable.totalinspection) {
+      console.log(
+        "$" +
+          Number(
+            Number(
+              QSeditable.totalinspection.replace("$", "").replace(",", "")
+            ) / Number(QSeditable.quantity.replace(",", ""))
+          ).toFixed(2)
+      );
+      setQSeditable({
+        ...QSeditable,
+        inspectioncost:
+          "$" +
+          Number(
+            Number(
+              QSeditable.totalinspection.replace("$", "").replace(",", "")
+            ) / Number(QSeditable.quantity.replace(",", ""))
+          ).toFixed(2),
+      });
+      setQSedits({
+        ...QSedits,
+        inspectioncost: Number(
+          Number(QSeditable.totalinspection.replace("$", "").replace(",", "")) /
+            Number(QSeditable.quantity.replace(",", ""))
+        ),
+      });
+    }
+  }, [QSeditable.quantity, QSeditable.totalinspection]);
+
+  useEffect(() => {
+    if (
+      QSeditable.incoterms === "CPT" ||
+      QSeditable.incoterms === "DAP" ||
+      QSeditable.incoterms === "CFR"
+    ) {
+      setQSeditable({
+        ...QSeditable,
+        insurancecost:
+          "$" +
+          (
+            (Number(
+              QSeditable.pricebeforeint.replace("$", "").replace(",", "")
+            ) *
+              0.07 *
+              1.1) /
+            100
+          ).toFixed(2),
+      });
+      setQSedits({
+        ...QSedits,
+        insurancecost:
+          (Number(QSeditable.pricebeforeint.replace("$", "").replace(",", "")) *
+            0.07 *
+            1.1) /
+          100,
+      });
+    } else if (
+      QSeditable.incoterms === "CIP" ||
+      QSeditable.incoterms === "CIF"
+    ) {
+      setQSeditable({
+        ...QSeditable,
+        insurancecost:
+          "$" +
+          (
+            (Number(
+              QSeditable.pricebeforeint.replace("$", "").replace(",", "")
+            ) *
+              0.14 *
+              1.1) /
+            100
+          ).toFixed(2),
+      });
+      setQSedits({
+        ...QSedits,
+        insurancecost:
+          (Number(QSeditable.pricebeforeint.replace("$", "").replace(",", "")) *
+            0.14 *
+            1.1) /
+          100,
+      });
+    } else {
+      setQSeditable({
+        ...QSeditable,
+        insurancecost: "$" + (0).toFixed(2),
+      });
+      setQSedits({
+        ...QSedits,
+        insurancecost: 0,
+      });
+    }
+  }, [QSeditable.pricebeforeint, QSeditable.incoterms]);
+
   useEffect(() => {
     setQSeditable({
       ...QSeditable,

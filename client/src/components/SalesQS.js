@@ -518,9 +518,9 @@ const SalesQS = () => {
 
   useEffect(() => {
     if (
-      QSData.incoterms == "CPT" ||
-      QSData.incoterms == "DAP" ||
-      QSData.incoterms == "CFR"
+      QSData.incoterms === "CPT" ||
+      QSData.incoterms === "DAP" ||
+      QSData.incoterms === "CFR"
     ) {
       setQSValues({
         ...QSValues,
