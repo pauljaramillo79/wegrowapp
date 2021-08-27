@@ -1361,7 +1361,12 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
               </div>
               <div className="form-group">
                 <label htmlFor="">Shipping Line:</label>
-                <input name="shippingline" type="text" />
+                <input
+                  name="shippingline"
+                  value={QSeditable ? QSeditable.shippingline || "" : ""}
+                  onChange={handleInputChange}
+                  type="text"
+                />
               </div>
               <div className="form-group">
                 <label htmlFor="">Payload:</label>
