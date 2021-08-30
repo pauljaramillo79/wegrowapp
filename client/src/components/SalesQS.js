@@ -237,6 +237,9 @@ const SalesQS = () => {
     }
   };
 
+  // FROM and TO
+  //////
+
   useEffect(() => {
     if (QSValues.from && !QSValues.to) {
       setQSValues({
@@ -269,27 +272,8 @@ const SalesQS = () => {
     }
   }, [QSValues.from, QSValues.to]);
 
-  // useEffect(() => {
-  //   if (QSData.quantity > 0 && QSData.totalinspection > 0) {
-  //     setQSValues({
-  //       ...QSValues,
-  //       inspectionpmt: (QSData.totalinspection / QSData.quantity).toFixed(2),
-  //     });
-  //     setQSData({
-  //       ...QSData,
-  //       inspectionpmt: QSData.totalinspection / QSData.quantity,
-  //     });
-  //   } else {
-  //     setQSValues({
-  //       ...QSValues,
-  //       inspectionpmt: Number(0).toFixed(2),
-  //     });
-  //     setQSData({
-  //       ...QSData,
-  //       inspectionpmt: 0,
-  //     });
-  //   }
-  // }, [QSData.quantity, QSData.totalinspection]);
+  // FREIGHT and PAYLOAD
+  //////
 
   useEffect(() => {
     if (QSData.freightTotal > 0 && QSData.payload > 0) {
@@ -304,7 +288,9 @@ const SalesQS = () => {
     }
   }, [QSData.freightTotal, QSData.payload]);
 
-  // Update sales interest
+  // UPDATE SALES INTEREST
+  /// intdays, intrate, pricebeforeint
+
   useEffect(() => {
     setQSData({
       ...QSData,
@@ -328,11 +314,68 @@ const SalesQS = () => {
     });
     // }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [QSData.interestdays, QSData.interestrate, QSData.pricebeforeint]);
+  }, [QSData.interestdays, QSData.interestrate]);
+
+  // INTEREST COST and SALES INTEREST
+  // CADdays, CADrate, pricebeforeint
 
   useEffect(() => {
     setQSData({
       ...QSData,
+      interestcost: Number(
+        (
+          (QSData.CADintrate * QSData.CADdays * QSData.pricebeforeint) /
+          360
+        ).toFixed(4)
+      ),
+      // salesinterest: Number(
+      //   (
+      //     (Number(QSData.interestrate) *
+      //       Number(QSData.interestdays) *
+      //       Number(QSData.pricebeforeint)) /
+      //     360
+      //   ).toFixed(4)
+      // ),
+    });
+    setQSValues({
+      ...QSValues,
+      interestcost: Number(
+        (QSData.CADintrate * QSData.CADdays * QSData.pricebeforeint) / 360
+      ).toFixed(2),
+      // salesinterest: Number(
+      //   (Number(QSData.interestrate) *
+      //     Number(QSData.interestdays) *
+      //     Number(QSData.pricebeforeint)) /
+      //     360
+      // ).toFixed(2),
+    });
+
+    // }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    QSData.CADdays,
+    QSData.CADintrate,
+    QSData.pricebeforeint,
+    // QSData.salesinterest,
+  ]);
+
+  //Update economics
+  useEffect(() => {
+    // if (QSData.quantity !== 0 && QSData.pricebeforeint !== 0) {
+    setQSData({
+      ...QSData,
+      insurance:
+        QSData.incoterms === "CPT" ||
+        QSData.incoterms === "CFR" ||
+        QSData.incoterms === "DAP"
+          ? Number(((QSData.pricebeforeint * 0.07 * 1.1) / 100).toFixed(2))
+          : QSData.incoterms === "CIP" || QSData.incoterms === "CIF"
+          ? Number(((QSData.pricebeforeint * 0.14 * 1.1) / 100).toFixed(2))
+          : 0,
+      inspectionpmt:
+        QSData.quantity > 0 && QSData.totalinspection
+          ? Number((QSData.totalinspection / QSData.quantity).toFixed(2))
+          : 0,
       interestcost: Number(
         (
           (QSData.CADintrate * QSData.CADdays * QSData.pricebeforeint) /
@@ -347,9 +390,60 @@ const SalesQS = () => {
           360
         ).toFixed(4)
       ),
+      priceafterint:
+        Number(QSData.pricebeforeint) + Number(QSData.salesinterest) * 10,
+      profit:
+        QSData.quantity !== 0 && QSData.pricebeforeint !== 0
+          ? Number((QSData.pricebeforeint - QSData.totalcost).toFixed(4))
+          : 0,
+      margin:
+        QSData.quantity !== 0 && QSData.pricebeforeint !== 0
+          ? Number(
+              (
+                (QSData.pricebeforeint - QSData.totalcost) *
+                QSData.quantity
+              ).toFixed(4)
+            )
+          : 0,
+      turnover:
+        QSData.quantity !== 0 && QSData.pricebeforeint !== 0
+          ? Number((QSData.quantity * QSData.pricebeforeint).toFixed(4))
+          : 0,
+      pctmargin:
+        QSData.quantity !== 0 && QSData.pricebeforeint !== 0
+          ? Number(
+              (
+                (QSData.pricebeforeint - QSData.totalcost) /
+                QSData.pricebeforeint
+              ).toFixed(4)
+            )
+          : 0,
+      netback:
+        QSData.quantity !== 0 && QSData.pricebeforeint !== 0
+          ? Number(
+              (
+                QSData.pricebeforeint -
+                QSData.totalcost +
+                QSData.materialcost
+              ).toFixed(4)
+            )
+          : 0,
     });
+
     setQSValues({
       ...QSValues,
+      insurance:
+        QSData.incoterms === "CPT" ||
+        QSData.incoterms === "CFR" ||
+        QSData.incoterms === "DAP"
+          ? Number((QSData.pricebeforeint * 0.07 * 1.1) / 100).toFixed(2)
+          : QSData.incoterms === "CIP" || QSData.incoterms === "CIF"
+          ? Number((QSData.pricebeforeint * 0.14 * 1.1) / 100).toFixed(2)
+          : Number(0).toFixed(2),
+      inspectionpmt:
+        QSData.quantity > 0 && QSData.totalinspection
+          ? Number(QSData.totalinspection / QSData.quantity).toFixed(2)
+          : "0.00",
       interestcost: Number(
         (QSData.CADintrate * QSData.CADdays * QSData.pricebeforeint) / 360
       ).toFixed(2),
@@ -359,16 +453,158 @@ const SalesQS = () => {
           Number(QSData.pricebeforeint)) /
           360
       ).toFixed(2),
+      priceafterint: Number(
+        Number(QSData.pricebeforeint) + Number(QSData.salesinterest) * 10
+      ).toFixed(2),
+      profit:
+        QSData.quantity !== 0 && QSData.pricebeforeint !== 0
+          ? Number(QSData.pricebeforeint - QSData.totalcost).toFixed(2)
+          : Number(0).toFixed(2),
+      margin:
+        QSData.quantity !== 0 && QSData.pricebeforeint !== 0
+          ? Number((QSData.pricebeforeint - QSData.totalcost) * QSData.quantity)
+              .toFixed(2)
+              .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+          : Number(0).toFixed(2),
+      turnover:
+        QSData.quantity !== 0 && QSData.pricebeforeint !== 0
+          ? Number(QSData.quantity * QSData.pricebeforeint)
+              .toFixed(2)
+              .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+          : Number(0).toFixed(2),
+      pctmargin:
+        QSData.quantity !== 0 && QSData.pricebeforeint !== 0
+          ? Number(
+              ((QSData.pricebeforeint - QSData.totalcost) /
+                QSData.pricebeforeint) *
+                100
+            ).toFixed(2) + "%"
+          : Number(0).toFixed(2) + "%",
+      netback:
+        QSData.quantity !== 0 && QSData.pricebeforeint !== 0
+          ? Number(
+              QSData.pricebeforeint - QSData.totalcost + QSData.materialcost
+            )
+              .toFixed(2)
+              .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+          : Number(0).toFixed(2),
     });
-
+    // } else {
+    //   setQSData({
+    //     ...QSData,
+    //     profit: 0,
+    //     margin: 0,
+    //     turnover: 0,
+    //     pctmargin: 0,
+    //     netback: 0,
+    //   });
+    //   setQSValues({
+    //     ...QSValues,
+    //     profit: Number(0).toFixed(2),
+    //     margin: Number(0).toFixed(2),
+    //     turnover: Number(0).toFixed(2),
+    //     pctmargin: Number(0).toFixed(2) + "%",
+    //     netback: Number(0).toFixed(2),
+    //   });
     // }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
-    QSData.CADdays,
-    QSData.CADintrate,
+    QSData.quantity,
     QSData.pricebeforeint,
-    // QSData.salesinterest,
+    QSData.totalinspection,
+    QSData.incoterms,
   ]);
+
+  // UPDATE ECONOMICS
+  // After total cost change
+
+  useEffect(() => {
+    if (QSData.quantity !== 0 && QSData.pricebeforeint !== 0) {
+      setQSData({
+        ...QSData,
+
+        profit:
+          QSData.quantity !== 0 && QSData.pricebeforeint !== 0
+            ? Number((QSData.pricebeforeint - QSData.totalcost).toFixed(4))
+            : 0,
+        margin:
+          QSData.quantity !== 0 && QSData.pricebeforeint !== 0
+            ? Number(
+                (
+                  (QSData.pricebeforeint - QSData.totalcost) *
+                  QSData.quantity
+                ).toFixed(4)
+              )
+            : 0,
+        turnover:
+          QSData.quantity !== 0 && QSData.pricebeforeint !== 0
+            ? Number((QSData.quantity * QSData.pricebeforeint).toFixed(4))
+            : 0,
+        pctmargin:
+          QSData.quantity !== 0 && QSData.pricebeforeint !== 0
+            ? Number(
+                (
+                  (QSData.pricebeforeint - QSData.totalcost) /
+                  QSData.pricebeforeint
+                ).toFixed(4)
+              )
+            : 0,
+        netback:
+          QSData.quantity !== 0 && QSData.pricebeforeint !== 0
+            ? Number(
+                (
+                  QSData.pricebeforeint -
+                  QSData.totalcost +
+                  QSData.materialcost
+                ).toFixed(4)
+              )
+            : 0,
+      });
+      setQSValues({
+        ...QSValues,
+
+        profit:
+          QSData.quantity !== 0 && QSData.pricebeforeint !== 0
+            ? Number(QSData.pricebeforeint - QSData.totalcost).toFixed(2)
+            : Number(0).toFixed(2),
+        margin:
+          QSData.quantity !== 0 && QSData.pricebeforeint !== 0
+            ? Number(
+                (QSData.pricebeforeint - QSData.totalcost) * QSData.quantity
+              )
+                .toFixed(2)
+                .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+            : Number(0).toFixed(2),
+        turnover:
+          QSData.quantity !== 0 && QSData.pricebeforeint !== 0
+            ? Number(QSData.quantity * QSData.pricebeforeint)
+                .toFixed(2)
+                .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+            : Number(0).toFixed(2),
+        pctmargin:
+          QSData.quantity !== 0 && QSData.pricebeforeint !== 0
+            ? Number(
+                ((QSData.pricebeforeint - QSData.totalcost) /
+                  QSData.pricebeforeint) *
+                  100
+              ).toFixed(2) + "%"
+            : Number(0).toFixed(2) + "%",
+        netback:
+          QSData.quantity !== 0 && QSData.pricebeforeint !== 0
+            ? Number(
+                QSData.pricebeforeint - QSData.totalcost + QSData.materialcost
+              )
+                .toFixed(2)
+                .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+            : Number(0).toFixed(2),
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [QSData.totalcost]);
+
+  // PRICEAFTERINT;
+  // salesinterest;
 
   useEffect(() => {
     setQSData({
@@ -385,317 +621,6 @@ const SalesQS = () => {
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [QSData.salesinterest]);
-
-  // useEffect(() => {
-  //   if (
-  //     QSData.incoterms === "CPT" ||
-  //     QSData.incoterms === "DAP" ||
-  //     QSData.incoterms === "CFR"
-  //   ) {
-  //     setQSValues({
-  //       ...QSValues,
-  //       insurance: Number((QSData.pricebeforeint * 0.07 * 1.1) / 100).toFixed(
-  //         2
-  //       ),
-  //     });
-  //     setQSData({
-  //       ...QSData,
-  //       insurance: (QSData.pricebeforeint * 0.07 * 1.1) / 100,
-  //     });
-  //   } else if (QSValues.incoterms === "CIP" || QSValues.incoterms === "CIF") {
-  //     console.log(
-  //       Number((QSData.pricebeforeint * 0.14 * 1.1) / 100).toFixed(2)
-  //     );
-  //     setQSValues({
-  //       ...QSValues,
-  //       insurance: Number((QSData.pricebeforeint * 0.14 * 1.1) / 100).toFixed(
-  //         2
-  //       ),
-  //     });
-  //     setQSData({
-  //       ...QSData,
-  //       insurance: Number((QSData.pricebeforeint * 0.14 * 1.1) / 100),
-  //     });
-  //   } else {
-  //     setQSValues({
-  //       ...QSValues,
-  //       insurance: Number(0).toFixed(2),
-  //     });
-  //     setQSData({
-  //       ...QSData,
-  //       insurance: 0,
-  //     });
-  //   }
-  // }, [QSData.pricebeforeint, QSData.incoterms]);
-
-  //Update economics
-  useEffect(() => {
-    if (QSData.quantity !== 0 && QSData.pricebeforeint !== 0) {
-      setQSData({
-        ...QSData,
-        insurance:
-          QSData.incoterms === "CPT" ||
-          QSData.incoterms === "CFR" ||
-          QSData.incoterms === "DAP"
-            ? Number(((QSData.pricebeforeint * 0.07 * 1.1) / 100).toFixed(2))
-            : QSData.incoterms === "CIP" || QSData.incoterms === "CIF"
-            ? Number(((QSData.pricebeforeint * 0.14 * 1.1) / 100).toFixed(2))
-            : 0,
-        inspectionpmt: Number(
-          (QSData.totalinspection / QSData.quantity).toFixed(2)
-        ),
-        interestcost: Number(
-          (
-            (QSData.CADintrate * QSData.CADdays * QSData.pricebeforeint) /
-            360
-          ).toFixed(4)
-        ),
-        salesinterest: Number(
-          (
-            (Number(QSData.interestrate) *
-              Number(QSData.interestdays) *
-              Number(QSData.pricebeforeint)) /
-            360
-          ).toFixed(4)
-        ),
-        priceafterint:
-          Number(QSData.pricebeforeint) + Number(QSData.salesinterest),
-        profit: Number((QSData.pricebeforeint - QSData.totalcost).toFixed(4)),
-        margin: Number(
-          (
-            (QSData.pricebeforeint - QSData.totalcost) *
-            QSData.quantity
-          ).toFixed(4)
-        ),
-        turnover: Number((QSData.quantity * QSData.pricebeforeint).toFixed(4)),
-        pctmargin: Number(
-          (
-            (QSData.pricebeforeint - QSData.totalcost) /
-            QSData.pricebeforeint
-          ).toFixed(4)
-        ),
-        netback: Number(
-          (
-            QSData.pricebeforeint -
-            QSData.totalcost +
-            QSData.materialcost
-          ).toFixed(4)
-        ),
-      });
-      setQSValues({
-        ...QSValues,
-        insurance:
-          QSData.incoterms === "CPT" ||
-          QSData.incoterms === "CFR" ||
-          QSData.incoterms === "DAP"
-            ? Number((QSData.pricebeforeint * 0.07 * 1.1) / 100).toFixed(2)
-            : QSData.incoterms === "CIP" || QSData.incoterms === "CIF"
-            ? Number((QSData.pricebeforeint * 0.14 * 1.1) / 100).toFixed(2)
-            : Number(0).toFixed(2),
-        inspectionpmt: Number(QSData.totalinspection / QSData.quantity).toFixed(
-          2
-        ),
-        interestcost: Number(
-          (QSData.CADintrate * QSData.CADdays * QSData.pricebeforeint) / 360
-        ).toFixed(2),
-        salesinterest: Number(
-          (Number(QSData.interestrate) *
-            Number(QSData.interestdays) *
-            Number(QSData.pricebeforeint)) /
-            360
-        ).toFixed(2),
-        priceafterint: Number(
-          Number(QSData.pricebeforeint) + Number(QSData.salesinterest)
-        ).toFixed(2),
-        profit: Number(QSData.pricebeforeint - QSData.totalcost).toFixed(2),
-        margin: Number(
-          (QSData.pricebeforeint - QSData.totalcost) * QSData.quantity
-        )
-          .toFixed(2)
-          .replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-        turnover: Number(QSData.quantity * QSData.pricebeforeint)
-          .toFixed(2)
-          .replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-        pctmargin:
-          Number(
-            ((QSData.pricebeforeint - QSData.totalcost) /
-              QSData.pricebeforeint) *
-              100
-          ).toFixed(2) + "%",
-        netback: Number(
-          QSData.pricebeforeint - QSData.totalcost + QSData.materialcost
-        )
-          .toFixed(2)
-          .replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-      });
-    } else {
-      setQSData({
-        ...QSData,
-        profit: 0,
-        margin: 0,
-        turnover: 0,
-        pctmargin: 0,
-        netback: 0,
-      });
-      setQSValues({
-        ...QSValues,
-        profit: Number(0).toFixed(2),
-        margin: Number(0).toFixed(2),
-        turnover: Number(0).toFixed(2),
-        pctmargin: Number(0).toFixed(2) + "%",
-        netback: Number(0).toFixed(2),
-      });
-    }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    QSData.quantity,
-    QSData.pricebeforeint,
-    QSData.totalcost,
-    QSData.totalinspection,
-    QSData.incoterms,
-  ]);
-
-  useEffect(() => {
-    if (QSData.quantity !== 0 && QSData.pricebeforeint !== 0) {
-      setQSData({
-        ...QSData,
-
-        profit: Number((QSData.pricebeforeint - QSData.totalcost).toFixed(4)),
-        margin: Number(
-          (
-            (QSData.pricebeforeint - QSData.totalcost) *
-            QSData.quantity
-          ).toFixed(4)
-        ),
-        turnover: Number((QSData.quantity * QSData.pricebeforeint).toFixed(4)),
-        pctmargin: Number(
-          (
-            (QSData.pricebeforeint - QSData.totalcost) /
-            QSData.pricebeforeint
-          ).toFixed(4)
-        ),
-        netback: Number(
-          (
-            QSData.pricebeforeint -
-            QSData.totalcost +
-            QSData.materialcost
-          ).toFixed(4)
-        ),
-      });
-      setQSValues({
-        ...QSValues,
-
-        profit: Number(QSData.pricebeforeint - QSData.totalcost).toFixed(2),
-        margin: Number(
-          (QSData.pricebeforeint - QSData.totalcost) * QSData.quantity
-        )
-          .toFixed(2)
-          .replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-        turnover: Number(QSData.quantity * QSData.pricebeforeint)
-          .toFixed(2)
-          .replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-        pctmargin:
-          Number(
-            ((QSData.pricebeforeint - QSData.totalcost) /
-              QSData.pricebeforeint) *
-              100
-          ).toFixed(2) + "%",
-        netback: Number(
-          QSData.pricebeforeint - QSData.totalcost + QSData.materialcost
-        )
-          .toFixed(2)
-          .replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-      });
-    }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    QSData.totalcost,
-    // QSData.totalinspection,
-    // QSData.incoterms,
-  ]);
-
-  // useEffect(() => {
-  //   setQSData({
-  //     ...QSData,
-  //     inspectionpmt:
-  //       QSData.quantity > 0
-  //         ? Number((QSData.totalinspection / QSData.quantity).toFixed(2))
-  //         : 0,
-  //   });
-  //   setQSValues({
-  //     ...QSValues,
-  //     inspectionpmt:
-  //       QSData.quantity > 0
-  //         ? (QSData.totalinspection / QSData.quantity).toFixed(2)
-  //         : Number(0).toFixed(2),
-  //   });
-  // }, [QSData.quantity, QSData.totalinspection]);
-
-  // useEffect(() => {
-  //   setQSData({
-  //     ...QSData,
-  //     insurance:
-  //       QSData.incoterms === "CPT" ||
-  //       QSData.incoterms === "CFR" ||
-  //       QSData.incoterms === "DAP"
-  //         ? Number(((QSData.pricebeforeint * 0.07 * 1.1) / 100).toFixed(2))
-  //         : QSData.incoterms === "CIP" || QSData.incoterms === "CIF"
-  //         ? Number(((QSData.pricebeforeint * 0.14 * 1.1) / 100).toFixed(2))
-  //         : 0,
-  //   });
-  //   setQSValues({
-  //     ...QSValues,
-  //     insurance:
-  //       QSData.incoterms === "CPT" ||
-  //       QSData.incoterms === "CFR" ||
-  //       QSData.incoterms === "DAP"
-  //         ? Number((QSData.pricebeforeint * 0.07 * 1.1) / 100).toFixed(2)
-  //         : QSData.incoterms === "CIP" || QSData.incoterms === "CIF"
-  //         ? Number((QSData.pricebeforeint * 0.14 * 1.1) / 100).toFixed(2)
-  //         : Number(0).toFixed(2),
-  //   });
-  // }, [QSData.incoterms, QSData.pricebeforeint]);
-
-  // useEffect(() => {
-  //   if (
-  //     QSData.incoterms === "CPT" ||
-  //     QSData.incoterms === "DAP" ||
-  //     QSData.incoterms === "CFR"
-  //   ) {
-  //     setQSValues({
-  //       ...QSValues,
-  //       insurance: Number((QSData.pricebeforeint * 0.07 * 1.1) / 100).toFixed(
-  //         2
-  //       ),
-  //     });
-  //     setQSData({
-  //       ...QSData,
-  //       insurance: (QSData.pricebeforeint * 0.07 * 1.1) / 100,
-  //     });
-  //   } else if (QSValues.incoterms === "CIP" || QSValues.incoterms === "CIF") {
-  //     setQSValues({
-  //       ...QSValues,
-  //       insurance: Number((QSData.pricebeforeint * 0.14 * 1.1) / 100).toFixed(
-  //         2
-  //       ),
-  //     });
-  //     setQSData({
-  //       ...QSData,
-  //       insurance: (QSData.pricebeforeint * 0.14 * 1.1) / 100,
-  //     });
-  //   } else {
-  //     setQSValues({
-  //       ...QSValues,
-  //       insurance: Number(0).toFixed(2),
-  //     });
-  //     setQSData({
-  //       ...QSData,
-  //       insurance: 0,
-  //     });
-  //   }
-  // }, [QSData.pricebeforeint, QSData.incoterms]);
 
   //Update total cost
   useEffect(() => {
