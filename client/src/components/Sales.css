@@ -25,3 +25,16 @@ h3 {
   top: 0;
   background-color: white;
 }
+.clearfilterbutton {
+  border-radius: 1.5rem;
+  border: 1px solid rgb(68, 65, 162);
+  margin-right: 1rem;
+  width: 200px;
+  color: rgb(68, 65, 162);
+  background-color: white;
+}
+.clearfilterbutton:hover {
+  cursor: pointer;
+  color: white;
+  background-color: rgb(68, 65, 162);
+}

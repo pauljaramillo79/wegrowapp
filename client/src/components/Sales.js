@@ -12,6 +12,7 @@ const Sales = (props) => {
     JSON.parse(localStorage.getItem("WGusercode"))
   );
   const [limit, setLimit] = useState(300);
+  const [columns, setColumns] = useState();
 
   useEffect(() => {
     Axios.post("/traders").then((response) => {
@@ -36,7 +37,7 @@ const Sales = (props) => {
         defaultSortOrder: "asc",
       },
       supplier: { name: "Supplier", filterText: "", defaultSortOrder: "asc" },
-      customer: { name: "Customer", filterText: "", defaultSortOrder: "asc" },
+      beginning: { name: "beginning", filterText: "", defaultSortOrder: "asc" },
       beginning: { name: "From", filterText: "", defaultSortOrder: "asc" },
       finish: { name: "To", filterText: "", defaultSortOrder: "asc" },
       portOfLoad: { name: "POL", filterText: "", defaultSortOrder: "asc" },
@@ -72,10 +73,39 @@ const Sales = (props) => {
       saleComplete: { name: "Status", filterText: "", defaultSortOrder: "asc" },
     },
   };
+  const clearFilters = (e) => {
+    setColumns({
+      ...columns,
+      QSDate: { ...columns.QSDate, filterText: "" },
+      QSID: { ...columns.QSID, filterText: "" },
+      saleType: { ...columns.saleType, filterText: "" },
+      WGP: { ...columns.WGP, filterText: "" },
+      WGS: { ...columns.WGS, filterText: "" },
+      abbreviation: { ...columns.abbreviation, filterText: "" },
+      supplier: { ...columns.supplie, filterText: "" },
+      customer: { ...columns.customer, filterText: "" },
+      beginning: { ...columns.beginning, filterText: "" },
+      finish: { ...columns.finish, filterText: "" },
+      portOfLoad: { ...columns.portOfLoad, filterText: "" },
+      portOfDestination: { ...columns.portOfDestination, filterText: "" },
+      quantity: { ...columns.quantity, filterText: "" },
+      materialCost: { ...columns.materialCost, filterText: "" },
+      oFreight: { ...columns.oFreight, filterText: "" },
+      priceBeforeInterest: { ...columns.priceBeforeInterest, filterText: "" },
+      tradingProfit: { ...columns.tradingProfit, filterText: "" },
+      tradingMargin: { ...columns.tradingMargin, filterText: "" },
+      percentageMargin: { ...columns.percentageMargin, filterText: "" },
+      netback: { ...columns.netback, filterText: "" },
+      saleComplete: { ...columns.saleComplete, filterText: "" },
+    });
+  };
   return (
     <div className="saleslist">
       <div className="salestitleline">
         <h3 className="saleslisttitle">Sales List</h3>
+        <button className="clearfilterbutton" onClick={clearFilters}>
+          Clear Filters
+        </button>
         <select onChange={(e) => setLimit(e.target.value)}>
           <option value={300}>300</option>
           <option value={1000}>1000</option>
@@ -112,7 +142,9 @@ const Sales = (props) => {
         hideEditModal={props.hideEditModal}
         QSmodalState={props.QSmodalState}
         QStoedit={props.QStoedit}
-      />{" "}
+        columns={columns}
+        setColumns={setColumns}
+      />
     </div>
   );
 };

@@ -67,18 +67,24 @@ const SalesTableSort = (props) => {
   const [sort, setSort] = useState(
     props.config.sort || { column: "", order: "" }
   );
-  const [columns, setColumns] = useState(props.config.columns);
+  // const [columns, setColumns] = useState(props.config.columns);
   const [columnNames, setColumnNames] = useState([]);
   // const [modalState, setModalState] = useState(false);
   // const [postoedit, setPostoedit] = useState({});
   // eslint-disable-next-line react-hooks/exhaustive-deps
+
+  useState(() => {
+    props.setColumns(props.config.columns);
+  }, []);
   useEffect(async () => {
     // console.log(props.limit);
     await authAxios
       .post("/sales", { userID: props.userID, limit: props.limit })
       .then((result) => {
         setItems(result.data);
-        setColumnNames(Object.keys(columns));
+        if (props.columns) {
+          setColumnNames(Object.keys(props.columns));
+        }
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [QSrefresh, props.userID, props.limit]);
@@ -96,16 +102,17 @@ const SalesTableSort = (props) => {
   };
 
   const handleFilterTextChange = (e, column) => {
-    setColumns({
-      ...columns,
-      [column]: { ...columns[column], filterText: e.target.value },
+    props.setColumns({
+      ...props.columns,
+      [column]: { ...props.columns[column], filterText: e.target.value },
     });
   };
+
   const sortColumn = (column) => {
     return (event) => {
       var newSortOrder = sort.order === "asc" ? "desc" : "asc";
       if (sort.column !== column) {
-        newSortOrder = columns[column].defaultSortOrder;
+        newSortOrder = props.columns[column].defaultSortOrder;
       }
       setSort({ column: column, order: newSortOrder });
     };
@@ -136,7 +143,7 @@ const SalesTableSort = (props) => {
   var operandRegex = /^((?:(?:[<>]=?)|==))\s?([-]?\d+(?:\.\d+)?)$/;
 
   columnNames.forEach((column) => {
-    var filterText = columns[column].filterText;
+    var filterText = props.columns[column].filterText;
     filters[column] = null;
 
     if (filterText.length > 0) {
@@ -336,7 +343,7 @@ const SalesTableSort = (props) => {
           onClick={sortColumn(c)}
           className={"header canceldrag " + sortClass(c)}
         >
-          {columns[c].name}
+          {props.columns[c].name}
         </th>
       </>
     );
@@ -347,7 +354,7 @@ const SalesTableSort = (props) => {
       <td className="sales-filter canceldrag">
         <input
           type="text"
-          value={columns[c].filterText}
+          value={props.columns[c].filterText}
           onChange={(e) => {
             handleFilterTextChange(e, c);
           }}
