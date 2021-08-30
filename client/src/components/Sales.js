@@ -103,9 +103,9 @@ const Sales = (props) => {
     <div className="saleslist">
       <div className="salestitleline">
         <h3 className="saleslisttitle">Sales List</h3>
-        <button className="clearfilterbutton" onClick={clearFilters}>
+        {/* <button className="clearfilterbutton" onClick={clearFilters}>
           Clear Filters
-        </button>
+        </button> */}
         <select onChange={(e) => setLimit(e.target.value)}>
           <option value={300}>300</option>
           <option value={1000}>1000</option>
