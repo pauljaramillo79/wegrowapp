@@ -6,6 +6,14 @@ const bodyParser = require("body-parser");
 
 app.use(express.static(path.join(__dirname, "..", "client", "build")));
 
+app.get("/*", function (req, res) {
+  res.sendFile(path.join(__dirname, "..", "client", "build"), function (err) {
+    if (err) {
+      res.status(500).send(err);
+    }
+  });
+});
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(bodyParser.urlencoded({ extended: true }));
