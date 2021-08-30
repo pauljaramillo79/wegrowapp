@@ -1333,6 +1333,7 @@ const SalesQS = () => {
                     onBlur={QtyBlur}
                     type="text"
                     required
+                    readOnly
                   />
                 </div>
                 <div className="form-group">

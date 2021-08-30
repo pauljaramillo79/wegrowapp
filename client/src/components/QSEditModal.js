@@ -3,6 +3,9 @@ import "./QSEditModal.css";
 import Axios from "axios";
 import SearchField from "./SearchField";
 import { RefreshPositionsContext } from "../contexts/RefreshPositionsProvider";
+import { confirmAlert } from "react-confirm-alert";
+import "react-confirm-alert/src/react-confirm-alert.css";
+import moment from "moment";
 
 const QSEditModal = ({ handleClose, show, QStoedit }) => {
   const { toggleQSrefresh } = useContext(RefreshPositionsContext);
@@ -361,7 +364,34 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
     }
   }, [sold]);
 
-  // FREIGHT UPDATE ////////
+  // FROM and TO
+  ///////////////
+
+  useEffect(() => {
+    if (QSeditable.from && !QSeditable.to) {
+      setQSeditable({ ...QSeditable, to: QSeditable.from });
+      setQSedits({ ...QSedits, to: QSeditable.from });
+    }
+    if (QSeditable.from && QSeditable.to) {
+      let date1 = moment(QSeditable.from);
+      let date2 = moment(QSeditable.to);
+      if (date2.diff(date1, "days") < 0) {
+        confirmAlert({
+          title: "Check shipment dates",
+          message: `Delivery date (to) cannot be earlier than shipment date (from)`,
+          buttons: [
+            {
+              label: "OK",
+            },
+          ],
+          closeOnClickOutside: true,
+          closeOnEscape: true,
+        });
+      }
+    }
+  }, [QSeditable.from, QSeditable.to]);
+
+  // FREIGHT and PAYLOAD ////////
   //////////////////////////
 
   useEffect(() => {
@@ -395,7 +425,7 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
   }, [QSeditable.freightTotal, QSeditable.payload]);
 
   // SALES INTEREST UPDATE //////////
-  ///////////////////////////////////
+  ///intdays, intrate, pricebeforeint
 
   useEffect(() => {
     setQSeditable({
@@ -425,6 +455,9 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
     QSeditable.interestrate,
     QSeditable.pricebeforeint,
   ]);
+
+  // INTEREST COST
+  // incdays, incrate, pricebforeint
 
   useEffect(() => {
     setQSeditable({
@@ -469,6 +502,9 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
     QSeditable.includedperiod,
     QSeditable.pricebeforeint,
   ]);
+
+  // INTERESTCOST, SALESINTEREST, PRICEAFTERINT
+  // pricebeforint
 
   useEffect(() => {
     if (
@@ -611,35 +647,8 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [QSeditable.pricebeforeint]);
 
-  // useEffect(() => {
-  //   if (QSeditable.quantity && QSeditable.totalinspection) {
-  //     console.log(
-  //       "$" +
-  //         Number(
-  //           Number(
-  //             QSeditable.totalinspection.replace("$", "").replace(",", "")
-  //           ) / Number(QSeditable.quantity.replace(",", ""))
-  //         ).toFixed(2)
-  //     );
-  //     setQSeditable({
-  //       ...QSeditable,
-  //       inspectioncost:
-  //         "$" +
-  //         Number(
-  //           Number(
-  //             QSeditable.totalinspection.replace("$", "").replace(",", "")
-  //           ) / Number(QSeditable.quantity.replace(",", ""))
-  //         ).toFixed(2),
-  //     });
-  //     setQSedits({
-  //       ...QSedits,
-  //       inspectioncost: Number(
-  //         Number(QSeditable.totalinspection.replace("$", "").replace(",", "")) /
-  //           Number(QSeditable.quantity.replace(",", ""))
-  //       ),
-  //     });
-  //   }
-  // }, [QSeditable.quantity, QSeditable.totalinspection]);
+  // PRICEAFTERINT
+  // salesinterest
 
   useEffect(() => {
     setQSeditable({
@@ -660,9 +669,45 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [QSeditable.salesinterest]);
 
+  // UPDATE ECONOMICS
+
   useEffect(() => {
     setQSeditable({
       ...QSeditable,
+      insurancecost:
+        QSeditable.incoterms === "CPT" ||
+        QSeditable.incoterms === "CFR" ||
+        QSeditable.incoterms === "DAP"
+          ? "$" +
+            (
+              (Number(
+                QSeditable.pricebeforeint.replace("$", "").replace(",", "")
+              ) *
+                0.07 *
+                1.1) /
+              100
+            ).toFixed(2)
+          : QSeditable.incoterms === "CIF" || QSeditable.incoterms === "CIP"
+          ? "$" +
+            (
+              (Number(
+                QSeditable.pricebeforeint.replace("$", "").replace(",", "")
+              ) *
+                0.14 *
+                1.1) /
+              100
+            ).toFixed(2)
+          : "$0.00",
+      inspectioncost:
+        Number(QSeditable.quantity.replace(",", "")) > 0 &&
+        QSeditable.totalinspection
+          ? "$" +
+            Number(
+              Number(
+                QSeditable.totalinspection.replace("$", "").replace(",", "")
+              ) / Number(QSeditable.quantity.replace(",", ""))
+            ).toFixed(2)
+          : "$0.00",
       interestcost:
         Number(QSeditable.includedrate.toString().replace("%", "") > 0) &&
         Number(QSeditable.includedperiod) > 0
@@ -698,51 +743,104 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
           Number(QSeditable.salesinterest.replace("$", ""))
         ).toFixed(2),
       profit:
-        "$" +
-        (
-          Number(QSeditable.pricebeforeint.replace("$", "").replace(",", "")) -
-          Number(QSeditable.totalcost.replace("$", "").replace(",", ""))
-        ).toFixed(2),
+        Number(QSeditable.quantity.replace(",", "")) > 0 &&
+        Number(QSeditable.pricebeforeint.replace("$", "").replace(",", "")) > 0
+          ? "$" +
+            (
+              Number(
+                QSeditable.pricebeforeint.replace("$", "").replace(",", "")
+              ) - Number(QSeditable.totalcost.replace("$", "").replace(",", ""))
+            ).toFixed(2)
+          : "$0.00",
       margin:
-        "$" +
-        (
-          (Number(QSeditable.pricebeforeint.replace("$", "").replace(",", "")) -
-            Number(QSeditable.totalcost.replace("$", "").replace(",", ""))) *
-          Number(QSeditable.quantity.replace(",", ""))
-        )
-          .toFixed(2)
-          .replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+        Number(QSeditable.quantity.replace(",", "")) > 0 &&
+        Number(QSeditable.pricebeforeint.replace("$", "").replace(",", "")) > 0
+          ? "$" +
+            (
+              (Number(
+                QSeditable.pricebeforeint.replace("$", "").replace(",", "")
+              ) -
+                Number(
+                  QSeditable.totalcost.replace("$", "").replace(",", "")
+                )) *
+              Number(QSeditable.quantity.replace(",", ""))
+            )
+              .toFixed(2)
+              .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+          : "$0.00",
       turnover:
-        "$" +
-        (
-          Number(QSeditable.quantity.replace(",", "")) *
-          Number(QSeditable.pricebeforeint.replace("$", "").replace(",", ""))
-        )
-          .toFixed(2)
-          .replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+        Number(QSeditable.quantity.replace(",", "")) > 0 &&
+        Number(QSeditable.pricebeforeint.replace("$", "").replace(",", "")) > 0
+          ? "$" +
+            (
+              Number(QSeditable.quantity.replace(",", "")) *
+              Number(
+                QSeditable.pricebeforeint.replace("$", "").replace(",", "")
+              )
+            )
+              .toFixed(2)
+              .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+          : "$0.00",
       pctmargin:
-        (
-          ((Number(
-            QSeditable.pricebeforeint.replace("$", "").replace(",", "")
-          ) -
-            Number(QSeditable.totalcost.replace("$", "").replace(",", ""))) /
-            Number(
-              QSeditable.pricebeforeint.replace("$", "").replace(",", "")
-            )) *
-          100
-        ).toFixed(2) + "%",
+        Number(QSeditable.quantity.replace(",", "")) > 0 &&
+        Number(QSeditable.pricebeforeint.replace("$", "").replace(",", "")) > 0
+          ? (
+              ((Number(
+                QSeditable.pricebeforeint.replace("$", "").replace(",", "")
+              ) -
+                Number(
+                  QSeditable.totalcost.replace("$", "").replace(",", "")
+                )) /
+                Number(
+                  QSeditable.pricebeforeint.replace("$", "").replace(",", "")
+                )) *
+              100
+            ).toFixed(2) + "%"
+          : "0.00%",
       netback:
-        "$" +
-        (
-          Number(QSeditable.pricebeforeint.replace("$", "").replace(",", "")) -
-          Number(QSeditable.totalcost.replace("$", "").replace(",", "")) +
-          Number(QSeditable.materialcost.replace("$", "").replace(",", ""))
-        )
-          .toFixed(2)
-          .replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+        Number(QSeditable.quantity.replace(",", "")) > 0 &&
+        Number(QSeditable.pricebeforeint.replace("$", "").replace(",", "")) > 0
+          ? "$" +
+            (
+              Number(
+                QSeditable.pricebeforeint.replace("$", "").replace(",", "")
+              ) -
+              Number(QSeditable.totalcost.replace("$", "").replace(",", "")) +
+              Number(QSeditable.materialcost.replace("$", "").replace(",", ""))
+            )
+              .toFixed(2)
+              .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+          : "$0.00",
     });
     setQSedits({
       ...QSedits,
+      insurancecost:
+        QSeditable.incoterms === "CFR" ||
+        QSeditable.incoterms === "CPT" ||
+        QSeditable.incoterms === "DAP"
+          ? (Number(
+              QSeditable.pricebeforeint.replace("$", "").replace(",", "")
+            ) *
+              0.07 *
+              1.1) /
+            100
+          : QSeditable.incoterms === "CIP" || QSeditable.incoterms === "CIF"
+          ? (Number(
+              QSeditable.pricebeforeint.replace("$", "").replace(",", "")
+            ) *
+              0.14 *
+              1.1) /
+            100
+          : 0,
+      inspectioncost:
+        Number(QSeditable.quantity.replace(",", "")) > 0 &&
+        QSeditable.totalinspection
+          ? Number(
+              Number(
+                QSeditable.totalinspection.replace("$", "").replace(",", "")
+              ) / Number(QSeditable.quantity.replace(",", ""))
+            )
+          : 0,
       interestcost:
         Number(QSeditable.includedrate.toString().replace("%", "") > 0) &&
         Number(QSeditable.includedperiod) > 0
@@ -767,120 +865,173 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
         Number(QSeditable.pricebeforeint.replace("$", "").replace(",", "")) +
         Number(QSeditable.salesinterest.replace("$", "")),
       profit:
-        Number(QSeditable.pricebeforeint.replace("$", "").replace(",", "")) -
-        Number(QSeditable.totalcost.replace("$", "").replace(",", "")),
+        Number(QSeditable.quantity.replace(",", "")) > 0 &&
+        Number(QSeditable.pricebeforeint.replace("$", "").replace(",", "")) > 0
+          ? Number(
+              QSeditable.pricebeforeint.replace("$", "").replace(",", "")
+            ) - Number(QSeditable.totalcost.replace("$", "").replace(",", ""))
+          : 0,
       margin:
-        (Number(QSeditable.pricebeforeint.replace("$", "").replace(",", "")) -
-          Number(QSeditable.totalcost.replace("$", "").replace(",", ""))) *
-        Number(QSeditable.quantity.replace(",", "")),
+        Number(QSeditable.quantity.replace(",", "")) > 0 &&
+        Number(QSeditable.pricebeforeint.replace("$", "").replace(",", "")) > 0
+          ? (Number(
+              QSeditable.pricebeforeint.replace("$", "").replace(",", "")
+            ) -
+              Number(QSeditable.totalcost.replace("$", "").replace(",", ""))) *
+            Number(QSeditable.quantity.replace(",", ""))
+          : 0,
       turnover:
-        Number(QSeditable.quantity.replace(",", "")) *
-        Number(QSeditable.pricebeforeint.replace("$", "").replace(",", "")),
+        Number(QSeditable.quantity.replace(",", "")) > 0 &&
+        Number(QSeditable.pricebeforeint.replace("$", "").replace(",", "")) > 0
+          ? Number(QSeditable.quantity.replace(",", "")) *
+            Number(QSeditable.pricebeforeint.replace("$", "").replace(",", ""))
+          : 0,
       pctmargin:
-        (Number(QSeditable.pricebeforeint.replace("$", "").replace(",", "")) -
-          Number(QSeditable.totalcost.replace("$", "").replace(",", ""))) /
-        Number(QSeditable.pricebeforeint.replace("$", "").replace(",", "")),
+        Number(QSeditable.quantity.replace(",", "")) > 0 &&
+        Number(QSeditable.pricebeforeint.replace("$", "").replace(",", "")) > 0
+          ? (Number(
+              QSeditable.pricebeforeint.replace("$", "").replace(",", "")
+            ) -
+              Number(QSeditable.totalcost.replace("$", "").replace(",", ""))) /
+            Number(QSeditable.pricebeforeint.replace("$", "").replace(",", ""))
+          : 0,
       netback:
-        Number(QSeditable.pricebeforeint.replace("$", "").replace(",", "")) -
-        Number(QSeditable.totalcost.replace("$", "").replace(",", "")) +
-        Number(QSeditable.materialcost.replace("$", "").replace(",", "")),
+        Number(QSeditable.quantity.replace(",", "")) > 0 &&
+        Number(QSeditable.pricebeforeint.replace("$", "").replace(",", "")) > 0
+          ? Number(
+              QSeditable.pricebeforeint.replace("$", "").replace(",", "")
+            ) -
+            Number(QSeditable.totalcost.replace("$", "").replace(",", "")) +
+            Number(QSeditable.materialcost.replace("$", "").replace(",", ""))
+          : 0,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [QSeditable.quantity, QSeditable.pricebeforeint, QSeditable.totalcost]);
+  }, [
+    QSeditable.quantity,
+    QSeditable.pricebeforeint,
+    QSeditable.incoterms,
+    QSeditable.totalinspection,
+  ]);
 
+  //UPDATE ECONOMICS
+  // on Total Cost Change
   useEffect(() => {
-    if (QSeditable.quantity && QSeditable.totalinspection) {
-      console.log(
-        "$" +
-          Number(
-            Number(
-              QSeditable.totalinspection.replace("$", "").replace(",", "")
-            ) / Number(QSeditable.quantity.replace(",", ""))
-          ).toFixed(2)
-      );
-      setQSeditable({
-        ...QSeditable,
-        inspectioncost:
-          "$" +
-          Number(
-            Number(
-              QSeditable.totalinspection.replace("$", "").replace(",", "")
-            ) / Number(QSeditable.quantity.replace(",", ""))
-          ).toFixed(2),
-      });
-      setQSedits({
-        ...QSedits,
-        inspectioncost: Number(
-          Number(QSeditable.totalinspection.replace("$", "").replace(",", "")) /
+    setQSeditable({
+      ...QSeditable,
+      profit:
+        Number(QSeditable.quantity.replace(",", "")) > 0 &&
+        Number(QSeditable.pricebeforeint.replace("$", "").replace(",", "")) > 0
+          ? "$" +
+            (
+              Number(
+                QSeditable.pricebeforeint.replace("$", "").replace(",", "")
+              ) - Number(QSeditable.totalcost.replace("$", "").replace(",", ""))
+            ).toFixed(2)
+          : "$0.00",
+      margin:
+        Number(QSeditable.quantity.replace(",", "")) > 0 &&
+        Number(QSeditable.pricebeforeint.replace("$", "").replace(",", "")) > 0
+          ? "$" +
+            (
+              (Number(
+                QSeditable.pricebeforeint.replace("$", "").replace(",", "")
+              ) -
+                Number(
+                  QSeditable.totalcost.replace("$", "").replace(",", "")
+                )) *
+              Number(QSeditable.quantity.replace(",", ""))
+            )
+              .toFixed(2)
+              .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+          : "$0.00",
+      turnover:
+        Number(QSeditable.quantity.replace(",", "")) > 0 &&
+        Number(QSeditable.pricebeforeint.replace("$", "").replace(",", "")) > 0
+          ? "$" +
+            (
+              Number(QSeditable.quantity.replace(",", "")) *
+              Number(
+                QSeditable.pricebeforeint.replace("$", "").replace(",", "")
+              )
+            )
+              .toFixed(2)
+              .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+          : "$0.00",
+      pctmargin:
+        Number(QSeditable.quantity.replace(",", "")) > 0 &&
+        Number(QSeditable.pricebeforeint.replace("$", "").replace(",", "")) > 0
+          ? (
+              ((Number(
+                QSeditable.pricebeforeint.replace("$", "").replace(",", "")
+              ) -
+                Number(
+                  QSeditable.totalcost.replace("$", "").replace(",", "")
+                )) /
+                Number(
+                  QSeditable.pricebeforeint.replace("$", "").replace(",", "")
+                )) *
+              100
+            ).toFixed(2) + "%"
+          : "0.00%",
+      netback:
+        Number(QSeditable.quantity.replace(",", "")) > 0 &&
+        Number(QSeditable.pricebeforeint.replace("$", "").replace(",", "")) > 0
+          ? "$" +
+            (
+              Number(
+                QSeditable.pricebeforeint.replace("$", "").replace(",", "")
+              ) -
+              Number(QSeditable.totalcost.replace("$", "").replace(",", "")) +
+              Number(QSeditable.materialcost.replace("$", "").replace(",", ""))
+            )
+              .toFixed(2)
+              .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+          : "$0.00",
+    });
+    setQSedits({
+      ...QSedits,
+      profit:
+        Number(QSeditable.quantity.replace(",", "")) > 0 &&
+        Number(QSeditable.pricebeforeint.replace("$", "").replace(",", "")) > 0
+          ? Number(
+              QSeditable.pricebeforeint.replace("$", "").replace(",", "")
+            ) - Number(QSeditable.totalcost.replace("$", "").replace(",", ""))
+          : 0,
+      margin:
+        Number(QSeditable.quantity.replace(",", "")) > 0 &&
+        Number(QSeditable.pricebeforeint.replace("$", "").replace(",", "")) > 0
+          ? (Number(
+              QSeditable.pricebeforeint.replace("$", "").replace(",", "")
+            ) -
+              Number(QSeditable.totalcost.replace("$", "").replace(",", ""))) *
             Number(QSeditable.quantity.replace(",", ""))
-        ),
-      });
-    }
-  }, [QSeditable.quantity, QSeditable.totalinspection]);
-
-  useEffect(() => {
-    if (
-      QSeditable.incoterms === "CPT" ||
-      QSeditable.incoterms === "DAP" ||
-      QSeditable.incoterms === "CFR"
-    ) {
-      setQSeditable({
-        ...QSeditable,
-        insurancecost:
-          "$" +
-          (
-            (Number(
+          : 0,
+      turnover:
+        Number(QSeditable.quantity.replace(",", "")) > 0 &&
+        Number(QSeditable.pricebeforeint.replace("$", "").replace(",", "")) > 0
+          ? Number(QSeditable.quantity.replace(",", "")) *
+            Number(QSeditable.pricebeforeint.replace("$", "").replace(",", ""))
+          : 0,
+      pctmargin:
+        Number(QSeditable.quantity.replace(",", "")) > 0 &&
+        Number(QSeditable.pricebeforeint.replace("$", "").replace(",", "")) > 0
+          ? (Number(
               QSeditable.pricebeforeint.replace("$", "").replace(",", "")
-            ) *
-              0.07 *
-              1.1) /
-            100
-          ).toFixed(2),
-      });
-      setQSedits({
-        ...QSedits,
-        insurancecost:
-          (Number(QSeditable.pricebeforeint.replace("$", "").replace(",", "")) *
-            0.07 *
-            1.1) /
-          100,
-      });
-    } else if (
-      QSeditable.incoterms === "CIP" ||
-      QSeditable.incoterms === "CIF"
-    ) {
-      setQSeditable({
-        ...QSeditable,
-        insurancecost:
-          "$" +
-          (
-            (Number(
+            ) -
+              Number(QSeditable.totalcost.replace("$", "").replace(",", ""))) /
+            Number(QSeditable.pricebeforeint.replace("$", "").replace(",", ""))
+          : 0,
+      netback:
+        Number(QSeditable.quantity.replace(",", "")) > 0 &&
+        Number(QSeditable.pricebeforeint.replace("$", "").replace(",", "")) > 0
+          ? Number(
               QSeditable.pricebeforeint.replace("$", "").replace(",", "")
-            ) *
-              0.14 *
-              1.1) /
-            100
-          ).toFixed(2),
-      });
-      setQSedits({
-        ...QSedits,
-        insurancecost:
-          (Number(QSeditable.pricebeforeint.replace("$", "").replace(",", "")) *
-            0.14 *
-            1.1) /
-          100,
-      });
-    } else {
-      setQSeditable({
-        ...QSeditable,
-        insurancecost: "$" + (0).toFixed(2),
-      });
-      setQSedits({
-        ...QSedits,
-        insurancecost: 0,
-      });
-    }
-  }, [QSeditable.pricebeforeint, QSeditable.incoterms]);
+            ) -
+            Number(QSeditable.totalcost.replace("$", "").replace(",", "")) +
+            Number(QSeditable.materialcost.replace("$", "").replace(",", ""))
+          : 0,
+    });
+  }, [QSeditable.totalcost]);
 
   useEffect(() => {
     setQSeditable({
