@@ -76,8 +76,14 @@ const SalesTableSort = (props) => {
   useState(() => {
     props.setColumns(props.config.columns);
   }, []);
+
+  // useState(() => {
+  //   setColumnNames(Object.keys(props.columns));
+  // }, [props.columns]);
+
   useEffect(async () => {
     // console.log(props.limit);
+    // props.setColumns(props.config.columns);
     await authAxios
       .post("/sales", { userID: props.userID, limit: props.limit })
       .then((result) => {
@@ -87,7 +93,7 @@ const SalesTableSort = (props) => {
         }
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [QSrefresh, props.userID, props.limit]);
+  }, [QSrefresh, props.userID, props.limit, props.columns]);
 
   const duplicateQS = (QSID) => {
     Axios.post("duplicateQS", {
