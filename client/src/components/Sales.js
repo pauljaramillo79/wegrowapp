@@ -37,7 +37,7 @@ const Sales = (props) => {
         defaultSortOrder: "asc",
       },
       supplier: { name: "Supplier", filterText: "", defaultSortOrder: "asc" },
-      beginning: { name: "beginning", filterText: "", defaultSortOrder: "asc" },
+      customer: { name: "Customer", filterText: "", defaultSortOrder: "asc" },
       beginning: { name: "From", filterText: "", defaultSortOrder: "asc" },
       finish: { name: "To", filterText: "", defaultSortOrder: "asc" },
       portOfLoad: { name: "POL", filterText: "", defaultSortOrder: "asc" },
