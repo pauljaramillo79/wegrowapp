@@ -1373,4 +1373,24 @@ router.post("/posmatching", (req, res) => {
   );
 });
 
+router.post("/lysales", (req, res) => {
+  let fromdate = req.body.fromdate;
+  let todate = req.body.todate;
+  let userID = req.body.userID;
+  // console.log(fromdate),
+  db.query(
+    `SELECT QSID, DATE_FORMAT(QSDate, '%Y-%m-%d') AS QSDate, DATE_FORMAT(QSDate, '%M') AS month, quantity, abbreviation, customerList.companyCode AS customer, priceBeforeInterest, tradingProfit, saleComplete, tCode FROM quotationsheet INNER JOIN customerList ON quotationsheet.customerID=customerList.customerID INNER JOIN productList ON quotationsheet.productID = productList.productID INNER JOIN prodNames ON productList.productName =  prodNames.prodNameID 
+    INNER JOIN productGroups ON prodNames.prodGroupID = productGroups.prodGroupID INNER JOIN traderList ON quotationsheet.traderID = traderList.traderID WHERE DATE_FORMAT(QSDate, '%Y-%m')>? AND DATE_FORMAT(QSDate, '%Y-%m')<=? AND tCode=? ORDER BY SaleComplete ASC, QSDate ASC, customer ASC`,
+    [fromdate, todate, userID],
+    (err, results) => {
+      if (err) {
+        console.log(err);
+      }
+      if (results.length > 0) {
+        return res.status(200).send(results);
+      }
+    }
+  );
+});
+
 module.exports = router;

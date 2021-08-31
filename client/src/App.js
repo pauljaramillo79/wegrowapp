@@ -11,6 +11,8 @@ import Nav from "./components/Nav";
 import { RefreshPositionsProvider } from "./contexts/RefreshPositionsProvider";
 import ManagementGrid from "./components/ManagementGrid";
 import Admin from "./components/Admin";
+import SunburstData from "./components/SunburstData";
+import AnalysisGrid from "./components/AnalysisGrid";
 
 // Export Auth Context to be used in Login.js
 export const AuthContext = createContext();
@@ -61,6 +63,7 @@ const reducer = (state, action) => {
       localStorage.removeItem("refreshtoken");
       localStorage.removeItem("accesstoken");
       localStorage.removeItem("role");
+      localStorage.removeItem("rgl-mgmt");
       // localStorage.clear();
       return {
         ...state,
@@ -102,6 +105,9 @@ function App() {
                   </Route>
                   <Route path="/admin">
                     <Admin />
+                  </Route>
+                  <Route path="/analysis">
+                    <AnalysisGrid />
                   </Route>
                 </Switch>
               </Router>

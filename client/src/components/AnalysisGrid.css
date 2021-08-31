@@ -1,0 +1,48 @@
+.lysaleslist {
+  overflow: auto;
+  height: 90%;
+  font-family: "Roboto", sans-serif;
+  font-size: 0.9rem;
+  padding-bottom: 5rem;
+}
+.lystitlesection {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+.lystitle {
+  margin-bottom: 1rem;
+}
+.lysalesline {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+}
+.lysalesline:hover {
+  background-color: #ddeaf9;
+}
+.lysalescolumn {
+  display: flex;
+  flex-basis: 20%;
+}
+.lysfig {
+  text-align: right;
+  width: 100px;
+  display: inline-block;
+  padding-right: 3rem;
+}
+.lysalesheader {
+  position: sticky;
+  top: 0;
+  font-weight: bold;
+  border-bottom: 1px solid rgb(68, 65, 162);
+  margin-bottom: 0.5rem;
+  background-color: white;
+}
+.lysalesmonth {
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.5rem;
+  padding-top: 0.5rem;
+  /* margin-top: 0.5rem; */
+  top: 19px;
+}
