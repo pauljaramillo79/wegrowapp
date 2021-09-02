@@ -968,7 +968,7 @@ router.post("/pievolumebycountry", (req, res) => {
   );
 });
 
-router.post("/waterfallprofit", (req, res) => {
+router.post("/waterfallprofit", authenticateToken, (req, res) => {
   db.query(
     "SELECT DATE_FORMAT(QSDate, '%b') AS category, TRUNCATE(SUM(tradingMargin),0) AS amount FROM quotationsheet WHERE 2021 = DATE_FORMAT(QSDate,'%Y') && saleComplete=-1 GROUP BY category ORDER BY AVG(MONTH(QSDate)) ASC",
     (err, results) => {
@@ -1379,9 +1379,23 @@ router.post("/lysales", (req, res) => {
   let userID = req.body.userID;
   // console.log(fromdate),
   db.query(
-    `SELECT QSID, DATE_FORMAT(QSDate, '%Y-%m-%d') AS QSDate, DATE_FORMAT(QSDate, '%M') AS month, quantity, abbreviation, customerList.companyCode AS customer, priceBeforeInterest, tradingProfit, saleComplete, tCode FROM quotationsheet INNER JOIN customerList ON quotationsheet.customerID=customerList.customerID INNER JOIN productList ON quotationsheet.productID = productList.productID INNER JOIN prodNames ON productList.productName =  prodNames.prodNameID 
-    INNER JOIN productGroups ON prodNames.prodGroupID = productGroups.prodGroupID INNER JOIN traderList ON quotationsheet.traderID = traderList.traderID WHERE DATE_FORMAT(QSDate, '%Y-%m')>? AND DATE_FORMAT(QSDate, '%Y-%m')<=? AND tCode=? ORDER BY SaleComplete ASC, QSDate ASC, customer ASC`,
+    `SELECT QSID, DATE_FORMAT(QSDate, '%Y-%m-%d') AS QSDate, DATE_FORMAT(QSDate, '%M') AS month, quantity, abbreviation, customerList.companyCode AS customer, priceBeforeInterest, tradingProfit, saleComplete, tCode FROM quotationsheet INNER JOIN customerList ON quotationsheet.customerID=customerList.customerID INNER JOIN productList ON quotationsheet.productID = productList.productID INNER JOIN prodNames ON productList.productName =  prodNames.prodNameID INNER JOIN productGroups ON prodNames.prodGroupID = productGroups.prodGroupID INNER JOIN traderList ON quotationsheet.traderID = traderList.traderID WHERE DATE_FORMAT(QSDate, '%Y-%m')>? AND DATE_FORMAT(QSDate, '%Y-%m')<=? ${
+      userID !== "all" ? `AND tCode=?` : ""
+    } ORDER BY SaleComplete ASC, QSDate ASC, customer ASC`,
     [fromdate, todate, userID],
+    (err, results) => {
+      if (err) {
+        console.log(err);
+      }
+      if (results.length > 0) {
+        return res.status(200).send(results);
+      }
+    }
+  );
+});
+router.post("/profitabilityreport", (req, res) => {
+  db.query(
+    "SELECT DATE_FORMAT(QSDate, '%M') AS month, quantity, customerList.companyCode AS customer, tradingProfit AS profitpmt, tradingMargin AS profit, priceBeforeInterest AS price FROM quotationsheet INNER JOIN customerList ON quotationsheet.customerID = customerList.customerID WHERE DATE_FORMAT(QSDate, '%Y')=2021 AND saleComplete=-1",
     (err, results) => {
       if (err) {
         console.log(err);
