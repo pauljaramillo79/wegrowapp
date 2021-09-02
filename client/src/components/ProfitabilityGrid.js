@@ -1,13 +1,52 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import Axios from "axios";
 import "../../node_modules/react-grid-layout/css/styles.css";
 import "../../node_modules/react-resizable/css/styles.css";
 import { Responsive, WidthProvider } from "react-grid-layout";
 import "./Grid.css";
 import ProfitabilityReport from "./ProfitabilityReport";
+import WaterfallChart from "./WaterFall";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
 const ProfitabilityGrid = () => {
+  const [data1, setData1] = useState();
+  let accesstoken = JSON.parse(localStorage.getItem("accesstoken"));
+  let refreshtoken = JSON.parse(localStorage.getItem("refreshtoken"));
+
+  const authAxios = Axios.create({
+    headers: {
+      Authorization: `Bearer ${accesstoken}`,
+    },
+  });
+  const refreshAxios = Axios.create({
+    headers: {
+      Authorization: `Bearer ${refreshtoken}`,
+    },
+  });
+  authAxios.interceptors.response.use(
+    (response) => {
+      return response;
+    },
+    async (error) => {
+      if (refreshtoken && error.response.status === 403) {
+        const res = await refreshAxios.post(".refreshtoken");
+        accesstoken = res.data.accesstoken;
+        return await authAxios.post(
+          "/waterfallprofit",
+          {},
+          { headers: { Authorization: `Bearer ${accesstoken}` } }
+        );
+      }
+      return Promise.reject(error.response);
+    }
+  );
+  useEffect(() => {
+    authAxios.post("/waterfallprofit").then((response) => {
+      setData1(response.data);
+      // console.log(response.data);
+    });
+  }, []);
   const initlayout = {
     lg: [
       { i: "h", x: 0, y: 0, w: 30, h: 14 },
@@ -70,7 +109,10 @@ const ProfitabilityGrid = () => {
         <div id="profitability" key="h">
           <ProfitabilityReport />
         </div>
-        <div id="profitabilitychart" key="j"></div>
+        <div id="profitabilitychart" key="j">
+          <h3>Profit Waterfall Chart, 2020</h3>
+          <WaterfallChart data={data1 ? data1 : ""} />
+        </div>
       </ResponsiveGridLayout>
     </>
   );
