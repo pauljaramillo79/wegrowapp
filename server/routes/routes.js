@@ -1356,7 +1356,7 @@ router.post("/updateprodname", (req, res) => {
 router.post("/posmatching", (req, res) => {
   let posnumber = req.body.posnumber;
   db.query(
-    "SELECT tCode, KTS, quantity, companyCode, saleComplete, tradingProfit  FROM quotationsheet INNER JOIN customerList ON quotationsheet.customerID = customerList.customerID INNER JOIN traderList ON quotationsheet.traderID = traderList.traderID WHERE KTP = ? AND saleComplete=-1 ORDER BY tradingProfit DESC",
+    "SELECT tCode, KTS, quantity, companyCode, saleComplete, FORMAT(tradingProfit,2) AS tradingProfit FROM quotationsheet INNER JOIN customerList ON quotationsheet.customerID = customerList.customerID INNER JOIN traderList ON quotationsheet.traderID = traderList.traderID WHERE KTP = ? AND saleComplete=-1 OR saleComplete=1 ORDER BY tradingProfit DESC",
     [posnumber],
     (err, results) => {
       console.log(results);
@@ -1395,7 +1395,7 @@ router.post("/lysales", (req, res) => {
 });
 router.post("/profitabilityreport", (req, res) => {
   db.query(
-    "SELECT DATE_FORMAT(QSDate, '%M') AS month, quantity, customerList.companyCode AS customer, tradingProfit AS profitpmt, tradingMargin AS profit, priceBeforeInterest AS price FROM quotationsheet INNER JOIN customerList ON quotationsheet.customerID = customerList.customerID WHERE DATE_FORMAT(QSDate, '%Y')=2021 AND saleComplete=-1",
+    "SELECT DATE_FORMAT(QSDate, '%M') AS month, quantity, customerList.companyCode AS customer, abbreviation AS product, tradingProfit AS profitpmt, tradingMargin AS profit, priceBeforeInterest AS price FROM quotationsheet INNER JOIN customerList ON quotationsheet.customerID = customerList.customerID INNER JOIN productList ON quotationsheet.productID = productList.productID INNER JOIN prodNames ON productList.productName =  prodNames.prodNameID INNER JOIN productGroups ON prodNames.prodGroupID = productGroups.prodGroupID WHERE DATE_FORMAT(QSDate, '%Y')=2021 AND saleComplete=-1",
     (err, results) => {
       if (err) {
         console.log(err);
