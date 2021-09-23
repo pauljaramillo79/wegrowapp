@@ -149,3 +149,60 @@
   display: flex;
   justify-content: flex-end;
 }
+.salesQStitleline {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+}
+.salesQSnavbuttons {
+  display: flex;
+  flex-direction: row;
+}
+.salesQSnavbuttons button {
+  border-radius: 1rem;
+  margin: 0 1rem;
+  width: 60px;
+  border: none;
+}
+.salesQSnavbuttons button:hover {
+  cursor: pointer;
+  background-color: rgb(68, 65, 162);
+  color: white;
+}
+#exchangerate label {
+  display: flex;
+  flex: 1 20%;
+}
+
+#exchangerate input {
+  display: flex;
+  flex: 1 30%;
+}
+#exchangerate button {
+  display: flex;
+  flex: 1 40%;
+  margin-top: 1rem;
+  margin-right: 0;
+  margin-left: 0;
+  background-color: rgb(68, 65, 162);
+  color: white;
+  border: none;
+}
+#exchangerate button:hover {
+  cursor: pointer;
+  background-color: rgb(123, 120, 219);
+  /* border: none; */
+}
+.QSindexbox {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0.5rem;
+}
+.QSIDerror {
+  color: red;
+  margin-left: 90px;
+}
+.editmode {
+  background-color: rgb(246, 246, 246) !important;
+}
