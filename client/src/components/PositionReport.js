@@ -84,15 +84,6 @@ const PositionReport = () => {
 
   return (
     <div className="positionreport">
-      <div className="positionreporttitleline">
-        <h3 className="positionreporttitle">Position Report</h3>
-        <RefreshIcon
-          className="refreshicon"
-          onClick={(e) => {
-            togglePosrefresh();
-          }}
-        />
-      </div>
       <table id="positionreporttable">
         <thead>
           <tr>

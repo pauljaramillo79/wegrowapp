@@ -544,8 +544,9 @@ router.post("/duplicateQS", (req, res) => {
   );
 });
 router.post("/QSIDList", (req, res) => {
+  user = req.body.user;
   db.query(
-    "SELECT QSID FROM quotationsheet ORDER BY QSID ASC",
+    `SELECT QSID FROM quotationsheet INNER JOIN traderList on quotationsheet.traderID = traderList.traderID WHERE traderList.tCode ="${user}" ORDER BY QSID ASC`,
     (err, results) => {
       if (err) {
         console.log(err);
@@ -695,7 +696,7 @@ router.post("/QStoedit", (req, res) => {
 router.post("/loadQStoedit", (req, res) => {
   let id = req.body.id;
   db.query(
-    "SELECT QSID, saleTypeID as saleType, KTP, KTS, DATE_FORMAT(QSDate,'%Y-%m-%d') AS QSDate, abbreviation, quotationsheet.productID, supplierlist.companyCode AS supplier, quotationsheet.supplierID, customerList.companyCode AS customer, quotationsheet.customerID, quotationsheet.packingSize AS packsize, marks, DATE_FORMAT(`from`,'%Y-%m-%d') AS `from`, DATE_FORMAT(`to`,'%Y-%m-%d') AS `to`, portOfLoad AS POL, quotationsheet.POLID, portOfDestination AS POD, quotationsheet.PODID, traderList.tCode AS trader, trafficList.tCode AS traffic, quotationsheet.trafficID, incoterms, paymentTerm AS paymentTerm, quotationsheet.pTermID, concat(format(interestrate*100,2),'%') AS includedrate, interestperiod AS includedperiod, concat('$ ', format(FreightTotal,2)) AS freightTotal, containerCapacity AS payload, freightCompany AS shippingline, concat('$ ', format(inspectionCostPer250,2)) AS totalinspection, format(quantity,2) AS quantity, concat('$ ',format(materialCost,2)) AS materialcost, concat('$ ',format(pAgentCommission,2)) AS pcommission, concat('$ ', format(pFinancialCostP,2)) AS pfinancecost, concat('$ ', format(sFinancialCost,2)) AS sfinancecost, concat('$ ', format(oFreight,2)) AS freightpmt, concat('$', format(insuranceCost,2)) AS insurancecost, concat('$', format(inspectionCost,2)) AS inspectioncost, concat('$', format(sAgentCommission,2)) AS scommission, concat('$', format(interestCost,2)) AS interestcost, concat('$', format(legal,2)) AS legal, concat('$', format(pallets,2)) AS pallets, concat('$', format(others,2)) AS other, concat('$', format(totalCost,2)) AS totalcost, concat(format(saleInterestRate*100,2),'%') AS interestrate, salePaymentPeriod AS interestdays, concat('$', format(priceBeforeInterest,2)) AS pricebeforeint, concat('$',format(saleInterest,2)) AS salesinterest, concat('$',format(priceAfterInterest,2)) AS priceafterint, concat('$',format(tradingProfit,2)) AS profit, concat('$',format(tradingMargin,2)) AS margin, concat('$',format(salesTurnover,2)) AS turnover, concat(format(percentageMargin*100,2),'%') AS pctmargin, concat('$',format(netback,2)) AS netback, saleComplete FROM quotationsheet INNER JOIN (productList INNER JOIN prodNames ON productList.productName = prodNames.prodNameID) ON quotationsheet.productID = productList.productID INNER JOIN supplierlist ON quotationsheet.supplierID = supplierlist.supplierID INNER JOIN customerList ON customerList.customerID=quotationsheet.customerID INNER JOIN POLList ON quotationsheet.POLID = POLList.POLID INNER JOIN PODList ON quotationsheet.PODID = PODList.PODID INNER JOIN traderList ON quotationsheet.traderID = traderList.traderID INNER JOIN trafficList ON quotationsheet.trafficID = trafficList.trafficID INNER JOIN paymentTerms ON quotationsheet.pTermID = paymentTerms.paytermID WHERE QSID=?",
+    "SELECT QSID, quotationsheet.saleTypeID, saleTypes.saleType, KTP, KTS, DATE_FORMAT(QSDate,'%Y-%m-%d') AS QSDate, abbreviation, quotationsheet.productID, supplierlist.companyCode AS supplier, quotationsheet.supplierID, customerList.companyCode AS customer, quotationsheet.customerID, quotationsheet.packingSize AS packsize, marks, DATE_FORMAT(`from`,'%Y-%m-%d') AS `from`, DATE_FORMAT(`to`,'%Y-%m-%d') AS `to`, portOfLoad AS POL, quotationsheet.POLID, portOfDestination AS POD, quotationsheet.PODID, traderList.tCode AS trader, quotationsheet.traderID, trafficList.tCode AS traffic, quotationsheet.trafficID, incoterms, paymentTerm AS paymentTerm, quotationsheet.pTermID, concat(format(interestrate*100,2),'%') AS includedrate, interestperiod AS includedperiod, quotationsheet.shipmentTypeID, shipmentTypes.shipmentType, concat('$ ', format(FreightTotal,2)) AS freightTotal, containerCapacity AS payload, freightCompany AS shippingline, concat('$ ', format(inspectionCostPer250,2)) AS totalinspection, format(quantity,2) AS quantity, concat('$ ',format(materialCost,2)) AS materialcost, concat('$ ',format(pAgentCommission,2)) AS pcommission, concat('$ ', format(pFinancialCostP,2)) AS pfinancecost, concat('$ ', format(sFinancialCost,2)) AS sfinancecost, concat('$ ', format(oFreight,2)) AS freightpmt, concat('$ ', format(insuranceCost,2)) AS insurance, concat('$ ', format(inspectionCost,2)) AS inspectionpmt, concat('$ ', format(sAgentCommission,2)) AS scommission, concat('$ ', format(interestCost,2)) AS interestcost, concat('$ ', format(legal,2)) AS legal, concat('$ ', format(pallets,2)) AS pallets, concat('$ ', format(others,2)) AS other, concat('$ ', format(totalCost,2)) AS totalcost, concat(format(saleInterestRate*100,2),'%') AS interestrate, salePaymentPeriod AS interestdays, concat('$ ', format(priceBeforeInterest,2)) AS pricebeforeint, concat('$ ',format(saleInterest,2)) AS salesinterest, concat('$ ',format(priceAfterInterest,2)) AS priceafterint, concat('$ ',format(tradingProfit,2)) AS profit, concat('$ ',format(tradingMargin,2)) AS margin, concat('$ ',format(salesTurnover,2)) AS turnover, concat(format(percentageMargin*100,2),'%') AS pctmargin, concat('$ ',format(netback,2)) AS netback, saleComplete, exchRate FROM quotationsheet INNER JOIN (productList INNER JOIN prodNames ON productList.productName = prodNames.prodNameID) ON quotationsheet.productID = productList.productID INNER JOIN supplierlist ON quotationsheet.supplierID = supplierlist.supplierID INNER JOIN customerList ON customerList.customerID=quotationsheet.customerID INNER JOIN POLList ON quotationsheet.POLID = POLList.POLID INNER JOIN PODList ON quotationsheet.PODID = PODList.PODID INNER JOIN traderList ON quotationsheet.traderID = traderList.traderID INNER JOIN trafficList ON quotationsheet.trafficID = trafficList.trafficID INNER JOIN paymentTerms ON quotationsheet.pTermID = paymentTerms.paytermID INNER JOIN saleTypes ON quotationsheet.saleTypeID = saleTypes.saleTypeID INNER JOIN shipmentTypes ON quotationsheet.shipmentTypeID = shipmentTypes.shipmentTypeID WHERE QSID=?",
     [id],
     (err, results) => {
       if (err) {
@@ -714,10 +715,39 @@ router.post("/loadQStoedit", (req, res) => {
 router.post("/updateQS", (req, res) => {
   let keys = Object.keys(req.body.QSedits);
   let values = Object.values(req.body.QSedits);
+  let exchrate = req.body.exchrate;
 
   var index = keys.indexOf("salesinterest");
   if (index !== -1) {
     keys[index] = "saleInterest";
+  }
+  var index = keys.indexOf("abbreviation");
+  if (index !== -1) {
+    keys[index] = "productID";
+  }
+  var index = keys.indexOf("supplier");
+  if (index !== -1) {
+    keys[index] = "supplierID";
+  }
+  var index = keys.indexOf("customer");
+  if (index !== -1) {
+    keys[index] = "customerID";
+  }
+  var index = keys.indexOf("POL");
+  if (index !== -1) {
+    keys[index] = "POLID";
+  }
+  var index = keys.indexOf("POD");
+  if (index !== -1) {
+    keys[index] = "PODID";
+  }
+  var index = keys.indexOf("traffic");
+  if (index !== -1) {
+    keys[index] = "trafficID";
+  }
+  var index = keys.indexOf("paymentTerm");
+  if (index !== -1) {
+    keys[index] = "pTermID";
   }
   var index = keys.indexOf("totalinspection");
   if (index !== -1) {
@@ -735,11 +765,11 @@ router.post("/updateQS", (req, res) => {
   if (index !== -1) {
     keys[index] = "tradingMargin";
   }
-  var index = keys.indexOf("includedrate");
+  var index = keys.indexOf("CADintrate");
   if (index !== -1) {
     keys[index] = "interestRate";
   }
-  var index = keys.indexOf("includedperiod");
+  var index = keys.indexOf("CADdays");
   if (index !== -1) {
     keys[index] = "interestPeriod";
   }
@@ -759,11 +789,11 @@ router.post("/updateQS", (req, res) => {
   if (index !== -1) {
     keys[index] = "oFreight";
   }
-  var index = keys.indexOf("insurancecost");
+  var index = keys.indexOf("insurance");
   if (index !== -1) {
     keys[index] = "insuranceCost";
   }
-  var index = keys.indexOf("inspectioncost");
+  var index = keys.indexOf("inspectionpmt");
   if (index !== -1) {
     keys[index] = "inspectionCost";
   }
@@ -816,6 +846,11 @@ router.post("/updateQS", (req, res) => {
   if (index !== -1) {
     values[index] = "'" + values[index] + "'";
   }
+  var index = keys.indexOf("saleType");
+  if (index !== -1) {
+    keys[index] = "saleTypeID";
+  }
+
   var index = keys.indexOf("from");
   if (index !== -1) {
     keys[index] = "`from`";
@@ -846,6 +881,8 @@ router.post("/updateQS", (req, res) => {
   for (let i = 1; i < keys.length; i++) {
     sql += ", " + keys[i] + "=" + values[i];
   }
+  sql += ", exchRate=" + exchrate;
+
   sql = `UPDATE quotationsheet SET ${sql} WHERE QSID=${QSID}`;
   // console.log(sql);
   // console.log(QSID);

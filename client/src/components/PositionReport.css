@@ -5,6 +5,8 @@
 .positionreporttitle {
   font-family: "Roboto", sans-serif;
   color: rgb(68, 65, 162);
+  background-color: white;
+  z-index: 90;
 }
 #positionreporttable {
   margin-top: 0.5rem;
@@ -28,6 +30,9 @@
   background-color: white;
   font-family: "Roboto", sans-serif;
   font-weight: 400;
+  padding-top: 0.2rem;
+  padding-bottom: 0.3rem;
+  top: 0px;
 }
 
 .fig {
@@ -83,4 +88,11 @@
 .posmatchitem p,
 .posmatchitem h4 {
   flex-basis: 20%;
+}
+.react-tabs__tab-panel--selected {
+  overflow: auto;
+  height: 90%;
+}
+.react-tabs {
+  height: 100%;
 }

@@ -11,7 +11,7 @@ const QSSearchField = ({
   otherID,
   setQSFields,
   resetfield,
-  setResetfield,
+  setEditing,
   value,
 }) => {
   const [data, setData] = useState();
@@ -124,6 +124,9 @@ const QSSearchField = ({
               } // testref.current.focus();
             }
           }
+          if (e.key === "Enter") {
+            e.preventDefault();
+          }
         }}
       />
       <div className="flexbreak"></div>
@@ -202,6 +205,7 @@ const QSSearchField = ({
                           }
                           if (e.key === "Enter") {
                             e.preventDefault();
+                            setEditing(true);
                             let selecteditem = e.target.innerText;
                             let ID1 = selecteditem.substring(
                               selecteditem.indexOf("(") + 1,
@@ -239,6 +243,7 @@ const QSSearchField = ({
                           }
                         }}
                         onClick={(e) => {
+                          setEditing(true);
                           let selecteditem = e.target.innerText;
                           let ID1 = selecteditem.substring(
                             selecteditem.indexOf("(") + 1,
@@ -327,6 +332,7 @@ const QSSearchField = ({
                           }
                           if (e.key === "Enter") {
                             e.preventDefault();
+                            setEditing(true);
                             let selecteditem = e.target.innerText;
                             let ID1 = selecteditem.substring(
                               selecteditem.indexOf("(") + 1,
@@ -356,6 +362,7 @@ const QSSearchField = ({
                           }
                         }}
                         onClick={(e) => {
+                          setEditing(true);
                           let selecteditem = e.target.innerText;
                           let ID1 = selecteditem.substring(
                             selecteditem.indexOf("(") + 1,

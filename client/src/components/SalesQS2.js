@@ -4,11 +4,16 @@ import moment from "moment";
 import QSSearchField from "./QSSearchField";
 import Axios from "axios";
 import { RefreshPositionsContext } from "../contexts/RefreshPositionsProvider";
+import { LoadQSContext } from "../contexts/LoadQSProvider";
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
+import { ReactComponent as UnlockedIcon } from "../assets/_images/unlocked.svg";
+import { ReactComponent as LockedIcon } from "../assets/_images/locked.svg";
 
 const SalesQS2 = () => {
   const { toggleQSrefresh } = useContext(RefreshPositionsContext);
+  const { QStoload, diffQS, duplicateBoolean } = useContext(LoadQSContext);
+
   const QSDataInit = {
     KTP: "",
     KTS: "",
@@ -48,7 +53,7 @@ const SalesQS2 = () => {
     legal: 1,
     pallets: 0,
     other: 0,
-    totalcost: 0,
+    totalcost: 1,
     interestrate: 0,
     interestdays: 0,
     pricebeforeint: 0,
@@ -100,7 +105,7 @@ const SalesQS2 = () => {
     legal: "$ 1.00",
     pallets: "$ 0.00",
     other: "$ 0.00",
-    totalcost: "$ 0.00",
+    totalcost: "$ 1.00",
     interestrate: "0.00%",
     interestdays: "0",
     pricebeforeint: "$ 0.00",
@@ -111,7 +116,7 @@ const SalesQS2 = () => {
     turnover: "$ 0.00",
     pctmargin: "0.00%",
     netback: "$ 0.00",
-    saleComplete: 0,
+    saleComplete: "indication",
   };
 
   const [QSData, setQSData] = useState(QSDataInit);
@@ -119,6 +124,7 @@ const SalesQS2 = () => {
   const [positionsddown, setPositionsddown] = useState();
   const [resetfield, setResetfield] = useState(false);
   const [sold, setSold] = useState(false);
+  const [allocated, setAllocated] = useState(false);
 
   const [QSsaved, setQSSaved] = useState(false);
 
@@ -130,17 +136,35 @@ const SalesQS2 = () => {
 
   const [inEuros, setInEuros] = useState(false);
   const [exchangerate, setExchangerate] = useState();
+  const [lockER, setLockER] = useState(false);
 
   const [editMode, setEditMode] = useState(false);
-  const [QSoriginaltoedit, setQSoriginaltoedit] = useState({});
+  const [QSOriginal, setQSOriginal] = useState({});
+
+  const [QSOriginalData, setQSOriginalData] = useState({});
+
+  const [editing, setEditing] = useState(false);
+
+  const [consolidatedEdits, setConsolidatedEdits] = useState({});
+
+  const [userID, setUserID] = useState(
+    JSON.parse(localStorage.getItem("WGusercode"))
+  );
+  const [traders, setTraders] = useState();
 
   useEffect(() => {
-    Axios.post("/QSIDList").then((response) => {
+    Axios.post("/traders").then((response) => {
+      setTraders(response.data);
+    });
+  }, []);
+
+  useEffect(() => {
+    Axios.post("/QSIDList", { user: userID }).then((response) => {
       const QSlist = [...new Set(response.data.map((item) => item.QSID))];
       setQSIDList(QSlist);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [QSsaved]);
+  }, [QSsaved, userID, duplicateBoolean]);
 
   useEffect(() => {
     setQSindex(QSIDList.length);
@@ -149,218 +173,974 @@ const SalesQS2 = () => {
   useEffect(() => {
     if (QSindex === QSIDList.length) {
       setEditMode(false);
+      setSold(false);
+      setAllocated(false);
     } else {
       setEditMode(true);
     }
   }, [QSindex]);
 
   useEffect(() => {
+    if (QSIDList.includes(QStoload)) {
+      if (editing === true) {
+        checkChanges(QSValues, QSOriginal, "enter", QStoload);
+      }
+      if (editing === false) {
+        setQSindex(QSIDList.indexOf(QStoload));
+        setQSIDtoedit(QStoload);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [QStoload, diffQS]);
+
+  useEffect(() => {
     if (QSindex < QSIDList.length) {
       Axios.post("/loadQStoedit", { id: QSIDList[QSindex] }).then(
         (response) => {
-          console.log(response.data[0]);
-          setQSValues({
-            ...QSValues,
-            KTP: response.data[0].KTP,
-            KTS: response.data[0].KTS,
-            QSDate: response.data[0].QSDate,
-            saleType: response.data[0].saleType,
-            QSID: response.data[0].QSID,
-            abbreviation: response.data[0].abbreviation,
-            supplier: response.data[0].supplier,
-            customer: response.data[0].customer,
-            packsize: response.data[0].packsize,
-            marks: response.data[0].marks,
-            from: response.data[0].from,
-            to: response.data[0].to,
-            POL: response.data[0].POL,
-            POD: response.data[0].POD,
-            traffic: response.data[0].traffic,
-            incoterms: response.data[0].incoterms,
-            paymentTerm: response.data[0].paymentTerm,
-            CADintrate: response.data[0].includedrate,
-            CADdays: response.data[0].includedperiod,
-            freightTotal:
-              inEuros && response.data[0].freightTotal
-                ? "€ " +
-                  (
-                    Number(
-                      response.data[0].freightTotal
-                        .replace("$", "")
-                        .replace(",", "")
-                    ) / exchangerate
+          const changeER = (resp) => {
+            return new Promise((resolve, reject) => {
+              if (resp.data[0].exchRate) {
+                setExchangerate(Number(resp.data[0].exchRate));
+                resolve(Number(resp.data[0].exchRate));
+              }
+              if (!resp.data[0].exchRate) {
+                setExchangerate(Number(resp.data[0].exchRate));
+                resolve(1);
+              }
+            });
+          };
+          const checkER = (resp) => {
+            return new Promise((resolve, reject) => {
+              if (resp.data[0].exchRate) {
+                resolve(true);
+              }
+              if (!resp.data[0].exchRate && inEuros) {
+                setInEuros(false);
+                setExchangerate(Number(resp.data[0].exchRate));
+                confirmAlert({
+                  title: "Back to $ dollars!",
+                  message: `This QS does not have an Exchange Rate defined. Reverting back to $ dollar currency`,
+                  buttons: [
+                    {
+                      label: "OK",
+                    },
+                  ],
+                  closeOnClickOutside: true,
+                  closeOnEscape: true,
+                });
+                resolve(false);
+              }
+              if (!resp.data[0].exchRate && !inEuros) {
+                setExchangerate(Number(resp.data[0].exchRate));
+                resolve(false);
+              }
+            });
+          };
+          const doWork = async () => {
+            const check = await checkER(response);
+            const exrate = await changeER(response);
+            setQSValues({
+              ...QSValues,
+              KTP: response.data[0].KTP,
+              KTS: response.data[0].KTS,
+              QSDate: response.data[0].QSDate,
+              saleType: response.data[0].saleType,
+              QSID: response.data[0].QSID,
+              abbreviation: response.data[0].abbreviation,
+              supplier: response.data[0].supplier,
+              customer: response.data[0].customer,
+              packsize: response.data[0].packsize,
+              marks: response.data[0].marks,
+              from: response.data[0].from,
+              to: response.data[0].to,
+              POL: response.data[0].POL,
+              POD: response.data[0].POD,
+              saleComplete:
+                response.data[0].saleComplete === -1 ? "sold" : "indication",
+              TIC: response.data[0].trader,
+              traffic: response.data[0].traffic,
+              incoterms: response.data[0].incoterms,
+              paymentTerm: response.data[0].paymentTerm,
+              CADintrate: response.data[0].includedrate,
+              CADdays: response.data[0].includedperiod,
+              shipmentType: response.data[0].shipmentType
+                ? response.data[0].shipmentType
+                : "Container",
+              freightTotal:
+                check && inEuros && response.data[0].freightTotal
+                  ? "€ " +
+                    (
+                      Number(
+                        response.data[0].freightTotal
+                          .replace("$", "")
+                          .replace(",", "")
+                      ) / exrate
+                    )
+                      .toFixed(2)
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                  : check && inEuros && !response.data[0].freightTotal
+                  ? "€ 0.00"
+                  : response.data[0].freightTotal,
+              shippingline: response.data[0].shippingline,
+              payload: response.data[0].payload,
+              totalinspection:
+                check && inEuros && response.data[0].totalinspection
+                  ? "€ " +
+                    (
+                      Number(
+                        response.data[0].totalinspection
+                          .replace("$", "")
+                          .replace(",", "")
+                      ) / exrate
+                    )
+                      .toFixed(2)
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                  : check && inEuros && !response.data[0].totalinspection
+                  ? "€ 0.00"
+                  : response.data[0].totalinspection,
+              quantity: response.data[0].quantity,
+              materialcost:
+                check && inEuros && response.data[0].materialcost
+                  ? "€ " +
+                    (
+                      Number(
+                        response.data[0].materialcost
+                          .replace("$", "")
+                          .replace(",", "")
+                      ) / exrate
+                    )
+                      .toFixed(2)
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                  : check && inEuros && !response.data[0].materialcost
+                  ? "€ 0.00"
+                  : response.data[0].materialcost,
+              pcommission:
+                check && inEuros && response.data[0].pcommission
+                  ? "€ " +
+                    (
+                      Number(
+                        response.data[0].pcommission
+                          .replace("$", "")
+                          .replace(",", "")
+                      ) / exrate
+                    )
+                      .toFixed(2)
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                  : check && inEuros && !response.data[0].pcommission
+                  ? "€ 0.00"
+                  : response.data[0].pcommission,
+              pfinancecost:
+                check && inEuros && response.data[0].pfinancecost
+                  ? "€ " +
+                    (
+                      Number(
+                        response.data[0].pfinancecost
+                          .replace("$", "")
+                          .replace(",", "")
+                      ) / exrate
+                    )
+                      .toFixed(2)
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                  : check && inEuros && !response.data[0].pfinancecost
+                  ? "€ 0.00"
+                  : response.data[0].pfinancecost,
+              sfinancecost:
+                check && inEuros && response.data[0].sfinancecost
+                  ? "€ " +
+                    (
+                      Number(
+                        response.data[0].sfinancecost
+                          .replace("$", "")
+                          .replace(",", "")
+                      ) / exrate
+                    )
+                      .toFixed(2)
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                  : check && inEuros && !response.data[0].sfinancecost
+                  ? "€ 0.00"
+                  : response.data[0].sfinancecost,
+              freightpmt:
+                check && inEuros && response.data[0].freightpmt
+                  ? "€ " +
+                    (
+                      Number(
+                        response.data[0].freightpmt
+                          .replace("$", "")
+                          .replace(",", "")
+                      ) / exrate
+                    )
+                      .toFixed(2)
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                  : check && inEuros && !response.data[0].freightpmt
+                  ? "€ 0.00"
+                  : response.data[0].freightpmt,
+              insurance:
+                check && inEuros && response.data[0].insurance
+                  ? "€ " +
+                    (
+                      Number(
+                        response.data[0].insurance
+                          .replace("$", "")
+                          .replace(",", "")
+                      ) / exrate
+                    )
+                      .toFixed(2)
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                  : check && inEuros && !response.data[0].insurance
+                  ? "€ 0.00"
+                  : response.data[0].insurance,
+              inspectionpmt:
+                check && inEuros && response.data[0].inspectionpmt
+                  ? "€ " +
+                    (
+                      Number(
+                        response.data[0].inspectionpmt
+                          .replace("$", "")
+                          .replace(",", "")
+                      ) / exrate
+                    )
+                      .toFixed(2)
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                  : check && inEuros && !response.data[0].inspectionpmt
+                  ? "€ 0.00"
+                  : response.data[0].inspectionpmt,
+              scommission:
+                check && inEuros && response.data[0].scommission
+                  ? "€ " +
+                    (
+                      Number(
+                        response.data[0].scommission
+                          .replace("$", "")
+                          .replace(",", "")
+                      ) / exrate
+                    )
+                      .toFixed(2)
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                  : check && inEuros && !response.data[0].scommission
+                  ? "€ 0.00"
+                  : response.data[0].scommission,
+              interestcost:
+                check && inEuros && response.data[0].interestcost
+                  ? "€ " +
+                    (
+                      Number(
+                        response.data[0].interestcost
+                          .replace("$", "")
+                          .replace(",", "")
+                      ) / exrate
+                    )
+                      .toFixed(2)
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                  : check && inEuros && !response.data[0].interestcost
+                  ? "€ 0.00"
+                  : response.data[0].interestcost,
+              legal:
+                check && inEuros && response.data[0].legal
+                  ? "€ " +
+                    (
+                      Number(
+                        response.data[0].legal.replace("$", "").replace(",", "")
+                      ) / exrate
+                    )
+                      .toFixed(2)
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                  : check && inEuros && !response.data[0].legal
+                  ? "€ 0.00"
+                  : response.data[0].legal,
+              pallets:
+                check && inEuros && response.data[0].pallets
+                  ? "€ " +
+                    (
+                      Number(
+                        response.data[0].pallets
+                          .replace("$", "")
+                          .replace(",", "")
+                      ) / exrate
+                    )
+                      .toFixed(2)
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                  : check && inEuros && !response.data[0].pallets
+                  ? "€ 0.00"
+                  : response.data[0].pallets,
+              other:
+                check && inEuros && response.data[0].other
+                  ? "€ " +
+                    (
+                      Number(
+                        response.data[0].other.replace("$", "").replace(",", "")
+                      ) / exrate
+                    )
+                      .toFixed(2)
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                  : check && inEuros && !response.data[0].other
+                  ? "€ 0.00"
+                  : response.data[0].other,
+              interestrate: response.data[0].interestrate,
+              interestdays: response.data[0].interestdays,
+              pricebeforeint:
+                check && inEuros && response.data[0].pricebeforeint
+                  ? "€ " +
+                    (
+                      Number(
+                        response.data[0].pricebeforeint
+                          .replace("$", "")
+                          .replace(",", "")
+                      ) / exrate
+                    )
+                      .toFixed(2)
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                  : check && inEuros && !response.data[0].pricebeforeint
+                  ? "€ 0.00"
+                  : response.data[0].pricebeforeint,
+              salesinterest:
+                check && inEuros && response.data[0].salesinterest
+                  ? "€ " +
+                    (
+                      Number(
+                        response.data[0].salesinterest
+                          .replace("$", "")
+                          .replace(",", "")
+                      ) / exrate
+                    )
+                      .toFixed(2)
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                  : check && inEuros && !response.data[0].salesinterest
+                  ? "€ 0.00"
+                  : response.data[0].salesinterest,
+              priceafterint:
+                check && inEuros && response.data[0].priceafterint
+                  ? "€ " +
+                    (
+                      Number(
+                        response.data[0].priceafterint
+                          .replace("$", "")
+                          .replace(",", "")
+                      ) / exrate
+                    )
+                      .toFixed(2)
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                  : check && inEuros && !response.data[0].priceafterint
+                  ? "€ 0.00"
+                  : response.data[0].priceafterint,
+            });
+            setQSData({
+              ...QSData,
+              KTP: response.data[0].KTP,
+              KTS: response.data[0].KTS,
+              QSDate: response.data[0].QSDate,
+              saleType: response.data[0].saleTypeID,
+              QSID: response.data[0].QSID,
+              abbreviation: response.data[0].productID,
+              supplier: response.data[0].supplierID,
+              customer: response.data[0].customerID,
+              packsize: response.data[0].packsize,
+              marks: response.data[0].marks,
+              from: response.data[0].from,
+              to: response.data[0].to,
+              POL: response.data[0].POLID,
+              POD: response.data[0].PODID,
+              saleComplete: response.data[0].saleComplete,
+              TIC: response.data[0].traderID,
+              traffic: response.data[0].trafficID,
+              incoterms: response.data[0].incoterms,
+              paymentTerm: response.data[0].pTermID,
+              CADintrate:
+                Number(response.data[0].includedrate.replace("%", "")) / 100,
+              CADdays: response.data[0].includedperiod,
+              shipmentType: response.data[0].shipmentTypeID
+                ? response.data[0].shipmentTypeID
+                : 1,
+              freightTotal: response.data[0].freightTotal
+                ? Number(
+                    response.data[0].freightTotal
+                      .replace("$", "")
+                      .replace(",", "")
                   )
-                    .toFixed(2)
-                    .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                : inEuros && !response.data[0].freightTotal
-                ? "€ 0.00"
-                : response.data[0].freightTotal,
-            shippingline: response.data[0].shippingline,
-            payload: response.data[0].payload,
-            totalinspection:
-              inEuros && response.data[0].totalinspection
-                ? "€ " +
-                  (
-                    Number(
-                      response.data[0].totalinspection
-                        .replace("$", "")
-                        .replace(",", "")
-                    ) / exchangerate
+                : 0,
+              shippingline: response.data[0].shippingline,
+              payload: response.data[0].payload,
+              totalinspection: response.data[0].totalinspection
+                ? Number(
+                    response.data[0].totalinspection
+                      .replace("$", "")
+                      .replace(",", "")
                   )
-                    .toFixed(2)
-                    .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                : inEuros && !response.data[0].totalinspection
-                ? "€ 0.00"
-                : response.data[0].totalinspection,
-            quantity: response.data[0].quantity,
-            materialcost:
-              inEuros && response.data[0].materialcost
-                ? "€ " +
-                  (
-                    Number(
-                      response.data[0].materialcost
-                        .replace("$", "")
-                        .replace(",", "")
-                    ) / exchangerate
+                : 0,
+              quantity: Number(response.data[0].quantity.replace(",", "")),
+              materialcost: response.data[0].materialcost
+                ? Number(
+                    response.data[0].materialcost
+                      .replace("$", "")
+                      .replace(",", "")
                   )
-                    .toFixed(2)
-                    .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                : inEuros && !response.data[0].materialcost
-                ? "€ 0.00"
-                : response.data[0].materialcost,
-            pcommission:
-              inEuros && response.data[0].pcommission
-                ? "€ " +
-                  (
-                    Number(
-                      response.data[0].pcommission
-                        .replace("$", "")
-                        .replace(",", "")
-                    ) / exchangerate
+                : 0,
+              pcommission: response.data[0].pcommission
+                ? Number(
+                    response.data[0].pcommission
+                      .replace("$", "")
+                      .replace(",", "")
                   )
-                    .toFixed(2)
-                    .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                : inEuros && !response.data[0].pcommission
-                ? "€ 0.00"
-                : response.data[0].pcommission,
-            pfinancecost:
-              inEuros && response.data[0].pfinancecost
-                ? "€ " +
-                  (
-                    Number(
-                      response.data[0].pfinancecost
-                        .replace("$", "")
-                        .replace(",", "")
-                    ) / exchangerate
+                : 0,
+              pfinancecost: response.data[0].pfinancecost
+                ? Number(
+                    response.data[0].pfinancecost
+                      .replace("$", "")
+                      .replace(",", "")
                   )
-                    .toFixed(2)
-                    .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                : inEuros && !response.data[0].pfinancecost
-                ? "€ 0.00"
-                : response.data[0].pfinancecost,
-            sfinancecost:
-              inEuros && response.data[0].sfinancecost
-                ? "€ " +
-                  (
-                    Number(
-                      response.data[0].sfinancecost
-                        .replace("$", "")
-                        .replace(",", "")
-                    ) / exchangerate
+                : 0,
+              sfinancecost: response.data[0].sfinancecost
+                ? Number(
+                    response.data[0].sfinancecost
+                      .replace("$", "")
+                      .replace(",", "")
                   )
-                    .toFixed(2)
-                    .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                : inEuros && !response.data[0].sfinancecost
-                ? "€ 0.00"
-                : response.data[0].sfinancecost,
-          });
-          setQSData({
-            ...QSData,
-            KTP: response.data[0].KTP,
-            KTS: response.data[0].KTS,
-            QSDate: response.data[0].QSDate,
-            saleType: response.data[0].saleType,
-            QSID: response.data[0].QSID,
-            abbreviation: response.data[0].productID,
-            supplier: response.data[0].supplierID,
-            customer: response.data[0].customerID,
-            packsize: response.data[0].packsize,
-            marks: response.data[0].marks,
-            from: response.data[0].from,
-            to: response.data[0].to,
-            POL: response.data[0].POLID,
-            POD: response.data[0].PODID,
-            traffic: response.data[0].trafficID,
-            incoterms: response.data[0].incoterms,
-            paymentTerm: response.data[0].pTermID,
-            CADintrate:
-              Number(response.data[0].includedrate.replace("%", "")) / 100,
-            CADdays: response.data[0].includedperiod,
-            freightTotal: response.data[0].freightTotal
-              ? Number(
-                  response.data[0].freightTotal
-                    .replace("$", "")
-                    .replace(",", "")
-                )
-              : 0,
-            shippingline: response.data[0].shippingline,
-            payload: response.data[0].payload,
-            totalinspection: response.data[0].totalinspection
-              ? Number(
-                  response.data[0].totalinspection
-                    .replace("$", "")
-                    .replace(",", "")
-                )
-              : 0,
-            quantity: Number(response.data[0].quantity.replace(",", "")),
-            materialcost: response.data[0].materialcost
-              ? Number(
-                  response.data[0].materialcost
-                    .replace("$", "")
-                    .replace(",", "")
-                )
-              : 0,
-            pcommission: response.data[0].pcommission
-              ? Number(
-                  response.data[0].pcommission.replace("$", "").replace(",", "")
-                )
-              : 0,
-            pfinancecost: response.data[0].pfinancecost
-              ? Number(
-                  response.data[0].pfinancecost
-                    .replace("$", "")
-                    .replace(",", "")
-                )
-              : 0,
-            sfinancecost: response.data[0].sfinancecost
-              ? Number(
-                  response.data[0].sfinancecost
-                    .replace("$", "")
-                    .replace(",", "")
-                )
-              : 0,
-          });
+                : 0,
+              freightpmt: response.data[0].freightpmt
+                ? Number(
+                    response.data[0].freightpmt
+                      .replace("$", "")
+                      .replace(",", "")
+                  )
+                : 0,
+              insurance: response.data[0].insurance
+                ? Number(
+                    response.data[0].insurance.replace("$", "").replace(",", "")
+                  )
+                : 0,
+              inspectionpmt: response.data[0].inspectionpmt
+                ? Number(
+                    response.data[0].inspectionpmt
+                      .replace("$", "")
+                      .replace(",", "")
+                  )
+                : 0,
+              scommission: response.data[0].scommission
+                ? Number(
+                    response.data[0].scommission
+                      .replace("$", "")
+                      .replace(",", "")
+                  )
+                : 0,
+              interestcost: response.data[0].interestcost
+                ? Number(
+                    response.data[0].interestcost
+                      .replace("$", "")
+                      .replace(",", "")
+                  )
+                : 0,
+              legal: response.data[0].legal
+                ? Number(
+                    response.data[0].legal.replace("$", "").replace(",", "")
+                  )
+                : 0,
+              pallets: response.data[0].pallets
+                ? Number(
+                    response.data[0].pallets.replace("$", "").replace(",", "")
+                  )
+                : 0,
+              other: response.data[0].other
+                ? Number(
+                    response.data[0].other.replace("$", "").replace(",", "")
+                  )
+                : 0,
+              interestrate:
+                Number(response.data[0].interestrate.replace("%", "")) / 100,
+              interestdays: response.data[0].interestdays,
+              pricebeforeint: response.data[0].pricebeforeint
+                ? Number(
+                    response.data[0].pricebeforeint
+                      .replace("$", "")
+                      .replace(",", "")
+                  )
+                : 0,
+              salesinterest: response.data[0].salesinterest
+                ? Number(
+                    response.data[0].salesinterest
+                      .replace("$", "")
+                      .replace(",", "")
+                  )
+                : 0,
+              priceafterint: response.data[0].priceafterint
+                ? Number(
+                    response.data[0].priceafterint
+                      .replace("$", "")
+                      .replace(",", "")
+                  )
+                : 0,
+            });
+            setQSOriginal({
+              ...QSOriginal,
+              KTP: response.data[0].KTP,
+              KTS: response.data[0].KTS,
+              QSDate: response.data[0].QSDate,
+              saleType: response.data[0].saleType,
+              QSID: response.data[0].QSID,
+              abbreviation: response.data[0].abbreviation,
+              supplier: response.data[0].supplier,
+              customer: response.data[0].customer,
+              packsize: response.data[0].packsize,
+              marks: response.data[0].marks,
+              from: response.data[0].from,
+              to: response.data[0].to,
+              POL: response.data[0].POL,
+              POD: response.data[0].POD,
+              saleComplete:
+                response.data[0].saleComplete === -1 ? "sold" : "indication",
+              TIC: response.data[0].trader,
+              traffic: response.data[0].traffic,
+              incoterms: response.data[0].incoterms,
+              paymentTerm: response.data[0].paymentTerm,
+              CADintrate: response.data[0].includedrate,
+              CADdays: response.data[0].includedperiod,
+              shipmentType: response.data[0].shipmentType,
+              freightTotal: response.data[0].freightTotal
+                ? response.data[0].freightTotal
+                : "",
+              shippingline: response.data[0].shippingline,
+              payload: response.data[0].payload,
+              totalinspection: response.data[0].totalinspection
+                ? response.data[0].totalinspection
+                : "",
+              quantity: response.data[0].quantity,
+              materialcost: response.data[0].materialcost
+                ? response.data[0].materialcost
+                : "$ 0.00",
+              pcommission: response.data[0].pcommission
+                ? response.data[0].pcommission
+                : "$ 0.00",
+              pfinancecost: response.data[0].pfinancecost
+                ? response.data[0].pfinancecost
+                : "$ 0.00",
+              sfinancecost: response.data[0].sfinancecost
+                ? response.data[0].sfinancecost
+                : "$ 0.00",
+              freightpmt: response.data[0].freightpmt
+                ? response.data[0].freightpmt
+                : "$ 0.00",
+              insurance: response.data[0].insurance
+                ? response.data[0].insurance
+                : "$ 0.00",
+              inspectionpmt: response.data[0].inspectionpmt
+                ? response.data[0].inspectionpmt
+                : "$ 0.00",
+              scommission: response.data[0].scommission
+                ? response.data[0].scommission
+                : "$ 0.00",
+              interestcost: response.data[0].interestcost
+                ? response.data[0].interestcost
+                : "$ 0.00",
+              legal: response.data[0].legal ? response.data[0].legal : "$ 0.00",
+              pallets: response.data[0].pallets
+                ? response.data[0].pallets
+                : "$ 0.00",
+              other: response.data[0].other ? response.data[0].other : "$ 0.00",
+              totalcost: response.data[0].totalcost
+                ? response.data[0].totalcost
+                : "$ 0.00",
+              interestrate: response.data[0].interestrate,
+              interestdays: response.data[0].interestdays,
+              pricebeforeint: response.data[0].pricebeforeint
+                ? response.data[0].pricebeforeint
+                : "$ 0.00",
+              salesinterest: response.data[0].salesinterest
+                ? response.data[0].salesinterest
+                : "$ 0.00",
+              priceafterint: response.data[0].priceafterint
+                ? response.data[0].priceafterint
+                : "$ 0.00",
+              profit: response.data[0].profit
+                ? response.data[0].profit
+                : "$ 0.00",
+              margin: response.data[0].margin
+                ? response.data[0].margin
+                : "$ 0.00",
+              turnover: response.data[0].turnover
+                ? response.data[0].turnover
+                : "$ 0.00",
+              pctmargin: response.data[0].pctmargin,
+              netback: response.data[0].netback
+                ? response.data[0].netback
+                : "$ 0.00",
+            });
+            setQSOriginalData({
+              ...QSOriginal,
+              KTP: response.data[0].KTP,
+              KTS: response.data[0].KTS,
+              QSDate: response.data[0].QSDate,
+              saleType: response.data[0].saleTypeID,
+              QSID: response.data[0].QSID,
+              abbreviation: response.data[0].productID,
+              supplier: response.data[0].supplierID,
+              customer: response.data[0].customerID,
+              packsize: response.data[0].packsize,
+              marks: response.data[0].marks,
+              from: response.data[0].from,
+              to: response.data[0].to,
+              POL: response.data[0].POLID,
+              POD: response.data[0].PODID,
+              saleComplete: response.data[0].saleComplete,
+              TIC: response.data[0].traderID,
+              traffic: response.data[0].trafficID,
+              incoterms: response.data[0].incoterms,
+              paymentTerm: response.data[0].pTermID,
+              CADintrate:
+                Number(response.data[0].includedrate.replace("%", "")) / 100,
+              CADdays: response.data[0].includedperiod,
+              shipmentType: response.data[0].shipmentTypeID
+                ? response.data[0].shipmentTypeID
+                : 1,
+              freightTotal: response.data[0].freightTotal
+                ? Number(
+                    response.data[0].freightTotal
+                      .replace("$", "")
+                      .replace(",", "")
+                  )
+                : 0,
+              shippingline: response.data[0].shippingline,
+              payload: response.data[0].payload,
+              totalinspection: response.data[0].totalinspection
+                ? Number(
+                    response.data[0].totalinspection
+                      .replace("$", "")
+                      .replace(",", "")
+                  )
+                : 0,
+              quantity: Number(response.data[0].quantity.replace(",", "")),
+              materialcost: response.data[0].materialcost
+                ? Number(
+                    response.data[0].materialcost
+                      .replace("$", "")
+                      .replace(",", "")
+                  )
+                : 0,
+              pcommission: response.data[0].pcommission
+                ? Number(
+                    response.data[0].pcommission
+                      .replace("$", "")
+                      .replace(",", "")
+                  )
+                : 0,
+              pfinancecost: response.data[0].pfinancecost
+                ? Number(
+                    response.data[0].pfinancecost
+                      .replace("$", "")
+                      .replace(",", "")
+                  )
+                : 0,
+              sfinancecost: response.data[0].sfinancecost
+                ? Number(
+                    response.data[0].sfinancecost
+                      .replace("$", "")
+                      .replace(",", "")
+                  )
+                : 0,
+              freightpmt: response.data[0].freightpmt
+                ? Number(
+                    response.data[0].freightpmt
+                      .replace("$", "")
+                      .replace(",", "")
+                  )
+                : 0,
+              insurance: response.data[0].insurance
+                ? Number(
+                    response.data[0].insurance.replace("$", "").replace(",", "")
+                  )
+                : 0,
+              inspectionpmt: response.data[0].inspectionpmt
+                ? Number(
+                    response.data[0].inspectionpmt
+                      .replace("$", "")
+                      .replace(",", "")
+                  )
+                : 0,
+              scommission: response.data[0].scommission
+                ? Number(
+                    response.data[0].scommission
+                      .replace("$", "")
+                      .replace(",", "")
+                  )
+                : 0,
+              interestcost: response.data[0].interestcost
+                ? Number(
+                    response.data[0].interestcost
+                      .replace("$", "")
+                      .replace(",", "")
+                  )
+                : 0,
+              legal: response.data[0].legal
+                ? Number(
+                    response.data[0].legal.replace("$", "").replace(",", "")
+                  )
+                : 0,
+              pallets: response.data[0].pallets
+                ? Number(
+                    response.data[0].pallets.replace("$", "").replace(",", "")
+                  )
+                : 0,
+              other: response.data[0].other
+                ? Number(
+                    response.data[0].other.replace("$", "").replace(",", "")
+                  )
+                : 0,
+              interestrate:
+                Number(response.data[0].interestrate.replace("%", "")) / 100,
+              interestdays: response.data[0].interestdays,
+              pricebeforeint: response.data[0].pricebeforeint
+                ? Number(
+                    response.data[0].pricebeforeint
+                      .replace("$", "")
+                      .replace(",", "")
+                  )
+                : 0,
+              salesinterest: response.data[0].salesinterest
+                ? Number(
+                    response.data[0].salesinterest
+                      .replace("$", "")
+                      .replace(",", "")
+                  )
+                : 0,
+              priceafterint: response.data[0].priceafterint
+                ? Number(
+                    response.data[0].priceafterint
+                      .replace("$", "")
+                      .replace(",", "")
+                  )
+                : 0,
+            });
+            if (response.data[0].saleComplete === -1) {
+              setSold(true);
+              setAllocated(false);
+            }
+            if (response.data[0].saleComplete === 1) {
+              setAllocated(true);
+              setSold(false);
+            }
+            if (response.data[0].saleComplete === 0) {
+              setSold(false);
+              setAllocated(false);
+            }
+          };
+          doWork();
         }
       );
     }
     if (QSindex === QSIDList.length) {
       setQSValues(QSValuesInit);
       setQSData(QSDataInit);
+      setExchangerate(null);
     }
+    setEditing(false);
   }, [QSindex]);
+
+  const checkChanges = (a, b, str, id) => {
+    let c = [];
+    let d = [];
+    let e = [];
+    for (const x in a) {
+      if (inEuros === false) {
+        if (a[x] !== b[x]) {
+          c.push(x);
+          if (b[x] === "") {
+            d.push("(empty)");
+          } else {
+            d.push(b[x]);
+          }
+          e.push(a[x]);
+        }
+      }
+      if (inEuros === true) {
+        if (a[x]) {
+          if (a[x].toString().indexOf("€") > -1) {
+            if (
+              Number(a[x].toString().replace("€", "").replace(",", "")).toFixed(
+                2
+              ) !==
+              (
+                Number(b[x].toString().replace("$", "").replace(",", "")) /
+                exchangerate
+              ).toFixed(2)
+            ) {
+              console.log(
+                Number(
+                  a[x].toString().replace("€", "").replace(",", "")
+                ).toFixed(2),
+                (
+                  Number(b[x].toString().replace("$", "").replace(",", "")) /
+                  exchangerate
+                ).toFixed(2)
+              );
+              c.push(x);
+              if (b[x] === "") {
+                d.push("(empty)");
+              } else {
+                d.push(
+                  "€ " +
+                    (
+                      Number(
+                        b[x].toString().replace("$", "").replace(",", "")
+                      ) / exchangerate
+                    ).toFixed(2)
+                );
+              }
+              e.push(a[x]);
+            }
+          } else {
+            if (a[x] !== b[x]) {
+              c.push(x);
+              if (b[x] === "") {
+                d.push("(empty)");
+              } else {
+                d.push(b[x]);
+              }
+              e.push(a[x]);
+            }
+          }
+        }
+      }
+    }
+    if (editMode === true) {
+      confirmAlert({
+        customUI: ({ onClose }) => {
+          return (
+            <div className="custom-ui">
+              <h1>Are you sure?</h1>
+              <p className="confirmmsg">
+                If you leave this QS now, the following unsaved edits will be
+                lost. Click CONTINUE to leave the QS anyway OR click CANCEL to
+                go back and avoid losing your edits.
+              </p>
+              <ul>
+                <li className="editsline editsheader">
+                  <p>Item:</p>
+                  <p className="editfig">Original:</p>
+                  <p>Edit:</p>
+                </li>
+                {c.map((it, index) => (
+                  <li className="editsline">
+                    <p className="edititem">{c[index]}</p>
+                    <p className="editfig">{d[index]}</p>
+                    <p className="editfig">{e[index]}</p>
+                  </li>
+                ))}
+              </ul>
+              <button onClick={onClose}>Cancel</button>
+              <button
+                onClick={(e) => {
+                  if (str === "prev") {
+                    setQSindex(QSindex - 1);
+                    setQSIDtoedit(QSIDList[QSindex - 1]);
+                    setQSID(QSIDList[QSindex - 1]);
+                    setQSindexerror(null);
+                  }
+                  if (str === "next") {
+                    setQSindex(
+                      QSindex < QSIDList.length ? QSindex + 1 : QSIDList.length
+                    );
+                    setQSIDtoedit(
+                      QSindex < QSIDList.length - 1 ? QSIDList[QSindex + 1] : ""
+                    );
+                    setQSID(
+                      QSindex < QSIDList.length - 1 ? QSIDList[QSindex + 1] : ""
+                    );
+                    setQSindexerror(null);
+                  }
+                  if (str === "enter") {
+                    setQSindex(QSIDList.indexOf(id));
+                    setQSindexerror("");
+                    setQSIDtoedit(id);
+                  }
+                  if (str === "new") {
+                    setQSindex(QSIDList.length);
+                    setQSIDtoedit("");
+                    setQSID("");
+                    setSold(false);
+                    setAllocated(false);
+                  }
+                  onClose();
+                }}
+              >
+                Continue
+              </button>
+            </div>
+          );
+        },
+      });
+    }
+
+    if (editMode === false) {
+      confirmAlert({
+        customUI: ({ onClose }) => {
+          return (
+            <div className="custom-ui">
+              <h1>Are you sure?</h1>
+              <p className="confirmmsg">
+                You have already added some data to this new QS. If you leave
+                this QS now without saving, the inputed data will be lost. Click
+                CONTINUE to leave the QS anyway OR click CANCEL to go back and
+                avoid losing your added data.
+              </p>
+
+              <button onClick={onClose}>Cancel</button>
+              <button
+                onClick={(e) => {
+                  if (str === "prev") {
+                    setQSindex(QSindex - 1);
+                    setQSIDtoedit(QSIDList[QSindex - 1]);
+                    setQSID(QSIDList[QSindex - 1]);
+                    setQSindexerror(null);
+                  }
+                  if (str === "enter") {
+                    setQSindex(QSIDList.indexOf(id));
+                    setQSindexerror("");
+                  }
+                  if (str === "new") {
+                    setQSindex(QSIDList.length);
+                    setQSIDtoedit("");
+                    setQSID("");
+                    clearQSData();
+                  }
+                  onClose();
+                }}
+              >
+                Continue
+              </button>
+            </div>
+          );
+        },
+      });
+    }
+
+    // console.log(c);
+
+    // console.log("checking changes");
+  };
 
   const handleSold = () => {
     setSold(!sold);
+    setAllocated(false);
+    setEditing(true);
+  };
+
+  const handleAllocated = () => {
+    setAllocated(!allocated);
+    setSold(false);
+    setEditing(true);
   };
 
   useEffect(() => {
     if (sold) {
       setQSData({ ...QSData, saleComplete: -1 });
+      setQSValues({ ...QSValues, saleComplete: "sold" });
     }
-    if (!sold) {
+    if (allocated) {
+      setQSData({ ...QSData, saleComplete: 1 });
+      setQSValues({ ...QSValues, saleComplete: "allocated-US" });
+    }
+    if (!sold & !allocated) {
       setQSData({ ...QSData, saleComplete: 0 });
+      setQSValues({ ...QSValues, saleComplete: "indication" });
     }
-  }, [sold]);
+  }, [sold, allocated]);
 
   const setQSFields = (ID1, ID2, Field1, Field2, name1, name2) => {
     if (ID2 === "" && Field2 === "" && name2 === "") {
@@ -387,6 +1167,7 @@ const SalesQS2 = () => {
   };
 
   const handleChange = (e) => {
+    setEditing(true);
     setQSData({
       ...QSData,
       [e.target.name]: e.target.value,
@@ -398,6 +1179,10 @@ const SalesQS2 = () => {
   };
 
   const PercentageChange = (e) => {
+    setEditing(true);
+    if (inEuros === true && exchangerate && lockER === false) {
+      setLockER(true);
+    }
     const isdecimalnumber = RegExp("^[0-9.,%]+$"); //RegExp("^[0-9\b]+$")
     if (isdecimalnumber.test(e.target.value) || e.target.value === "") {
       if (e.target.value.toString().includes("%")) {
@@ -429,7 +1214,12 @@ const SalesQS2 = () => {
       [e.target.name]: Number(e.target.value.replace("%", "")).toFixed(2) + "%",
     });
   };
+
   const QtyChange = (e) => {
+    setEditing(true);
+    if (inEuros === true && exchangerate && lockER === false) {
+      setLockER(true);
+    }
     const isdecimalnumber = RegExp("^[0-9.]+$");
     if (isdecimalnumber.test(e.target.value) || e.target.value === "") {
       setQSData({
@@ -456,6 +1246,7 @@ const SalesQS2 = () => {
   };
 
   const CurrencyChange = (e) => {
+    setEditing(true);
     if (inEuros === false) {
       const isCurrency = RegExp("^[ $0-9.]+$");
       if (isCurrency.test(e.target.value) || e.target.value === "") {
@@ -472,6 +1263,9 @@ const SalesQS2 = () => {
       }
     }
     if (inEuros === true && exchangerate) {
+      if (!lockER) {
+        setLockER(true);
+      }
       const isCurrency = RegExp("^[ €0-9.]+$");
       if (isCurrency.test(e.target.value) || e.target.value === "") {
         setQSData({
@@ -538,6 +1332,7 @@ const SalesQS2 = () => {
 
   const handleCNumInputChange = (e) => {
     e.preventDefault();
+    setEditing(true);
     const isInteger = RegExp("^[0-9]+$");
     if (isInteger.test(e.target.value) || e.target.value === "") {
       setQSValues({
@@ -568,7 +1363,7 @@ const SalesQS2 = () => {
     if (QSValues.from && QSValues.to) {
       let date1 = moment(QSValues.from);
       let date2 = moment(QSValues.to);
-      console.log(date2.diff(date1, "days"));
+      // console.log(date2.diff(date1, "days"));
       if (date2.diff(date1, "days") < 0) {
         confirmAlert({
           title: "Check shipment dates",
@@ -586,408 +1381,135 @@ const SalesQS2 = () => {
     }
   }, [QSValues.from, QSValues.to]);
 
-  // FREIGHT and PAYLOAD
-  //////
-
-  useEffect(() => {
-    if (inEuros === false) {
-      if (QSData.freightTotal > 0 && QSData.payload > 0) {
-        setQSValues({
-          ...QSValues,
-          freightpmt: "$ " + (QSData.freightTotal / QSData.payload).toFixed(2),
-        });
-        setQSData({
-          ...QSData,
-          freightpmt: QSData.freightTotal / QSData.payload,
-        });
+  const freightcalc = (frttotal, pload) => {
+    return new Promise((resolve, reject) => {
+      if (frttotal > 0 && pload > 0) {
+        resolve(frttotal / pload);
+      } else {
+        resolve(0);
       }
-    }
-    if (inEuros === true) {
-      if (QSData.freightTotal > 0 && QSData.payload > 0) {
-        setQSValues({
-          ...QSValues,
-          freightpmt:
-            "€ " +
-            (QSData.freightTotal / QSData.payload / exchangerate).toFixed(2),
-        });
-        setQSData({
-          ...QSData,
-          freightpmt: QSData.freightTotal / QSData.payload,
-        });
+    });
+  };
+
+  const intcostcalc = (incr, incd, pbi) => {
+    return new Promise((resolve, reject) => {
+      if (incr > 0 && incd > 0 && pbi > 0) {
+        resolve((incr * incd * pbi) / 360);
+      } else {
+        resolve(0);
       }
-    }
-  }, [QSData.freightTotal, QSData.payload]);
-
-  // UPDATE SALES INTEREST
-  /// intdays, intrate, pricebeforeint
-
-  useEffect(() => {
-    setQSData({
-      ...QSData,
-      salesinterest: Number(
-        (
-          (QSData.interestrate *
-            Number(QSData.interestdays) *
-            Number(QSData.pricebeforeint)) /
-          360
-        ).toFixed(4)
-      ),
     });
-    if (inEuros === true && exchangerate) {
-      setQSValues({
-        ...QSValues,
-        salesinterest:
-          "€ " +
-          Number(
-            (QSData.interestrate *
-              Number(QSData.interestdays) *
-              Number(QSData.pricebeforeint)) /
-              360 /
-              exchangerate
-          ).toFixed(2),
-      });
-    }
+  };
 
-    if (inEuros === false) {
-      setQSValues({
-        ...QSValues,
-        salesinterest:
-          "$ " +
-          Number(
-            (QSData.interestrate *
-              Number(QSData.interestdays) *
-              Number(QSData.pricebeforeint)) /
-              360
-          ).toFixed(2),
-      });
-    }
-    // }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [QSData.interestdays, QSData.interestrate]);
-
-  // INTEREST COST and SALES INTEREST
-  // CADdays, CADrate, pricebeforeint
-
-  useEffect(() => {
-    setQSData({
-      ...QSData,
-      interestcost: Number(
-        (
-          (QSData.CADintrate * QSData.CADdays * QSData.pricebeforeint) /
-          360
-        ).toFixed(4)
-      ),
+  const inspcostcalc = (instotal, qty) => {
+    return new Promise((resolve, reject) => {
+      if (instotal > 0 && qty > 0) {
+        resolve(instotal / qty);
+      } else {
+        resolve(0);
+      }
     });
-    if (inEuros === true && exchangerate) {
-      setQSValues({
-        ...QSValues,
-        interestcost:
-          "€ " +
-          Number(
-            (QSData.CADintrate * QSData.CADdays * QSData.pricebeforeint) /
-              360 /
-              exchangerate
-          ).toFixed(2),
-      });
-    }
-    if (inEuros === false) {
-      setQSValues({
-        ...QSValues,
-        interestcost:
-          "$ " +
-          Number(
-            (QSData.CADintrate * QSData.CADdays * QSData.pricebeforeint) / 360
-          ).toFixed(2),
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [QSData.CADdays, QSData.CADintrate, QSData.pricebeforeint]);
+  };
 
-  //Update economics
-  useEffect(() => {
-    // if (QSData.quantity !== 0 && QSData.pricebeforeint !== 0) {
-    setQSData({
-      ...QSData,
-      insurance:
-        QSData.incoterms === "CPT" ||
-        QSData.incoterms === "CFR" ||
-        QSData.incoterms === "DAP"
-          ? Number(((QSData.pricebeforeint * 0.07 * 1.1) / 100).toFixed(2))
-          : QSData.incoterms === "CIP" || QSData.incoterms === "CIF"
-          ? Number(((QSData.pricebeforeint * 0.14 * 1.1) / 100).toFixed(2))
-          : 0,
-      inspectionpmt:
-        QSData.quantity > 0 && QSData.totalinspection
-          ? Number((QSData.totalinspection / QSData.quantity).toFixed(2))
-          : 0,
-      interestcost: Number(
-        (
-          (QSData.CADintrate * QSData.CADdays * QSData.pricebeforeint) /
-          360
-        ).toFixed(4)
-      ),
-      salesinterest: Number(
-        (
-          (Number(QSData.interestrate) *
-            Number(QSData.interestdays) *
-            Number(QSData.pricebeforeint)) /
-          360
-        ).toFixed(4)
-      ),
-      priceafterint:
-        Number(QSData.pricebeforeint) + Number(QSData.salesinterest) * 10,
-      profit:
-        QSData.quantity !== 0 && QSData.pricebeforeint !== 0
-          ? Number((QSData.pricebeforeint - QSData.totalcost).toFixed(4))
-          : 0,
-      margin:
-        QSData.quantity !== 0 && QSData.pricebeforeint !== 0
-          ? Number(
-              (
-                (QSData.pricebeforeint - QSData.totalcost) *
-                QSData.quantity
-              ).toFixed(4)
-            )
-          : 0,
-      turnover:
-        QSData.quantity !== 0 && QSData.pricebeforeint !== 0
-          ? Number((QSData.quantity * QSData.pricebeforeint).toFixed(4))
-          : 0,
-      pctmargin:
-        QSData.quantity !== 0 && QSData.pricebeforeint !== 0
-          ? Number(
-              (
-                (QSData.pricebeforeint - QSData.totalcost) /
-                QSData.pricebeforeint
-              ).toFixed(4)
-            )
-          : 0,
-      netback:
-        QSData.quantity !== 0 && QSData.pricebeforeint !== 0
-          ? Number(
-              (
-                QSData.pricebeforeint -
-                QSData.totalcost +
-                QSData.materialcost
-              ).toFixed(4)
-            )
-          : 0,
+  const insurcalc = (inco, pbi) => {
+    return new Promise((resolve, reject) => {
+      if (pbi > 0 && (inco === "CPT" || inco === "CFR" || inco === "DAP")) {
+        resolve((pbi * 0.07 * 1.1) / 100);
+      } else if (pbi > 0 && (inco === "CIP" || inco === "CIF")) {
+        resolve((pbi * 0.14 * 1.1) / 100);
+      } else {
+        resolve(0);
+      }
     });
+  };
 
-    if (inEuros === true && exchangerate) {
-      setQSValues({
-        ...QSValues,
-        insurance:
-          QSData.incoterms === "CPT" ||
-          QSData.incoterms === "CFR" ||
-          QSData.incoterms === "DAP"
-            ? "€ " +
-              Number(
-                (QSData.pricebeforeint * 0.07 * 1.1) / 100 / exchangerate
-              ).toFixed(2)
-            : QSData.incoterms === "CIP" || QSData.incoterms === "CIF"
-            ? "€ " +
-              Number(
-                (QSData.pricebeforeint * 0.14 * 1.1) / 100 / exchangerate
-              ).toFixed(2)
-            : "€ " + Number(0).toFixed(2),
-        inspectionpmt:
-          QSData.quantity > 0 && QSData.totalinspection
-            ? "€ " +
-              Number(
-                QSData.totalinspection / QSData.quantity / exchangerate
-              ).toFixed(2)
-            : "$ 0.00",
-        interestcost:
-          "€ " +
-          Number(
-            (QSData.CADintrate * QSData.CADdays * QSData.pricebeforeint) /
-              360 /
-              exchangerate
-          ).toFixed(2),
-        salesinterest:
-          "€ " +
-          Number(
-            (Number(QSData.interestrate) *
-              Number(QSData.interestdays) *
-              Number(QSData.pricebeforeint)) /
-              360 /
-              exchangerate
-          ).toFixed(2),
-        priceafterint:
-          "€ " +
-          Number(
-            Number(QSData.pricebeforeint) +
-              (Number(QSData.salesinterest) * 10) / exchangerate
-          )
-            .toFixed(2)
-            .replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-        profit:
-          QSData.quantity !== 0 && QSData.pricebeforeint !== 0
-            ? "€ " +
-              Number(
-                (QSData.pricebeforeint - QSData.totalcost) / exchangerate
-              ).toFixed(2)
-            : "€ " +
-              Number(0)
-                .toFixed(2)
-                .replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-        margin:
-          QSData.quantity !== 0 && QSData.pricebeforeint !== 0
-            ? "€ " +
-              Number(
-                ((QSData.pricebeforeint - QSData.totalcost) * QSData.quantity) /
-                  exchangerate
-              )
-                .toFixed(2)
-                .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-            : "€ " + Number(0).toFixed(2),
-        turnover:
-          QSData.quantity !== 0 && QSData.pricebeforeint !== 0
-            ? "€ " +
-              Number((QSData.quantity * QSData.pricebeforeint) / exchangerate)
-                .toFixed(2)
-                .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-            : "€ " + Number(0).toFixed(2),
-        pctmargin:
-          QSData.quantity !== 0 && QSData.pricebeforeint !== 0
-            ? Number(
-                ((QSData.pricebeforeint - QSData.totalcost) /
-                  QSData.pricebeforeint) *
-                  100
-              ).toFixed(2) + "%"
-            : Number(0).toFixed(2) + "%",
-        netback:
-          QSData.quantity !== 0 && QSData.pricebeforeint !== 0
-            ? "€ " +
-              Number(
-                (QSData.pricebeforeint -
-                  QSData.totalcost +
-                  QSData.materialcost) /
-                  exchangerate
-              )
-                .toFixed(2)
-                .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-            : "€ " + Number(0).toFixed(2),
-      });
-    }
-    if (inEuros === false) {
-      setQSValues({
-        ...QSValues,
-        insurance:
-          QSData.incoterms === "CPT" ||
-          QSData.incoterms === "CFR" ||
-          QSData.incoterms === "DAP"
-            ? "$ " +
-              Number((QSData.pricebeforeint * 0.07 * 1.1) / 100).toFixed(2)
-            : QSData.incoterms === "CIP" || QSData.incoterms === "CIF"
-            ? "$ " +
-              Number((QSData.pricebeforeint * 0.14 * 1.1) / 100).toFixed(2)
-            : "$ " + Number(0).toFixed(2),
-        inspectionpmt:
-          QSData.quantity > 0 && QSData.totalinspection
-            ? "$ " + Number(QSData.totalinspection / QSData.quantity).toFixed(2)
-            : "$ 0.00",
-        interestcost:
-          "$ " +
-          Number(
-            (QSData.CADintrate * QSData.CADdays * QSData.pricebeforeint) / 360
-          ).toFixed(2),
-        salesinterest:
-          "$ " +
-          Number(
-            (Number(QSData.interestrate) *
-              Number(QSData.interestdays) *
-              Number(QSData.pricebeforeint)) /
-              360
-          ).toFixed(2),
-        priceafterint:
-          "$ " +
-          Number(
-            Number(QSData.pricebeforeint) + Number(QSData.salesinterest) * 10
-          )
-            .toFixed(2)
-            .replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-        profit:
-          QSData.quantity !== 0 && QSData.pricebeforeint !== 0
-            ? "$ " + Number(QSData.pricebeforeint - QSData.totalcost).toFixed(2)
-            : "$ " +
-              Number(0)
-                .toFixed(2)
-                .replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-        margin:
-          QSData.quantity !== 0 && QSData.pricebeforeint !== 0
-            ? "$ " +
-              Number(
-                (QSData.pricebeforeint - QSData.totalcost) * QSData.quantity
-              )
-                .toFixed(2)
-                .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-            : "$ " + Number(0).toFixed(2),
-        turnover:
-          QSData.quantity !== 0 && QSData.pricebeforeint !== 0
-            ? "$ " +
-              Number(QSData.quantity * QSData.pricebeforeint)
-                .toFixed(2)
-                .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-            : "$ " + Number(0).toFixed(2),
-        pctmargin:
-          QSData.quantity !== 0 && QSData.pricebeforeint !== 0
-            ? Number(
-                ((QSData.pricebeforeint - QSData.totalcost) /
-                  QSData.pricebeforeint) *
-                  100
-              ).toFixed(2) + "%"
-            : Number(0).toFixed(2) + "%",
-        netback:
-          QSData.quantity !== 0 && QSData.pricebeforeint !== 0
-            ? "$ " +
-              Number(
-                QSData.pricebeforeint - QSData.totalcost + QSData.materialcost
-              )
-                .toFixed(2)
-                .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-            : "$ " + Number(0).toFixed(2),
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    QSData.quantity,
-    QSData.pricebeforeint,
-    QSData.totalinspection,
-    QSData.incoterms,
-  ]);
+  const ttlcostcalc = (
+    mc,
+    pc,
+    pf,
+    sf,
+    frt,
+    ins,
+    insp,
+    sc,
+    int,
+    lg,
+    pal,
+    oth
+  ) => {
+    return new Promise((resolve, reject) => {
+      resolve(mc + pc + pf + sf + frt + ins + insp + sc + int + lg + pal + oth);
+    });
+  };
 
-  // UPDATE ECONOMICS
-  // After total cost change
+  const paicalc = (pbi, slsint) => {
+    return new Promise((resolve, reject) => {
+      resolve(pbi + slsint);
+    });
+  };
 
+  // QS CALCULATIONS
   useEffect(() => {
-    if (QSData.quantity !== 0 && QSData.pricebeforeint !== 0) {
+    const docalcs = async () => {
+      const frtpmt = await freightcalc(QSData.freightTotal, QSData.payload);
+      const intcost = await intcostcalc(
+        QSData.CADintrate,
+        QSData.CADdays,
+        QSData.pricebeforeint
+      );
+      const slsint = await intcostcalc(
+        QSData.interestrate,
+        QSData.interestdays,
+        QSData.pricebeforeint
+      );
+      const inspcost = await inspcostcalc(
+        QSData.totalinspection,
+        QSData.quantity
+      );
+      const insur = await insurcalc(QSData.incoterms, QSData.pricebeforeint);
+      const ttlcost = await ttlcostcalc(
+        QSData.materialcost,
+        QSData.pcommission,
+        QSData.pfinancecost,
+        QSData.sfinancecost,
+        frtpmt,
+        insur,
+        inspcost,
+        QSData.scommission,
+        intcost,
+        QSData.legal,
+        QSData.pallets,
+        QSData.other
+      );
+      const praftint = await paicalc(QSData.pricebeforeint, slsint);
       setQSData({
         ...QSData,
-
+        freightpmt: frtpmt,
+        insurance: insur,
+        inspectionpmt: inspcost,
+        interestcost: intcost,
+        totalcost: ttlcost,
+        salesinterest: slsint,
+        priceafterint: praftint,
         profit:
           QSData.quantity !== 0 && QSData.pricebeforeint !== 0
-            ? Number((QSData.pricebeforeint - QSData.totalcost).toFixed(4))
+            ? Number((QSData.pricebeforeint - ttlcost).toFixed(4))
             : 0,
         margin:
           QSData.quantity !== 0 && QSData.pricebeforeint !== 0
             ? Number(
-                (
-                  (QSData.pricebeforeint - QSData.totalcost) *
-                  QSData.quantity
-                ).toFixed(4)
+                ((QSData.pricebeforeint - ttlcost) * QSData.quantity).toFixed(4)
               )
             : 0,
         turnover:
           QSData.quantity !== 0 && QSData.pricebeforeint !== 0
-            ? Number((QSData.quantity * QSData.pricebeforeint).toFixed(4))
+            ? Number((QSData.quantity * praftint).toFixed(4))
             : 0,
         pctmargin:
           QSData.quantity !== 0 && QSData.pricebeforeint !== 0
             ? Number(
                 (
-                  (QSData.pricebeforeint - QSData.totalcost) /
+                  (QSData.pricebeforeint - ttlcost) /
                   QSData.pricebeforeint
                 ).toFixed(4)
               )
@@ -995,233 +1517,142 @@ const SalesQS2 = () => {
         netback:
           QSData.quantity !== 0 && QSData.pricebeforeint !== 0
             ? Number(
-                (
-                  QSData.pricebeforeint -
-                  QSData.totalcost +
-                  QSData.materialcost
-                ).toFixed(4)
+                (QSData.pricebeforeint - ttlcost + QSData.materialcost).toFixed(
+                  4
+                )
               )
             : 0,
       });
-      if (inEuros === true && exchangerate) {
-        setQSValues({
-          ...QSValues,
-          profit:
-            QSData.quantity !== 0 && QSData.pricebeforeint !== 0
-              ? "€ " +
-                Number(
-                  (QSData.pricebeforeint - QSData.totalcost) / exchangerate
-                ).toFixed(2)
-              : "€ " +
-                Number(0)
-                  .toFixed(2)
-                  .replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-          margin:
-            QSData.quantity !== 0 && QSData.pricebeforeint !== 0
-              ? "€ " +
-                Number(
-                  ((QSData.pricebeforeint - QSData.totalcost) *
-                    QSData.quantity) /
-                    exchangerate
-                )
-                  .toFixed(2)
-                  .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-              : "€ " + Number(0).toFixed(2),
-          turnover:
-            QSData.quantity !== 0 && QSData.pricebeforeint !== 0
-              ? "€ " +
-                Number((QSData.quantity * QSData.pricebeforeint) / exchangerate)
-                  .toFixed(2)
-                  .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-              : "€ " + Number(0).toFixed(2),
-          pctmargin:
-            QSData.quantity !== 0 && QSData.pricebeforeint !== 0
-              ? Number(
-                  ((QSData.pricebeforeint - QSData.totalcost) /
-                    QSData.pricebeforeint) *
-                    100
-                ).toFixed(2) + "%"
-              : Number(0).toFixed(2) + "%",
-          netback:
-            QSData.quantity !== 0 && QSData.pricebeforeint !== 0
-              ? "€ " +
-                Number(
-                  (QSData.pricebeforeint -
-                    QSData.totalcost +
-                    QSData.materialcost) /
-                    exchangerate
-                )
-                  .toFixed(2)
-                  .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-              : "€ " + Number(0).toFixed(2),
-        });
-      }
       if (inEuros === false) {
         setQSValues({
           ...QSValues,
+          freightpmt: "$ " + frtpmt.toFixed(2),
+          insurance: "$ " + insur.toFixed(2),
+          inspectionpmt: "$ " + inspcost.toFixed(2),
+          interestcost: "$ " + intcost.toFixed(2),
+          totalcost:
+            "$ " + ttlcost.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+          salesinterest: "$ " + slsint.toFixed(2),
+          priceafterint:
+            "$ " + praftint.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ","),
           profit:
             QSData.quantity !== 0 && QSData.pricebeforeint !== 0
               ? "$ " +
-                Number(QSData.pricebeforeint - QSData.totalcost).toFixed(2)
-              : "$ " +
-                Number(0)
+                Number(QSData.pricebeforeint - ttlcost)
                   .toFixed(2)
-                  .replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                  .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+              : "$ " + Number(0).toFixed(2),
+
           margin:
             QSData.quantity !== 0 && QSData.pricebeforeint !== 0
               ? "$ " +
-                Number(
-                  (QSData.pricebeforeint - QSData.totalcost) * QSData.quantity
-                )
+                Number((QSData.pricebeforeint - ttlcost) * QSData.quantity)
                   .toFixed(2)
                   .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
               : "$ " + Number(0).toFixed(2),
           turnover:
             QSData.quantity !== 0 && QSData.pricebeforeint !== 0
               ? "$ " +
-                Number(QSData.quantity * QSData.pricebeforeint)
+                Number(QSData.quantity * praftint)
                   .toFixed(2)
                   .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
               : "$ " + Number(0).toFixed(2),
           pctmargin:
             QSData.quantity !== 0 && QSData.pricebeforeint !== 0
               ? Number(
-                  ((QSData.pricebeforeint - QSData.totalcost) /
-                    QSData.pricebeforeint) *
+                  ((QSData.pricebeforeint - ttlcost) / QSData.pricebeforeint) *
                     100
                 ).toFixed(2) + "%"
               : Number(0).toFixed(2) + "%",
           netback:
             QSData.quantity !== 0 && QSData.pricebeforeint !== 0
               ? "$ " +
-                Number(
-                  QSData.pricebeforeint - QSData.totalcost + QSData.materialcost
-                )
+                Number(QSData.pricebeforeint - ttlcost + QSData.materialcost)
                   .toFixed(2)
                   .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
               : "$ " + Number(0).toFixed(2),
         });
       }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [QSData.totalcost]);
-
-  // PRICEAFTERINT;
-  // salesinterest;
-
-  useEffect(() => {
-    setQSData({
-      ...QSData,
-
-      priceafterint:
-        Number(QSData.pricebeforeint) + Number(QSData.salesinterest),
-    });
-    if (inEuros === true && exchangerate) {
-      setQSValues({
-        ...QSValues,
-        priceafterint:
-          "€ " +
-          Number(
-            (Number(QSData.pricebeforeint) + Number(QSData.salesinterest)) /
-              exchangerate
-          )
-            .toFixed(2)
-            .replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-      });
-    }
-    if (inEuros === false) {
-      setQSValues({
-        ...QSValues,
-        priceafterint:
-          "$ " +
-          Number(Number(QSData.pricebeforeint) + Number(QSData.salesinterest))
-            .toFixed(2)
-            .replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [QSData.salesinterest]);
-
-  //Update total cost
-  useEffect(() => {
-    if (inEuros === true && exchangerate) {
-      setQSValues({
-        ...QSValues,
-        totalcost:
-          "€ " +
-          Number(
-            Number(
-              Number(QSData.materialcost) +
-                QSData.pcommission +
-                QSData.pfinancecost +
-                QSData.sfinancecost +
-                QSData.freightpmt +
-                QSData.insurance +
-                QSData.inspectionpmt +
-                QSData.scommission +
-                QSData.interestcost +
-                QSData.legal +
-                QSData.pallets +
-                QSData.other
-            ) / exchangerate
-          )
-            .toFixed(2)
-            .replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-      });
-    }
-    if (inEuros === false) {
-      setQSValues({
-        ...QSValues,
-        totalcost:
-          "$ " +
-          Number(
-            Number(QSData.materialcost) +
-              QSData.pcommission +
-              QSData.pfinancecost +
-              QSData.sfinancecost +
-              QSData.freightpmt +
-              QSData.insurance +
-              QSData.inspectionpmt +
-              QSData.scommission +
-              QSData.interestcost +
-              QSData.legal +
-              QSData.pallets +
-              QSData.other
-          )
-            .toFixed(2)
-            .replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-      });
-    }
-    setQSData({
-      ...QSData,
-      totalcost: Number(
-        (
-          Number(QSData.materialcost) +
-          QSData.pcommission +
-          QSData.pfinancecost +
-          QSData.sfinancecost +
-          QSData.freightpmt +
-          QSData.insurance +
-          QSData.inspectionpmt +
-          QSData.scommission +
-          QSData.interestcost +
-          QSData.legal +
-          QSData.pallets +
-          QSData.other
-        ).toFixed(2)
-      ),
-    });
+      if (inEuros === true && exchangerate) {
+        setQSValues({
+          ...QSValues,
+          freightpmt: "€ " + (frtpmt / exchangerate).toFixed(2),
+          insurance: "€ " + (insur / exchangerate).toFixed(2),
+          inspectionpmt: "€ " + (inspcost / exchangerate).toFixed(2),
+          interestcost: "€ " + (intcost / exchangerate).toFixed(2),
+          totalcost:
+            "€ " +
+            (ttlcost / exchangerate)
+              .toFixed(2)
+              .replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+          salesinterest: "€ " + (slsint / exchangerate).toFixed(2),
+          priceafterint:
+            "€ " +
+            (praftint / exchangerate)
+              .toFixed(2)
+              .replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+          profit:
+            QSData.quantity !== 0 && QSData.pricebeforeint !== 0
+              ? "€ " +
+                Number((QSData.pricebeforeint - ttlcost) / exchangerate)
+                  .toFixed(2)
+                  .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+              : "€ " + Number(0).toFixed(2),
+          margin:
+            QSData.quantity !== 0 && QSData.pricebeforeint !== 0
+              ? "€ " +
+                Number(
+                  ((QSData.pricebeforeint - ttlcost) * QSData.quantity) /
+                    exchangerate
+                )
+                  .toFixed(2)
+                  .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+              : "€ " + Number(0).toFixed(2),
+          turnover:
+            QSData.quantity !== 0 && QSData.pricebeforeint !== 0
+              ? "€ " +
+                Number((QSData.quantity * praftint) / exchangerate)
+                  .toFixed(2)
+                  .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+              : "€ " + Number(0).toFixed(2),
+          pctmargin:
+            QSData.quantity !== 0 && QSData.pricebeforeint !== 0
+              ? Number(
+                  ((QSData.pricebeforeint - ttlcost) / QSData.pricebeforeint) *
+                    100
+                ).toFixed(2) + "%"
+              : Number(0).toFixed(2) + "%",
+          netback:
+            QSData.quantity !== 0 && QSData.pricebeforeint !== 0
+              ? "€ " +
+                Number(
+                  (QSData.pricebeforeint - ttlcost + QSData.materialcost) /
+                    exchangerate
+                )
+                  .toFixed(2)
+                  .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+              : "€ " + Number(0).toFixed(2),
+        });
+      }
+    };
+    docalcs();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
+    QSData.freightTotal,
+    QSData.payload,
+    QSData.CADintrate,
+    QSData.CADdays,
+    QSData.pricebeforeint,
+    QSData.interestrate,
+    QSData.interestdays,
+    QSData.totalinspection,
+    QSData.quantity,
+    QSData.incoterms,
     QSData.materialcost,
     QSData.pcommission,
+    QSData.scommission,
     QSData.pfinancecost,
     QSData.sfinancecost,
-    QSData.freightpmt,
-    QSData.insurance,
-    QSData.inspectionpmt,
-    QSData.scommission,
-    QSData.interestcost,
     QSData.legal,
     QSData.pallets,
     QSData.other,
@@ -1347,14 +1778,45 @@ const SalesQS2 = () => {
     }
   }, [inEuros]);
 
-  //SAVE QS
-  const addQS = async (e) => {
-    e.preventDefault();
-    await Axios.post("/saveQS", { QSData }).then((response) => {
-      toggleQSrefresh();
+  // CONSOLIDATE EDITS
+  const consolidateEdits = (a, b) => {
+    return new Promise((resolve, reject) => {
+      let c = {};
+      for (const x in a) {
+        if (a[x] !== b[x]) {
+          c[x] = a[x];
+        }
+      }
+      resolve(c);
     });
-    await clearQSData();
-    // createemail();
+  };
+
+  //SAVE and UPDATE QS
+  const addupdateQS = async (e) => {
+    if (editMode) {
+      e.preventDefault();
+      const QSedits = await consolidateEdits(QSData, QSOriginalData);
+      console.log(exchangerate);
+      Axios.post("/updateQS", {
+        QSedits,
+        QSID: QSIDtoedit,
+        exchrate: exchangerate,
+      }).then((response) => {
+        setEditing(false);
+        toggleQSrefresh();
+        console.log(response.data);
+      });
+      // console.log("updatingQS");
+    }
+    if (!editMode) {
+      e.preventDefault();
+      await Axios.post("/saveQS", { QSData }).then((response) => {
+        toggleQSrefresh();
+        setQSSaved(!QSsaved);
+      });
+      await clearQSData();
+      // createemail();
+    }
   };
 
   const loadPositions = () => {
@@ -1364,6 +1826,7 @@ const SalesQS2 = () => {
     });
   };
   const setPosition = (val) => {
+    setEditing(true);
     let position = positionsddown[val];
     setQSValues({
       ...QSValues,
@@ -1392,28 +1855,67 @@ const SalesQS2 = () => {
     let Message = `Product:   ${QSValues.abbreviation}%0dQuantity:  ${QSValues.quantity} metric tons +/-10% at Seller's option %0dPrice:  ${QSValues.priceafterint} pmt ${QSValues.incoterms} ${QSValues.POD}`;
     window.location.href = `mailto:user@example.com?subject=${Subject}&body=${Message}`;
   };
+
+  //CLEAR QS
   const clearQSData = () => {
     setQSValues(QSValuesInit);
     setQSData(QSDataInit);
     setSold(false);
+    setAllocated(false);
+    setLockER(false);
+    setEditing(false);
+  };
+
+  const ignoreEnter = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+    }
   };
 
   return (
     <div className="salesQS">
       <div className="salesQStitleline">
         <h3 className="saleslisttitle">Quotation Sheet</h3>
+
         <span style={{ width: "100px", fontWeight: "bold" }}>
           {editMode ? "Edit Mode" : "New QS"}
         </span>
         <div className="QSindexbox">
           <div className="salesQSnavbuttons">
+            <select onChange={(e) => setUserID(e.target.value)}>
+              <option value="all">All</option>
+              {traders
+                ? traders.map((trader) => {
+                    if (trader.trader === userID) {
+                      return (
+                        <option selected value={trader.trader}>
+                          {trader.trader}
+                        </option>
+                      );
+                    } else {
+                      return (
+                        <option value={trader.trader}>{trader.trader}</option>
+                      );
+                    }
+                  })
+                : "reload"}
+            </select>
             <button
               onClick={(e) => {
                 e.preventDefault();
+                if (editing === true && editMode === false) {
+                  checkChanges(QSValues, QSValuesInit, "prev");
+                }
+                if (editing === true && editMode === true) {
+                  checkChanges(QSValues, QSOriginal, "prev");
+                }
                 // console.log(QSindex);
-                setQSindex(QSindex - 1);
-                setQSIDtoedit(QSIDList[QSindex - 1]);
-                setQSID(QSIDList[QSindex - 1]);
+                if (editing === false) {
+                  setQSindex(QSindex - 1);
+                  setQSIDtoedit(QSIDList[QSindex - 1]);
+                  setQSID(QSIDList[QSindex - 1]);
+                  setQSindexerror(null);
+                }
               }}
             >
               Prev
@@ -1425,42 +1927,53 @@ const SalesQS2 = () => {
               placeholder=" New..."
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
-                  console.log(e.target.value);
-                  console.log(QSIDList);
+                  // console.log(e.target.value);
+                  // console.log(QSIDList);
                   if (QSIDList.includes(Number(e.target.value))) {
-                    setQSindex(QSIDList.indexOf(Number(e.target.value)));
-                    setQSindexerror("");
+                    if (editing === true) {
+                      checkChanges(
+                        QSValues,
+                        QSOriginal,
+                        "enter",
+                        Number(e.target.value)
+                      );
+                    }
+                    if (editing === false) {
+                      setQSindex(QSIDList.indexOf(Number(e.target.value)));
+                      setQSindexerror("");
+                    }
                   } else {
                     setQSindexerror("QSID not found.");
-                    console.log("nope");
+                    // console.log("nope");
                   }
                 }
               }}
               onChange={(e) => setQSIDtoedit(e.target.value)}
-              // onEnter={(e) => {
-              //   console.log("yep");
-              //   if (QSIDList.includes(e.target.value)) {
-              //     console.log("yep");
-              //   } else {
-              //     console.log("nope");
-              //   }
-              // }}
               value={QSIDtoedit ? QSIDtoedit : ""}
             />
 
             <button
               onClick={(e) => {
                 e.preventDefault();
-                console.log(QSindex);
-                setQSindex(
-                  QSindex < QSIDList.length ? QSindex + 1 : QSIDList.length
-                );
-                setQSIDtoedit(
-                  QSindex < QSIDList.length - 1 ? QSIDList[QSindex + 1] : ""
-                );
-                setQSID(
-                  QSindex < QSIDList.length - 1 ? QSIDList[QSindex + 1] : ""
-                );
+                // if (editing === true && editMode === false) {
+                //   checkChanges(QSValues, QSValuesInit);
+                // }
+                if (editing === true && editMode === true) {
+                  checkChanges(QSValues, QSOriginal, "next");
+                }
+                // console.log(QSindex);
+                if (editing === false) {
+                  setQSindex(
+                    QSindex < QSIDList.length ? QSindex + 1 : QSIDList.length
+                  );
+                  setQSIDtoedit(
+                    QSindex < QSIDList.length - 1 ? QSIDList[QSindex + 1] : ""
+                  );
+                  setQSID(
+                    QSindex < QSIDList.length - 1 ? QSIDList[QSindex + 1] : ""
+                  );
+                  setQSindexerror(null);
+                }
               }}
             >
               Next
@@ -1468,9 +1981,17 @@ const SalesQS2 = () => {
             <button
               onClick={(e) => {
                 e.preventDefault();
-                setQSindex(QSIDList.length);
-                setQSIDtoedit("");
-                setQSID("");
+                if (editMode === true && editing === true) {
+                  checkChanges(QSValues, QSOriginal, "new");
+                }
+                if (editMode === false && editing === true) {
+                  checkChanges(QSValues, QSValuesInit, "new");
+                }
+                if (editing === false) {
+                  setQSindex(QSIDList.length);
+                  setQSIDtoedit("");
+                  setQSID("");
+                }
               }}
             >
               New
@@ -1482,7 +2003,9 @@ const SalesQS2 = () => {
 
       <form
         className={editMode ? "salesQS-form editmode" : "salesQS-form"}
-        onSubmit={(e) => addQS(e)}
+        onSubmit={(e) => {
+          addupdateQS(e);
+        }}
       >
         <section id="salesQS-1">
           <div className="form-group">
@@ -1492,6 +2015,7 @@ const SalesQS2 = () => {
               className="canceldrag"
               value={QSValues.QSDate}
               type="date"
+              onKeyDown={ignoreEnter}
             />
           </div>
           <div className="form-group">
@@ -1502,6 +2026,7 @@ const SalesQS2 = () => {
               value={QSValues ? QSValues.KTP || "" : ""}
               onChange={handleCNumInputChange}
               className="canceldrag"
+              onKeyDown={ignoreEnter}
             ></input>
           </div>
           <fieldset>
@@ -1514,9 +2039,11 @@ const SalesQS2 = () => {
                 checked={QSData && QSData.saleType === 1 ? true : false}
                 required
                 onClick={(e) => {
+                  setEditing(true);
                   setQSData({ ...QSData, saleType: 1 });
                   setQSValues({ ...QSValues, saleType: "Back-to-back" });
                 }}
+                onKeyDown={ignoreEnter}
               />
               <label htmlFor="">Back-to-back</label>
             </div>
@@ -1527,10 +2054,12 @@ const SalesQS2 = () => {
                 checked={QSData && QSData.saleType === 2 ? true : false}
                 required
                 onClick={(e) => {
+                  setEditing(true);
                   setQSData({ ...QSData, saleType: 2 });
                   setQSValues({ ...QSValues, saleType: "Position" });
                   loadPositions();
                 }}
+                onKeyDown={ignoreEnter}
               />
               <label htmlFor="">Position</label>
               {QSData && QSData.saleType === 2 ? (
@@ -1570,6 +2099,7 @@ const SalesQS2 = () => {
                 placeholder="New QS"
                 readOnly
                 value={QSData ? QSData.QSID || "" : ""}
+                onKeyDown={ignoreEnter}
               />
             </div>
             <div className="form-group">
@@ -1586,6 +2116,7 @@ const SalesQS2 = () => {
                 value={QSValues ? QSValues.abbreviation || "" : ""}
                 resetfield={resetfield}
                 setResetfield={setResetfield}
+                setEditing={setEditing}
                 required
               />
             </div>
@@ -1598,6 +2129,7 @@ const SalesQS2 = () => {
                 type="text"
                 required
                 readOnly
+                onKeyDown={ignoreEnter}
               />
             </div>
             <div className="form-group">
@@ -1610,12 +2142,17 @@ const SalesQS2 = () => {
                 placeholder={"Customer..."}
                 setQSFields={setQSFields}
                 value={QSValues ? QSValues.customer || "" : ""}
+                setEditing={setEditing}
                 required
               />
             </div>
             <div className="form-group">
               <label htmlFor="">Contact:</label>
-              <input className="canceldrag" type="text" />
+              <input
+                className="canceldrag"
+                type="text"
+                onKeyDown={ignoreEnter}
+              />
             </div>
           </fieldset>
           <fieldset>
@@ -1633,6 +2170,7 @@ const SalesQS2 = () => {
                 }}
                 className="canceldrag"
                 required
+                onKeyDown={ignoreEnter}
               />
             </div>
             <div className="form-group">
@@ -1647,6 +2185,8 @@ const SalesQS2 = () => {
                   e.target.select();
                 }}
                 className="canceldrag"
+                onKeyDown={ignoreEnter}
+
                 // required
               />
             </div>
@@ -1666,6 +2206,7 @@ const SalesQS2 = () => {
                 }}
                 className="canceldrag"
                 required
+                onKeyDown={ignoreEnter}
               />
             </div>
             <div className="form-group">
@@ -1680,6 +2221,7 @@ const SalesQS2 = () => {
                 }}
                 className="canceldrag"
                 required
+                onKeyDown={ignoreEnter}
               />
             </div>
             {/* </div> */}
@@ -1693,6 +2235,7 @@ const SalesQS2 = () => {
                 placeholder={"POL..."}
                 setQSFields={setQSFields}
                 value={QSValues ? QSValues.POL || "" : ""}
+                setEditing={setEditing}
                 required
               />
             </div>
@@ -1706,30 +2249,36 @@ const SalesQS2 = () => {
                 placeholder={"POD..."}
                 setQSFields={setQSFields}
                 value={QSValues ? QSValues.POD || "" : ""}
+                setEditing={setEditing}
                 required
               />
             </div>
           </fieldset>
         </section>
         <section id="salesQS-2">
-          {/* <div className="form-group">
-            <label>WGP:</label>
-            <input
-              name="KTP"
-              value={QSValues ? QSValues.KTP || "" : ""}
-              onChange={handleChange}
-              className="canceldrag"
-            ></input>
-          </div> */}
-          <div className="soldcheckbox">
-            <input
-              className="canceldrag"
-              name="saleComplete"
-              type="checkbox"
-              checked={sold}
-              onClick={handleSold}
-            />
-            <label>Sold</label>
+          <div className="saleboxes">
+            <div className="soldcheckbox">
+              <input
+                className="canceldrag"
+                name="saleComplete"
+                type="checkbox"
+                checked={sold}
+                onClick={handleSold}
+                onKeyDown={ignoreEnter}
+              />
+              <label>Sold</label>
+            </div>
+            <div className="soldcheckbox">
+              <input
+                className="canceldrag"
+                name="allocationComplete"
+                type="checkbox"
+                checked={allocated}
+                onClick={handleAllocated}
+                onKeyDown={ignoreEnter}
+              />
+              <label>US-Allocation</label>
+            </div>
           </div>
           <div className="form-group">
             <label>WGS:</label>
@@ -1739,6 +2288,7 @@ const SalesQS2 = () => {
               value={QSValues ? QSValues.KTS || "" : ""}
               onChange={handleCNumInputChange}
               className="canceldrag"
+              onKeyDown={ignoreEnter}
             ></input>
           </div>
           <fieldset>
@@ -1750,6 +2300,7 @@ const SalesQS2 = () => {
                 value={QSValues.TIC}
                 type="text"
                 readOnly
+                onKeyDown={ignoreEnter}
               />
             </div>
             <div className="form-group">
@@ -1762,6 +2313,8 @@ const SalesQS2 = () => {
                 placeholder={"Traffic..."}
                 setQSFields={setQSFields}
                 value={QSValues ? QSValues.traffic || "" : ""}
+                setEditing={setEditing}
+                required
               />
             </div>
           </fieldset>
@@ -1780,6 +2333,7 @@ const SalesQS2 = () => {
                 }}
                 className="canceldrag"
                 required
+                onKeyDown={ignoreEnter}
               />
             </div>
             <div className="form-group">
@@ -1792,6 +2346,7 @@ const SalesQS2 = () => {
                 placeholder={"Payment terms..."}
                 setQSFields={setQSFields}
                 value={QSValues ? QSValues.paymentTerm || "" : ""}
+                setEditing={setEditing}
                 required
               />
             </div>
@@ -1802,6 +2357,7 @@ const SalesQS2 = () => {
                 placeholder="Interest rate..."
                 type="text"
                 name="CADintrate"
+                onKeyDown={ignoreEnter}
                 // onDoubleClick={(e) => {
                 //   e.target.select();
                 // }}
@@ -1832,6 +2388,7 @@ const SalesQS2 = () => {
               <input
                 value={QSValues.CADdays}
                 name="CADdays"
+                onKeyDown={ignoreEnter}
                 onChange={(e) => {
                   if (inEuros === true && !exchangerate) {
                     confirmAlert({
@@ -1861,25 +2418,24 @@ const SalesQS2 = () => {
           </fieldset>
 
           <div id="shipmenttyperadio" className="form-group">
-            {/* <p> */}
             <input
               name="shipmenttype"
               type="radio"
               defaultChecked
               required
+              onKeyDown={ignoreEnter}
               onClick={(e) => {
                 setQSData({ ...QSData, shipmentType: 1 });
                 setQSValues({ ...QSValues, shipmentType: "Container" });
               }}
             />
             <label htmlFor="">Container</label>
-            {/* </p>
 
-            <p> */}
             <input
               name="shipmenttype"
               type="radio"
               required
+              onKeyDown={ignoreEnter}
               onClick={(e) => {
                 setQSData({ ...QSData, shipmentType: 2 });
                 setQSValues({ ...QSValues, shipmentType: "Breakbulk" });
@@ -1890,13 +2446,13 @@ const SalesQS2 = () => {
               name="shipmenttype"
               type="radio"
               required
+              onKeyDown={ignoreEnter}
               onClick={(e) => {
                 setQSData({ ...QSData, shipmentType: 3 });
-                setQSValues({ ...QSValues, shipmentType: "Distribution" });
+                setQSValues({ ...QSValues, shipmentType: "Truck" });
               }}
             />
-            <label htmlFor="">Distribution</label>
-            {/* </p> */}
+            <label htmlFor="">Truck</label>
           </div>
 
           {QSData && QSData.shipmentType === 1 ? (
@@ -1904,7 +2460,11 @@ const SalesQS2 = () => {
               <legend>Freight</legend>
               <div className="form-group">
                 <label htmlFor="">Freight ID:</label>
-                <input placeholder="[Leave Blank]" type="text" />
+                <input
+                  placeholder="[Leave Blank]"
+                  type="text"
+                  onKeyDown={ignoreEnter}
+                />
               </div>
               <div className="form-group">
                 <label htmlFor="">Freight Total:</label>
@@ -1915,6 +2475,7 @@ const SalesQS2 = () => {
                   value={QSValues.freightTotal}
                   onChange={CurrencyChange}
                   onBlur={CurrencyBlur}
+                  onKeyDown={ignoreEnter}
                 />
               </div>
               <div className="form-group">
@@ -1926,6 +2487,7 @@ const SalesQS2 = () => {
                   onChange={handleChange}
                   value={QSValues ? QSValues.shippingline || "" : ""}
                   type="text"
+                  onKeyDown={ignoreEnter}
                 />
               </div>
               <div className="form-group">
@@ -1937,6 +2499,7 @@ const SalesQS2 = () => {
                   value={QSValues.payload}
                   onChange={QtyChange}
                   onBlur={QtyBlur}
+                  onKeyDown={ignoreEnter}
                 />
               </div>
               <div className="form-group">
@@ -1948,6 +2511,7 @@ const SalesQS2 = () => {
                   onChange={CurrencyChange}
                   onBlur={CurrencyBlur}
                   type="text"
+                  onKeyDown={ignoreEnter}
                 />
               </div>
             </fieldset>
@@ -1975,6 +2539,7 @@ const SalesQS2 = () => {
                   // }}
                   onBlur={QtyBlur}
                   required
+                  onKeyDown={ignoreEnter}
                 />
               </div>
               <fieldset>
@@ -1993,6 +2558,7 @@ const SalesQS2 = () => {
                     value={QSValues.materialcost}
                     onBlur={CurrencyBlur}
                     required
+                    onKeyDown={ignoreEnter}
                   />
                 </div>
                 <div className="form-group">
@@ -2009,6 +2575,7 @@ const SalesQS2 = () => {
                     onChange={CurrencyChange}
                     onBlur={CurrencyBlur}
                     required
+                    onKeyDown={ignoreEnter}
                   />
                 </div>
                 <div className="form-group">
@@ -2025,6 +2592,7 @@ const SalesQS2 = () => {
                     onChange={CurrencyChange}
                     onBlur={CurrencyBlur}
                     required
+                    onKeyDown={ignoreEnter}
                   />
                 </div>
                 <div className="form-group">
@@ -2041,6 +2609,7 @@ const SalesQS2 = () => {
                     onBlur={CurrencyBlur}
                     type="text"
                     required
+                    onKeyDown={ignoreEnter}
                   />
                 </div>
                 <div className="form-group">
@@ -2057,6 +2626,7 @@ const SalesQS2 = () => {
                     onBlur={CurrencyBlur}
                     type="text"
                     required
+                    onKeyDown={ignoreEnter}
                   />
                 </div>
                 <div className="form-group">
@@ -2073,6 +2643,7 @@ const SalesQS2 = () => {
                     onBlur={CurrencyBlur}
                     type="text"
                     required
+                    onKeyDown={ignoreEnter}
                   />
                 </div>
                 <div className="form-group">
@@ -2089,6 +2660,7 @@ const SalesQS2 = () => {
                     onBlur={CurrencyBlur}
                     type="text"
                     required
+                    onKeyDown={ignoreEnter}
                   />
                 </div>
                 <div className="form-group">
@@ -2105,6 +2677,7 @@ const SalesQS2 = () => {
                     onBlur={CurrencyBlur}
                     type="text"
                     required
+                    onKeyDown={ignoreEnter}
                   />
                 </div>
                 <div className="form-group">
@@ -2122,6 +2695,7 @@ const SalesQS2 = () => {
                     type="text"
                     required
                     readOnly
+                    onKeyDown={ignoreEnter}
                   />
                 </div>
                 <div className="form-group">
@@ -2138,6 +2712,7 @@ const SalesQS2 = () => {
                     onBlur={CurrencyBlur}
                     type="text"
                     required
+                    onKeyDown={ignoreEnter}
                   />
                 </div>
                 <div className="form-group">
@@ -2154,6 +2729,7 @@ const SalesQS2 = () => {
                     onBlur={CurrencyBlur}
                     type="text"
                     required
+                    onKeyDown={ignoreEnter}
                   />
                 </div>
                 <div className="form-group">
@@ -2170,6 +2746,7 @@ const SalesQS2 = () => {
                     onBlur={CurrencyBlur}
                     type="text"
                     required
+                    onKeyDown={ignoreEnter}
                   />
                 </div>
               </fieldset>
@@ -2181,6 +2758,7 @@ const SalesQS2 = () => {
                   value={QSValues.totalcost}
                   type="text"
                   required
+                  onKeyDown={ignoreEnter}
                 />
               </div>
             </section>
@@ -2217,6 +2795,7 @@ const SalesQS2 = () => {
                     onBlur={PercentageBlur}
                     type="text"
                     required
+                    onKeyDown={ignoreEnter}
                   />
                 </div>
                 <div className="form-group">
@@ -2248,6 +2827,7 @@ const SalesQS2 = () => {
                     // }}
                     type="text"
                     required
+                    onKeyDown={ignoreEnter}
                   />
                 </div>
               </fieldset>
@@ -2266,6 +2846,7 @@ const SalesQS2 = () => {
                     onBlur={CurrencyBlur}
                     type="text"
                     required
+                    onKeyDown={ignoreEnter}
                   />
                 </div>
                 <div className="form-group">
@@ -2276,6 +2857,7 @@ const SalesQS2 = () => {
                     readOnly
                     type="text"
                     required
+                    onKeyDown={ignoreEnter}
                   />
                 </div>
               </fieldset>
@@ -2287,6 +2869,7 @@ const SalesQS2 = () => {
                   value={QSValues.priceafterint}
                   type="text"
                   required
+                  onKeyDown={ignoreEnter}
                 />
               </div>
               <fieldset>
@@ -2299,6 +2882,7 @@ const SalesQS2 = () => {
                     value={QSValues.profit}
                     type="text"
                     required
+                    onKeyDown={ignoreEnter}
                   />
                 </div>
                 <div className="form-group">
@@ -2309,6 +2893,7 @@ const SalesQS2 = () => {
                     value={QSValues.margin}
                     type="text"
                     required
+                    onKeyDown={ignoreEnter}
                   />
                 </div>
                 <div className="form-group">
@@ -2319,6 +2904,7 @@ const SalesQS2 = () => {
                     value={QSValues.turnover}
                     type="text"
                     required
+                    onKeyDown={ignoreEnter}
                   />
                 </div>
                 <div className="form-group">
@@ -2329,6 +2915,7 @@ const SalesQS2 = () => {
                     value={QSValues.pctmargin}
                     type="text"
                     required
+                    onKeyDown={ignoreEnter}
                   />
                 </div>
                 <div className="form-group">
@@ -2339,6 +2926,7 @@ const SalesQS2 = () => {
                     value={QSValues.netback}
                     type="text"
                     required
+                    onKeyDown={ignoreEnter}
                   />
                 </div>
               </fieldset>
@@ -2348,17 +2936,53 @@ const SalesQS2 = () => {
                   className="canceldrag"
                   onChange={(e) => {
                     e.preventDefault();
+                    setEditing(true);
                     const isdecimalnumber = RegExp("^[0-9.]+$");
                     if (
                       isdecimalnumber.test(e.target.value) ||
                       e.target.value === ""
                     ) {
-                      console.log("hey u");
+                      // console.log("hey u");
                       setExchangerate(e.target.value);
                     }
                   }}
                   value={exchangerate ? exchangerate : ""}
                   placeholder="$/€ (up to 4 decimals)"
+                  readOnly={lockER}
+                  onKeyDown={ignoreEnter}
+                />
+                <UnlockedIcon
+                  onClick={(e) => {
+                    setLockER(!lockER);
+                  }}
+                  className={
+                    !lockER
+                      ? "unlockicon display-block"
+                      : "unlockicon display-none"
+                  }
+                />
+                <LockedIcon
+                  onClick={(e) => {
+                    e.preventDefault();
+                    confirmAlert({
+                      title: "Warning",
+                      message: `If you have already entered data with a different exchange rate. Changing the rate at this point will likely cause currency and calculation inconsistencies in the QS.`,
+                      buttons: [
+                        {
+                          label: "Go ahead",
+                          onClick: () => setLockER(!lockER),
+                        },
+                        {
+                          label: "Cancel",
+                        },
+                      ],
+                      closeOnClickOutside: true,
+                      closeOnEscape: true,
+                    });
+                  }}
+                  className={
+                    lockER ? "lockicon display-block" : "lockicon display-none"
+                  }
                 />
                 <button
                   onClick={(e) => {
@@ -2399,7 +3023,7 @@ const SalesQS2 = () => {
                 <button type="submit">Save and New</button>
               </>
             ) : (
-              <button type="button">Save Edits</button>
+              <button type="submit">Save Edits</button>
             )}
             {/* <button type="submit" onClick={(e) => console.log("prepare offer")}>
             Save and Offer

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import "../../node_modules/react-grid-layout/css/styles.css";
 import "../../node_modules/react-resizable/css/styles.css";
 import GridLayout from "react-grid-layout";
@@ -10,12 +10,18 @@ import PositionAdd from "./PositionAdd";
 import PositionModal from "./PositionModal";
 import AddProductModal from "./AddProductModal";
 import "./PositionsTableSort.css";
+import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
+import "react-tabs/style/react-tabs.css";
+import { ReactComponent as RefreshIcon } from "../assets/_images/refreshicon.svg";
+import { RefreshPositionsContext } from "../contexts/RefreshPositionsProvider";
 
 import { Responsive, WidthProvider } from "react-grid-layout";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
 const PositionsGrid = () => {
+  const { posrefresh, togglePosrefresh } = useContext(RefreshPositionsContext);
+
   const initlayout = {
     lg: [
       { i: "a", x: 0, y: 0, w: 21, h: 12 },
@@ -116,7 +122,25 @@ const PositionsGrid = () => {
           draggableCancel=".canceldrag"
         >
           <div id="positions1" key="a">
-            <PositionReport key="positionreport" />
+            <div className="positionreporttitleline">
+              <h3 className="positionreporttitle">Position Report</h3>
+              <RefreshIcon
+                className="refreshicon"
+                onClick={(e) => {
+                  togglePosrefresh();
+                }}
+              />
+            </div>
+            <Tabs>
+              <TabList>
+                <Tab>Global</Tab>
+                <Tab>USA Distribution</Tab>
+              </TabList>
+              <TabPanel>
+                <PositionReport key="positionreport" />
+              </TabPanel>
+              <TabPanel>USA Position Report Here</TabPanel>
+            </Tabs>
           </div>
           <div id="positions2" key="b">
             <PositionAdd key="positionadd" showAddProd={showAddProdModal} />

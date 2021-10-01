@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import Login from "./components/Login";
 import Home from "./components/Home";
 import SalesGrid from "./components/SalesGrid";
+import SalesGrid2 from "./components/SalesGrid2";
 import Header from "./components/Header";
 import PositionsGrid from "./components/PositionsGrid";
 import Register from "./components/Register";
@@ -13,6 +14,7 @@ import ManagementGrid from "./components/ManagementGrid";
 import Admin from "./components/Admin";
 import SunburstData from "./components/SunburstData";
 import AnalysisGrid from "./components/AnalysisGrid";
+import { LoadQSProvider } from "./contexts/LoadQSProvider";
 
 // Export Auth Context to be used in Login.js
 export const AuthContext = createContext();
@@ -83,39 +85,44 @@ const reducer = (state, action) => {
 function App() {
   const [state, dispatch] = useReducer(reducer, initialState);
   return (
-    <RefreshPositionsProvider>
-      <AuthContext.Provider value={{ state, dispatch }}>
-        <div className="App">
-          {!state.isAuthenticated ? (
-            <Login />
-          ) : (
-            <>
-              <Header />
-              <Router>
-                <Nav />
-                <Switch>
-                  <Route exact path="/">
-                    <PositionsGrid />
-                  </Route>
-                  <Route path="/sales">
-                    <SalesGrid />
-                  </Route>
-                  <Route path="/management">
-                    <ManagementGrid />
-                  </Route>
-                  <Route path="/admin">
-                    <Admin />
-                  </Route>
-                  <Route path="/analysis">
-                    <AnalysisGrid />
-                  </Route>
-                </Switch>
-              </Router>
-            </>
-          )}
-        </div>
-      </AuthContext.Provider>
-    </RefreshPositionsProvider>
+    <LoadQSProvider>
+      <RefreshPositionsProvider>
+        <AuthContext.Provider value={{ state, dispatch }}>
+          <div className="App">
+            {!state.isAuthenticated ? (
+              <Login />
+            ) : (
+              <>
+                <Header />
+                <Router>
+                  <Nav />
+                  <Switch>
+                    <Route exact path="/">
+                      <PositionsGrid />
+                    </Route>
+                    <Route path="/sales">
+                      <SalesGrid />
+                    </Route>
+                    <Route path="/sales2">
+                      <SalesGrid2 />
+                    </Route>
+                    <Route path="/management">
+                      <ManagementGrid />
+                    </Route>
+                    <Route path="/admin">
+                      <Admin />
+                    </Route>
+                    <Route path="/analysis">
+                      <AnalysisGrid />
+                    </Route>
+                  </Switch>
+                </Router>
+              </>
+            )}
+          </div>
+        </AuthContext.Provider>
+      </RefreshPositionsProvider>
+    </LoadQSProvider>
   );
 }
 

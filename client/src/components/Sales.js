@@ -20,9 +20,7 @@ const Sales = (props) => {
       setTraders(response.data);
     });
   }, []);
-  // useEffect(() => {
-  //   Axios.post("/sales").then((response) => console.log(response.data));
-  // }, []);
+
   var CONFIG = {
     sort: { column: "QSID", order: "desc" },
     columns: {

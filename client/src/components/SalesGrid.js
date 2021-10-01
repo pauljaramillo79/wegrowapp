@@ -112,6 +112,7 @@ const SalesGrid = () => {
           <div id="sales2" key="b">
             <SalesQS />
           </div>
+
           {/* <div id="sales2" key="c"></div> */}
         </ResponsiveGridLayout>
         {/* </GridLayout> */}

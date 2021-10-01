@@ -141,9 +141,10 @@
   margin-left: 0.5rem;
   margin-bottom: 0.5rem;
   margin-top: 0.5rem;
+  margin-right: 1rem;
 }
 .salesQS-form .soldcheckbox label {
-  margin-left: 1rem;
+  margin-left: 0.5rem;
 }
 #QSbuttons {
   display: flex;
@@ -205,4 +206,64 @@
 }
 .editmode {
   background-color: rgb(246, 246, 246) !important;
+}
+.unlockicon {
+  height: 20px;
+  margin-left: 5px;
+}
+.lockicon {
+  height: 20px;
+  margin-left: 5px;
+}
+.custom-ui {
+  background-color: white;
+  padding: 3rem;
+  border-radius: 1rem;
+  min-width: 550px;
+  min-height: 200px;
+  text-align: center;
+}
+.custom-ui h1 {
+  color: rgb(68, 65, 162);
+  margin-bottom: 2rem;
+}
+.confirmmsg {
+  max-width: 450px;
+  margin-bottom: 2rem;
+}
+.custom-ui button {
+  padding: 0.3rem 1.5rem;
+  border: solid 2px rgb(68, 65, 162);
+  background-color: white;
+  border-radius: 3rem;
+  margin: 0 1rem;
+}
+.custom-ui button:hover {
+  cursor: pointer;
+  background-color: rgba(68, 65, 162, 0.75);
+  color: white;
+}
+.custom-ui ul {
+  margin-bottom: 1.5rem;
+}
+.editsline {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  justify-content: space-between;
+}
+.editsheader {
+  font-weight: bold;
+}
+.edititem {
+  min-width: 130px;
+  text-align: left;
+}
+.editfig {
+  text-align: right;
+  min-width: 130px;
+}
+.saleboxes {
+  display: flex;
+  flex-direction: row;
 }
