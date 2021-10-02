@@ -40,7 +40,7 @@ const Nav = () => {
             Sales
           </NavLink>
         </li>
-        {role === 1 ? (
+        {/* {role === 1 ? (
           <li>
             <NavLink activeClassName="navbaractive" to="/sales2">
               Sales2
@@ -48,7 +48,7 @@ const Nav = () => {
           </li>
         ) : (
           ""
-        )}
+        )} */}
         {/* <li>
           <NavLink activeClassName="navbaractive" to="/purchases">
             Purchases

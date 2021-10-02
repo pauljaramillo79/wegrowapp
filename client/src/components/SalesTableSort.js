@@ -6,6 +6,7 @@ import "./css/screen.css";
 import PositionModal from "./PositionModal";
 import { AuthContext } from "../App";
 import { RefreshPositionsContext } from "../contexts/RefreshPositionsProvider";
+import { LoadQSContext } from "../contexts/LoadQSProvider";
 import moment from "moment";
 
 import { confirmAlert } from "react-confirm-alert";
@@ -17,6 +18,8 @@ const SalesTableSort = (props) => {
 
   const { state } = useContext(AuthContext);
   const { QSrefresh, toggleQSrefresh } = useContext(RefreshPositionsContext);
+  const { toggleQSload, setQStoload, toggleDuplicate } =
+    useContext(LoadQSContext);
   // Get token values from UseContext and Local Storage
   // let accesstoken = state.accesstoken;
   let accesstoken = JSON.parse(localStorage.getItem("accesstoken"));
@@ -81,6 +84,7 @@ const SalesTableSort = (props) => {
   //   setColumnNames(Object.keys(props.columns));
   // }, [props.columns]);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(async () => {
     // console.log(props.limit);
     // props.setColumns(props.config.columns);
@@ -102,6 +106,7 @@ const SalesTableSort = (props) => {
     }).then(
       (response) => {
         toggleQSrefresh();
+        toggleDuplicate();
       }
       // toggleQSrefresh()
     );
@@ -291,7 +296,9 @@ const SalesTableSort = (props) => {
           <button
             className="editbutton"
             onClick={(e) => {
-              props.showEditModal(e, item);
+              setQStoload(item.QSID);
+              toggleQSload();
+              // props.showEditModal(e, item);
             }}
           >
             Edit
@@ -323,7 +330,10 @@ const SalesTableSort = (props) => {
                         await Axios.delete("/deleteQS", {
                           data: { id: item.QSID },
                         })
-                          .then((response) => toggleQSrefresh())
+                          .then((response) => {
+                            toggleQSrefresh();
+                            toggleDuplicate();
+                          })
                           .catch((err) => console.log(err));
                       },
                     },

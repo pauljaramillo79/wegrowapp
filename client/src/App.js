@@ -101,11 +101,11 @@ function App() {
                       <PositionsGrid />
                     </Route>
                     <Route path="/sales">
-                      <SalesGrid />
-                    </Route>
-                    <Route path="/sales2">
                       <SalesGrid2 />
                     </Route>
+                    {/* <Route path="/sales2">
+                      <SalesGrid2 />
+                    </Route> */}
                     <Route path="/management">
                       <ManagementGrid />
                     </Route>
