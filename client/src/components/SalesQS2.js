@@ -147,6 +147,8 @@ const SalesQS2 = () => {
 
   const [consolidatedEdits, setConsolidatedEdits] = useState({});
 
+  const [loading, setLoading] = useState(false);
+
   const [userID, setUserID] = useState(
     JSON.parse(localStorage.getItem("WGusercode"))
   );
@@ -236,9 +238,22 @@ const SalesQS2 = () => {
               }
             });
           };
+          const loading = () => {
+            return new Promise((resolve, reject) => {
+              setLoading(true);
+              resolve();
+            });
+          };
+          const doneloading = () => {
+            return new Promise((resolve, reject) => {
+              setLoading(false);
+              resolve();
+            });
+          };
           const doWork = async () => {
             const check = await checkER(response);
             const exrate = await changeER(response);
+            await loading();
             setQSValues({
               ...QSValues,
               KTP: response.data[0].KTP,
@@ -475,6 +490,21 @@ const SalesQS2 = () => {
                   : check && inEuros && !response.data[0].other
                   ? "€ 0.00"
                   : response.data[0].other,
+              totalcost:
+                check && inEuros && response.data[0].totalcost
+                  ? "€ " +
+                    (
+                      Number(
+                        response.data[0].totalcost
+                          .replace("$", "")
+                          .replace(",", "")
+                      ) / exrate
+                    )
+                      .toFixed(2)
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                  : check && inEuros && !response.data[0].totalcost
+                  ? "€ 0.00"
+                  : response.data[0].totalcost,
               interestrate: response.data[0].interestrate,
               interestdays: response.data[0].interestdays,
               pricebeforeint:
@@ -522,6 +552,70 @@ const SalesQS2 = () => {
                   : check && inEuros && !response.data[0].priceafterint
                   ? "€ 0.00"
                   : response.data[0].priceafterint,
+              profit:
+                check && inEuros && response.data[0].profit
+                  ? "€ " +
+                    (
+                      Number(
+                        response.data[0].profit
+                          .replace("$", "")
+                          .replace(",", "")
+                      ) / exrate
+                    )
+                      .toFixed(2)
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                  : check && inEuros && !response.data[0].pricebeforeint
+                  ? "€ 0.00"
+                  : response.data[0].profit,
+              margin:
+                check && inEuros && response.data[0].margin
+                  ? "€ " +
+                    (
+                      Number(
+                        response.data[0].margin
+                          .replace("$", "")
+                          .replace(",", "")
+                      ) / exrate
+                    )
+                      .toFixed(2)
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                  : check && inEuros && !response.data[0].margin
+                  ? "€ 0.00"
+                  : response.data[0].margin,
+              turnover:
+                check && inEuros && response.data[0].turnover
+                  ? "€ " +
+                    (
+                      Number(
+                        response.data[0].turnover
+                          .replace("$", "")
+                          .replace(",", "")
+                      ) / exrate
+                    )
+                      .toFixed(2)
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                  : check && inEuros && !response.data[0].turnover
+                  ? "€ 0.00"
+                  : response.data[0].turnover,
+              pctmargin:
+                check && response.data[0].pctmargin
+                  ? response.data[0].pctmargin
+                  : "0.00%",
+              netback:
+                check && inEuros && response.data[0].netback
+                  ? "€ " +
+                    (
+                      Number(
+                        response.data[0].netback
+                          .replace("$", "")
+                          .replace(",", "")
+                      ) / exrate
+                    )
+                      .toFixed(2)
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                  : check && inEuros && !response.data[0].netback
+                  ? "€ 0.00"
+                  : response.data[0].netback,
             });
             setQSData({
               ...QSData,
@@ -643,6 +737,11 @@ const SalesQS2 = () => {
                     response.data[0].other.replace("$", "").replace(",", "")
                   )
                 : 0,
+              totalcost: response.data[0].totalcost
+                ? Number(
+                    response.data[0].totalcost.replace("$", "").replace(",", "")
+                  )
+                : 0,
               interestrate:
                 Number(response.data[0].interestrate.replace("%", "")) / 100,
               interestdays: response.data[0].interestdays,
@@ -665,6 +764,28 @@ const SalesQS2 = () => {
                     response.data[0].priceafterint
                       .replace("$", "")
                       .replace(",", "")
+                  )
+                : 0,
+              profit: response.data[0].profit
+                ? Number(
+                    response.data[0].profit.replace("$", "").replace(",", "")
+                  )
+                : 0,
+              margin: response.data[0].margin
+                ? Number(
+                    response.data[0].margin.replace("$", "").replace(",", "")
+                  )
+                : 0,
+              turnover: response.data[0].turnover
+                ? Number(
+                    response.data[0].turnover.replace("$", "").replace(",", "")
+                  )
+                : 0,
+              pctmargin:
+                Number(response.data[0].pctmargin.replace("%", "")) / 100,
+              netback: response.data[0].netback
+                ? Number(
+                    response.data[0].netback.replace("$", "").replace(",", "")
                   )
                 : 0,
             });
@@ -919,6 +1040,7 @@ const SalesQS2 = () => {
               setSold(false);
               setAllocated(false);
             }
+            await doneloading();
           };
           doWork();
         }
@@ -1125,6 +1247,16 @@ const SalesQS2 = () => {
     setAllocated(!allocated);
     setSold(false);
     setEditing(true);
+    setQSValues({
+      ...QSValues,
+      customer: "USA Distribution",
+      CADdays: 100,
+    });
+    setQSData({
+      ...QSData,
+      customer: 452,
+      CADdays: 100,
+    });
   };
 
   useEffect(() => {
@@ -1635,11 +1767,14 @@ const SalesQS2 = () => {
         });
       }
     };
-    docalcs();
+    if (loading === false) {
+      docalcs();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     QSData.freightTotal,
     QSData.payload,
+    // QSData.freightpmt,
     QSData.CADintrate,
     QSData.CADdays,
     QSData.pricebeforeint,
@@ -2615,6 +2750,7 @@ const SalesQS2 = () => {
                 <div className="form-group">
                   <label htmlFor="">Freight (pmt):</label>
                   <input
+                    style={{ backgroundColor: "rgb(244,244,244)" }}
                     className="QSfig canceldrag"
                     value={QSValues.freightpmt}
                     // onDoubleClick={(e) => {
@@ -2622,16 +2758,22 @@ const SalesQS2 = () => {
                     // }}
                     name="freightpmt"
                     placeholder="...Freight pmt"
-                    onChange={CurrencyChange}
-                    onBlur={CurrencyBlur}
+                    onChange={(e) => {
+                      CurrencyChange(e);
+                    }}
+                    onBlur={(e) => {
+                      CurrencyBlur(e);
+                    }}
                     type="text"
                     required
+                    readOnly
                     onKeyDown={ignoreEnter}
                   />
                 </div>
                 <div className="form-group">
                   <label htmlFor="">Insurance Cost:</label>
                   <input
+                    style={{ backgroundColor: "rgb(244,244,244)" }}
                     className="QSfig canceldrag"
                     value={QSValues.insurance}
                     // onDoubleClick={(e) => {
@@ -2643,12 +2785,14 @@ const SalesQS2 = () => {
                     onBlur={CurrencyBlur}
                     type="text"
                     required
+                    readOnly
                     onKeyDown={ignoreEnter}
                   />
                 </div>
                 <div className="form-group">
                   <label htmlFor="">Inspection Cost:</label>
                   <input
+                    style={{ backgroundColor: "rgb(244,244,244)" }}
                     className="QSfig canceldrag"
                     value={QSValues.inspectionpmt}
                     // onDoubleClick={(e) => {
@@ -2660,6 +2804,7 @@ const SalesQS2 = () => {
                     onBlur={CurrencyBlur}
                     type="text"
                     required
+                    readOnly
                     onKeyDown={ignoreEnter}
                   />
                 </div>
@@ -2683,6 +2828,7 @@ const SalesQS2 = () => {
                 <div className="form-group">
                   <label htmlFor="">Interest Cost:</label>
                   <input
+                    style={{ backgroundColor: "rgb(244,244,244)" }}
                     className="QSfig canceldrag"
                     value={QSValues.interestcost}
                     // onDoubleClick={(e) => {
