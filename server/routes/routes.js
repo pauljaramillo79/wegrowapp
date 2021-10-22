@@ -546,7 +546,11 @@ router.post("/duplicateQS", (req, res) => {
 router.post("/QSIDList", (req, res) => {
   user = req.body.user;
   db.query(
-    `SELECT QSID FROM quotationsheet INNER JOIN traderList on quotationsheet.traderID = traderList.traderID WHERE traderList.tCode ="${user}" ORDER BY QSID ASC`,
+    `SELECT QSID FROM quotationsheet ${
+      user !== "all"
+        ? `INNER JOIN traderList on quotationsheet.traderID = traderList.traderID WHERE traderList.tCode ="${user}"`
+        : ""
+    } ORDER BY QSID ASC`,
     (err, results) => {
       if (err) {
         console.log(err);
