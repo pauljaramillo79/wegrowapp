@@ -4,6 +4,7 @@ import "../../node_modules/react-grid-layout/css/styles.css";
 import "../../node_modules/react-resizable/css/styles.css";
 import { Responsive, WidthProvider } from "react-grid-layout";
 import "./Grid.css";
+import "./ProfitabilityGrid.css";
 import ProfitabilityReport from "./ProfitabilityReport";
 import WaterfallChart from "./WaterFall";
 
@@ -92,9 +93,25 @@ const ProfitabilityGrid = () => {
   };
   const originalLayout = getFromLS("layouts") || initlayout;
   const [layouts, setLayouts] = useState(originalLayout);
+
+  const periodfilters = [
+    "This month",
+    "Last 3 months",
+    "This year",
+    "Last 12 months",
+    "Custom",
+  ];
+
+  const [clickedId, setClickedId] = useState(0);
+
+  const handleClick = (event, id) => {
+    setClickedId(id);
+  };
+
   return (
     <>
       <ResponsiveGridLayout
+        style={{ left: "2px" }}
         className="layout"
         breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
         layouts={layouts}
@@ -107,6 +124,29 @@ const ProfitabilityGrid = () => {
         draggableCancel=".canceldrag"
       >
         <div id="profitability" key="h">
+          <h3>Profitability Report</h3>
+          <div className="periodfilter">
+            <p>Period:</p>
+            {periodfilters.map((buttonlabel, i) => (
+              <button
+                key={i}
+                name={buttonlabel}
+                onClick={(event) => handleClick(event, i)}
+                className={
+                  i === clickedId
+                    ? "periodfilterbutton active"
+                    : "periodfilterbutton"
+                }
+              >
+                {buttonlabel}
+              </button>
+            ))}
+            {/* <button>This month</button>
+            <button>Last 3 months</button>
+            <button>This year</button>
+            <button>Last 12 months</button>
+            <p>Custom:</p> */}
+          </div>
           <ProfitabilityReport />
         </div>
         <div id="profitabilitychart" key="j">

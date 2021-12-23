@@ -1,0 +1,31 @@
+#profitability {
+  overflow: hidden;
+  padding-bottom: 5rem;
+}
+#profitability h3 {
+  padding-bottom: 0.5rem;
+}
+.periodfilter {
+  font-size: 0.9rem;
+  padding-bottom: 0.5rem;
+  display: flex;
+  flex-direction: row;
+  width: 50%;
+  justify-content: space-between;
+  align-items: baseline;
+}
+.periodfilterbutton {
+  border-radius: 1rem;
+  border: none;
+  padding: 0.3rem 1rem;
+}
+.periodfilterbutton:hover {
+  cursor: pointer;
+  background-color: rgb(169, 167, 218);
+  color: white;
+}
+.active,
+.active:hover {
+  background-color: rgb(68, 65, 162);
+  color: white;
+}

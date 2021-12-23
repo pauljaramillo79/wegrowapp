@@ -4,6 +4,9 @@
   font-family: "Roboto", sans-serif;
   font-size: 0.9rem;
 }
+.profitabilityreport p {
+  font-size: 0.8rem;
+}
 
 .profitabilityreportline {
   display: flex;
@@ -41,4 +44,10 @@
   font-size: 0.9rem;
   width: 100%;
   border-bottom: 1px solid rgb(68, 65, 162);
+}
+.profitabilityreportline:nth-child(even) {
+  background-color: rgb(245, 245, 245);
+}
+.profitabilityreportline:hover {
+  background-color: #ddeaf9;
 }

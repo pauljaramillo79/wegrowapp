@@ -4,5 +4,40 @@
   padding-left: 1rem;
   padding-top: 0.7rem;
   z-index: -10;
+  border-top-left-radius: 1rem;
+  border-top-right-radius: 1rem;
   /* padding-bottom: 1rem; */
 }
+.mgmtcontainer {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+}
+.mgmtgridcontainer {
+  /* margin-left: 10%; */
+  display: flex;
+  flex-basis: 90%;
+  display: inline-block;
+  width: 100%;
+  position: relative;
+  left: 230px;
+}
+.mgmtnav {
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  flex-basis: 19%;
+  width: 230px;
+  background-color: rgb(65, 64, 73);
+  /* background-color: black; */
+  color: white;
+  padding: 8rem 2rem;
+  height: 100vh;
+}
+.mgmtnav a {
+  font-size: 0.9rem;
+  color: white;
+}
+/* #profitability {
+  width: 900px !important;
+} */

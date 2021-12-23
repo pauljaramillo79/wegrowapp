@@ -2,8 +2,13 @@ import React, { useState, useEffect } from "react";
 import Axios from "axios";
 import "./ProfitabilityReport.css";
 
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEllipsisH } from "@fortawesome/free-solid-svg-icons";
+
 const ProfitabilityReport = () => {
   const [profitabilitydata, setProfitabilitydata] = useState();
+
+  const [sortorderr, setSortorderr] = useState({ product: "" });
 
   Array.prototype.groupBy = function (key) {
     return this.reduce(function (groups, item) {
@@ -21,6 +26,29 @@ const ProfitabilityReport = () => {
     });
   }, []);
 
+  useEffect(() => {
+    // console.log(Object.keys(profitabilitydata));
+    if (profitabilitydata) {
+      setProfitabilitydata({
+        ...profitabilitydata,
+        ["January-2021"]: profitabilitydata["January-2021"].sort(function (
+          a,
+          b
+        ) {
+          var nameA = a.product.toUpperCase();
+          var nameB = b.product.toUpperCase();
+          if (nameA < nameB) {
+            return -1;
+          }
+          if (nameA > nameB) {
+            return 1;
+          }
+          return 0;
+        }),
+      });
+    }
+  }, [sortorderr.product]);
+
   var group = "";
   var u = 0;
 
@@ -28,7 +56,50 @@ const ProfitabilityReport = () => {
     <div className="profitabilityreport">
       <ul>
         <li className="profitabilityreportline prheader">
-          <p className="profitabilityreportcolumn ">Customer</p>
+          <p className="profitabilityreportcolumn ">
+            Date
+            <FontAwesomeIcon
+              style={{ color: "gray", marginLeft: "1rem" }}
+              icon={faEllipsisH}
+            />
+          </p>
+          <p className="profitabilityreportcolumn ">
+            Customer{" "}
+            <FontAwesomeIcon
+              style={{ color: "gray", marginLeft: "1rem" }}
+              icon={faEllipsisH}
+            />
+          </p>
+          <p
+            className="profitabilityreportcolumn "
+            onClick={(e) => {
+              setSortorderr({
+                ...sortorderr,
+                product:
+                  sortorderr.product === ""
+                    ? "ASC"
+                    : sortorderr.product === "ASC"
+                    ? "DSC"
+                    : "",
+              });
+              // setProfitabilitydata({
+              //   ...profitabilitydata,
+              //   January: profitabilitydata["January"].sort(function (a, b) {
+              //     var nameA = a.product.toUpperCase();
+              //     var nameB = b.product.toUpperCase();
+              //     if (nameA < nameB) {
+              //       return -1;
+              //     }
+              //     if (nameA > nameB) {
+              //       return 1;
+              //     }
+              //     return 0;
+              //   }),
+              // });
+            }}
+          >
+            Product
+          </p>
           <p className="profitabilityreportcolumn prfig">Quantity</p>
           <p className="profitabilityreportcolumn prfig">Price</p>
           <p className="profitabilityreportcolumn prfig">Profit(pmt)</p>
@@ -44,7 +115,10 @@ const ProfitabilityReport = () => {
                   u = u + Number(x.profit);
                   return (
                     <li className="profitabilityreportline">
+                      <p className="profitabilityreportcolumn">{x.date}</p>
                       <p className="profitabilityreportcolumn">{x.customer}</p>
+                      <p className="profitabilityreportcolumn">{x.product}</p>
+
                       <p className="profitabilityreportcolumn prfig">
                         {x.quantity.toFixed(2)}
                       </p>

@@ -4,6 +4,10 @@
   "private": true,
   "proxy": "http://localhost:4001",
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^5.15.4",
+    "@fortawesome/fontawesome-svg-core": "^1.2.36",
+    "@fortawesome/free-solid-svg-icons": "^5.15.4",
+    "@fortawesome/react-fontawesome": "^0.1.16",
     "@nivo/axes": "^0.67.0",
     "@nivo/bar": "^0.67.0",
     "@nivo/core": "^0.67.0",
@@ -17,10 +21,12 @@
     "moment-timezone": "^0.5.33",
     "react": "^17.0.1",
     "react-confirm-alert": "^2.7.0",
+    "react-d3-zoomable-sunburst": "^1.0.5",
     "react-dom": "^17.0.1",
     "react-grid-layout": "^1.2.0",
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.2",
+    "react-tabs": "^3.2.2",
     "web-vitals": "^1.1.0"
   },
   "scripts": {
