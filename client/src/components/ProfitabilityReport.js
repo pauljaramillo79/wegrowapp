@@ -1,12 +1,19 @@
 import React, { useState, useEffect } from "react";
 import Axios from "axios";
 import "./ProfitabilityReport.css";
-
+import moment from "moment";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEllipsisH } from "@fortawesome/free-solid-svg-icons";
 
 const ProfitabilityReport = () => {
+  let currentyear = Number(moment().format("YYYY"));
+  let currentmonth = Number(moment().format("MM"));
   const [profitabilitydata, setProfitabilitydata] = useState();
+
+  const [reportdate, setReportdate] = useState(
+    currentyear + "-0" + currentmonth
+  );
+  // const [reportdate, setReportdate] = useState(currentyear - 1);
 
   const [sortorderr, setSortorderr] = useState({ product: "" });
 
@@ -20,11 +27,12 @@ const ProfitabilityReport = () => {
   };
 
   useEffect(() => {
-    Axios.post("/profitabilityreport").then((response) => {
+    console.log(reportdate);
+    Axios.post("/profitabilityreport", { reportdate }).then((response) => {
       const rep = response.data.groupBy("month");
       setProfitabilitydata(rep);
     });
-  }, []);
+  }, [reportdate]);
 
   useEffect(() => {
     // console.log(Object.keys(profitabilitydata));
@@ -57,7 +65,14 @@ const ProfitabilityReport = () => {
       <ul>
         <li className="profitabilityreportline prheader">
           <p className="profitabilityreportcolumn ">
-            Date
+            QSDate
+            <FontAwesomeIcon
+              style={{ color: "gray", marginLeft: "1rem" }}
+              icon={faEllipsisH}
+            />
+          </p>
+          <p className="profitabilityreportcolumn ">
+            ShipmentDate
             <FontAwesomeIcon
               style={{ color: "gray", marginLeft: "1rem" }}
               icon={faEllipsisH}
@@ -116,6 +131,9 @@ const ProfitabilityReport = () => {
                   return (
                     <li className="profitabilityreportline">
                       <p className="profitabilityreportcolumn">{x.date}</p>
+                      <p className="profitabilityreportcolumn">
+                        {x.startship} - {x.endship}
+                      </p>
                       <p className="profitabilityreportcolumn">{x.customer}</p>
                       <p className="profitabilityreportcolumn">{x.product}</p>
 

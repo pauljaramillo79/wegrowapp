@@ -1455,8 +1455,10 @@ router.post("/lysales", (req, res) => {
   );
 });
 router.post("/profitabilityreport", (req, res) => {
+  let reportdate = req.body.reportdate;
   db.query(
-    "SELECT DATE_FORMAT(QSDate, '%M-%Y') AS month, DATE_FORMAT(QSDate, '%d/%m/%Y') AS date, quantity, customerList.companyCode AS customer, abbreviation AS product, tradingProfit AS profitpmt, tradingMargin AS profit, priceBeforeInterest AS price FROM quotationsheet INNER JOIN customerList ON quotationsheet.customerID = customerList.customerID INNER JOIN productList ON quotationsheet.productID = productList.productID INNER JOIN prodNames ON productList.productName =  prodNames.prodNameID INNER JOIN productGroups ON prodNames.prodGroupID = productGroups.prodGroupID WHERE DATE_FORMAT(QSDate, '%Y')>2020 AND saleComplete=-1 ORDER BY QSDate DESC",
+    "SELECT DATE_FORMAT(`from`, '%M-%Y') AS month, DATE_FORMAT(QSDate, '%d/%m/%Y') AS date, DATE_FORMAT(`from`, '%d %b') AS startship, DATE_FORMAT(`to`, '%d %b') AS endship, quantity, customerList.companyCode AS customer, abbreviation AS product, tradingProfit AS profitpmt, tradingMargin AS profit, priceBeforeInterest AS price FROM quotationsheet INNER JOIN customerList ON quotationsheet.customerID = customerList.customerID INNER JOIN productList ON quotationsheet.productID = productList.productID INNER JOIN prodNames ON productList.productName =  prodNames.prodNameID INNER JOIN productGroups ON prodNames.prodGroupID = productGroups.prodGroupID WHERE DATE_FORMAT(`from`, '%Y-%m')=? AND saleComplete=-1 ORDER BY QSDate DESC",
+    [reportdate],
     (err, results) => {
       if (err) {
         console.log(err);
