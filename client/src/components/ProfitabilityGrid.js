@@ -7,6 +7,7 @@ import "./Grid.css";
 import "./ProfitabilityGrid.css";
 import ProfitabilityReport from "./ProfitabilityReport";
 import WaterfallChart from "./WaterFall";
+import moment from "moment";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -104,8 +105,33 @@ const ProfitabilityGrid = () => {
 
   const [clickedId, setClickedId] = useState(0);
 
+  let currentyear = moment().format("YYYY");
+  let currentmonth = moment().format("MM");
+  let currentday = moment().format("DD");
+  let currentdate = moment().format("YYYY-MM-DD");
+  let amonthago = moment().subtract(1, "months").format("YYYY-MM-DD");
+
+  // const [reportdate, setReportdate] = useState(
+  //   currentyear + "-0" + currentmonth
+  // );
+  const [reportstartdate, setReportstartdate] = useState(amonthago);
+  const [reportenddate, setReportenddate] = useState(currentdate);
   const handleClick = (event, id) => {
     setClickedId(id);
+    if (id === 0) {
+      setReportstartdate(moment().subtract(1, "months").format("YYYY-MM-DD"));
+    }
+    if (id === 1) {
+      setReportstartdate(moment().subtract(3, "months").format("YYYY-MM-DD"));
+    }
+    if (id === 2) {
+      setReportstartdate(
+        moment().year(currentyear).month(0).day(1).format("YYYY-MM-DD")
+      );
+    }
+    if (id === 3) {
+      setReportstartdate(moment().subtract(12, "months").format("YYYY-MM-DD"));
+    }
   };
 
   return (
@@ -147,7 +173,10 @@ const ProfitabilityGrid = () => {
             <button>Last 12 months</button>
             <p>Custom:</p> */}
           </div>
-          <ProfitabilityReport />
+          <ProfitabilityReport
+            reportstartdate={reportstartdate}
+            reportenddate={reportenddate}
+          />
         </div>
         <div id="profitabilitychart" key="j">
           <h3>Profit Waterfall Chart, 2020</h3>

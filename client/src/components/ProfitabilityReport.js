@@ -5,14 +5,14 @@ import moment from "moment";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEllipsisH } from "@fortawesome/free-solid-svg-icons";
 
-const ProfitabilityReport = () => {
-  let currentyear = Number(moment().format("YYYY"));
-  let currentmonth = Number(moment().format("MM"));
+const ProfitabilityReport = ({ reportstartdate, reportenddate }) => {
+  // let currentyear = Number(moment().format("YYYY"));
+  // let currentmonth = Number(moment().format("MM"));
   const [profitabilitydata, setProfitabilitydata] = useState();
 
-  const [reportdate, setReportdate] = useState(
-    currentyear + "-0" + currentmonth
-  );
+  // const [reportdate, setReportdate] = useState(
+  //   currentyear + "-0" + currentmonth
+  // );
   // const [reportdate, setReportdate] = useState(currentyear - 1);
 
   const [sortorderr, setSortorderr] = useState({ product: "" });
@@ -27,12 +27,14 @@ const ProfitabilityReport = () => {
   };
 
   useEffect(() => {
-    console.log(reportdate);
-    Axios.post("/profitabilityreport", { reportdate }).then((response) => {
-      const rep = response.data.groupBy("month");
-      setProfitabilitydata(rep);
-    });
-  }, [reportdate]);
+    // console.log(reportdate);
+    Axios.post("/profitabilityreport", { reportstartdate, reportenddate }).then(
+      (response) => {
+        const rep = response.data.groupBy("month");
+        setProfitabilitydata(rep);
+      }
+    );
+  }, [reportstartdate, reportenddate]);
 
   useEffect(() => {
     // console.log(Object.keys(profitabilitydata));
@@ -124,6 +126,7 @@ const ProfitabilityReport = () => {
           ? Object.entries(profitabilitydata).map((i, key) => {
               group = Object.keys(profitabilitydata)[key];
               u = 0;
+              console.log(profitabilitydata);
               return [
                 <h3 className="prmonth">{group}</h3>,
                 i[1].map((x) => {
@@ -144,14 +147,16 @@ const ProfitabilityReport = () => {
                         {x.price.toFixed(2)}
                       </p>
                       <p className="profitabilityreportcolumn prfig">
-                        {x.profitpmt.toFixed(2)}
+                        {x ? x.profitpmt.toFixed(2) : ""}
                       </p>
                       <p className="profitabilityreportcolumn prfig">
-                        {"$" +
-                          x.profit
-                            .toFixed(2)
-                            .toString()
-                            .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                        {x.profit
+                          ? "$" +
+                            x.profit
+                              .toFixed(2)
+                              .toString()
+                              .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                          : ""}
                       </p>
                     </li>
                   );
