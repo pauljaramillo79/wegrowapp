@@ -1459,7 +1459,7 @@ router.post("/profitabilityreport", (req, res) => {
   let reportenddate = req.body.reportenddate;
   console.log(reportstartdate);
   db.query(
-    "SELECT DATE_FORMAT(`from`, '%M-%Y') AS month, DATE_FORMAT(QSDate, '%d/%m/%Y') AS date, DATE_FORMAT(`from`, '%d %b') AS startship, DATE_FORMAT(`to`, '%d %b') AS endship, quantity, customerList.companyCode AS customer, abbreviation AS product, tradingProfit AS profitpmt, tradingMargin AS profit, priceBeforeInterest AS price FROM quotationsheet INNER JOIN customerList ON quotationsheet.customerID = customerList.customerID INNER JOIN productList ON quotationsheet.productID = productList.productID INNER JOIN prodNames ON productList.productName =  prodNames.prodNameID INNER JOIN productGroups ON prodNames.prodGroupID = productGroups.prodGroupID WHERE DATE(`from`) BETWEEN ? AND ? AND saleComplete=-1 ORDER BY QSDate DESC",
+    "SELECT DATE_FORMAT(`from`, '%M-%Y') AS month, DATE_FORMAT(QSDate, '%d/%m/%Y') AS date, DATE_FORMAT(`from`, '%d %b') AS startship, DATE_FORMAT(`to`, '%d %b') AS endship, quantity, customerList.companyCode AS customer, abbreviation AS product, tradingProfit AS profitpmt, tradingMargin AS profit, priceBeforeInterest AS price FROM quotationsheet INNER JOIN customerList ON quotationsheet.customerID = customerList.customerID INNER JOIN productList ON quotationsheet.productID = productList.productID INNER JOIN prodNames ON productList.productName =  prodNames.prodNameID INNER JOIN productGroups ON prodNames.prodGroupID = productGroups.prodGroupID WHERE DATE(`from`) BETWEEN ? AND ? AND saleComplete=-1 ORDER BY `from` DESC",
     [reportstartdate, reportenddate],
     (err, results) => {
       if (err) {

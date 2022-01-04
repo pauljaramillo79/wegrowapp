@@ -109,7 +109,6 @@ const ProfitabilityGrid = () => {
   let currentmonth = moment().format("MM");
   let currentday = moment().format("DD");
   let currentdate = moment().format("YYYY-MM-DD");
-  let amonthago = moment().subtract(1, "months").format("YYYY-MM-DD");
   let startofcurrentmonth = moment()
     .year(currentyear)
     .month(Number(currentmonth) - 1)
@@ -120,7 +119,9 @@ const ProfitabilityGrid = () => {
   //   currentyear + "-0" + currentmonth
   // );
   const [reportstartdate, setReportstartdate] = useState(startofcurrentmonth);
-  const [reportenddate, setReportenddate] = useState(currentdate);
+  const [reportenddate, setReportenddate] = useState(
+    moment().add(1, "years").format("YYYY-MM-DD")
+  );
   const handleClick = (event, id) => {
     setClickedId(id);
     if (id === 0) {
