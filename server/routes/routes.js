@@ -1467,6 +1467,8 @@ router.post("/profitabilityreport", (req, res) => {
       }
       if (results.length > 0) {
         return res.status(200).send(results);
+      } else {
+        return res.status(200).send([]);
       }
     }
   );
