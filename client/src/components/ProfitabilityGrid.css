@@ -10,9 +10,39 @@
   padding-bottom: 0.5rem;
   display: flex;
   flex-direction: row;
-  width: 50%;
-  justify-content: space-between;
+  width: 100%;
+  /* justify-content: space-between; */
   align-items: baseline;
+}
+.periodfilterbuttons {
+  display: flex;
+  flex-direction: row;
+  /* flex-basis: 50%; */
+  width: 600px;
+  justify-content: space-between;
+}
+.customdateinputs {
+  display: flex;
+  flex-direction: row;
+  flex-basis: 40%;
+  align-items: stretch;
+  font-size: 0.8rem;
+  margin: 0 0 0 1rem;
+}
+.customdateinputs label {
+  margin: 0 0.3rem 0 1rem;
+}
+.customdateinputs button {
+  border-radius: 1rem;
+  border: none;
+  padding: 0.3rem 1rem;
+  margin-left: 1rem;
+  color: white;
+  background-color: rgb(68, 65, 162);
+}
+.customdateinputs button:hover {
+  cursor: pointer;
+  background-color: rgb(101, 98, 184);
 }
 .periodfilterbutton {
   border-radius: 1rem;

@@ -5,7 +5,11 @@ import moment from "moment";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEllipsisH } from "@fortawesome/free-solid-svg-icons";
 
-const ProfitabilityReport = ({ reportstartdate, reportenddate }) => {
+const ProfitabilityReport = ({
+  reportstartdate,
+  reportenddate,
+  refreshreport,
+}) => {
   // let currentyear = Number(moment().format("YYYY"));
   // let currentmonth = Number(moment().format("MM"));
   const [profitabilitydata, setProfitabilitydata] = useState();
@@ -34,7 +38,7 @@ const ProfitabilityReport = ({ reportstartdate, reportenddate }) => {
         setProfitabilitydata(rep);
       }
     );
-  }, [reportstartdate, reportenddate]);
+  }, [refreshreport]);
 
   useEffect(() => {
     // console.log(Object.keys(profitabilitydata));
