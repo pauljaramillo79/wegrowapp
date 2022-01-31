@@ -539,6 +539,19 @@ router.post("/positiondropdown", (req, res) => {
     }
   );
 });
+router.post("/uspositiondropdown", (req, res) => {
+  db.query(
+    "SELECT USpositionreport.USWGP, USpositionreport.product, USpositionreport.supplier, USpositionreport.EWPrice, USpositionreport.Inventory, productID, supplierID, packaging, marks  FROM USpositionreport INNER JOIN uspositionsview ON USpositionreport.USWGP = uspositionsview.USWGP",
+    (err, results) => {
+      if (err) {
+        console.log(err);
+      }
+      if (results.length > 0) {
+        return res.status(200).send(results);
+      }
+    }
+  );
+});
 router.post("/duplicateQS", (req, res) => {
   QSID = req.body.QSID;
   QSDate = req.body.QSDate;

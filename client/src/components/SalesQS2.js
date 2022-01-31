@@ -9,11 +9,13 @@ import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
 import { ReactComponent as UnlockedIcon } from "../assets/_images/unlocked.svg";
 import { ReactComponent as LockedIcon } from "../assets/_images/locked.svg";
+import USPositionReport from "./USPositionReport";
 
 const SalesQS2 = () => {
   const { toggleQSrefresh } = useContext(RefreshPositionsContext);
   const { QStoload, diffQS, duplicateBoolean } = useContext(LoadQSContext);
 
+  // Initial values for New QS
   const QSDataInit = {
     KTP: "",
     KTS: "",
@@ -119,51 +121,58 @@ const SalesQS2 = () => {
     saleComplete: "indication",
   };
 
+  // State Variables
   const [QSData, setQSData] = useState(QSDataInit);
   const [QSValues, setQSValues] = useState(QSValuesInit);
   const [positionsddown, setPositionsddown] = useState();
+  const [USPositionsddown, setUSPositionsddown] = useState();
   const [resetfield, setResetfield] = useState(false);
   const [sold, setSold] = useState(false);
   const [allocated, setAllocated] = useState(false);
-
   const [QSsaved, setQSSaved] = useState(false);
-
   const [QSIDList, setQSIDList] = useState([]);
   const [QSIDtoedit, setQSIDtoedit] = useState();
   const [QSID, setQSID] = useState();
   const [QSindex, setQSindex] = useState();
   const [QSindexerror, setQSindexerror] = useState("");
-
   const [inEuros, setInEuros] = useState(false);
   const [exchangerate, setExchangerate] = useState();
   const [lockER, setLockER] = useState(false);
-
   const [editMode, setEditMode] = useState(false);
   const [QSOriginal, setQSOriginal] = useState({});
-
   const [QSOriginalData, setQSOriginalData] = useState({});
-
   const [editing, setEditing] = useState(false);
-
   const [consolidatedEdits, setConsolidatedEdits] = useState({});
-
   const [loading, setLoading] = useState(false);
 
+  // Load Userid from local storage
   const [userID, setUserID] = useState(
     JSON.parse(localStorage.getItem("WGusercode"))
   );
-  const [traders, setTraders] = useState();
 
+  // Load and set trader list for dropdown menus
+  const [traders, setTraders] = useState();
   useEffect(() => {
     Axios.post("/traders").then((response) => {
       setTraders(response.data);
     });
   }, []);
 
+  // load and set a user-dependent QSID list for navigation
+  //Refresh QSID List everytime a QS is saved, userID is changed, or QS is duplicated
   useEffect(() => {
     Axios.post("/QSIDList", { user: userID }).then((response) => {
-      const QSlist = [...new Set(response.data.map((item) => item.QSID))];
-      setQSIDList(QSlist);
+      const loadQSList = (resp) => {
+        return new Promise((resolve, reject) => {
+          const QSlist = [...new Set(response.data.map((item) => item.QSID))];
+          setQSIDList(QSlist);
+          resolve();
+        });
+      };
+      const doWork = async () => {
+        await loadQSList(response);
+      };
+      doWork();
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [QSsaved, userID, duplicateBoolean]);
@@ -171,7 +180,6 @@ const SalesQS2 = () => {
   useEffect(() => {
     setQSindex(QSIDList.length);
   }, [QSIDList]);
-
   useEffect(() => {
     if (QSindex === QSIDList.length) {
       setEditMode(false);
@@ -181,7 +189,6 @@ const SalesQS2 = () => {
       setEditMode(true);
     }
   }, [QSindex]);
-
   useEffect(() => {
     if (QSIDList.includes(QStoload)) {
       if (editing === true) {
@@ -196,9 +203,11 @@ const SalesQS2 = () => {
   }, [QStoload, diffQS]);
 
   useEffect(() => {
+    // if navigating, load values from database based on QSindex selected
     if (QSindex < QSIDList.length) {
       Axios.post("/loadQStoedit", { id: QSIDList[QSindex] }).then(
         (response) => {
+          // Define promise to change exchange rate using loaded value
           const changeER = (resp) => {
             return new Promise((resolve, reject) => {
               if (resp.data[0].exchRate) {
@@ -211,6 +220,7 @@ const SalesQS2 = () => {
               }
             });
           };
+          // Define promise to check if exchange rate exists, otherwise revert back to dollars
           const checkER = (resp) => {
             return new Promise((resolve, reject) => {
               if (resp.data[0].exchRate) {
@@ -238,12 +248,14 @@ const SalesQS2 = () => {
               }
             });
           };
+          // loading
           const loading = () => {
             return new Promise((resolve, reject) => {
               setLoading(true);
               resolve();
             });
           };
+          // finish loading
           const doneloading = () => {
             return new Promise((resolve, reject) => {
               setLoading(false);
@@ -253,7 +265,9 @@ const SalesQS2 = () => {
           const doWork = async () => {
             const check = await checkER(response);
             const exrate = await changeER(response);
+            // Start loading
             await loading();
+            // Set Values
             setQSValues({
               ...QSValues,
               KTP: response.data[0].KTP,
@@ -1040,20 +1054,25 @@ const SalesQS2 = () => {
               setSold(false);
               setAllocated(false);
             }
+            // Finish loading
             await doneloading();
           };
+          // Call the do work function
           doWork();
         }
       );
     }
+    // otherwise, this is a new QS and set initial values
     if (QSindex === QSIDList.length) {
       setQSValues(QSValuesInit);
       setQSData(QSDataInit);
       setExchangerate(null);
     }
+    // reset to non-editing mode everytime a QS is loaded or a new QS is started
     setEditing(false);
   }, [QSindex]);
 
+  // Check changes before leaving current QS
   const checkChanges = (a, b, str, id) => {
     let c = [];
     let d = [];
@@ -1244,19 +1263,37 @@ const SalesQS2 = () => {
   };
 
   const handleAllocated = () => {
+    if (!allocated) {
+      setQSValues({
+        ...QSValues,
+        customer: "USA Distribution",
+        CADdays: 100,
+        saleComplete: "US Allocation",
+      });
+      setQSData({
+        ...QSData,
+        customer: 452,
+        CADdays: 100,
+        saleComplete: 1,
+      });
+    }
+    if (allocated) {
+      setQSValues({
+        ...QSValues,
+        customer: "",
+        CADdays: 10,
+        saleComplete: "Indication",
+      });
+      setQSData({
+        ...QSData,
+        customer: "",
+        CADdays: 10,
+        saleComplete: 0,
+      });
+    }
     setAllocated(!allocated);
     setSold(false);
     setEditing(true);
-    setQSValues({
-      ...QSValues,
-      customer: "USA Distribution",
-      CADdays: 100,
-    });
-    setQSData({
-      ...QSData,
-      customer: 452,
-      CADdays: 100,
-    });
   };
 
   useEffect(() => {
@@ -1266,7 +1303,7 @@ const SalesQS2 = () => {
     }
     if (allocated) {
       setQSData({ ...QSData, saleComplete: 1 });
-      setQSValues({ ...QSValues, saleComplete: "allocated-US" });
+      setQSValues({ ...QSValues, saleComplete: "US Allocation" });
     }
     if (!sold & !allocated) {
       setQSData({ ...QSData, saleComplete: 0 });
@@ -1960,6 +1997,12 @@ const SalesQS2 = () => {
       setPositionsddown(response.data);
     });
   };
+  const loadUSPositions = () => {
+    Axios.post("/uspositiondropdown").then((response) => {
+      setUSPositionsddown(response.data);
+      console.log(response.data);
+    });
+  };
   const setPosition = (val) => {
     setEditing(true);
     let position = positionsddown[val];
@@ -1970,9 +2013,9 @@ const SalesQS2 = () => {
       from: position.start,
       to: position.end,
       KTP: position.KTP,
-      materialcost: Number(
-        position.Price.replace("$", "").replace(",", "")
-      ).toFixed(2),
+      materialcost:
+        "$ " +
+        Number(position.Price.replace("$", "").replace(",", "")).toFixed(2),
     });
     setQSData({
       ...QSData,
@@ -1982,6 +2025,34 @@ const SalesQS2 = () => {
       to: position.end,
       KTP: position.KTP,
       materialcost: Number(position.Price.replace("$", "").replace(",", "")),
+    });
+  };
+
+  const setUSPosition = (val) => {
+    setEditing(true);
+    let usposition = USPositionsddown[val];
+    console.log(usposition);
+    setQSValues({
+      ...QSValues,
+      KTP: usposition.USWGP,
+      abbreviation: usposition.product,
+      supplier: usposition.supplier,
+      packsize: usposition.packaging ? usposition.packaging : "",
+      marks: usposition.marks ? usposition.marks : "",
+      materialcost:
+        "$ " +
+        Number(usposition.EWPrice.replace("$", "").replace(",", "")).toFixed(2),
+    });
+    setQSData({
+      ...QSData,
+      KTP: usposition.USWGP,
+      abbreviation: usposition.productID,
+      supplier: usposition.supplierID,
+      packsize: usposition.packaging ? usposition.packaging : "",
+      marks: usposition.marks ? usposition.marks : "",
+      materialcost: Number(
+        usposition.EWPrice.replace("$", "").replace(",", "")
+      ),
     });
   };
 
@@ -2219,6 +2290,47 @@ const SalesQS2 = () => {
                   {/* <option>P500320 - T-MAP - Cashmere</option>
                 <option>B</option>
                 <option>C</option> */}
+                </select>
+              ) : (
+                ""
+              )}
+            </div>
+            <div className="saletype-group">
+              <input
+                name="saletype"
+                type="radio"
+                checked={QSData && QSData.saleType === 3 ? true : false}
+                required
+                onClick={(e) => {
+                  setEditing(true);
+                  setQSData({ ...QSData, saleType: 3 });
+                  setQSValues({ ...QSValues, saleType: "US Distribution" });
+                  loadUSPositions();
+                }}
+              />
+              <label>US Distribution</label>
+              {QSData && QSData.saleType == 3 ? (
+                <select
+                  className="USWGPSelect"
+                  onChange={(e) => setUSPosition(e.target.value)}
+                >
+                  <option>Select...</option>
+                  {USPositionsddown
+                    ? USPositionsddown.map((pos, i) => {
+                        return (
+                          <option value={i}>
+                            {pos.USWGP +
+                              " - " +
+                              pos.product +
+                              " - " +
+                              pos.supplier +
+                              " - " +
+                              pos.Inventory +
+                              "mt left"}
+                          </option>
+                        );
+                      })
+                    : ""}
                 </select>
               ) : (
                 ""
