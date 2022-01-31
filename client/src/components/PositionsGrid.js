@@ -16,6 +16,7 @@ import { ReactComponent as RefreshIcon } from "../assets/_images/refreshicon.svg
 import { RefreshPositionsContext } from "../contexts/RefreshPositionsProvider";
 
 import { Responsive, WidthProvider } from "react-grid-layout";
+import USPositionReport from "./USPositionReport";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -139,7 +140,10 @@ const PositionsGrid = () => {
               <TabPanel>
                 <PositionReport key="positionreport" />
               </TabPanel>
-              <TabPanel>USA Position Report Here</TabPanel>
+              {/* <TabPanel>USA Position Report Here</TabPanel> */}
+              <TabPanel>
+                <USPositionReport key="usapositionreport" />
+              </TabPanel>
             </Tabs>
           </div>
           <div id="positions2" key="b">

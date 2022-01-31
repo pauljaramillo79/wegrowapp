@@ -245,6 +245,20 @@ router.post("/positionreport", authenticateToken, async (req, res) => {
     }
   );
 });
+router.post("/usapositionreport", async (req, res) => {
+  await db.query(
+    // "SELECT KTP, prodName, productGroup, companyCode, saleComplete, priceAfterInterest FROM quotationsheet INNER JOIN ((prodNames INNER JOIN productGroups ON prodNames.prodGroupID = productGroups.prodGroupID) INNER JOIN productList ON prodNames.prodNameID = productList.productName) ON quotationsheet.productID = productList.productID INNER JOIN supplierlist ON quotationsheet.supplierID = supplierlist.supplierID WHERE saleComplete = 1",
+    "SELECT * FROM uspositionreport",
+    (err, results) => {
+      if (err) {
+        console.log(err);
+      }
+      if (results.length > 0) {
+        return res.status(200).send(results);
+      }
+    }
+  );
+});
 router.post("/positions", authenticateToken, async (req, res) => {
   db.query(
     "SELECT KTP AS WGP,positionID AS id, abbreviation, companyCode, packaging, shipmentStart AS Start, DATE_FORMAT(shipmentEnd,'%Y-%m-%d') AS End, FOBCost AS FOB, quantityHigh AS quantity, year FROM positionsview",
@@ -1417,7 +1431,7 @@ router.post("/updateprodname", (req, res) => {
 router.post("/posmatching", (req, res) => {
   let posnumber = req.body.posnumber;
   db.query(
-    "SELECT tCode, KTS, quantity, companyCode, saleComplete, FORMAT(tradingProfit,2) AS tradingProfit FROM quotationsheet INNER JOIN customerList ON quotationsheet.customerID = customerList.customerID INNER JOIN traderList ON quotationsheet.traderID = traderList.traderID WHERE KTP = ? AND saleComplete=-1 OR saleComplete=1 ORDER BY tradingProfit DESC",
+    "SELECT tCode, KTS, quantity, companyCode, saleComplete, saleTypeID, FORMAT(tradingProfit,2) AS tradingProfit FROM quotationsheet INNER JOIN customerList ON quotationsheet.customerID = customerList.customerID INNER JOIN traderList ON quotationsheet.traderID = traderList.traderID WHERE KTP = ? AND (saleComplete=-1 OR saleComplete=1) AND (saleTypeID=1 OR saleTypeID=2) ORDER BY tradingProfit DESC",
     [posnumber],
     (err, results) => {
       console.log(results);

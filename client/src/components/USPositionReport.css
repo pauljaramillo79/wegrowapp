@@ -1,0 +1,40 @@
+.uspositionreport {
+  overflow: auto;
+  height: 100%;
+}
+#uspositionreporttable {
+  margin-top: 0.5rem;
+  border-collapse: collapse;
+  font-family: "Roboto", sans-serif;
+}
+#uspositionreporttable td {
+  padding-right: 3.5rem;
+  font-size: 0.8rem;
+  padding-top: 0.1rem;
+  padding-left: 0.1rem;
+  font-family: "Roboto", sans-serif;
+}
+#uspositionreporttable th {
+  padding-right: 3rem;
+  font-size: 0.9rem;
+  border: none;
+  background-color: white;
+  font-family: "Roboto", sans-serif;
+  font-weight: 400;
+  padding-top: 0.2rem;
+  padding-bottom: 0.3rem;
+  top: 0px;
+}
+#uspositionreporttable tr:hover {
+  background-color: #ddeaf9;
+  cursor: pointer;
+}
+#uspositionreporttable .totals {
+  border-top: 1px solid black;
+  height: 2rem;
+  vertical-align: top;
+}
+.usprodgroup {
+  background-color: rgb(68, 65, 162);
+  color: white;
+}
