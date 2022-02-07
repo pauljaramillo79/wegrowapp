@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import "./SalesQS.css";
 import moment from "moment";
 import QSSearchField from "./QSSearchField";
@@ -10,11 +10,35 @@ import "react-confirm-alert/src/react-confirm-alert.css";
 import { ReactComponent as UnlockedIcon } from "../assets/_images/unlocked.svg";
 import { ReactComponent as LockedIcon } from "../assets/_images/locked.svg";
 import USPositionReport from "./USPositionReport";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCalculator } from "@fortawesome/free-solid-svg-icons";
+import { faLock } from "@fortawesome/free-solid-svg-icons";
+import { faUnlock } from "@fortawesome/free-solid-svg-icons";
+import { gsap } from "gsap";
 
 const SalesQS2 = () => {
   const { toggleQSrefresh } = useContext(RefreshPositionsContext);
   const { QStoload, diffQS, duplicateBoolean } = useContext(LoadQSContext);
 
+  const refrespmsg = useRef(null);
+  const [showmsg, setShowmsg] = useState(false);
+
+  const onComplete = () => {
+    setQSresponsemsg("");
+  };
+  useEffect(() => {
+    const elem = refrespmsg.current;
+    gsap.fromTo(
+      elem,
+      { opacity: 1 },
+      {
+        opacity: 0,
+        duration: 2.5,
+        ease: "power1.inOut",
+        onComplete: onComplete,
+      }
+    );
+  }, [showmsg]);
   // Initial values for New QS
   const QSDataInit = {
     KTP: "",
@@ -47,6 +71,21 @@ const SalesQS2 = () => {
     pcommission: 0,
     pfinancecost: 0,
     sfinancecost: 0,
+    // customsentry: 0,
+    materialvalue: 0,
+    generalduty: 0,
+    additionalduty: 0,
+    totalduty: 0,
+    dutyfee: 0,
+    harborfeepct: 0,
+    harborfee: 0,
+    merchprocfeepct: 0,
+    merchprocfee: 0,
+    cflatfee: 0,
+    tsca: 0,
+    isf: 0,
+    totalcentryfee: 0,
+    centryfeepmt: 0,
     freightpmt: 0,
     insurance: 0,
     inspectionpmt: 0,
@@ -99,6 +138,21 @@ const SalesQS2 = () => {
     pcommission: "$ 0.00",
     pfinancecost: "$ 0.00",
     sfinancecost: "$ 0.00",
+    // customsentry: "$ 0.00",
+    materialvalue: "$ 0,00",
+    generalduty: "0.00%",
+    additionalduty: "0.00%",
+    totalduty: "0.00%",
+    dutyfee: "$ 0.00",
+    harborfeepct: "0.00%",
+    harborfee: "$ 0.00",
+    merchprocfeepct: "0.00%",
+    merchprocfee: "$ 0.00",
+    cflatfee: "$ 0.00",
+    tsca: "$ 0.00",
+    isf: "$ 0.00",
+    totalcentryfee: "$ 0.00",
+    centryfeepmt: "$ 0.00",
     freightpmt: "$ 0.00",
     insurance: "$ 0.00",
     inspectionpmt: "$ 0.00",
@@ -144,6 +198,7 @@ const SalesQS2 = () => {
   const [editing, setEditing] = useState(false);
   const [consolidatedEdits, setConsolidatedEdits] = useState({});
   const [loading, setLoading] = useState(false);
+  const [showcustomscalculator, setShowcustomscalculator] = useState(false);
 
   // Load Userid from local storage
   const [userID, setUserID] = useState(
@@ -202,11 +257,58 @@ const SalesQS2 = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [QStoload, diffQS]);
 
+  /**
+   * takes number and turns into currency string with comma separated thousands
+   * @param {number} value number to be currencified
+   * @param {string} symbol currency symbol, default='$'
+   * @param {int} decim decimal places, default=2
+   * @return {string} (str) - currency string with comma separated thousands
+   */
+  const currencify = (val, symbol = "$", decim = 2) => {
+    return (
+      symbol + " " + val.toFixed(decim).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+    );
+  };
+
+  /**
+   * takes a currency string (e.g., $1,000) and returns a number
+   * @ param {string} value - string to be numerified
+   * @ param {string} symbol - currency symbol to be stripped, default='$'
+   */
+  const numerify = (val, symbol = "$") => {
+    return Number(val.replace(symbol, "").replace(",", ""));
+  };
+
+  /** takes a value, currency symbol, number of decimals, exchange rate - processes currency data coming from /loadQStoedit - and returns
+   * */
+  const numcurrex = (
+    val,
+    er = 1,
+    symboltoadd = "€",
+    symboltoremove = "$",
+    decim = 2
+  ) => {
+    return (
+      symboltoadd +
+      " " +
+      (Number(val.replace(symboltoremove, "").replace(",", "")) / er)
+        .toFixed(decim)
+        .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+    );
+  };
+
   useEffect(() => {
     // if navigating, load values from database based on QSindex selected
     if (QSindex < QSIDList.length) {
       Axios.post("/loadQStoedit", { id: QSIDList[QSindex] }).then(
         (response) => {
+          // const loaddata = (resp) => {
+          //   return new Promise((resolve, reject) => {
+          //     resolve(resp.data[0]);
+          //   });
+          // };
+          // const ldata = await loaddata(response);
+          const ldata = response.data[0];
           // Define promise to change exchange rate using loaded value
           const changeER = (resp) => {
             return new Promise((resolve, reject) => {
@@ -268,789 +370,566 @@ const SalesQS2 = () => {
             // Start loading
             await loading();
             // Set Values
+            const matvalue = await materialvaluecalc(
+              Number(ldata.materialcost.replace("$", "")),
+              ldata.quantity
+            );
+            const totalduty =
+              ldata.generalduty && ldata.additionalduty
+                ? await totaldutycalc(
+                    Number(ldata.generalduty.replace("%", "")),
+                    Number(ldata.additionalduty.replace("%", ""))
+                  )
+                : 0;
+            const dutyfee = await dutyfeecalc(matvalue, totalduty / 100);
+            const harborfee = ldata.harborfeepct
+              ? await harborfeecalc(
+                  matvalue,
+                  Number(ldata.harborfeepct.replace("%", "") / 100)
+                )
+              : 0;
+            const merchprocfee = ldata.merchprocfeepct
+              ? await mercprocfeecalc(
+                  matvalue,
+                  Number(ldata.merchprocfeepct.replace("%", "") / 100)
+                )
+              : 0;
+            const totalcentryfee = await totalcentryfeecalc(
+              dutyfee ? dutyfee : 0,
+              harborfee ? harborfee : 0,
+              merchprocfee ? merchprocfee : 0,
+              ldata.cflatfee ? numerify(ldata.cflatfee, "$") : 0,
+              ldata.tsca ? numerify(ldata.tsca, "$") : 0,
+              ldata.isf ? numerify(ldata.isf, "$") : 0
+            );
+
             setQSValues({
               ...QSValues,
-              KTP: response.data[0].KTP,
-              KTS: response.data[0].KTS,
-              QSDate: response.data[0].QSDate,
-              saleType: response.data[0].saleType,
-              QSID: response.data[0].QSID,
-              abbreviation: response.data[0].abbreviation,
-              supplier: response.data[0].supplier,
-              customer: response.data[0].customer,
-              packsize: response.data[0].packsize,
-              marks: response.data[0].marks,
-              from: response.data[0].from,
-              to: response.data[0].to,
-              POL: response.data[0].POL,
-              POD: response.data[0].POD,
-              saleComplete:
-                response.data[0].saleComplete === -1 ? "sold" : "indication",
-              TIC: response.data[0].trader,
-              traffic: response.data[0].traffic,
-              incoterms: response.data[0].incoterms,
-              paymentTerm: response.data[0].paymentTerm,
-              CADintrate: response.data[0].includedrate,
-              CADdays: response.data[0].includedperiod,
-              shipmentType: response.data[0].shipmentType
-                ? response.data[0].shipmentType
+              KTP: ldata.KTP,
+              KTS: ldata.KTS,
+              QSDate: ldata.QSDate,
+              saleType: ldata.saleType,
+              QSID: ldata.QSID,
+              abbreviation: ldata.abbreviation,
+              supplier: ldata.supplier,
+              customer: ldata.customer,
+              packsize: ldata.packsize,
+              marks: ldata.marks,
+              from: ldata.from,
+              to: ldata.to,
+              POL: ldata.POL,
+              POD: ldata.POD,
+              saleComplete: ldata.saleComplete === -1 ? "sold" : "indication",
+              TIC: ldata.trader,
+              traffic: ldata.traffic,
+              incoterms: ldata.incoterms,
+              paymentTerm: ldata.paymentTerm,
+              CADintrate: ldata.includedrate,
+              CADdays: ldata.includedperiod,
+              shipmentType: ldata.shipmentType
+                ? ldata.shipmentType
                 : "Container",
               freightTotal:
-                check && inEuros && response.data[0].freightTotal
-                  ? "€ " +
-                    (
-                      Number(
-                        response.data[0].freightTotal
-                          .replace("$", "")
-                          .replace(",", "")
-                      ) / exrate
-                    )
-                      .toFixed(2)
-                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                  : check && inEuros && !response.data[0].freightTotal
+                check && inEuros && ldata.freightTotal
+                  ? numcurrex(ldata.freightTotal, exrate)
+                  : check && inEuros && !ldata.freightTotal
                   ? "€ 0.00"
-                  : response.data[0].freightTotal,
-              shippingline: response.data[0].shippingline,
-              payload: response.data[0].payload,
+                  : ldata.freightTotal,
+              shippingline: ldata.shippingline,
+              payload: ldata.payload,
               totalinspection:
-                check && inEuros && response.data[0].totalinspection
-                  ? "€ " +
-                    (
-                      Number(
-                        response.data[0].totalinspection
-                          .replace("$", "")
-                          .replace(",", "")
-                      ) / exrate
-                    )
-                      .toFixed(2)
-                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                  : check && inEuros && !response.data[0].totalinspection
+                check && inEuros && ldata.totalinspection
+                  ? numcurrex(ldata.totalinspection, exrate)
+                  : check && inEuros && !ldata.totalinspection
                   ? "€ 0.00"
-                  : response.data[0].totalinspection,
-              quantity: response.data[0].quantity,
+                  : ldata.totalinspection,
+              quantity: ldata.quantity,
               materialcost:
-                check && inEuros && response.data[0].materialcost
-                  ? "€ " +
-                    (
-                      Number(
-                        response.data[0].materialcost
-                          .replace("$", "")
-                          .replace(",", "")
-                      ) / exrate
-                    )
-                      .toFixed(2)
-                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                  : check && inEuros && !response.data[0].materialcost
+                check && inEuros && ldata.materialcost
+                  ? numcurrex(ldata.materialcost, exrate)
+                  : check && inEuros && !ldata.materialcost
                   ? "€ 0.00"
-                  : response.data[0].materialcost,
+                  : ldata.materialcost,
+              materialvalue:
+                check && inEuros && matvalue
+                  ? numcurrex(matvalue.toFixed(2), exrate)
+                  : check && inEuros && !matvalue
+                  ? "€ 0.00"
+                  : currencify(matvalue, "$", 2),
+              generalduty: ldata.generalduty ? ldata.generalduty : "0.00%",
+              additionalduty: ldata.additionalduty
+                ? ldata.additionalduty
+                : "0.00%",
+              totalduty: totalduty ? totalduty + "%" : "0.00%",
+              dutyfee:
+                check && inEuros && dutyfee
+                  ? numcurrex(dutyfee.toFixed(2), exrate)
+                  : check && inEuros && !dutyfee
+                  ? "€ 0.00"
+                  : currencify(dutyfee, "$", 2),
+              harborfeepct: ldata.harborfeepct ? ldata.harborfeepct : "0.00%",
+              harborfee:
+                check && inEuros && harborfee
+                  ? numcurrex(harborfee.toFixed(2), exrate)
+                  : check && inEuros && !harborfee
+                  ? "€ 0.00"
+                  : currencify(harborfee, "$", 2),
+              merchprocfeepct: ldata.merchprocfeepct
+                ? ldata.merchprocfeepct
+                : "0.00%",
+              merchprocfee:
+                check && inEuros && merchprocfee
+                  ? numcurrex(merchprocfee.toFixed(2), exrate)
+                  : check && inEuros && !merchprocfee
+                  ? "€ 0.00"
+                  : currencify(merchprocfee, "$", 2),
+              cflatfee:
+                check && inEuros && ldata.cflatfee
+                  ? numcurrex(ldata.cflatfee, exrate)
+                  : check && inEuros && !ldata.cflatfee
+                  ? "€ 0.00"
+                  : ldata.cflatfee,
+              tsca:
+                check && inEuros && ldata.tsca
+                  ? numcurrex(ldata.tsca, exrate)
+                  : check && inEuros && !ldata.tsca
+                  ? "€ 0.00"
+                  : ldata.tsca,
+              isf:
+                check && inEuros && ldata.isf
+                  ? numcurrex(ldata.isf, exrate)
+                  : check && inEuros && !ldata.isf
+                  ? "€ 0.00"
+                  : ldata.isf,
+              totalcentryfee:
+                check && inEuros && totalcentryfee
+                  ? numcurrex(totalcentryfee.toFixed(2), exrate)
+                  : check && inEuros && !totalcentryfee
+                  ? "€ 0.00"
+                  : currencify(totalcentryfee, "$", 2),
+              centryfeepmt:
+                check && inEuros && totalcentryfee
+                  ? numcurrex(
+                      (totalcentryfee / ldata.quantity).toFixed(2),
+                      exrate
+                    )
+                  : check && inEuros && !totalcentryfee
+                  ? "€ 0.00"
+                  : currencify(totalcentryfee / ldata.quantity, "$", 2),
               pcommission:
-                check && inEuros && response.data[0].pcommission
-                  ? "€ " +
-                    (
-                      Number(
-                        response.data[0].pcommission
-                          .replace("$", "")
-                          .replace(",", "")
-                      ) / exrate
-                    )
-                      .toFixed(2)
-                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                  : check && inEuros && !response.data[0].pcommission
+                check && inEuros && ldata.pcommission
+                  ? numcurrex(ldata.pcommission, exrate)
+                  : check && inEuros && !ldata.pcommission
                   ? "€ 0.00"
-                  : response.data[0].pcommission,
+                  : ldata.pcommission,
               pfinancecost:
-                check && inEuros && response.data[0].pfinancecost
-                  ? "€ " +
-                    (
-                      Number(
-                        response.data[0].pfinancecost
-                          .replace("$", "")
-                          .replace(",", "")
-                      ) / exrate
-                    )
-                      .toFixed(2)
-                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                  : check && inEuros && !response.data[0].pfinancecost
+                check && inEuros && ldata.pfinancecost
+                  ? numcurrex(ldata.pfinancecost, exrate)
+                  : check && inEuros && !ldata.pfinancecost
                   ? "€ 0.00"
-                  : response.data[0].pfinancecost,
+                  : ldata.pfinancecost,
               sfinancecost:
-                check && inEuros && response.data[0].sfinancecost
-                  ? "€ " +
-                    (
-                      Number(
-                        response.data[0].sfinancecost
-                          .replace("$", "")
-                          .replace(",", "")
-                      ) / exrate
-                    )
-                      .toFixed(2)
-                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                  : check && inEuros && !response.data[0].sfinancecost
+                check && inEuros && ldata.sfinancecost
+                  ? numcurrex(ldata.sfinancecost, exrate)
+                  : check && inEuros && !ldata.sfinancecost
                   ? "€ 0.00"
-                  : response.data[0].sfinancecost,
+                  : ldata.sfinancecost,
               freightpmt:
-                check && inEuros && response.data[0].freightpmt
-                  ? "€ " +
-                    (
-                      Number(
-                        response.data[0].freightpmt
-                          .replace("$", "")
-                          .replace(",", "")
-                      ) / exrate
-                    )
-                      .toFixed(2)
-                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                  : check && inEuros && !response.data[0].freightpmt
+                check && inEuros && ldata.freightpmt
+                  ? numcurrex(ldata.freightpmt, exrate)
+                  : check && inEuros && !ldata.freightpmt
                   ? "€ 0.00"
-                  : response.data[0].freightpmt,
+                  : ldata.freightpmt,
               insurance:
-                check && inEuros && response.data[0].insurance
-                  ? "€ " +
-                    (
-                      Number(
-                        response.data[0].insurance
-                          .replace("$", "")
-                          .replace(",", "")
-                      ) / exrate
-                    )
-                      .toFixed(2)
-                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                  : check && inEuros && !response.data[0].insurance
+                check && inEuros && ldata.insurance
+                  ? numcurrex(ldata.insurance, exrate)
+                  : check && inEuros && !ldata.insurance
                   ? "€ 0.00"
-                  : response.data[0].insurance,
+                  : ldata.insurance,
               inspectionpmt:
-                check && inEuros && response.data[0].inspectionpmt
-                  ? "€ " +
-                    (
-                      Number(
-                        response.data[0].inspectionpmt
-                          .replace("$", "")
-                          .replace(",", "")
-                      ) / exrate
-                    )
-                      .toFixed(2)
-                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                  : check && inEuros && !response.data[0].inspectionpmt
+                check && inEuros && ldata.inspectionpmt
+                  ? numcurrex(ldata.inspectionpmt, exrate)
+                  : check && inEuros && !ldata.inspectionpmt
                   ? "€ 0.00"
-                  : response.data[0].inspectionpmt,
+                  : ldata.inspectionpmt,
               scommission:
-                check && inEuros && response.data[0].scommission
-                  ? "€ " +
-                    (
-                      Number(
-                        response.data[0].scommission
-                          .replace("$", "")
-                          .replace(",", "")
-                      ) / exrate
-                    )
-                      .toFixed(2)
-                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                  : check && inEuros && !response.data[0].scommission
+                check && inEuros && ldata.scommission
+                  ? numcurrex(ldata.scommission, exrate)
+                  : check && inEuros && !ldata.scommission
                   ? "€ 0.00"
-                  : response.data[0].scommission,
+                  : ldata.scommission,
               interestcost:
-                check && inEuros && response.data[0].interestcost
-                  ? "€ " +
-                    (
-                      Number(
-                        response.data[0].interestcost
-                          .replace("$", "")
-                          .replace(",", "")
-                      ) / exrate
-                    )
-                      .toFixed(2)
-                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                  : check && inEuros && !response.data[0].interestcost
+                check && inEuros && ldata.interestcost
+                  ? numcurrex(ldata.interestcost, exrate)
+                  : check && inEuros && !ldata.interestcost
                   ? "€ 0.00"
-                  : response.data[0].interestcost,
+                  : ldata.interestcost,
               legal:
-                check && inEuros && response.data[0].legal
-                  ? "€ " +
-                    (
-                      Number(
-                        response.data[0].legal.replace("$", "").replace(",", "")
-                      ) / exrate
-                    )
-                      .toFixed(2)
-                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                  : check && inEuros && !response.data[0].legal
+                check && inEuros && ldata.legal
+                  ? numcurrex(ldata.legal, exrate)
+                  : check && inEuros && !ldata.legal
                   ? "€ 0.00"
-                  : response.data[0].legal,
+                  : ldata.legal,
               pallets:
-                check && inEuros && response.data[0].pallets
-                  ? "€ " +
-                    (
-                      Number(
-                        response.data[0].pallets
-                          .replace("$", "")
-                          .replace(",", "")
-                      ) / exrate
-                    )
-                      .toFixed(2)
-                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                  : check && inEuros && !response.data[0].pallets
+                check && inEuros && ldata.pallets
+                  ? numcurrex(ldata.pallets, exrate)
+                  : check && inEuros && !ldata.pallets
                   ? "€ 0.00"
-                  : response.data[0].pallets,
+                  : ldata.pallets,
               other:
-                check && inEuros && response.data[0].other
-                  ? "€ " +
-                    (
-                      Number(
-                        response.data[0].other.replace("$", "").replace(",", "")
-                      ) / exrate
-                    )
-                      .toFixed(2)
-                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                  : check && inEuros && !response.data[0].other
+                check && inEuros && ldata.other
+                  ? numcurrex(ldata.other, exrate)
+                  : check && inEuros && !ldata.other
                   ? "€ 0.00"
-                  : response.data[0].other,
+                  : ldata.other,
               totalcost:
-                check && inEuros && response.data[0].totalcost
-                  ? "€ " +
-                    (
-                      Number(
-                        response.data[0].totalcost
-                          .replace("$", "")
-                          .replace(",", "")
-                      ) / exrate
-                    )
-                      .toFixed(2)
-                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                  : check && inEuros && !response.data[0].totalcost
+                check && inEuros && ldata.totalcost
+                  ? numcurrex(ldata.totalcost, exrate)
+                  : check && inEuros && !ldata.totalcost
                   ? "€ 0.00"
-                  : response.data[0].totalcost,
-              interestrate: response.data[0].interestrate,
-              interestdays: response.data[0].interestdays,
+                  : ldata.totalcost,
+              interestrate: ldata.interestrate,
+              interestdays: ldata.interestdays,
               pricebeforeint:
-                check && inEuros && response.data[0].pricebeforeint
-                  ? "€ " +
-                    (
-                      Number(
-                        response.data[0].pricebeforeint
-                          .replace("$", "")
-                          .replace(",", "")
-                      ) / exrate
-                    )
-                      .toFixed(2)
-                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                  : check && inEuros && !response.data[0].pricebeforeint
+                check && inEuros && ldata.pricebeforeint
+                  ? numcurrex(ldata.pricebeforeint, exrate)
+                  : check && inEuros && !ldata.pricebeforeint
                   ? "€ 0.00"
-                  : response.data[0].pricebeforeint,
+                  : ldata.pricebeforeint,
               salesinterest:
-                check && inEuros && response.data[0].salesinterest
-                  ? "€ " +
-                    (
-                      Number(
-                        response.data[0].salesinterest
-                          .replace("$", "")
-                          .replace(",", "")
-                      ) / exrate
-                    )
-                      .toFixed(2)
-                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                  : check && inEuros && !response.data[0].salesinterest
+                check && inEuros && ldata.salesinterest
+                  ? numcurrex(ldata.salesinterest, exrate)
+                  : check && inEuros && !ldata.salesinterest
                   ? "€ 0.00"
-                  : response.data[0].salesinterest,
+                  : ldata.salesinterest,
               priceafterint:
-                check && inEuros && response.data[0].priceafterint
-                  ? "€ " +
-                    (
-                      Number(
-                        response.data[0].priceafterint
-                          .replace("$", "")
-                          .replace(",", "")
-                      ) / exrate
-                    )
-                      .toFixed(2)
-                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                  : check && inEuros && !response.data[0].priceafterint
+                check && inEuros && ldata.priceafterint
+                  ? numcurrex(ldata.priceafterint, exrate)
+                  : check && inEuros && !ldata.priceafterint
                   ? "€ 0.00"
-                  : response.data[0].priceafterint,
+                  : ldata.priceafterint,
               profit:
-                check && inEuros && response.data[0].profit
-                  ? "€ " +
-                    (
-                      Number(
-                        response.data[0].profit
-                          .replace("$", "")
-                          .replace(",", "")
-                      ) / exrate
-                    )
-                      .toFixed(2)
-                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                  : check && inEuros && !response.data[0].pricebeforeint
+                check && inEuros && ldata.profit
+                  ? numcurrex(ldata.profit, exrate)
+                  : check && inEuros && !ldata.pricebeforeint
                   ? "€ 0.00"
-                  : response.data[0].profit,
+                  : ldata.profit,
               margin:
-                check && inEuros && response.data[0].margin
-                  ? "€ " +
-                    (
-                      Number(
-                        response.data[0].margin
-                          .replace("$", "")
-                          .replace(",", "")
-                      ) / exrate
-                    )
-                      .toFixed(2)
-                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                  : check && inEuros && !response.data[0].margin
+                check && inEuros && ldata.margin
+                  ? numcurrex(ldata.margin, exrate)
+                  : check && inEuros && !ldata.margin
                   ? "€ 0.00"
-                  : response.data[0].margin,
+                  : ldata.margin,
               turnover:
-                check && inEuros && response.data[0].turnover
-                  ? "€ " +
-                    (
-                      Number(
-                        response.data[0].turnover
-                          .replace("$", "")
-                          .replace(",", "")
-                      ) / exrate
-                    )
-                      .toFixed(2)
-                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                  : check && inEuros && !response.data[0].turnover
+                check && inEuros && ldata.turnover
+                  ? numcurrex(ldata.turnover, exrate)
+                  : check && inEuros && !ldata.turnover
                   ? "€ 0.00"
-                  : response.data[0].turnover,
-              pctmargin:
-                check && response.data[0].pctmargin
-                  ? response.data[0].pctmargin
-                  : "0.00%",
+                  : ldata.turnover,
+              pctmargin: check && ldata.pctmargin ? ldata.pctmargin : "0.00%",
               netback:
-                check && inEuros && response.data[0].netback
-                  ? "€ " +
-                    (
-                      Number(
-                        response.data[0].netback
-                          .replace("$", "")
-                          .replace(",", "")
-                      ) / exrate
-                    )
-                      .toFixed(2)
-                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                  : check && inEuros && !response.data[0].netback
+                check && inEuros && ldata.netback
+                  ? numcurrex(ldata.netback, exrate)
+                  : check && inEuros && !ldata.netback
                   ? "€ 0.00"
-                  : response.data[0].netback,
+                  : ldata.netback,
             });
             setQSData({
               ...QSData,
-              KTP: response.data[0].KTP,
-              KTS: response.data[0].KTS,
-              QSDate: response.data[0].QSDate,
-              saleType: response.data[0].saleTypeID,
-              QSID: response.data[0].QSID,
-              abbreviation: response.data[0].productID,
-              supplier: response.data[0].supplierID,
-              customer: response.data[0].customerID,
-              packsize: response.data[0].packsize,
-              marks: response.data[0].marks,
-              from: response.data[0].from,
-              to: response.data[0].to,
-              POL: response.data[0].POLID,
-              POD: response.data[0].PODID,
-              saleComplete: response.data[0].saleComplete,
-              TIC: response.data[0].traderID,
-              traffic: response.data[0].trafficID,
-              incoterms: response.data[0].incoterms,
-              paymentTerm: response.data[0].pTermID,
-              CADintrate:
-                Number(response.data[0].includedrate.replace("%", "")) / 100,
-              CADdays: response.data[0].includedperiod,
-              shipmentType: response.data[0].shipmentTypeID
-                ? response.data[0].shipmentTypeID
-                : 1,
-              freightTotal: response.data[0].freightTotal
-                ? Number(
-                    response.data[0].freightTotal
-                      .replace("$", "")
-                      .replace(",", "")
-                  )
+              KTP: ldata.KTP,
+              KTS: ldata.KTS,
+              QSDate: ldata.QSDate,
+              saleType: ldata.saleTypeID,
+              QSID: ldata.QSID,
+              abbreviation: ldata.productID,
+              supplier: ldata.supplierID,
+              customer: ldata.customerID,
+              packsize: ldata.packsize,
+              marks: ldata.marks,
+              from: ldata.from,
+              to: ldata.to,
+              POL: ldata.POLID,
+              POD: ldata.PODID,
+              saleComplete: ldata.saleComplete,
+              TIC: ldata.traderID,
+              traffic: ldata.trafficID,
+              incoterms: ldata.incoterms,
+              paymentTerm: ldata.pTermID,
+              CADintrate: Number(ldata.includedrate.replace("%", "")) / 100,
+              CADdays: ldata.includedperiod,
+              shipmentType: ldata.shipmentTypeID ? ldata.shipmentTypeID : 1,
+              freightTotal: ldata.freightTotal
+                ? numerify(ldata.freightTotal, "$")
                 : 0,
-              shippingline: response.data[0].shippingline,
-              payload: response.data[0].payload,
-              totalinspection: response.data[0].totalinspection
-                ? Number(
-                    response.data[0].totalinspection
-                      .replace("$", "")
-                      .replace(",", "")
-                  )
+              shippingline: ldata.shippingline,
+              payload: ldata.payload,
+              totalinspection: ldata.totalinspection
+                ? numerify(ldata.totalinspection, "$")
                 : 0,
-              quantity: Number(response.data[0].quantity.replace(",", "")),
-              materialcost: response.data[0].materialcost
-                ? Number(
-                    response.data[0].materialcost
-                      .replace("$", "")
-                      .replace(",", "")
-                  )
+              quantity: Number(ldata.quantity.replace(",", "")),
+              materialcost: ldata.materialcost
+                ? numerify(ldata.materialcost, "$")
                 : 0,
-              pcommission: response.data[0].pcommission
-                ? Number(
-                    response.data[0].pcommission
-                      .replace("$", "")
-                      .replace(",", "")
-                  )
+              materialvalue: matvalue ? matvalue : 0,
+              generalduty: ldata.generalduty
+                ? Number(ldata.generalduty.replace("%", "")) / 100
                 : 0,
-              pfinancecost: response.data[0].pfinancecost
-                ? Number(
-                    response.data[0].pfinancecost
-                      .replace("$", "")
-                      .replace(",", "")
-                  )
+              additionalduty: ldata.additionalduty
+                ? Number(ldata.additionalduty.replace("%", "")) / 100
                 : 0,
-              sfinancecost: response.data[0].sfinancecost
-                ? Number(
-                    response.data[0].sfinancecost
-                      .replace("$", "")
-                      .replace(",", "")
-                  )
+              totalduty: totalduty ? totalduty / 100 : 0,
+              dutyfee: dutyfee ? dutyfee : 0,
+              harborfeepct: ldata.harborfeepct
+                ? Number(ldata.harborfeepct.replace("%", "")) / 100
                 : 0,
-              freightpmt: response.data[0].freightpmt
-                ? Number(
-                    response.data[0].freightpmt
-                      .replace("$", "")
-                      .replace(",", "")
-                  )
+              harborfee: harborfee ? harborfee : 0,
+              merchprocfeepct: ldata.merchprocfeepct
+                ? Number(ldata.merchprocfeepct.replace("%", "")) / 100
                 : 0,
-              insurance: response.data[0].insurance
-                ? Number(
-                    response.data[0].insurance.replace("$", "").replace(",", "")
-                  )
+              merchprocfee: merchprocfee ? merchprocfee : 0,
+              cflatfee: ldata.cflatfee ? numerify(ldata.cflatfee, "$") : 0,
+              tsca: ldata.tsca ? numerify(ldata.tsca, "$") : 0,
+              isf: ldata.isf ? numerify(ldata.isf, "$") : 0,
+              totalcentryfee: totalcentryfee ? totalcentryfee : 0,
+              centryfeepmt: totalcentryfee
+                ? totalcentryfee / ldata.quantity
                 : 0,
-              inspectionpmt: response.data[0].inspectionpmt
-                ? Number(
-                    response.data[0].inspectionpmt
-                      .replace("$", "")
-                      .replace(",", "")
-                  )
+              pcommission: ldata.pcommission
+                ? numerify(ldata.pcommission, "$")
                 : 0,
-              scommission: response.data[0].scommission
-                ? Number(
-                    response.data[0].scommission
-                      .replace("$", "")
-                      .replace(",", "")
-                  )
+              pfinancecost: ldata.pfinancecost
+                ? numerify(ldata.pfinancecost, "$")
                 : 0,
-              interestcost: response.data[0].interestcost
-                ? Number(
-                    response.data[0].interestcost
-                      .replace("$", "")
-                      .replace(",", "")
-                  )
+              sfinancecost: ldata.sfinancecost
+                ? numerify(ldata.sfinancecost, "$")
                 : 0,
-              legal: response.data[0].legal
-                ? Number(
-                    response.data[0].legal.replace("$", "").replace(",", "")
-                  )
+              freightpmt: ldata.freightpmt
+                ? numerify(ldata.freightpmt, "$")
                 : 0,
-              pallets: response.data[0].pallets
-                ? Number(
-                    response.data[0].pallets.replace("$", "").replace(",", "")
-                  )
+              insurance: ldata.insurance ? numerify(ldata.insurance, "$") : 0,
+              inspectionpmt: ldata.inspectionpmt
+                ? numerify(ldata.inspectionpmt, "$")
                 : 0,
-              other: response.data[0].other
-                ? Number(
-                    response.data[0].other.replace("$", "").replace(",", "")
-                  )
+              scommission: ldata.scommission
+                ? numerify(ldata.scommission, "$")
                 : 0,
-              totalcost: response.data[0].totalcost
-                ? Number(
-                    response.data[0].totalcost.replace("$", "").replace(",", "")
-                  )
+              interestcost: ldata.interestcost
+                ? numerify(ldata.interestcost, "$")
                 : 0,
-              interestrate:
-                Number(response.data[0].interestrate.replace("%", "")) / 100,
-              interestdays: response.data[0].interestdays,
-              pricebeforeint: response.data[0].pricebeforeint
-                ? Number(
-                    response.data[0].pricebeforeint
-                      .replace("$", "")
-                      .replace(",", "")
-                  )
+              legal: ldata.legal ? numerify(ldata.legal, "$") : 0,
+              pallets: ldata.pallets ? numerify(ldata.pallets, "$") : 0,
+              other: ldata.other ? numerify(ldata.other, "$") : 0,
+              totalcost: ldata.totalcost ? numerify(ldata.totalcost, "$") : 0,
+              interestrate: Number(ldata.interestrate.replace("%", "")) / 100,
+              interestdays: ldata.interestdays,
+              pricebeforeint: ldata.pricebeforeint
+                ? numerify(ldata.pricebeforeint, "$")
                 : 0,
-              salesinterest: response.data[0].salesinterest
-                ? Number(
-                    response.data[0].salesinterest
-                      .replace("$", "")
-                      .replace(",", "")
-                  )
+              salesinterest: ldata.salesinterest
+                ? numerify(ldata.salesinterest, "$")
                 : 0,
-              priceafterint: response.data[0].priceafterint
-                ? Number(
-                    response.data[0].priceafterint
-                      .replace("$", "")
-                      .replace(",", "")
-                  )
+              priceafterint: ldata.priceafterint
+                ? numerify(ldata.priceafterint, "$")
                 : 0,
-              profit: response.data[0].profit
-                ? Number(
-                    response.data[0].profit.replace("$", "").replace(",", "")
-                  )
-                : 0,
-              margin: response.data[0].margin
-                ? Number(
-                    response.data[0].margin.replace("$", "").replace(",", "")
-                  )
-                : 0,
-              turnover: response.data[0].turnover
-                ? Number(
-                    response.data[0].turnover.replace("$", "").replace(",", "")
-                  )
-                : 0,
-              pctmargin:
-                Number(response.data[0].pctmargin.replace("%", "")) / 100,
-              netback: response.data[0].netback
-                ? Number(
-                    response.data[0].netback.replace("$", "").replace(",", "")
-                  )
-                : 0,
+              profit: ldata.profit ? numerify(ldata.profit, "$") : 0,
+              margin: ldata.margin ? numerify(ldata.margin, "$") : 0,
+              turnover: ldata.turnover ? numerify(ldata.turnover, "$") : 0,
+              pctmargin: Number(ldata.pctmargin.replace("%", "")) / 100,
+              netback: ldata.netback ? numerify(ldata.netback, "$") : 0,
             });
             setQSOriginal({
               ...QSOriginal,
-              KTP: response.data[0].KTP,
-              KTS: response.data[0].KTS,
-              QSDate: response.data[0].QSDate,
-              saleType: response.data[0].saleType,
-              QSID: response.data[0].QSID,
-              abbreviation: response.data[0].abbreviation,
-              supplier: response.data[0].supplier,
-              customer: response.data[0].customer,
-              packsize: response.data[0].packsize,
-              marks: response.data[0].marks,
-              from: response.data[0].from,
-              to: response.data[0].to,
-              POL: response.data[0].POL,
-              POD: response.data[0].POD,
+              KTP: ldata.KTP,
+              KTS: ldata.KTS,
+              QSDate: ldata.QSDate,
+              saleType: ldata.saleType,
+              QSID: ldata.QSID,
+              abbreviation: ldata.abbreviation,
+              supplier: ldata.supplier,
+              customer: ldata.customer,
+              packsize: ldata.packsize,
+              marks: ldata.marks,
+              from: ldata.from,
+              to: ldata.to,
+              POL: ldata.POL,
+              POD: ldata.POD,
               saleComplete:
-                response.data[0].saleComplete === -1 ? "sold" : "indication",
-              TIC: response.data[0].trader,
-              traffic: response.data[0].traffic,
-              incoterms: response.data[0].incoterms,
-              paymentTerm: response.data[0].paymentTerm,
-              CADintrate: response.data[0].includedrate,
-              CADdays: response.data[0].includedperiod,
-              shipmentType: response.data[0].shipmentType,
-              freightTotal: response.data[0].freightTotal
-                ? response.data[0].freightTotal
+                ldata.saleComplete === -1
+                  ? "sold"
+                  : ldata.saleComplete === 0
+                  ? "indication"
+                  : ldata.saleComplete === 1
+                  ? "US Allocation"
+                  : "",
+              TIC: ldata.trader,
+              traffic: ldata.traffic,
+              incoterms: ldata.incoterms,
+              paymentTerm: ldata.paymentTerm,
+              CADintrate: ldata.includedrate,
+              CADdays: ldata.includedperiod,
+              shipmentType: ldata.shipmentType,
+              freightTotal: ldata.freightTotal ? ldata.freightTotal : "",
+              shippingline: ldata.shippingline,
+              payload: ldata.payload,
+              totalinspection: ldata.totalinspection
+                ? ldata.totalinspection
                 : "",
-              shippingline: response.data[0].shippingline,
-              payload: response.data[0].payload,
-              totalinspection: response.data[0].totalinspection
-                ? response.data[0].totalinspection
-                : "",
-              quantity: response.data[0].quantity,
-              materialcost: response.data[0].materialcost
-                ? response.data[0].materialcost
+              quantity: ldata.quantity,
+              materialcost: ldata.materialcost ? ldata.materialcost : "$ 0.00",
+              materialvalue: matvalue ? currencify(matvalue) : "$ 0.00",
+              generalduty: ldata.generalduty ? ldata.generalduty : "0.00%",
+              additionalduty: ldata.additionalduty
+                ? ldata.additionalduty
+                : "0.00%",
+              totalduty: totalduty ? totalduty + "%" : "0.00%",
+              dutyfee: dutyfee ? currencify(dutyfee) : "$ 0.00",
+              harborfeepct: ldata.harborfeepct ? ldata.harborfeepct : "0.00%",
+              harborfee: harborfee ? currencify(harborfee) : "$ 0.00",
+              merchprocfeepct: ldata.merchprocfeepct
+                ? ldata.merchprocfeepct
+                : "0.00%",
+              merchprocfee: merchprocfee ? currencify(merchprocfee) : "$ 0.00",
+              cflatfee: ldata.cflatfee ? ldata.cflatfee : "$ 0.00",
+              tsca: ldata.tsca ? ldata.tsca : "$ 0.00",
+              isf: ldata.isf ? ldata.isf : "$ 0.00",
+              totalcentryfee: totalcentryfee
+                ? currencify(totalcentryfee)
                 : "$ 0.00",
-              pcommission: response.data[0].pcommission
-                ? response.data[0].pcommission
+              centryfeepmt: totalcentryfee
+                ? currencify(totalcentryfee / ldata.quantity)
                 : "$ 0.00",
-              pfinancecost: response.data[0].pfinancecost
-                ? response.data[0].pfinancecost
+              pcommission: ldata.pcommission ? ldata.pcommission : "$ 0.00",
+              pfinancecost: ldata.pfinancecost ? ldata.pfinancecost : "$ 0.00",
+              sfinancecost: ldata.sfinancecost ? ldata.sfinancecost : "$ 0.00",
+              freightpmt: ldata.freightpmt ? ldata.freightpmt : "$ 0.00",
+              insurance: ldata.insurance ? ldata.insurance : "$ 0.00",
+              inspectionpmt: ldata.inspectionpmt
+                ? ldata.inspectionpmt
                 : "$ 0.00",
-              sfinancecost: response.data[0].sfinancecost
-                ? response.data[0].sfinancecost
+              scommission: ldata.scommission ? ldata.scommission : "$ 0.00",
+              interestcost: ldata.interestcost ? ldata.interestcost : "$ 0.00",
+              legal: ldata.legal ? ldata.legal : "$ 0.00",
+              pallets: ldata.pallets ? ldata.pallets : "$ 0.00",
+              other: ldata.other ? ldata.other : "$ 0.00",
+              totalcost: ldata.totalcost ? ldata.totalcost : "$ 0.00",
+              interestrate: ldata.interestrate,
+              interestdays: ldata.interestdays,
+              pricebeforeint: ldata.pricebeforeint
+                ? ldata.pricebeforeint
                 : "$ 0.00",
-              freightpmt: response.data[0].freightpmt
-                ? response.data[0].freightpmt
+              salesinterest: ldata.salesinterest
+                ? ldata.salesinterest
                 : "$ 0.00",
-              insurance: response.data[0].insurance
-                ? response.data[0].insurance
+              priceafterint: ldata.priceafterint
+                ? ldata.priceafterint
                 : "$ 0.00",
-              inspectionpmt: response.data[0].inspectionpmt
-                ? response.data[0].inspectionpmt
-                : "$ 0.00",
-              scommission: response.data[0].scommission
-                ? response.data[0].scommission
-                : "$ 0.00",
-              interestcost: response.data[0].interestcost
-                ? response.data[0].interestcost
-                : "$ 0.00",
-              legal: response.data[0].legal ? response.data[0].legal : "$ 0.00",
-              pallets: response.data[0].pallets
-                ? response.data[0].pallets
-                : "$ 0.00",
-              other: response.data[0].other ? response.data[0].other : "$ 0.00",
-              totalcost: response.data[0].totalcost
-                ? response.data[0].totalcost
-                : "$ 0.00",
-              interestrate: response.data[0].interestrate,
-              interestdays: response.data[0].interestdays,
-              pricebeforeint: response.data[0].pricebeforeint
-                ? response.data[0].pricebeforeint
-                : "$ 0.00",
-              salesinterest: response.data[0].salesinterest
-                ? response.data[0].salesinterest
-                : "$ 0.00",
-              priceafterint: response.data[0].priceafterint
-                ? response.data[0].priceafterint
-                : "$ 0.00",
-              profit: response.data[0].profit
-                ? response.data[0].profit
-                : "$ 0.00",
-              margin: response.data[0].margin
-                ? response.data[0].margin
-                : "$ 0.00",
-              turnover: response.data[0].turnover
-                ? response.data[0].turnover
-                : "$ 0.00",
-              pctmargin: response.data[0].pctmargin,
-              netback: response.data[0].netback
-                ? response.data[0].netback
-                : "$ 0.00",
+              profit: ldata.profit ? ldata.profit : "$ 0.00",
+              margin: ldata.margin ? ldata.margin : "$ 0.00",
+              turnover: ldata.turnover ? ldata.turnover : "$ 0.00",
+              pctmargin: ldata.pctmargin,
+              netback: ldata.netback ? ldata.netback : "$ 0.00",
             });
             setQSOriginalData({
               ...QSOriginal,
-              KTP: response.data[0].KTP,
-              KTS: response.data[0].KTS,
-              QSDate: response.data[0].QSDate,
-              saleType: response.data[0].saleTypeID,
-              QSID: response.data[0].QSID,
-              abbreviation: response.data[0].productID,
-              supplier: response.data[0].supplierID,
-              customer: response.data[0].customerID,
-              packsize: response.data[0].packsize,
-              marks: response.data[0].marks,
-              from: response.data[0].from,
-              to: response.data[0].to,
-              POL: response.data[0].POLID,
-              POD: response.data[0].PODID,
-              saleComplete: response.data[0].saleComplete,
-              TIC: response.data[0].traderID,
-              traffic: response.data[0].trafficID,
-              incoterms: response.data[0].incoterms,
-              paymentTerm: response.data[0].pTermID,
-              CADintrate:
-                Number(response.data[0].includedrate.replace("%", "")) / 100,
-              CADdays: response.data[0].includedperiod,
-              shipmentType: response.data[0].shipmentTypeID
-                ? response.data[0].shipmentTypeID
-                : 1,
-              freightTotal: response.data[0].freightTotal
-                ? Number(
-                    response.data[0].freightTotal
-                      .replace("$", "")
-                      .replace(",", "")
-                  )
+              KTP: ldata.KTP,
+              KTS: ldata.KTS,
+              QSDate: ldata.QSDate,
+              saleType: ldata.saleTypeID,
+              QSID: ldata.QSID,
+              abbreviation: ldata.productID,
+              supplier: ldata.supplierID,
+              customer: ldata.customerID,
+              packsize: ldata.packsize,
+              marks: ldata.marks,
+              from: ldata.from,
+              to: ldata.to,
+              POL: ldata.POLID,
+              POD: ldata.PODID,
+              saleComplete: ldata.saleComplete,
+              TIC: ldata.traderID,
+              traffic: ldata.trafficID,
+              incoterms: ldata.incoterms,
+              paymentTerm: ldata.pTermID,
+              CADintrate: Number(ldata.includedrate.replace("%", "")) / 100,
+              CADdays: ldata.includedperiod,
+              shipmentType: ldata.shipmentTypeID ? ldata.shipmentTypeID : 1,
+              freightTotal: ldata.freightTotal
+                ? numerify(ldata.freightTotal)
                 : 0,
-              shippingline: response.data[0].shippingline,
-              payload: response.data[0].payload,
-              totalinspection: response.data[0].totalinspection
-                ? Number(
-                    response.data[0].totalinspection
-                      .replace("$", "")
-                      .replace(",", "")
-                  )
+              shippingline: ldata.shippingline,
+              payload: ldata.payload,
+              totalinspection: ldata.totalinspection
+                ? numerify(ldata.totalinspection)
                 : 0,
-              quantity: Number(response.data[0].quantity.replace(",", "")),
-              materialcost: response.data[0].materialcost
-                ? Number(
-                    response.data[0].materialcost
-                      .replace("$", "")
-                      .replace(",", "")
-                  )
+              quantity: Number(ldata.quantity.replace(",", "")),
+              materialcost: ldata.materialcost
+                ? numerify(ldata.materialcost)
                 : 0,
-              pcommission: response.data[0].pcommission
-                ? Number(
-                    response.data[0].pcommission
-                      .replace("$", "")
-                      .replace(",", "")
-                  )
+              materialvalue: matvalue ? matvalue : 0,
+              generalduty: ldata.generalduty
+                ? numerify(ldata.generalduty, "%") / 100
                 : 0,
-              pfinancecost: response.data[0].pfinancecost
-                ? Number(
-                    response.data[0].pfinancecost
-                      .replace("$", "")
-                      .replace(",", "")
-                  )
+              additionalduty: ldata.additionalduty
+                ? numerify(ldata.additionalduty, "%") / 100
                 : 0,
-              sfinancecost: response.data[0].sfinancecost
-                ? Number(
-                    response.data[0].sfinancecost
-                      .replace("$", "")
-                      .replace(",", "")
-                  )
+              totalduty: totalduty ? totalduty / 100 : 0,
+
+              dutyfee: dutyfee ? dutyfee : 0,
+              harborfeepct: ldata.harborfeepct
+                ? numerify(ldata.harborfeepct, "%") / 100
                 : 0,
-              freightpmt: response.data[0].freightpmt
-                ? Number(
-                    response.data[0].freightpmt
-                      .replace("$", "")
-                      .replace(",", "")
-                  )
+              harborfee: harborfee ? harborfee : 0,
+              merchprocfeepct: ldata.merchprocfeepct
+                ? numerify(ldata.merchprocfeepct, "%") / 100
                 : 0,
-              insurance: response.data[0].insurance
-                ? Number(
-                    response.data[0].insurance.replace("$", "").replace(",", "")
-                  )
+              merchprocfee: merchprocfee ? merchprocfee : 0,
+              cflatfee: ldata.cflatfee ? numerify(ldata.cflatfee) : 0,
+              tsca: ldata.tsca ? numerify(ldata.tsca) : 0,
+              isf: ldata.isf ? numerify(ldata.isf) : 0,
+              pcommission: ldata.pcommission ? numerify(ldata.pcommission) : 0,
+              totalcentryfee: totalcentryfee ? totalcentryfee : 0,
+              centryfeepmt: totalcentryfee
+                ? totalcentryfee / ldata.quantity
                 : 0,
-              inspectionpmt: response.data[0].inspectionpmt
-                ? Number(
-                    response.data[0].inspectionpmt
-                      .replace("$", "")
-                      .replace(",", "")
-                  )
+              pfinancecost: ldata.pfinancecost
+                ? numerify(ldata.pfinancecost)
                 : 0,
-              scommission: response.data[0].scommission
-                ? Number(
-                    response.data[0].scommission
-                      .replace("$", "")
-                      .replace(",", "")
-                  )
+              sfinancecost: ldata.sfinancecost
+                ? numerify(ldata.sfinancecost)
                 : 0,
-              interestcost: response.data[0].interestcost
-                ? Number(
-                    response.data[0].interestcost
-                      .replace("$", "")
-                      .replace(",", "")
-                  )
+              freightpmt: ldata.freightpmt ? numerify(ldata.freightpmt) : 0,
+              insurance: ldata.insurance ? numerify(ldata.insurance) : 0,
+              inspectionpmt: ldata.inspectionpmt
+                ? numerify(ldata.inspectionpmt)
                 : 0,
-              legal: response.data[0].legal
-                ? Number(
-                    response.data[0].legal.replace("$", "").replace(",", "")
-                  )
+              scommission: ldata.scommission ? numerify(ldata.scommission) : 0,
+              interestcost: ldata.interestcost
+                ? numerify(ldata.interestcost)
                 : 0,
-              pallets: response.data[0].pallets
-                ? Number(
-                    response.data[0].pallets.replace("$", "").replace(",", "")
-                  )
+              legal: ldata.legal ? numerify(ldata.legal) : 0,
+              pallets: ldata.pallets ? numerify(ldata.pallets) : 0,
+              other: ldata.other ? numerify(ldata.other) : 0,
+              interestrate: Number(ldata.interestrate.replace("%", "")) / 100,
+              interestdays: ldata.interestdays,
+              pricebeforeint: ldata.pricebeforeint
+                ? numerify(ldata.pricebeforeint)
                 : 0,
-              other: response.data[0].other
-                ? Number(
-                    response.data[0].other.replace("$", "").replace(",", "")
-                  )
+              salesinterest: ldata.salesinterest
+                ? numerify(ldata.salesinterest)
                 : 0,
-              interestrate:
-                Number(response.data[0].interestrate.replace("%", "")) / 100,
-              interestdays: response.data[0].interestdays,
-              pricebeforeint: response.data[0].pricebeforeint
-                ? Number(
-                    response.data[0].pricebeforeint
-                      .replace("$", "")
-                      .replace(",", "")
-                  )
-                : 0,
-              salesinterest: response.data[0].salesinterest
-                ? Number(
-                    response.data[0].salesinterest
-                      .replace("$", "")
-                      .replace(",", "")
-                  )
-                : 0,
-              priceafterint: response.data[0].priceafterint
-                ? Number(
-                    response.data[0].priceafterint
-                      .replace("$", "")
-                      .replace(",", "")
-                  )
+              priceafterint: ldata.priceafterint
+                ? numerify(ldata.priceafterint)
                 : 0,
             });
-            if (response.data[0].saleComplete === -1) {
+            if (ldata.saleComplete === -1) {
               setSold(true);
               setAllocated(false);
             }
-            if (response.data[0].saleComplete === 1) {
+            if (ldata.saleComplete === 1) {
               setAllocated(true);
               setSold(false);
             }
-            if (response.data[0].saleComplete === 0) {
+            if (ldata.saleComplete === 0) {
               setSold(false);
               setAllocated(false);
             }
@@ -1077,15 +956,20 @@ const SalesQS2 = () => {
     let c = [];
     let d = [];
     let e = [];
+    // loop over a, an array containing all new values.
     for (const x in a) {
       if (inEuros === false) {
+        // compare each value in a to its original in b. If values are different:
         if (a[x] !== b[x]) {
+          // push the value name into c
           c.push(x);
+          // if original value was "" then push (empty) into d, else push the original value into b
           if (b[x] === "") {
             d.push("(empty)");
           } else {
             d.push(b[x]);
           }
+          // push the new value into e
           e.push(a[x]);
         }
       }
@@ -1093,34 +977,16 @@ const SalesQS2 = () => {
         if (a[x]) {
           if (a[x].toString().indexOf("€") > -1) {
             if (
-              Number(a[x].toString().replace("€", "").replace(",", "")).toFixed(
-                2
-              ) !==
-              (
-                Number(b[x].toString().replace("$", "").replace(",", "")) /
-                exchangerate
-              ).toFixed(2)
+              numerify(a[x], "€").toFixed(2) !==
+              (numerify(b[x], "$") / exchangerate).toFixed(2)
             ) {
-              console.log(
-                Number(
-                  a[x].toString().replace("€", "").replace(",", "")
-                ).toFixed(2),
-                (
-                  Number(b[x].toString().replace("$", "").replace(",", "")) /
-                  exchangerate
-                ).toFixed(2)
-              );
               c.push(x);
               if (b[x] === "") {
                 d.push("(empty)");
               } else {
                 d.push(
-                  "€ " +
-                    (
-                      Number(
-                        b[x].toString().replace("$", "").replace(",", "")
-                      ) / exchangerate
-                    ).toFixed(2)
+                  numcurrex(b[x], exchangerate, "€", "$", 2)
+                  // if any bug arrises it may be because numcurrex adds commas as thousand separator. This was not the case in the original code.
                 );
               }
               e.push(a[x]);
@@ -1347,7 +1213,7 @@ const SalesQS2 = () => {
     });
   };
 
-  const PercentageChange = (e) => {
+  const PercentageChange = (e, dec = 2) => {
     setEditing(true);
     if (inEuros === true && exchangerate && lockER === false) {
       setLockER(true);
@@ -1358,7 +1224,7 @@ const SalesQS2 = () => {
         setQSData({
           ...QSData,
           [e.target.name]:
-            Number(e.target.value.replace("%", "")).toFixed(2) / 100,
+            Number(e.target.value.replace("%", "")).toFixed(dec) / 100,
         });
         setQSValues({
           ...QSValues,
@@ -1367,7 +1233,7 @@ const SalesQS2 = () => {
       } else {
         setQSData({
           ...QSData,
-          [e.target.name]: Number(e.target.value).toFixed(2) / 100,
+          [e.target.name]: Number(e.target.value).toFixed(dec) / 100,
         });
         setQSValues({
           ...QSValues,
@@ -1377,10 +1243,11 @@ const SalesQS2 = () => {
     }
   };
 
-  const PercentageBlur = (e) => {
+  const PercentageBlur = (e, dec = 2) => {
     setQSValues({
       ...QSValues,
-      [e.target.name]: Number(e.target.value.replace("%", "")).toFixed(2) + "%",
+      [e.target.name]:
+        Number(e.target.value.replace("%", "")).toFixed(dec) + "%",
     });
   };
 
@@ -1594,6 +1461,7 @@ const SalesQS2 = () => {
 
   const ttlcostcalc = (
     mc,
+    cef,
     pc,
     pf,
     sf,
@@ -1607,13 +1475,50 @@ const SalesQS2 = () => {
     oth
   ) => {
     return new Promise((resolve, reject) => {
-      resolve(mc + pc + pf + sf + frt + ins + insp + sc + int + lg + pal + oth);
+      resolve(
+        mc + cef + pc + pf + sf + frt + ins + insp + sc + int + lg + pal + oth
+      );
     });
   };
 
   const paicalc = (pbi, slsint) => {
     return new Promise((resolve, reject) => {
       resolve(pbi + slsint);
+    });
+  };
+  const materialvaluecalc = (matcost, qty) => {
+    return new Promise((resolve, reject) => {
+      resolve(matcost * qty);
+    });
+  };
+  const totaldutycalc = (gduty, aduty) => {
+    return new Promise((resolve, reject) => {
+      resolve(gduty + aduty);
+    });
+  };
+  const dutyfeecalc = (entryfee, tduty) => {
+    return new Promise((resolve, reject) => {
+      resolve(entryfee * tduty);
+    });
+  };
+  const harborfeecalc = (entryfee, hpct) => {
+    return new Promise((resolve, reject) => {
+      resolve(entryfee * hpct);
+    });
+  };
+  const mercprocfeecalc = (entryfee, mppct) => {
+    return new Promise((resolve, reject) => {
+      resolve(entryfee * mppct);
+    });
+  };
+  const totalcentryfeecalc = (dfee, hfee, mpfee, ffee, tsca, isf) => {
+    return new Promise((resolve, reject) => {
+      resolve(dfee + hfee + mpfee + ffee + tsca + isf);
+    });
+  };
+  const centryfeepmtcalc = (tcfee, qty) => {
+    return new Promise((resolve, reject) => {
+      resolve(tcfee / qty);
     });
   };
 
@@ -1636,8 +1541,35 @@ const SalesQS2 = () => {
         QSData.quantity
       );
       const insur = await insurcalc(QSData.incoterms, QSData.pricebeforeint);
+
+      const materialvalue = await materialvaluecalc(
+        QSData.materialcost,
+        QSData.quantity
+      );
+      const totalduty = await totaldutycalc(
+        QSData.generalduty,
+        QSData.additionalduty
+      );
+      const dutyfee = await dutyfeecalc(materialvalue, totalduty);
+      const harborfee = await harborfeecalc(materialvalue, QSData.harborfeepct);
+      const merchprocfee = await mercprocfeecalc(
+        materialvalue,
+        QSData.merchprocfeepct
+      );
+      const totalcentryfee = await totalcentryfeecalc(
+        dutyfee,
+        harborfee,
+        merchprocfee,
+        QSData.cflatfee,
+        QSData.tsca,
+        QSData.isf
+      );
+      const centryfeepmt = QSData.quantity
+        ? await centryfeepmtcalc(totalcentryfee, QSData.quantity)
+        : 0;
       const ttlcost = await ttlcostcalc(
         QSData.materialcost,
+        centryfeepmt,
         QSData.pcommission,
         QSData.pfinancecost,
         QSData.sfinancecost,
@@ -1657,6 +1589,13 @@ const SalesQS2 = () => {
         insurance: insur,
         inspectionpmt: inspcost,
         interestcost: intcost,
+        materialvalue: materialvalue,
+        totalduty: totalduty,
+        dutyfee: dutyfee,
+        harborfee: harborfee,
+        merchprocfee: merchprocfee,
+        totalcentryfee: totalcentryfee,
+        centryfeepmt: centryfeepmt,
         totalcost: ttlcost,
         salesinterest: slsint,
         priceafterint: praftint,
@@ -1699,6 +1638,16 @@ const SalesQS2 = () => {
           insurance: "$ " + insur.toFixed(2),
           inspectionpmt: "$ " + inspcost.toFixed(2),
           interestcost: "$ " + intcost.toFixed(2),
+          materialvalue:
+            "$ " +
+            materialvalue.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+          totalduty: Number(totalduty * 100).toFixed(2) + "%",
+          dutyfee:
+            "$ " + dutyfee.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+          harborfee: "$ " + harborfee.toFixed(2),
+          merchprocfee: "$ " + merchprocfee.toFixed(2),
+          totalcentryfee: "$ " + totalcentryfee.toFixed(2),
+          centryfeepmt: "$ " + centryfeepmt.toFixed(2),
           totalcost:
             "$ " + ttlcost.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ","),
           salesinterest: "$ " + slsint.toFixed(2),
@@ -1749,6 +1698,22 @@ const SalesQS2 = () => {
           insurance: "€ " + (insur / exchangerate).toFixed(2),
           inspectionpmt: "€ " + (inspcost / exchangerate).toFixed(2),
           interestcost: "€ " + (intcost / exchangerate).toFixed(2),
+          materialvalue:
+            "€ " +
+            (materialvalue / exchangerate)
+              .toFixed(2)
+              .replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+          totalduty: Number(totalduty * 100).toFixed(2) + "%",
+          dutyfee:
+            "€ " +
+            (dutyfee / exchangerate)
+              .toFixed(2)
+              .replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+          harborfee: "€ " + Number(harborfee / exchangerate).toFixed(2),
+          merchprocfee: "€ " + Number(merchprocfee / exchangerate).toFixed(2),
+          totalcentryfee:
+            "€ " + Number(totalcentryfee / exchangerate).toFixed(2),
+          centryfeepmt: "€ " + Number(centryfeepmt / exchangerate).toFixed(2),
           totalcost:
             "€ " +
             (ttlcost / exchangerate)
@@ -1822,6 +1787,13 @@ const SalesQS2 = () => {
     QSData.incoterms,
     QSData.materialcost,
     QSData.pcommission,
+    QSData.generalduty,
+    QSData.additionalduty,
+    QSData.harborfeepct,
+    QSData.merchprocfeepct,
+    QSData.cflatfee,
+    QSData.tsca,
+    QSData.isf,
     QSData.scommission,
     QSData.pfinancecost,
     QSData.sfinancecost,
@@ -1835,117 +1807,73 @@ const SalesQS2 = () => {
     if (inEuros === true) {
       setQSValues({
         ...QSValues,
-        freightTotal:
-          "€ " +
-          (QSData.freightTotal / exchangerate)
-            .toFixed(2)
-            .replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-        totalinspection:
-          "€ " +
-          (QSData.totalinspection / exchangerate)
-            .toFixed(2)
-            .replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-        materialcost:
-          "€ " +
-          (QSData.materialcost / exchangerate)
-            .toFixed(2)
-            .replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-        pcommission: "€ " + (QSData.pcommission / exchangerate).toFixed(2),
-        pfinancecost: "€ " + (QSData.pfinancecost / exchangerate).toFixed(2),
-        sfinancecost: "€ " + (QSData.sfinancecost / exchangerate).toFixed(2),
-        freightpmt: "€ " + (QSData.freightpmt / exchangerate).toFixed(2),
-        insurance: "€ " + (QSData.insurance / exchangerate).toFixed(2),
-        inspectionpmt: "€ " + (QSData.inspectionpmt / exchangerate).toFixed(2),
-        scommission: "€ " + (QSData.scommission / exchangerate).toFixed(2),
-        interestcost: "€ " + (QSData.interestcost / exchangerate).toFixed(2),
-        legal: "€ " + (QSData.legal / exchangerate).toFixed(2),
-        pallets: "€ " + (QSData.pallets / exchangerate).toFixed(2),
-        other: "€ " + (QSData.other / exchangerate).toFixed(2),
-        totalcost:
-          "€ " +
-          (QSData.totalcost / exchangerate)
-            .toFixed(2)
-            .replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-        pricebeforeint:
-          "€ " +
-          (QSData.pricebeforeint / exchangerate)
-            .toFixed(2)
-            .replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-        salesinterest: "€ " + (QSData.salesinterest / exchangerate).toFixed(2),
-        priceafterint:
-          "€ " +
-          (QSData.priceafterint / exchangerate)
-            .toFixed(2)
-            .replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-        profit:
-          "€ " +
-          (QSData.profit / exchangerate)
-            .toFixed(2)
-            .replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-        margin:
-          "€ " +
-          (QSData.margin / exchangerate)
-            .toFixed(2)
-            .replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-        turnover:
-          "€ " +
-          (QSData.turnover / exchangerate)
-            .toFixed(2)
-            .replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-        netback:
-          "€ " +
-          (QSData.netback / exchangerate)
-            .toFixed(2)
-            .replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+        freightTotal: currencify(QSData.freightTotal / exchangerate, "€"),
+        totalinspection: currencify(QSData.totalinspection / exchangerate, "€"),
+        materialcost: currencify(QSData.materialcost / exchangerate, "€"),
+        materialvalue: currencify(QSData.materialvalue / exchangerate, "€"),
+        dutyfee: currencify(QSData.dutyfee / exchangerate, "€"),
+        harborfee: currencify(QSData.harborfee / exchangerate, "€"),
+        merchprocfee: currencify(QSData.merchprocfee / exchangerate, "€"),
+        cflatfee: currencify(QSData.cflatfee / exchangerate, "€"),
+        tsca: currencify(QSData.tsca / exchangerate, "€"),
+        isf: currencify(QSData.isf / exchangerate, "€"),
+        totalcentryfee: currencify(QSData.totalcentryfee / exchangerate, "€"),
+        centryfeepmt: currencify(QSData.centryfeepmt / exchangerate, "€"),
+        pcommission: currencify(QSData.pcommission / exchangerate, "€"),
+        pfinancecost: currencify(QSData.pfinancecost / exchangerate, "€"),
+        sfinancecost: currencify(QSData.sfinancecost / exchangerate, "€"),
+        freightpmt: currencify(QSData.freightpmt / exchangerate, "€"),
+        insurance: currencify(QSData.insurance / exchangerate, "€"),
+        inspectionpmt: currencify(QSData.inspectionpmt / exchangerate, "€"),
+        scommission: currencify(QSData.scommission / exchangerate, "€"),
+        interestcost: currencify(QSData.interestcost / exchangerate, "€"),
+        legal: currencify(QSData.legal / exchangerate, "€"),
+        pallets: currencify(QSData.pallets / exchangerate, "€"),
+        other: currencify(QSData.other / exchangerate, "€"),
+        totalcost: currencify(QSData.totalcost / exchangerate, "€"),
+        pricebeforeint: currencify(QSData.pricebeforeint / exchangerate, "€"),
+        salesinterest: currencify(QSData.salesinterest / exchangerate, "€"),
+        priceafterint: currencify(QSData.priceafterint / exchangerate, "€"),
+        profit: currencify(QSData.profit / exchangerate, "€"),
+        margin: currencify(QSData.margin / exchangerate, "€"),
+        turnover: currencify(QSData.turnover / exchangerate, "€"),
+        netback: currencify(QSData.netback / exchangerate, "€"),
       });
     }
     if (inEuros === false) {
       setQSValues({
         ...QSValues,
-        freightTotal:
-          "$ " +
-          QSData.freightTotal.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-        totalinspection:
-          "$ " +
-          QSData.totalinspection
-            .toFixed(2)
-            .replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-        materialcost:
-          "$ " +
-          QSData.materialcost.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-        pcommission: "$ " + QSData.pcommission.toFixed(2),
-        pfinancecost: "$ " + QSData.pfinancecost.toFixed(2),
-        sfinancecost: "$ " + QSData.sfinancecost.toFixed(2),
-        freightpmt: "$ " + QSData.freightpmt.toFixed(2),
-        insurance: "$ " + QSData.insurance.toFixed(2),
-        inspectionpmt: "$ " + QSData.inspectionpmt.toFixed(2),
-        scommission: "$ " + QSData.scommission.toFixed(2),
-        interestcost: "$ " + QSData.interestcost.toFixed(2),
-        legal: "$ " + QSData.legal.toFixed(2),
-        pallets: "$ " + QSData.pallets.toFixed(2),
-        other: "$ " + QSData.other.toFixed(2),
-        totalcost:
-          "$ " +
-          QSData.totalcost.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-        pricebeforeint:
-          "$ " +
-          QSData.pricebeforeint
-            .toFixed(2)
-            .replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-        salesinterest: "$ " + QSData.salesinterest.toFixed(2),
-        priceafterint:
-          "$ " +
-          QSData.priceafterint.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-        profit:
-          "$ " + QSData.profit.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-        margin:
-          "$ " + QSData.margin.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-        turnover:
-          "$ " +
-          QSData.turnover.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-        netback:
-          "$ " +
-          QSData.netback.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+        freightTotal: currencify(QSData.freightTotal, "$"),
+        totalinspection: currencify(QSData.totalinspection, "$"),
+        materialcost: currencify(QSData.materialcost, "$"),
+        materialvalue: currencify(QSData.materialvalue, "$"),
+        dutyfee: currencify(QSData.dutyfee, "$"),
+        harborfee: currencify(QSData.harborfee, "$"),
+        merchprocfee: currencify(QSData.merchprocfee, "$"),
+        cflatfee: currencify(QSData.cflatfee, "$"),
+        tsca: currencify(QSData.tsca, "$"),
+        isf: currencify(QSData.isf, "$"),
+        totalcentryfee: currencify(QSData.totalcentryfee, "$"),
+        centryfeepmt: currencify(QSData.centryfeepmt, "$"),
+        pcommission: currencify(QSData.pcommission, "$"),
+        pfinancecost: currencify(QSData.pfinancecost, "$"),
+        sfinancecost: currencify(QSData.sfinancecost, "$"),
+        freightpmt: currencify(QSData.freightpmt, "$"),
+        insurance: currencify(QSData.insurance, "$"),
+        inspectionpmt: currencify(QSData.inspectionpmt, "$"),
+        scommission: currencify(QSData.scommission, "$"),
+        interestcost: currencify(QSData.interestcost, "$"),
+        legal: currencify(QSData.legal, "$"),
+        pallets: currencify(QSData.pallets, "$"),
+        other: currencify(QSData.other, "$"),
+        totalcost: currencify(QSData.totalcost, "$"),
+        pricebeforeint: currencify(QSData.pricebeforeint, "$"),
+        salesinterest: currencify(QSData.salesinterest, "$"),
+        priceafterint: currencify(QSData.priceafterint, "$"),
+        profit: currencify(QSData.profit, "$"),
+        margin: currencify(QSData.margin, "$"),
+        turnover: currencify(QSData.turnover, "$"),
+        netback: currencify(QSData.netback, "$"),
       });
     }
   }, [inEuros]);
@@ -1963,6 +1891,7 @@ const SalesQS2 = () => {
     });
   };
 
+  const [QSresponsemsg, setQSresponsemsg] = useState();
   //SAVE and UPDATE QS
   const addupdateQS = async (e) => {
     if (editMode) {
@@ -1974,9 +1903,12 @@ const SalesQS2 = () => {
         QSID: QSIDtoedit,
         exchrate: exchangerate,
       }).then((response) => {
+        setQSresponsemsg(response.data["message"]);
+        setShowmsg(!showmsg);
         setEditing(false);
         toggleQSrefresh();
-        console.log(response.data);
+
+        // console.log(response.data["message"]);
       });
       // console.log("updatingQS");
     }
@@ -2075,6 +2007,9 @@ const SalesQS2 = () => {
   const ignoreEnter = (e) => {
     if (e.key === "Enter") {
       e.preventDefault();
+      if (e.target.name === "centryfeepmt") {
+        setShowcustomscalculator(!showcustomscalculator);
+      }
     }
   };
 
@@ -2790,7 +2725,7 @@ const SalesQS2 = () => {
                 />
               </div>
               <fieldset>
-                <legend>Costs</legend>
+                <legend>Costs (per mt)</legend>
                 <div className="form-group">
                   <label htmlFor="">Material Cost:</label>
                   <input
@@ -2808,6 +2743,322 @@ const SalesQS2 = () => {
                     onKeyDown={ignoreEnter}
                   />
                 </div>
+
+                {QSData.saleComplete !== 1 ? (
+                  <div className="form-group">
+                    <label htmlFor="">S Finance Cost:</label>
+                    <input
+                      className="QSfig canceldrag"
+                      value={QSValues.sfinancecost}
+                      // onDoubleClick={(e) => {
+                      //   e.target.select();
+                      // }}
+                      name="sfinancecost"
+                      placeholder="...S Finance Cost pmt"
+                      onChange={CurrencyChange}
+                      onBlur={CurrencyBlur}
+                      type="text"
+                      required
+                      onKeyDown={ignoreEnter}
+                    />
+                  </div>
+                ) : (
+                  ""
+                )}
+                {QSData.saleComplete === 1 ? (
+                  <div className="form-group">
+                    <label htmlFor="" style={{ position: "relative" }}>
+                      Customs Entry:{" "}
+                      <FontAwesomeIcon
+                        icon={faCalculator}
+                        onClick={(e) => {
+                          setShowcustomscalculator(!showcustomscalculator);
+                        }}
+                      />
+                    </label>
+                    <input
+                      style={{ backgroundColor: "rgb(244,244,244)" }}
+                      className="QSfig canceldrag"
+                      value={QSValues.centryfeepmt}
+                      // onDoubleClick={(e) => {
+                      //   e.target.select();
+                      // }}
+                      name="centryfeepmt"
+                      placeholder="...Customs Entry pmt"
+                      onChange={CurrencyChange}
+                      onBlur={CurrencyBlur}
+                      type="text"
+                      required
+                      readOnly
+                      onKeyDown={ignoreEnter}
+                    />
+                  </div>
+                ) : (
+                  ""
+                )}
+                {showcustomscalculator & (QSData.saleComplete === 1) ? (
+                  <div className="customscalc" style={{ position: "absolute" }}>
+                    <div className="form-group">
+                      <label htmlFor="">Quantity:</label>
+                      <input
+                        className="QSfig canceldrag"
+                        name="quantity"
+                        value={QSValues.quantity}
+                        onChange={QtyChange}
+                        type="text"
+                        placeholder="MT"
+                        // onDoubleClick={(e) => {
+                        //   e.target.select();
+                        // }}
+                        onBlur={QtyBlur}
+                        required
+                        onKeyDown={ignoreEnter}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="">Material Cost/mt:</label>
+                      <input
+                        className="QSfig canceldrag"
+                        type="text"
+                        placeholder="...Material Cost pmt"
+                        onChange={CurrencyChange}
+                        name="materialcost"
+                        value={QSValues.materialcost}
+                        onBlur={CurrencyBlur}
+                        required
+                        onKeyDown={ignoreEnter}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="">Entry Value:</label>
+                      <input
+                        style={{
+                          backgroundColor: "rgb(230,230,230",
+                          borderBottom: "None",
+                        }}
+                        className="QSfig canceldrag"
+                        type="text"
+                        placeholder="...Material Value $"
+                        onChange={CurrencyChange}
+                        name="materialvalue"
+                        value={QSValues.materialvalue}
+                        onBlur={CurrencyBlur}
+                        required
+                        readOnly
+                        onKeyDown={ignoreEnter}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="">General Duty (%):</label>
+                      <input
+                        className="QSfig canceldrag"
+                        type="text"
+                        placeholder="...General Duty"
+                        onChange={PercentageChange}
+                        name="generalduty"
+                        value={QSValues.generalduty}
+                        onBlur={PercentageBlur}
+                        required
+                        onKeyDown={ignoreEnter}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="">Additional Duty (%):</label>
+                      <input
+                        className="QSfig canceldrag"
+                        type="text"
+                        placeholder="...Additional Duty"
+                        onChange={PercentageChange}
+                        name="additionalduty"
+                        value={QSValues.additionalduty}
+                        onBlur={PercentageBlur}
+                        required
+                        onKeyDown={ignoreEnter}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="">Total Duty:</label>
+                      <input
+                        style={{
+                          backgroundColor: "rgb(230,230,230",
+                          borderBottom: "None",
+                        }}
+                        className="QSfig canceldrag"
+                        type="text"
+                        placeholder="...Total Duty %"
+                        onChange={PercentageChange}
+                        name="totalduty"
+                        value={QSValues.totalduty}
+                        onBlur={PercentageBlur}
+                        required
+                        readOnly
+                        onKeyDown={ignoreEnter}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="">Duty Fee:</label>
+                      <input
+                        style={{
+                          backgroundColor: "rgb(230,230,230",
+                          borderBottom: "None",
+                        }}
+                        className="QSfig canceldrag"
+                        type="text"
+                        placeholder="...Duty Fee $"
+                        onChange={CurrencyChange}
+                        name="dutyfee"
+                        value={QSValues.dutyfee}
+                        onBlur={CurrencyBlur}
+                        required
+                        readOnly
+                        onKeyDown={ignoreEnter}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="">Harbor Fee %:</label>
+                      <input
+                        className="QSfig canceldrag"
+                        type="text"
+                        placeholder="...HarborFee %"
+                        onChange={(e) => PercentageChange(e, 3)}
+                        name="harborfeepct"
+                        value={QSValues.harborfeepct}
+                        onBlur={(e) => PercentageBlur(e, 3)}
+                        required
+                        onKeyDown={ignoreEnter}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="">Harbor Fee:</label>
+                      <input
+                        style={{
+                          backgroundColor: "rgb(230,230,230",
+                          borderBottom: "None",
+                        }}
+                        className="QSfig canceldrag"
+                        type="text"
+                        placeholder="...Harbor Fee $"
+                        onChange={CurrencyChange}
+                        name="harborfee"
+                        value={QSValues.harborfee}
+                        onBlur={CurrencyBlur}
+                        required
+                        readOnly
+                        onKeyDown={ignoreEnter}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="">Merch. Proc. Fee %:</label>
+                      <input
+                        className="QSfig canceldrag"
+                        type="text"
+                        placeholder="...Merch. Proc. %"
+                        onChange={(e) => PercentageChange(e, 4)}
+                        name="merchprocfeepct"
+                        value={QSValues.merchprocfeepct}
+                        onBlur={(e) => PercentageBlur(e, 4)}
+                        required
+                        onKeyDown={ignoreEnter}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="">Merch. Proc. Fee:</label>
+                      <input
+                        style={{
+                          backgroundColor: "rgb(230,230,230",
+                          borderBottom: "None",
+                        }}
+                        className="QSfig canceldrag"
+                        type="text"
+                        placeholder="...MP Fee $"
+                        onChange={CurrencyChange}
+                        name="merchprocfee"
+                        value={QSValues.merchprocfee}
+                        onBlur={CurrencyBlur}
+                        required
+                        readOnly
+                        onKeyDown={ignoreEnter}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="">Flat Fee:</label>
+                      <input
+                        className="QSfig canceldrag"
+                        type="text"
+                        placeholder="...Flat Fee $"
+                        onChange={CurrencyChange}
+                        name="cflatfee"
+                        value={QSValues.cflatfee}
+                        onBlur={CurrencyBlur}
+                        required
+                        onKeyDown={ignoreEnter}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="">TSCA:</label>
+                      <input
+                        className="QSfig canceldrag"
+                        type="text"
+                        placeholder="...TSCA $"
+                        onChange={CurrencyChange}
+                        name="tsca"
+                        value={QSValues.tsca}
+                        onBlur={CurrencyBlur}
+                        required
+                        onKeyDown={ignoreEnter}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="">ISF:</label>
+                      <input
+                        className="QSfig canceldrag"
+                        type="text"
+                        placeholder="...ISF $"
+                        onChange={CurrencyChange}
+                        name="isf"
+                        value={QSValues.isf}
+                        onBlur={CurrencyBlur}
+                        required
+                        onKeyDown={ignoreEnter}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="">Total Entry Fee:</label>
+                      <input
+                        style={{
+                          backgroundColor: "rgb(230,230,230",
+                          borderBottom: "None",
+                        }}
+                        className="QSfig canceldrag"
+                        type="text"
+                        placeholder="...Total Entry Fee $"
+                        onChange={CurrencyChange}
+                        name="totalcentryfee"
+                        value={QSValues.totalcentryfee}
+                        onBlur={CurrencyBlur}
+                        required
+                        readOnly
+                        onKeyDown={ignoreEnter}
+                      />
+                    </div>
+                    <button
+                      onClick={(e) => {
+                        setShowcustomscalculator(false);
+                      }}
+                    >
+                      Reset
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        setShowcustomscalculator(false);
+                      }}
+                    >
+                      OK
+                    </button>
+                  </div>
+                ) : (
+                  ""
+                )}
                 <div className="form-group">
                   <label htmlFor="">P Commission:</label>
                   <input
@@ -2838,23 +3089,6 @@ const SalesQS2 = () => {
                     value={QSValues.pfinancecost}
                     onChange={CurrencyChange}
                     onBlur={CurrencyBlur}
-                    required
-                    onKeyDown={ignoreEnter}
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="">S Finance Cost:</label>
-                  <input
-                    className="QSfig canceldrag"
-                    value={QSValues.sfinancecost}
-                    // onDoubleClick={(e) => {
-                    //   e.target.select();
-                    // }}
-                    name="sfinancecost"
-                    placeholder="...S Finance Cost pmt"
-                    onChange={CurrencyChange}
-                    onBlur={CurrencyBlur}
-                    type="text"
                     required
                     onKeyDown={ignoreEnter}
                   />
@@ -3209,7 +3443,8 @@ const SalesQS2 = () => {
                   readOnly={lockER}
                   onKeyDown={ignoreEnter}
                 />
-                <UnlockedIcon
+                <FontAwesomeIcon
+                  icon={faUnlock}
                   onClick={(e) => {
                     setLockER(!lockER);
                   }}
@@ -3219,7 +3454,8 @@ const SalesQS2 = () => {
                       : "unlockicon display-none"
                   }
                 />
-                <LockedIcon
+                <FontAwesomeIcon
+                  icon={faLock}
                   onClick={(e) => {
                     e.preventDefault();
                     confirmAlert({
@@ -3281,7 +3517,12 @@ const SalesQS2 = () => {
                 <button type="submit">Save and New</button>
               </>
             ) : (
-              <button type="submit">Save Edits</button>
+              <>
+                <span ref={refrespmsg}>{QSresponsemsg}</span>
+                <button className="saveQSeditsbutton" type="submit">
+                  Save Edits
+                </button>
+              </>
             )}
             {/* <button type="submit" onClick={(e) => console.log("prepare offer")}>
             Save and Offer

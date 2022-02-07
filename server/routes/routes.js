@@ -1,4 +1,4 @@
-// require("dotenv").config({ path: __dirname + "/../config/.env" });
+require("dotenv").config({ path: __dirname + "/../config/.env" });
 const moment = require("moment");
 const express = require("express");
 const router = express();
@@ -619,6 +619,20 @@ router.post("/saveQS", (req, res) => {
     pcommission,
     pfinancecost,
     sfinancecost,
+    materialvalue,
+    generalduty,
+    additionalduty,
+    totalduty,
+    dutyfee,
+    harborfeepct,
+    harborfee,
+    merchprocfeepct,
+    merchprocfee,
+    cflatfee,
+    tsca,
+    isf,
+    totalcentryfee,
+    centryfeepmt,
     freightpmt,
     insurance,
     inspectionpmt,
@@ -641,7 +655,7 @@ router.post("/saveQS", (req, res) => {
     saleComplete,
   } = req.body.QSData;
   db.query(
-    "INSERT INTO quotationsheet (KTS, KTP, saleTypeID, QSDate, productID, supplierID, customerID, packingSize, marks, `from`, `to`, POLID, PODID, traderID, trafficID, incoterms, pTermID, FreightTotal, freightCompany, containerCapacity, inspectionCostPer250, quantity, materialCost, pAgentCommission, pFinancialCostP, sFinancialCost, oFreight, insuranceCost, inspectionCost, sAgentCommission, interestCost, interestRate, interestPeriod, legal, pallets, others, totalCost, saleInterestRate, salePaymentPeriod, priceBeforeInterest, saleInterest, priceAfterInterest, tradingProfit, tradingMargin, salesTurnover, percentageMargin, netback, saleComplete) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);",
+    "INSERT INTO quotationsheet (KTS, KTP, saleTypeID, QSDate, productID, supplierID, customerID, packingSize, marks, `from`, `to`, POLID, PODID, traderID, trafficID, incoterms, pTermID, FreightTotal, freightCompany, containerCapacity, inspectionCostPer250, quantity, materialCost, pAgentCommission, pFinancialCostP, sFinancialCost, oFreight, insuranceCost, inspectionCost, sAgentCommission, interestCost, interestRate, interestPeriod, legal, pallets, others, totalCost, saleInterestRate, salePaymentPeriod, priceBeforeInterest, saleInterest, priceAfterInterest, tradingProfit, tradingMargin, salesTurnover, percentageMargin, netback, saleComplete, generalduty, additionalduty, harborpct, merchprocpct, flatfee, tsca, isf) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);",
     [
       KTS,
       KTP,
@@ -691,6 +705,13 @@ router.post("/saveQS", (req, res) => {
       pctmargin,
       netback,
       saleComplete,
+      generalduty,
+      additionalduty,
+      harborfeepct,
+      merchprocfeepct,
+      cflatfee,
+      tsca,
+      isf,
     ],
     (err) => {
       if (err) {
@@ -727,7 +748,7 @@ router.post("/QStoedit", (req, res) => {
 router.post("/loadQStoedit", (req, res) => {
   let id = req.body.id;
   db.query(
-    "SELECT QSID, quotationsheet.saleTypeID, saleTypes.saleType, KTP, KTS, DATE_FORMAT(QSDate,'%Y-%m-%d') AS QSDate, abbreviation, quotationsheet.productID, supplierlist.companyCode AS supplier, quotationsheet.supplierID, customerList.companyCode AS customer, quotationsheet.customerID, quotationsheet.packingSize AS packsize, marks, DATE_FORMAT(`from`,'%Y-%m-%d') AS `from`, DATE_FORMAT(`to`,'%Y-%m-%d') AS `to`, portOfLoad AS POL, quotationsheet.POLID, portOfDestination AS POD, quotationsheet.PODID, traderList.tCode AS trader, quotationsheet.traderID, trafficList.tCode AS traffic, quotationsheet.trafficID, incoterms, paymentTerm AS paymentTerm, quotationsheet.pTermID, concat(format(interestrate*100,2),'%') AS includedrate, interestperiod AS includedperiod, quotationsheet.shipmentTypeID, shipmentTypes.shipmentType, concat('$ ', format(FreightTotal,2)) AS freightTotal, containerCapacity AS payload, freightCompany AS shippingline, concat('$ ', format(inspectionCostPer250,2)) AS totalinspection, format(quantity,2) AS quantity, concat('$ ',format(materialCost,2)) AS materialcost, concat('$ ',format(pAgentCommission,2)) AS pcommission, concat('$ ', format(pFinancialCostP,2)) AS pfinancecost, concat('$ ', format(sFinancialCost,2)) AS sfinancecost, concat('$ ', format(oFreight,2)) AS freightpmt, concat('$ ', format(insuranceCost,2)) AS insurance, concat('$ ', format(inspectionCost,2)) AS inspectionpmt, concat('$ ', format(sAgentCommission,2)) AS scommission, concat('$ ', format(interestCost,2)) AS interestcost, concat('$ ', format(legal,2)) AS legal, concat('$ ', format(pallets,2)) AS pallets, concat('$ ', format(others,2)) AS other, concat('$ ', format(totalCost,2)) AS totalcost, concat(format(saleInterestRate*100,2),'%') AS interestrate, salePaymentPeriod AS interestdays, concat('$ ', format(priceBeforeInterest,2)) AS pricebeforeint, concat('$ ',format(saleInterest,2)) AS salesinterest, concat('$ ',format(priceAfterInterest,2)) AS priceafterint, concat('$ ',format(tradingProfit,2)) AS profit, concat('$ ',format(tradingMargin,2)) AS margin, concat('$ ',format(salesTurnover,2)) AS turnover, concat(format(percentageMargin*100,2),'%') AS pctmargin, concat('$ ',format(netback,2)) AS netback, saleComplete, exchRate FROM quotationsheet INNER JOIN (productList INNER JOIN prodNames ON productList.productName = prodNames.prodNameID) ON quotationsheet.productID = productList.productID INNER JOIN supplierlist ON quotationsheet.supplierID = supplierlist.supplierID INNER JOIN customerList ON customerList.customerID=quotationsheet.customerID INNER JOIN POLList ON quotationsheet.POLID = POLList.POLID INNER JOIN PODList ON quotationsheet.PODID = PODList.PODID INNER JOIN traderList ON quotationsheet.traderID = traderList.traderID INNER JOIN trafficList ON quotationsheet.trafficID = trafficList.trafficID INNER JOIN paymentTerms ON quotationsheet.pTermID = paymentTerms.paytermID INNER JOIN saleTypes ON quotationsheet.saleTypeID = saleTypes.saleTypeID INNER JOIN shipmentTypes ON quotationsheet.shipmentTypeID = shipmentTypes.shipmentTypeID WHERE QSID=?",
+    "SELECT QSID, quotationsheet.saleTypeID, saleTypes.saleType, KTP, KTS, DATE_FORMAT(QSDate,'%Y-%m-%d') AS QSDate, abbreviation, quotationsheet.productID, supplierlist.companyCode AS supplier, quotationsheet.supplierID, customerList.companyCode AS customer, quotationsheet.customerID, quotationsheet.packingSize AS packsize, marks, DATE_FORMAT(`from`,'%Y-%m-%d') AS `from`, DATE_FORMAT(`to`,'%Y-%m-%d') AS `to`, portOfLoad AS POL, quotationsheet.POLID, portOfDestination AS POD, quotationsheet.PODID, traderList.tCode AS trader, quotationsheet.traderID, trafficList.tCode AS traffic, quotationsheet.trafficID, incoterms, paymentTerm AS paymentTerm, quotationsheet.pTermID, concat(format(interestrate*100,2),'%') AS includedrate, interestperiod AS includedperiod, quotationsheet.shipmentTypeID, shipmentTypes.shipmentType, concat('$ ', format(FreightTotal,2)) AS freightTotal, containerCapacity AS payload, freightCompany AS shippingline, concat('$ ', format(inspectionCostPer250,2)) AS totalinspection, format(quantity,2) AS quantity, concat('$ ',format(materialCost,2)) AS materialcost, concat(format(generalduty*100,2),'%') AS generalduty, concat(format(additionalduty*100,2),'%') AS additionalduty, concat(format(harborpct*100,4),'%') AS harborfeepct, concat(format(merchprocpct*100,4),'%') AS merchprocfeepct, concat('$ ',format(flatfee,2)) AS cflatfee, concat('$ ',format(tsca,2)) AS tsca, concat('$ ',format(isf,2)) AS isf, concat('$ ',format(pAgentCommission,2)) AS pcommission, concat('$ ', format(pFinancialCostP,2)) AS pfinancecost, concat('$ ', format(sFinancialCost,2)) AS sfinancecost, concat('$ ', format(oFreight,2)) AS freightpmt, concat('$ ', format(insuranceCost,2)) AS insurance, concat('$ ', format(inspectionCost,2)) AS inspectionpmt, concat('$ ', format(sAgentCommission,2)) AS scommission, concat('$ ', format(interestCost,2)) AS interestcost, concat('$ ', format(legal,2)) AS legal, concat('$ ', format(pallets,2)) AS pallets, concat('$ ', format(others,2)) AS other, concat('$ ', format(totalCost,2)) AS totalcost, concat(format(saleInterestRate*100,2),'%') AS interestrate, salePaymentPeriod AS interestdays, concat('$ ', format(priceBeforeInterest,2)) AS pricebeforeint, concat('$ ',format(saleInterest,2)) AS salesinterest, concat('$ ',format(priceAfterInterest,2)) AS priceafterint, concat('$ ',format(tradingProfit,2)) AS profit, concat('$ ',format(tradingMargin,2)) AS margin, concat('$ ',format(salesTurnover,2)) AS turnover, concat(format(percentageMargin*100,2),'%') AS pctmargin, concat('$ ',format(netback,2)) AS netback, saleComplete, exchRate FROM quotationsheet INNER JOIN (productList INNER JOIN prodNames ON productList.productName = prodNames.prodNameID) ON quotationsheet.productID = productList.productID INNER JOIN supplierlist ON quotationsheet.supplierID = supplierlist.supplierID INNER JOIN customerList ON customerList.customerID=quotationsheet.customerID INNER JOIN POLList ON quotationsheet.POLID = POLList.POLID INNER JOIN PODList ON quotationsheet.PODID = PODList.PODID INNER JOIN traderList ON quotationsheet.traderID = traderList.traderID INNER JOIN trafficList ON quotationsheet.trafficID = trafficList.trafficID INNER JOIN paymentTerms ON quotationsheet.pTermID = paymentTerms.paytermID INNER JOIN saleTypes ON quotationsheet.saleTypeID = saleTypes.saleTypeID INNER JOIN shipmentTypes ON quotationsheet.shipmentTypeID = shipmentTypes.shipmentTypeID WHERE QSID=?",
     [id],
     (err, results) => {
       if (err) {
@@ -852,6 +873,18 @@ router.post("/updateQS", (req, res) => {
   if (index !== -1) {
     keys[index] = "salesTurnover";
   }
+  var index = keys.indexOf("harborfeepct");
+  if (index !== -1) {
+    keys[index] = "harborpct";
+  }
+  var index = keys.indexOf("merchprocfeepct");
+  if (index !== -1) {
+    keys[index] = "merchprocpct";
+  }
+  var index = keys.indexOf("cflatfee");
+  if (index !== -1) {
+    keys[index] = "flatfee";
+  }
   var index = keys.indexOf("pctmargin");
   if (index !== -1) {
     keys[index] = "percentageMargin";
@@ -910,7 +943,19 @@ router.post("/updateQS", (req, res) => {
   let QSID = req.body.QSID;
   let sql = keys[0] + "=" + values[0];
   for (let i = 1; i < keys.length; i++) {
-    sql += ", " + keys[i] + "=" + values[i];
+    if (
+      ![
+        "materialvalue",
+        "dutyfee",
+        "harborfee",
+        "merchprocfee",
+        "totalcentryfee",
+        "centryfeepmt",
+        "totalduty",
+      ].includes(keys[i])
+    ) {
+      sql += ", " + keys[i] + "=" + values[i];
+    }
   }
   sql += ", exchRate=" + exchrate;
 

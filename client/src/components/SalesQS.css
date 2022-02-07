@@ -44,28 +44,42 @@
   padding-right: 0.5rem;
 }
 .salesQS-form .form-group label {
-  flex: 1;
+  /* flex: 1; */
+  min-width: 120px;
   flex-basis: 32%;
 }
 .salesQS-form .form-group input {
-  flex: 1;
-  flex-basis: 10%;
+  /* flex: 1; */
+  flex-basis: 42%;
+  min-width: 42%;
+}
+#salesQS-1 .form-group input {
+  flex-basis: 60%;
+  min-width: 60%;
+}
+#salesQS-1 .form-group label {
+  min-width: 70px;
+  flex-basis: 25%;
 }
 #salesQS-1 {
   /* border: solid 1px black; */
-  flex: 1;
-  flex-basis: 18%;
+  /* flex: 1; */
+  flex-basis: 25%;
   min-height: 100%;
 }
 #salesQS-2 {
   /* border: solid 1px black; */
-  flex: 1;
-  flex-basis: 22%;
+  /* flex: 1; */
+  /* flex-basis: 22%;
+   */
   min-height: 100%;
+  flex-basis: 25%;
 }
 #salesQS-3 {
   /* border: solid 1px black; */
-  flex: 1;
+  /* flex: 1; */
+  /* display: flex; */
+  /* flex-basis: 50%; */
   flex-basis: 50%;
   min-height: 100%;
 }
@@ -151,6 +165,7 @@
 #QSbuttons {
   display: flex;
   justify-content: flex-end;
+  align-items: center;
 }
 .salesQStitleline {
   display: flex;
@@ -268,4 +283,35 @@
 .saleboxes {
   display: flex;
   flex-direction: row;
+}
+.customscalc {
+  position: absolute;
+  /* top: 10px; */
+  width: 380px;
+  background-color: rgb(230, 230, 230);
+  padding: 2rem;
+  border-radius: 0.5rem;
+  border: 1px solid black;
+}
+.customscalc .form-group label {
+  min-width: 150px;
+}
+.customscalc::before {
+  content: "";
+  width: 0px;
+  height: 0px;
+  position: absolute;
+  border-left: 10px solid rgb(230, 230, 230);
+  border-right: 10px solid transparent;
+  border-bottom: 15px solid rgb(230, 230, 230);
+  border-top: 10px solid transparent;
+  left: 120px;
+  top: -12px;
+}
+.saveQSeditsbutton:hover {
+  cursor: pointer;
+}
+#QSbuttons span {
+  padding-right: 2rem;
+  color: green;
 }
