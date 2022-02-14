@@ -284,7 +284,7 @@
   display: flex;
   flex-direction: row;
 }
-.customscalc {
+.bottompopupcalculator {
   position: absolute;
   /* top: 10px; */
   width: 380px;
@@ -292,11 +292,12 @@
   padding: 2rem;
   border-radius: 0.5rem;
   border: 1px solid black;
+  z-index: 1;
 }
-.customscalc .form-group label {
+.bottompopupcalculator .form-group label {
   min-width: 150px;
 }
-.customscalc::before {
+.bottompopupcalculator::before {
   content: "";
   width: 0px;
   height: 0px;
@@ -308,10 +309,57 @@
   left: 120px;
   top: -12px;
 }
-.saveQSeditsbutton:hover {
+.bottompopupcalculatorlg {
+  position: absolute;
+  display: flex;
+  /* top: 10px; */
+  width: 680px;
+  background-color: rgb(230, 230, 230);
+  padding: 2rem;
+  border-radius: 0.5rem;
+  border: 1px solid black;
+  z-index: 1;
+}
+.bottompopupcalculatorlg-1 {
+  display: flex;
+  flex-basis: 60%;
+  flex-direction: column;
+}
+.bottompopupcalculatorlg-1 {
+  display: flex;
+  flex-basis: 60%;
+  flex-direction: column;
+}
+.bottompopupcalculatorlg .form-group label {
+  min-width: 150px;
+}
+.bottompopupcalculator ul {
+  margin-left: 1rem;
+  margin-top: 0.5rem;
+}
+.saveQSbutton:hover {
   cursor: pointer;
 }
 #QSbuttons span {
   padding-right: 2rem;
   color: green;
+}
+.storagefields .form-group label {
+  min-width: 142px;
+}
+.storagefields .form-group input {
+  flex-basis: 36%;
+  min-width: 36%;
+  margin-left: 4px;
+}
+.storagefields .form-group select {
+  flex-basis: 48% !important;
+  min-width: 33%;
+}
+.form-group {
+  justify-content: space-between;
+}
+.salesQS-form button:focus {
+  background-color: rgb(68, 65, 162);
+  color: white;
 }

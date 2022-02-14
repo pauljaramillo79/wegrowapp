@@ -1,9 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Axios from "axios";
 import moment from "moment";
 import "./USPositionReport.css";
+import { NavLink } from "react-router-dom";
+import { LoadQSContext } from "../contexts/LoadQSProvider";
 
 const USPositionReport = () => {
+  const { setQStoload } = useContext(LoadQSContext);
   // eslint-disable-next-line no-extend-native
   Array.prototype.groupBy = function (key) {
     return this.reduce(function (groups, item) {
@@ -24,6 +27,25 @@ const USPositionReport = () => {
     });
   }, []);
 
+  const storagepmtcalc = (
+    whentry,
+    stgfix,
+    stgvar,
+    stggrace,
+    stgaccrual,
+    qtypal,
+    qty
+  ) => {
+    let daysinwh =
+      moment().diff(moment(whentry), "days") > 0
+        ? moment().diff(moment(whentry), "days")
+        : 0;
+    let daysinstg = daysinwh > stggrace ? (daysinwh = stggrace) : 0;
+    return (
+      stgfix / qty + (Math.ceil(daysinstg / stgaccrual) * stgvar * qtypal) / qty
+    );
+  };
+
   var group = "";
   var prod = {};
   var u = 0;
@@ -36,7 +58,9 @@ const USPositionReport = () => {
             <th>USWGP</th>
             <th className="fig">Quantity</th>
             <th className="fig">Inventory</th>
+            <th>Warehouse</th>
             <th className="fig">EW Price</th>
+            <th className="fig">Storage</th>
             <th>Supplier</th>
             <th>From</th>
             <th>To</th>
@@ -50,7 +74,7 @@ const USPositionReport = () => {
             // eslint-disable-next-line no-sparse-arrays
             return [
               <tr>
-                <td className="usprodgroup" colSpan={8}>
+                <td className="usprodgroup" colSpan={10}>
                   <p>{group}</p>
                 </td>
               </tr>,
@@ -58,7 +82,7 @@ const USPositionReport = () => {
                 u = 0;
                 return [
                   <tr>
-                    <td className="usproduct" colSpan={8}>
+                    <td className="usproduct" colSpan={10}>
                       <h4>{Object.keys(prod)[k]}</h4>
                     </td>
                   </tr>,
@@ -67,7 +91,18 @@ const USPositionReport = () => {
                     return (
                       <>
                         <tr>
-                          <td>{x.USWGP}</td>
+                          <td>
+                            {
+                              <NavLink
+                                onClick={(e) => {
+                                  setQStoload(x.QSID);
+                                }}
+                                to="/sales"
+                              >
+                                {x.USWGP}
+                              </NavLink>
+                            }
+                          </td>
                           <td className="fig">
                             {x.quantity
                               .toFixed(2)
@@ -80,8 +115,21 @@ const USPositionReport = () => {
                               .toString()
                               .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                           </td>
+                          <td>{x.warehouseName}</td>
                           <td className="fig">
                             {x.EWPrice.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                          </td>
+                          <td>
+                            {"$" +
+                              storagepmtcalc(
+                                x.whentry,
+                                x.storagefixed,
+                                x.storagevariable,
+                                x.stggraceperiod,
+                                x.stgaccrualperiod,
+                                x.quantitypallets,
+                                x.quantity
+                              ).toFixed(2)}
                           </td>
                           <td>{x.supplier}</td>
                           <td>
@@ -120,7 +168,7 @@ const USPositionReport = () => {
                           .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                       </h4>
                     </td>
-                    <td colSpan={5}></td>
+                    <td colSpan={7}></td>
                   </tr>,
                 ];
               }),

@@ -14,6 +14,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCalculator } from "@fortawesome/free-solid-svg-icons";
 import { faLock } from "@fortawesome/free-solid-svg-icons";
 import { faUnlock } from "@fortawesome/free-solid-svg-icons";
+import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
 import { gsap } from "gsap";
 
 const SalesQS2 = () => {
@@ -26,6 +27,7 @@ const SalesQS2 = () => {
   const onComplete = () => {
     setQSresponsemsg("");
   };
+
   useEffect(() => {
     const elem = refrespmsg.current;
     gsap.fromTo(
@@ -39,6 +41,7 @@ const SalesQS2 = () => {
       }
     );
   }, [showmsg]);
+
   // Initial values for New QS
   const QSDataInit = {
     KTP: "",
@@ -86,11 +89,28 @@ const SalesQS2 = () => {
     isf: 0,
     totalcentryfee: 0,
     centryfeepmt: 0,
+    inboundpmt: 0,
+    drayage: 0,
+    unloading: 0,
+    collectcharges: 0,
+    inboundothers: 0,
+    totalinbound: 0,
     freightpmt: 0,
     insurance: 0,
+    insurancerate: 0.07,
+    insurancefactor: 1.1,
     inspectionpmt: 0,
     scommission: 0,
     interestcost: 0.0,
+    warehouse: "",
+    storagepmt: 0,
+    whentry: "",
+    whexit: "",
+    storagefixed: 0,
+    storagevariable: 0,
+    stggraceperiod: 0,
+    stgaccrualperiod: 0,
+    quantitypallets: 0,
     legal: 1,
     pallets: 0,
     other: 0,
@@ -106,6 +126,11 @@ const SalesQS2 = () => {
     pctmargin: 0,
     netback: 0,
     saleComplete: 0,
+    outboundpmt: 0,
+    loading: 0,
+    bolcharges: 0,
+    outboundothers: 0,
+    totaloutbound: 0,
   };
   const QSValuesInit = {
     KTP: "",
@@ -153,11 +178,28 @@ const SalesQS2 = () => {
     isf: "$ 0.00",
     totalcentryfee: "$ 0.00",
     centryfeepmt: "$ 0.00",
+    inboundpmt: "$ 0.00",
+    drayage: "$ 0.00",
+    unloading: "$ 0.00",
+    collectcharges: "$ 0.00",
+    inboundothers: "$ 0.00",
+    totalinbound: "$ 0.00",
     freightpmt: "$ 0.00",
     insurance: "$ 0.00",
+    insurancerate: "7.00%",
+    insurancefactor: "1.10",
     inspectionpmt: "$ 0.00",
     scommission: "$ 0.00",
     interestcost: "$ 0.00",
+    warehouse: "",
+    storagepmt: "$ 0.00",
+    whentry: "",
+    whexit: "",
+    storagefixed: "$ 0.00",
+    storagevariable: "$ 0.00",
+    stggraceperiod: "0",
+    stgaccrualperiod: "0",
+    quantitypallets: "",
     legal: "$ 1.00",
     pallets: "$ 0.00",
     other: "$ 0.00",
@@ -173,6 +215,11 @@ const SalesQS2 = () => {
     pctmargin: "0.00%",
     netback: "$ 0.00",
     saleComplete: "indication",
+    outboundpmt: "$ 0.00",
+    loading: "$ 0.00",
+    bolcharges: "$ 0.00",
+    outboundothers: "$ 0.00",
+    totaloutbound: "$ 0.00",
   };
 
   // State Variables
@@ -199,11 +246,28 @@ const SalesQS2 = () => {
   const [consolidatedEdits, setConsolidatedEdits] = useState({});
   const [loading, setLoading] = useState(false);
   const [showcustomscalculator, setShowcustomscalculator] = useState(false);
+  const [showinboundcalculator, setShowinboundcalculator] = useState(false);
+  const [showstoragecalculator, setShowstoragecalculator] = useState(false);
+  const [showinsurancecalculator, setShowinsurancecalculator] = useState(false);
+  const [showoutboundcalculator, setShowoutboundcalculator] = useState(false);
+  const [showstorageinfo, setShowstorageinfo] = useState(false);
+
+  const [warehouseList, setWarehouseList] = useState();
+  const [USP, setUSP] = useState();
+  // const [whentryinfo, setWhentryinfo] = useState("");
 
   // Load Userid from local storage
   const [userID, setUserID] = useState(
     JSON.parse(localStorage.getItem("WGusercode"))
   );
+
+  // Load and set warehouse list for dropdown menu
+  // useEffect(() => {
+  //   Axios.post("/warehouses").then((response) => {
+  //     // console.log(response.data);
+  //     setWarehouseList(response.data);
+  //   });
+  // }, []);
 
   // Load and set trader list for dropdown menus
   const [traders, setTraders] = useState();
@@ -233,8 +297,14 @@ const SalesQS2 = () => {
   }, [QSsaved, userID, duplicateBoolean]);
 
   useEffect(() => {
+    // if (QStoload === "") {
     setQSindex(QSIDList.length);
+    // }
+    // if (QStoload !== "") {
+    //   setQSindex(QSIDList.indexOf(QStoload));
+    // }
   }, [QSIDList]);
+
   useEffect(() => {
     if (QSindex === QSIDList.length) {
       setEditMode(false);
@@ -256,6 +326,12 @@ const SalesQS2 = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [QStoload, diffQS]);
+
+  // useEffect(() => {
+  //   setQSindex(437);
+  //   setQSIDtoedit(QStoload);
+
+  // }, []);
 
   /**
    * takes number and turns into currency string with comma separated thousands
@@ -297,11 +373,844 @@ const SalesQS2 = () => {
     );
   };
 
+  // const [whdays, setWhdays] = useState();
+  // const [whstatus, setWhstatus] = useState();
+  // const [stgdays, setStgdays] = useState();
+  // const [stgaccruedpallet, setStgaccruedpallet] = useState();
+
+  // useEffect(() => {
+  //   const dostgcalcs = async () => {
+  //     const whdays = await whdayscalc();
+  //     const stgdays = await stgdayscalc(whdays);
+  //     setWhdays(whdays);
+  //     setStgdays(stgdays);
+  //     if (whdays < QSData.stggraceperiod) {
+  //       setWhstatus("stagging");
+  //     } else {
+  //       setWhstatus("storage");
+  //     }
+  //     if (whdays && QSData.stgaccrualperiod) {
+  //       setStgaccruedpallet(
+  //         Math.ceil(whdays / QSData.stgaccrualperiod) * QSData.storagevariable
+  //       );
+  //     }
+  //   };
+  //   dostgcalcs();
+  // }, [
+  //   QSData.whentry,
+  //   QSData.stggraceperiod,
+  //   QSData.stgaccrualperiod,
+  //   QSData.storagevariable,
+  // ]);
+  const changeER = (resp) => {
+    return new Promise((resolve, reject) => {
+      if (resp.exchRate) {
+        setExchangerate(Number(resp.exchRate));
+        resolve(Number(resp.exchRate));
+      }
+      if (!resp.exchRate) {
+        setExchangerate(Number(resp.exchRate));
+        resolve(1);
+      }
+    });
+  };
+  const checkER = (resp) => {
+    return new Promise((resolve, reject) => {
+      if (resp.exchRate) {
+        resolve(true);
+      }
+      if (!resp.exchRate && inEuros) {
+        setInEuros(false);
+        setExchangerate(Number(resp.exchRate));
+        confirmAlert({
+          title: "Back to $ dollars!",
+          message: `This QS does not have an Exchange Rate defined. Reverting back to $ dollar currency`,
+          buttons: [
+            {
+              label: "OK",
+            },
+          ],
+          closeOnClickOutside: true,
+          closeOnEscape: true,
+        });
+        resolve(false);
+      }
+      if (!resp.exchRate && !inEuros) {
+        setExchangerate(Number(resp.exchRate));
+        resolve(false);
+      }
+    });
+  };
+  // loading
+  const loadingQS = () => {
+    return new Promise((resolve, reject) => {
+      setLoading(true);
+      resolve();
+    });
+  };
+  // finish loading
+  const doneloading = () => {
+    return new Promise((resolve, reject) => {
+      setLoading(false);
+      resolve();
+    });
+  };
+  const setloadeddata = (resp) => {
+    return new Promise((resolve, reject) => {
+      resolve(resp.data[0]);
+    });
+  };
+  const setwarehouses = (resp) => {
+    return new Promise((resolve, reject) => {
+      setWarehouseList(resp);
+      resolve();
+    });
+  };
+
+  const loadQS = async (QSid) => {
+    const warehouses = await Axios.post("/warehouses");
+    await setwarehouses(warehouses.data);
+    let response;
+    try {
+      response = await Axios.post("/loadQStoedit", { id: QSid });
+    } catch (err) {
+      console.error(err);
+    }
+    // const ldata = response["data"][0];
+    const ldata = await setloadeddata(response);
+    const check = await checkER(ldata);
+    const exrate = await changeER(ldata);
+    // Start loading
+    await loadingQS();
+    if (ldata.KTP && ldata.saleTypeID === 3) {
+      const uspos = await Axios.post("/loadusposition", {
+        WGS: ldata["KTP"],
+      });
+      setUSP(uspos.data[0]);
+      // console.log(uspos);
+    }
+    const matvalue = await materialvaluecalc(
+      Number(ldata.materialcost.replace("$", "")),
+      ldata.quantity
+    );
+    const totalduty =
+      ldata.generalduty && ldata.additionalduty
+        ? await totaldutycalc(
+            Number(ldata.generalduty.replace("%", "")),
+            Number(ldata.additionalduty.replace("%", ""))
+          )
+        : 0;
+    const dutyfee = await dutyfeecalc(matvalue, totalduty / 100);
+    const harborfee = ldata.harborfeepct
+      ? await harborfeecalc(
+          matvalue,
+          Number(ldata.harborfeepct.replace("%", "") / 100)
+        )
+      : 0;
+    const merchprocfee = ldata.merchprocfeepct
+      ? await mercprocfeecalc(
+          matvalue,
+          Number(ldata.merchprocfeepct.replace("%", "") / 100)
+        )
+      : 0;
+    const totalcentryfee = await totalcentryfeecalc(
+      dutyfee ? dutyfee : 0,
+      harborfee ? harborfee : 0,
+      merchprocfee ? merchprocfee : 0,
+      ldata.cflatfee ? numerify(ldata.cflatfee, "$") : 0,
+      ldata.tsca ? numerify(ldata.tsca, "$") : 0,
+      ldata.isf ? numerify(ldata.isf, "$") : 0
+    );
+    const centryfeepmt = ldata.quantity
+      ? await centryfeepmtcalc(totalcentryfee, ldata.quantity)
+      : 0;
+    const totalinbound = await totalinboundcalc(
+      ldata.drayage ? numerify(ldata.drayage) : 0,
+      ldata.unloading ? numerify(ldata.unloading) : 0,
+      ldata.collectcharges ? numerify(ldata.collectcharges) : 0,
+      ldata.inboundothers ? numerify(ldata.inboundothers) : 0
+    );
+    const inboundpmt = ldata.payload
+      ? await inboundpmtcalc(totalinbound, ldata.payload)
+      : 0;
+    const totaloutbound = await totaloutboundcalc(
+      ldata.loading ? numerify(ldata.loading) : 0,
+      ldata.bolcharges ? numerify(ldata.bolcharges) : 0,
+      ldata.outboundothers ? numerify(ldata.outboundothers) : 0
+    );
+    const outboundpmt = await outboundpmtcalc(totaloutbound, ldata.payload);
+
+    // await setvalues(
+    //   ldata,
+    //   check,
+    //   exrate,
+    //   outboundpmt,
+    //   totaloutbound,
+    //   inboundpmt,
+    //   totalinbound,
+    //   centryfeepmt,
+    //   totalcentryfee,
+    //   merchprocfee,
+    //   harborfee,
+    //   dutyfee,
+    //   matvalue,
+    //   totalduty
+    // );
+    setQSValues({
+      ...QSValues,
+      warehouse: ldata.warehouseName ? ldata.warehouseName : "",
+      whentry: ldata.whentry ? ldata.whentry : "",
+      whexit: ldata.whexit ? ldata.whexit : "",
+      storagepmt:
+        check && inEuros && ldata.storagepmt
+          ? numcurrex(ldata.storagepmt, exrate)
+          : check && inEuros && !ldata.storagepmt
+          ? "€ 0.00"
+          : ldata.storagepmt,
+      storagefixed:
+        check && inEuros && ldata.storagefixed
+          ? numcurrex(ldata.storagefixed, exrate)
+          : check && inEuros && !ldata.storagefixed
+          ? "€ 0.00"
+          : ldata.storagefixed,
+      storagevariable:
+        check && inEuros && ldata.storagevariable
+          ? numcurrex(ldata.storagevariable, exrate)
+          : check && inEuros && !ldata.storagevariable
+          ? "€ 0.00"
+          : ldata.storagevariable,
+      stggraceperiod: ldata.stggraceperiod ? ldata.stggraceperiod : "0",
+      stgaccrualperiod: ldata.stgaccrualperiod ? ldata.stgaccrualperiod : "0",
+      quantitypallets: ldata.quantitypallets ? ldata.quantitypallets : "",
+      KTP: ldata.KTP,
+      KTS: ldata.KTS,
+      QSDate: ldata.QSDate,
+      saleType: ldata.saleType,
+      QSID: ldata.QSID,
+      abbreviation: ldata.abbreviation,
+      supplier: ldata.supplier,
+      customer: ldata.customer,
+      packsize: ldata.packsize,
+      marks: ldata.marks,
+      from: ldata.from,
+      to: ldata.to,
+      POL: ldata.POL,
+      POD: ldata.POD,
+      saleComplete:
+        ldata.saleComplete === -1
+          ? "sold"
+          : ldata.saleComplete === 0
+          ? "indication"
+          : ldata.saleComplete === 1
+          ? "US Allocation"
+          : "",
+      TIC: ldata.trader,
+      traffic: ldata.traffic,
+      incoterms: ldata.incoterms,
+      paymentTerm: ldata.paymentTerm,
+      CADintrate: ldata.includedrate,
+      insurancerate: ldata.insurancerate,
+      insurancefactor: ldata.insurancefactor.toFixed(2),
+      CADdays: ldata.includedperiod,
+      shipmentType: ldata.shipmentType ? ldata.shipmentType : "Container",
+      freightTotal:
+        check && inEuros && ldata.freightTotal
+          ? numcurrex(ldata.freightTotal, exrate)
+          : check && inEuros && !ldata.freightTotal
+          ? "€ 0.00"
+          : ldata.freightTotal,
+      shippingline: ldata.shippingline,
+      payload: ldata.payload,
+      totalinspection:
+        check && inEuros && ldata.totalinspection
+          ? numcurrex(ldata.totalinspection, exrate)
+          : check && inEuros && !ldata.totalinspection
+          ? "€ 0.00"
+          : ldata.totalinspection,
+      quantity: ldata.quantity,
+      materialcost:
+        check && inEuros && ldata.materialcost
+          ? numcurrex(ldata.materialcost, exrate)
+          : check && inEuros && !ldata.materialcost
+          ? "€ 0.00"
+          : ldata.materialcost,
+      materialvalue:
+        check && inEuros && matvalue
+          ? numcurrex(matvalue.toFixed(2), exrate)
+          : check && inEuros && !matvalue
+          ? "€ 0.00"
+          : currencify(matvalue, "$", 2),
+      generalduty: ldata.generalduty ? ldata.generalduty : "0.00%",
+      additionalduty: ldata.additionalduty ? ldata.additionalduty : "0.00%",
+      totalduty: totalduty ? totalduty + "%" : "0.00%",
+      dutyfee:
+        check && inEuros && dutyfee
+          ? numcurrex(dutyfee.toFixed(2), exrate)
+          : check && inEuros && !dutyfee
+          ? "€ 0.00"
+          : currencify(dutyfee, "$", 2),
+      harborfeepct: ldata.harborfeepct ? ldata.harborfeepct : "0.00%",
+      harborfee:
+        check && inEuros && harborfee
+          ? numcurrex(harborfee.toFixed(2), exrate)
+          : check && inEuros && !harborfee
+          ? "€ 0.00"
+          : currencify(harborfee, "$", 2),
+      merchprocfeepct: ldata.merchprocfeepct ? ldata.merchprocfeepct : "0.00%",
+      merchprocfee:
+        check && inEuros && merchprocfee
+          ? numcurrex(merchprocfee.toFixed(2), exrate)
+          : check && inEuros && !merchprocfee
+          ? "€ 0.00"
+          : currencify(merchprocfee, "$", 2),
+      cflatfee:
+        check && inEuros && ldata.cflatfee
+          ? numcurrex(ldata.cflatfee, exrate)
+          : check && inEuros && !ldata.cflatfee
+          ? "€ 0.00"
+          : ldata.cflatfee,
+      tsca:
+        check && inEuros && ldata.tsca
+          ? numcurrex(ldata.tsca, exrate)
+          : check && inEuros && !ldata.tsca
+          ? "€ 0.00"
+          : ldata.tsca,
+      isf:
+        check && inEuros && ldata.isf
+          ? numcurrex(ldata.isf, exrate)
+          : check && inEuros && !ldata.isf
+          ? "€ 0.00"
+          : ldata.isf,
+      totalcentryfee:
+        check && inEuros && totalcentryfee
+          ? numcurrex(totalcentryfee.toFixed(2), exrate)
+          : check && inEuros && !totalcentryfee
+          ? "€ 0.00"
+          : currencify(totalcentryfee, "$", 2),
+      centryfeepmt:
+        check && inEuros && centryfeepmt
+          ? numcurrex(centryfeepmt.toFixed(2), exrate)
+          : check && inEuros && !centryfeepmt
+          ? "€ 0.00"
+          : currencify(centryfeepmt, "$", 2),
+      drayage:
+        check && inEuros && ldata.drayage
+          ? numcurrex(ldata.drayage, exrate)
+          : check && inEuros && !ldata.drayage
+          ? "€ 0.00"
+          : ldata.drayage,
+      unloading:
+        check && inEuros && ldata.unloading
+          ? numcurrex(ldata.unloading, exrate)
+          : check && inEuros && !ldata.unloading
+          ? "€ 0.00"
+          : ldata.unloading,
+      collectcharges:
+        check && inEuros && ldata.collectcharges
+          ? numcurrex(ldata.collectcharges, exrate)
+          : check && inEuros && !ldata.collectcharges
+          ? "€ 0.00"
+          : ldata.collectcharges,
+      inboundothers:
+        check && inEuros && ldata.inboundothers
+          ? numcurrex(ldata.inboundothers, exrate)
+          : check && inEuros && !ldata.inboundothers
+          ? "€ 0.00"
+          : ldata.inboundothers,
+      totalinbound:
+        check && inEuros && totalinbound
+          ? numcurrex(totalinbound.toFixed(2), exrate)
+          : check && inEuros && !totalinbound
+          ? "€ 0.00"
+          : currencify(totalinbound, "$", 2),
+      inboundpmt:
+        check && inEuros && inboundpmt
+          ? numcurrex(inboundpmt.toFixed(2), exrate)
+          : check && inEuros && !inboundpmt
+          ? "€ 0.00"
+          : currencify(inboundpmt, "$", 2),
+      loading:
+        check && inEuros && ldata.loading
+          ? numcurrex(ldata.loading, exrate)
+          : check && inEuros && !ldata.loading
+          ? "€ 0.00"
+          : ldata.loading,
+      bolcharges:
+        check && inEuros && ldata.bolcharges
+          ? numcurrex(ldata.bolcharges, exrate)
+          : check && inEuros && !ldata.bolcharges
+          ? "€ 0.00"
+          : ldata.bolcharges,
+      outboundothers:
+        check && inEuros && ldata.outboundothers
+          ? numcurrex(ldata.outboundothers, exrate)
+          : check && inEuros && !ldata.outboundothers
+          ? "€ 0.00"
+          : ldata.outboundothers,
+      totaloutbound:
+        check && inEuros && totaloutbound
+          ? numcurrex(totaloutbound.toFixed(2), exrate)
+          : check && inEuros && !totaloutbound
+          ? "€ 0.00"
+          : currencify(totaloutbound, "$", 2),
+      outboundpmt:
+        check && inEuros && outboundpmt
+          ? numcurrex(outboundpmt.toFixed(2), exrate)
+          : check && inEuros && !outboundpmt
+          ? "€ 0.00"
+          : currencify(outboundpmt, "$", 2),
+      pcommission:
+        check && inEuros && ldata.pcommission
+          ? numcurrex(ldata.pcommission, exrate)
+          : check && inEuros && !ldata.pcommission
+          ? "€ 0.00"
+          : ldata.pcommission,
+      pfinancecost:
+        check && inEuros && ldata.pfinancecost
+          ? numcurrex(ldata.pfinancecost, exrate)
+          : check && inEuros && !ldata.pfinancecost
+          ? "€ 0.00"
+          : ldata.pfinancecost,
+      sfinancecost:
+        check && inEuros && ldata.sfinancecost
+          ? numcurrex(ldata.sfinancecost, exrate)
+          : check && inEuros && !ldata.sfinancecost
+          ? "€ 0.00"
+          : ldata.sfinancecost,
+      freightpmt:
+        check && inEuros && ldata.freightpmt
+          ? numcurrex(ldata.freightpmt, exrate)
+          : check && inEuros && !ldata.freightpmt
+          ? "€ 0.00"
+          : ldata.freightpmt,
+      insurance:
+        check && inEuros && ldata.insurance
+          ? numcurrex(ldata.insurance, exrate)
+          : check && inEuros && !ldata.insurance
+          ? "€ 0.00"
+          : ldata.insurance,
+      inspectionpmt:
+        check && inEuros && ldata.inspectionpmt
+          ? numcurrex(ldata.inspectionpmt, exrate)
+          : check && inEuros && !ldata.inspectionpmt
+          ? "€ 0.00"
+          : ldata.inspectionpmt,
+      scommission:
+        check && inEuros && ldata.scommission
+          ? numcurrex(ldata.scommission, exrate)
+          : check && inEuros && !ldata.scommission
+          ? "€ 0.00"
+          : ldata.scommission,
+      interestcost:
+        check && inEuros && ldata.interestcost
+          ? numcurrex(ldata.interestcost, exrate)
+          : check && inEuros && !ldata.interestcost
+          ? "€ 0.00"
+          : ldata.interestcost,
+      legal:
+        check && inEuros && ldata.legal
+          ? numcurrex(ldata.legal, exrate)
+          : check && inEuros && !ldata.legal
+          ? "€ 0.00"
+          : ldata.legal,
+      pallets:
+        check && inEuros && ldata.pallets
+          ? numcurrex(ldata.pallets, exrate)
+          : check && inEuros && !ldata.pallets
+          ? "€ 0.00"
+          : ldata.pallets,
+      other:
+        check && inEuros && ldata.other
+          ? numcurrex(ldata.other, exrate)
+          : check && inEuros && !ldata.other
+          ? "€ 0.00"
+          : ldata.other,
+      totalcost:
+        check && inEuros && ldata.totalcost
+          ? numcurrex(ldata.totalcost, exrate)
+          : check && inEuros && !ldata.totalcost
+          ? "€ 0.00"
+          : ldata.totalcost,
+      interestrate: ldata.interestrate,
+      interestdays: ldata.interestdays,
+      pricebeforeint:
+        check && inEuros && ldata.pricebeforeint
+          ? numcurrex(ldata.pricebeforeint, exrate)
+          : check && inEuros && !ldata.pricebeforeint
+          ? "€ 0.00"
+          : ldata.pricebeforeint,
+      salesinterest:
+        check && inEuros && ldata.salesinterest
+          ? numcurrex(ldata.salesinterest, exrate)
+          : check && inEuros && !ldata.salesinterest
+          ? "€ 0.00"
+          : ldata.salesinterest,
+      priceafterint:
+        check && inEuros && ldata.priceafterint
+          ? numcurrex(ldata.priceafterint, exrate)
+          : check && inEuros && !ldata.priceafterint
+          ? "€ 0.00"
+          : ldata.priceafterint,
+      profit:
+        check && inEuros && ldata.profit
+          ? numcurrex(ldata.profit, exrate)
+          : check && inEuros && !ldata.pricebeforeint
+          ? "€ 0.00"
+          : ldata.profit,
+      margin:
+        check && inEuros && ldata.margin
+          ? numcurrex(ldata.margin, exrate)
+          : check && inEuros && !ldata.margin
+          ? "€ 0.00"
+          : ldata.margin,
+      turnover:
+        check && inEuros && ldata.turnover
+          ? numcurrex(ldata.turnover, exrate)
+          : check && inEuros && !ldata.turnover
+          ? "€ 0.00"
+          : ldata.turnover,
+      pctmargin: check && ldata.pctmargin ? ldata.pctmargin : "0.00%",
+      netback:
+        check && inEuros && ldata.netback
+          ? numcurrex(ldata.netback, exrate)
+          : check && inEuros && !ldata.netback
+          ? "€ 0.00"
+          : ldata.netback,
+    });
+    setQSData({
+      ...QSData,
+      warehouse: ldata.warehouseID ? ldata.warehouseID : "",
+      whentry: ldata.whentry ? ldata.whentry : "",
+      whexit: ldata.whexit ? ldata.whexit : "",
+      storagepmt: ldata.storagepmt ? numerify(ldata.storagepmt, "$") : 0,
+      storagefixed: ldata.storagefixed ? numerify(ldata.storagefixed, "$") : 0,
+      storagevariable: ldata.storagevariable
+        ? numerify(ldata.storagevariable, "$")
+        : 0,
+      stggraceperiod: ldata.stggraceperiod ? ldata.stggraceperiod : 0,
+      stgaccrualperiod: ldata.stgaccrualperiod ? ldata.stgaccrualperiod : 0,
+      quantitypallets: ldata.quantitypallets ? ldata.quantitypallets : "",
+      KTP: ldata.KTP,
+      KTS: ldata.KTS,
+      QSDate: ldata.QSDate,
+      saleType: ldata.saleTypeID,
+      QSID: ldata.QSID,
+      abbreviation: ldata.productID,
+      supplier: ldata.supplierID,
+      customer: ldata.customerID,
+      packsize: ldata.packsize,
+      marks: ldata.marks,
+      from: ldata.from,
+      to: ldata.to,
+      POL: ldata.POLID,
+      POD: ldata.PODID,
+      saleComplete: ldata.saleComplete,
+      TIC: ldata.traderID,
+      traffic: ldata.trafficID,
+      incoterms: ldata.incoterms,
+      paymentTerm: ldata.pTermID,
+      CADintrate: Number(ldata.includedrate.replace("%", "")) / 100,
+      insurancerate: Number(ldata.insurancerate.replace("%", "")) / 100,
+      insurancefactor: ldata.insurancefactor,
+      CADdays: ldata.includedperiod,
+      shipmentType: ldata.shipmentTypeID ? ldata.shipmentTypeID : 1,
+      freightTotal: ldata.freightTotal ? numerify(ldata.freightTotal, "$") : 0,
+      shippingline: ldata.shippingline,
+      payload: ldata.payload,
+      totalinspection: ldata.totalinspection
+        ? numerify(ldata.totalinspection, "$")
+        : 0,
+      quantity: Number(ldata.quantity.replace(",", "")),
+      materialcost: ldata.materialcost ? numerify(ldata.materialcost, "$") : 0,
+      materialvalue: matvalue ? matvalue : 0,
+      generalduty: ldata.generalduty
+        ? Number(ldata.generalduty.replace("%", "")) / 100
+        : 0,
+      additionalduty: ldata.additionalduty
+        ? Number(ldata.additionalduty.replace("%", "")) / 100
+        : 0,
+      totalduty: totalduty ? totalduty / 100 : 0,
+      dutyfee: dutyfee ? dutyfee : 0,
+      harborfeepct: ldata.harborfeepct
+        ? Number(ldata.harborfeepct.replace("%", "")) / 100
+        : 0,
+      harborfee: harborfee ? harborfee : 0,
+      merchprocfeepct: ldata.merchprocfeepct
+        ? Number(ldata.merchprocfeepct.replace("%", "")) / 100
+        : 0,
+      merchprocfee: merchprocfee ? merchprocfee : 0,
+      cflatfee: ldata.cflatfee ? numerify(ldata.cflatfee, "$") : 0,
+      tsca: ldata.tsca ? numerify(ldata.tsca, "$") : 0,
+      isf: ldata.isf ? numerify(ldata.isf, "$") : 0,
+      totalcentryfee: totalcentryfee ? totalcentryfee : 0,
+      centryfeepmt: centryfeepmt ? centryfeepmt : 0,
+      drayage: ldata.drayage ? numerify(ldata.drayage, "$") : 0,
+      unloading: ldata.unloading ? numerify(ldata.unloading, "$") : 0,
+      collectcharges: ldata.collectcharges
+        ? numerify(ldata.collectcharges, "$")
+        : 0,
+      inboundothers: ldata.inboundothers
+        ? numerify(ldata.inboundothers, "$")
+        : 0,
+      totalinbound: totalinbound ? totalinbound : 0,
+      inboundpmt: inboundpmt ? inboundpmt : 0,
+      loading: ldata.loading ? numerify(ldata.loading, "$") : 0,
+      bolcharges: ldata.bolcharges ? numerify(ldata.bolcharges, "$") : 0,
+      outboundothers: ldata.outboundothers
+        ? numerify(ldata.outboundothers, "$")
+        : 0,
+      totaloutbound: totaloutbound ? totaloutbound : 0,
+      outboundpmt: outboundpmt ? outboundpmt : 0,
+      pcommission: ldata.pcommission ? numerify(ldata.pcommission, "$") : 0,
+      pfinancecost: ldata.pfinancecost ? numerify(ldata.pfinancecost, "$") : 0,
+      sfinancecost: ldata.sfinancecost ? numerify(ldata.sfinancecost, "$") : 0,
+      freightpmt: ldata.freightpmt ? numerify(ldata.freightpmt, "$") : 0,
+      insurance: ldata.insurance ? numerify(ldata.insurance, "$") : 0,
+      inspectionpmt: ldata.inspectionpmt
+        ? numerify(ldata.inspectionpmt, "$")
+        : 0,
+      scommission: ldata.scommission ? numerify(ldata.scommission, "$") : 0,
+      interestcost: ldata.interestcost ? numerify(ldata.interestcost, "$") : 0,
+      legal: ldata.legal ? numerify(ldata.legal, "$") : 0,
+      pallets: ldata.pallets ? numerify(ldata.pallets, "$") : 0,
+      other: ldata.other ? numerify(ldata.other, "$") : 0,
+      totalcost: ldata.totalcost ? numerify(ldata.totalcost, "$") : 0,
+      interestrate: Number(ldata.interestrate.replace("%", "")) / 100,
+      interestdays: ldata.interestdays,
+      pricebeforeint: ldata.pricebeforeint
+        ? numerify(ldata.pricebeforeint, "$")
+        : 0,
+      salesinterest: ldata.salesinterest
+        ? numerify(ldata.salesinterest, "$")
+        : 0,
+      priceafterint: ldata.priceafterint
+        ? numerify(ldata.priceafterint, "$")
+        : 0,
+      profit: ldata.profit ? numerify(ldata.profit, "$") : 0,
+      margin: ldata.margin ? numerify(ldata.margin, "$") : 0,
+      turnover: ldata.turnover ? numerify(ldata.turnover, "$") : 0,
+      pctmargin: Number(ldata.pctmargin.replace("%", "")) / 100,
+      netback: ldata.netback ? numerify(ldata.netback, "$") : 0,
+    });
+    setQSOriginal({
+      ...QSOriginal,
+      warehouse: ldata.warehouseName ? ldata.warehouseName : "",
+      whentry: ldata.whentry ? ldata.whentry : "",
+      whexit: ldata.whexit ? ldata.whexit : "",
+      storagefixed: ldata.storagefixed ? ldata.storagefixed : "$ 0.00",
+      storagepmt: ldata.storagepmt ? ldata.storagepmt : "$ 0.00",
+      storagevariable: ldata.storagevariable ? ldata.storagevariable : "$ 0.00",
+      stggraceperiod: ldata.stggraceperiod ? ldata.stggraceperiod : "0",
+      stgaccrualperiod: ldata.stgaccrualperiod ? ldata.stgaccrualperiod : "0",
+      quantitypallets: ldata.quantitypallets ? ldata.quantitypallets : "",
+      KTP: ldata.KTP,
+      KTS: ldata.KTS,
+      QSDate: ldata.QSDate,
+      saleType: ldata.saleType,
+      QSID: ldata.QSID,
+      abbreviation: ldata.abbreviation,
+      supplier: ldata.supplier,
+      customer: ldata.customer,
+      packsize: ldata.packsize,
+      marks: ldata.marks,
+      from: ldata.from,
+      to: ldata.to,
+      POL: ldata.POL,
+      POD: ldata.POD,
+      saleComplete:
+        ldata.saleComplete === -1
+          ? "sold"
+          : ldata.saleComplete === 0
+          ? "indication"
+          : ldata.saleComplete === 1
+          ? "US Allocation"
+          : "",
+      TIC: ldata.trader,
+      traffic: ldata.traffic,
+      incoterms: ldata.incoterms,
+      paymentTerm: ldata.paymentTerm,
+      CADintrate: ldata.includedrate,
+      insurancerate: ldata.insurancerate,
+      insurancefactor: ldata.insurancefactor.toFixed(2),
+      CADdays: ldata.includedperiod,
+      shipmentType: ldata.shipmentType,
+      freightTotal: ldata.freightTotal ? ldata.freightTotal : "",
+      shippingline: ldata.shippingline,
+      payload: ldata.payload,
+      totalinspection: ldata.totalinspection ? ldata.totalinspection : "",
+      quantity: ldata.quantity,
+      materialcost: ldata.materialcost ? ldata.materialcost : "$ 0.00",
+      materialvalue: matvalue ? currencify(matvalue) : "$ 0.00",
+      generalduty: ldata.generalduty ? ldata.generalduty : "0.00%",
+      additionalduty: ldata.additionalduty ? ldata.additionalduty : "0.00%",
+      totalduty: totalduty ? totalduty + "%" : "0.00%",
+      dutyfee: dutyfee ? currencify(dutyfee) : "$ 0.00",
+      harborfeepct: ldata.harborfeepct ? ldata.harborfeepct : "0.00%",
+      harborfee: harborfee ? currencify(harborfee) : "$ 0.00",
+      merchprocfeepct: ldata.merchprocfeepct ? ldata.merchprocfeepct : "0.00%",
+      merchprocfee: merchprocfee ? currencify(merchprocfee) : "$ 0.00",
+      cflatfee: ldata.cflatfee ? ldata.cflatfee : "$ 0.00",
+      tsca: ldata.tsca ? ldata.tsca : "$ 0.00",
+      isf: ldata.isf ? ldata.isf : "$ 0.00",
+      totalcentryfee: totalcentryfee ? currencify(totalcentryfee) : "$ 0.00",
+      centryfeepmt: centryfeepmt ? currencify(centryfeepmt) : "$ 0.00",
+      drayage: ldata.drayage ? ldata.drayage : "$ 0.00",
+      unloading: ldata.unloading ? ldata.unloading : "$ 0.00",
+      collectcharges: ldata.collectcharges ? ldata.collectcharges : "$ 0.00",
+      inboundothers: ldata.inboundothers ? ldata.inboundothers : "$ 0.00",
+      totalinbound: totalinbound ? currencify(totalinbound) : "$ 0.00",
+      inboundpmt: inboundpmt ? currencify(inboundpmt) : "$ 0.00",
+      loading: ldata.loading ? ldata.loading : "$ 0.00",
+      bolcharges: ldata.bolcharges ? ldata.bolcharges : "$ 0.00",
+      outboundothers: ldata.outboundothers ? ldata.outboundothers : "$ 0.00",
+      totaloutbound: totaloutbound ? currencify(totaloutbound) : "$ 0.00",
+      outboundpmt: outboundpmt ? currencify(outboundpmt) : "$ 0.00",
+      pcommission: ldata.pcommission ? ldata.pcommission : "$ 0.00",
+      pfinancecost: ldata.pfinancecost ? ldata.pfinancecost : "$ 0.00",
+      sfinancecost: ldata.sfinancecost ? ldata.sfinancecost : "$ 0.00",
+      freightpmt: ldata.freightpmt ? ldata.freightpmt : "$ 0.00",
+      insurance: ldata.insurance ? ldata.insurance : "$ 0.00",
+      inspectionpmt: ldata.inspectionpmt ? ldata.inspectionpmt : "$ 0.00",
+      scommission: ldata.scommission ? ldata.scommission : "$ 0.00",
+      interestcost: ldata.interestcost ? ldata.interestcost : "$ 0.00",
+      legal: ldata.legal ? ldata.legal : "$ 0.00",
+      pallets: ldata.pallets ? ldata.pallets : "$ 0.00",
+      other: ldata.other ? ldata.other : "$ 0.00",
+      totalcost: ldata.totalcost ? ldata.totalcost : "$ 0.00",
+      interestrate: ldata.interestrate,
+      interestdays: ldata.interestdays,
+      pricebeforeint: ldata.pricebeforeint ? ldata.pricebeforeint : "$ 0.00",
+      salesinterest: ldata.salesinterest ? ldata.salesinterest : "$ 0.00",
+      priceafterint: ldata.priceafterint ? ldata.priceafterint : "$ 0.00",
+      profit: ldata.profit ? ldata.profit : "$ 0.00",
+      margin: ldata.margin ? ldata.margin : "$ 0.00",
+      turnover: ldata.turnover ? ldata.turnover : "$ 0.00",
+      pctmargin: ldata.pctmargin,
+      netback: ldata.netback ? ldata.netback : "$ 0.00",
+    });
+    setQSOriginalData({
+      ...QSOriginal,
+      warehouse: ldata.warehouseID ? ldata.warehouseID : "",
+      whentry: ldata.whentry ? ldata.whentry : "",
+      whexit: ldata.whexit ? ldata.whexit : "",
+      storagepmt: ldata.storagepmt ? numerify(ldata.storagepmt) : 0,
+      storagefixed: ldata.storagefixed ? numerify(ldata.storagefixed) : 0,
+      storagevariable: ldata.storagevariable
+        ? numerify(ldata.storagevariable)
+        : 0,
+      stggraceperiod: ldata.stggraceperiod ? ldata.stggraceperiod : 0,
+      stgaccrualperiod: ldata.stgaccrualperiod ? ldata.stgaccrualperiod : 0,
+      quantitypallets: ldata.quantitypallets ? ldata.quantitypallets : "",
+      KTP: ldata.KTP,
+      KTS: ldata.KTS,
+      QSDate: ldata.QSDate,
+      saleType: ldata.saleTypeID,
+      QSID: ldata.QSID,
+      abbreviation: ldata.productID,
+      supplier: ldata.supplierID,
+      customer: ldata.customerID,
+      packsize: ldata.packsize,
+      marks: ldata.marks,
+      from: ldata.from,
+      to: ldata.to,
+      POL: ldata.POLID,
+      POD: ldata.PODID,
+      saleComplete: ldata.saleComplete,
+      TIC: ldata.traderID,
+      traffic: ldata.trafficID,
+      incoterms: ldata.incoterms,
+      paymentTerm: ldata.pTermID,
+      CADintrate: Number(ldata.includedrate.replace("%", "")) / 100,
+      insurancerate: Number(ldata.insurancerate.replace("%", "")) / 100,
+      insurancefactor: ldata.insurancefactor,
+      CADdays: ldata.includedperiod,
+      shipmentType: ldata.shipmentTypeID ? ldata.shipmentTypeID : 1,
+      freightTotal: ldata.freightTotal ? numerify(ldata.freightTotal) : 0,
+      shippingline: ldata.shippingline,
+      payload: ldata.payload,
+      totalinspection: ldata.totalinspection
+        ? numerify(ldata.totalinspection)
+        : 0,
+      quantity: Number(ldata.quantity.replace(",", "")),
+      materialcost: ldata.materialcost ? numerify(ldata.materialcost) : 0,
+      materialvalue: matvalue ? matvalue : 0,
+      generalduty: ldata.generalduty
+        ? numerify(ldata.generalduty, "%") / 100
+        : 0,
+      additionalduty: ldata.additionalduty
+        ? numerify(ldata.additionalduty, "%") / 100
+        : 0,
+      totalduty: totalduty ? totalduty / 100 : 0,
+      dutyfee: dutyfee ? dutyfee : 0,
+      harborfeepct: ldata.harborfeepct
+        ? numerify(ldata.harborfeepct, "%") / 100
+        : 0,
+      harborfee: harborfee ? harborfee : 0,
+      merchprocfeepct: ldata.merchprocfeepct
+        ? numerify(ldata.merchprocfeepct, "%") / 100
+        : 0,
+      merchprocfee: merchprocfee ? merchprocfee : 0,
+      cflatfee: ldata.cflatfee ? numerify(ldata.cflatfee) : 0,
+      tsca: ldata.tsca ? numerify(ldata.tsca) : 0,
+      isf: ldata.isf ? numerify(ldata.isf) : 0,
+      totalcentryfee: totalcentryfee ? totalcentryfee : 0,
+      centryfeepmt: centryfeepmt ? centryfeepmt : 0,
+      drayage: ldata.drayage ? numerify(ldata.drayage) : 0,
+      unloading: ldata.unloading ? numerify(ldata.unloading) : 0,
+      collectcharges: ldata.collectcharges ? numerify(ldata.collectcharges) : 0,
+      inboundothers: ldata.inboundothers ? numerify(ldata.inboundothers) : 0,
+      totalinbound: totalinbound ? totalinbound : 0,
+      inboundpmt: inboundpmt ? inboundpmt : 0,
+      loading: ldata.loading ? numerify(ldata.loading) : 0,
+      bolcharges: ldata.bolcharges ? numerify(ldata.bolcharges) : 0,
+      outboundothers: ldata.outboundothers ? numerify(ldata.outboundothers) : 0,
+      totaloutbound: totaloutbound ? totaloutbound : 0,
+      outboundpmt: outboundpmt ? outboundpmt : 0,
+      pcommission: ldata.pcommission ? numerify(ldata.pcommission) : 0,
+      pfinancecost: ldata.pfinancecost ? numerify(ldata.pfinancecost) : 0,
+      sfinancecost: ldata.sfinancecost ? numerify(ldata.sfinancecost) : 0,
+      freightpmt: ldata.freightpmt ? numerify(ldata.freightpmt) : 0,
+      insurance: ldata.insurance ? numerify(ldata.insurance) : 0,
+      inspectionpmt: ldata.inspectionpmt ? numerify(ldata.inspectionpmt) : 0,
+      scommission: ldata.scommission ? numerify(ldata.scommission) : 0,
+      interestcost: ldata.interestcost ? numerify(ldata.interestcost) : 0,
+      legal: ldata.legal ? numerify(ldata.legal) : 0,
+      pallets: ldata.pallets ? numerify(ldata.pallets) : 0,
+      other: ldata.other ? numerify(ldata.other) : 0,
+      interestrate: Number(ldata.interestrate.replace("%", "")) / 100,
+      interestdays: ldata.interestdays,
+      pricebeforeint: ldata.pricebeforeint ? numerify(ldata.pricebeforeint) : 0,
+      salesinterest: ldata.salesinterest ? numerify(ldata.salesinterest) : 0,
+      priceafterint: ldata.priceafterint ? numerify(ldata.priceafterint) : 0,
+    });
+    if (ldata.saleComplete === -1) {
+      setSold(true);
+      setAllocated(false);
+    }
+    if (ldata.saleComplete === 1) {
+      setAllocated(true);
+      setSold(false);
+    }
+    if (ldata.saleComplete === 0) {
+      setSold(false);
+      setAllocated(false);
+    }
+    // Finish loading
+    await doneloading();
+  };
+
+  useEffect(() => {
+    if (QStoload) {
+      loadQS(QStoload);
+    }
+  }, []);
+
   useEffect(() => {
     // if navigating, load values from database based on QSindex selected
     if (QSindex < QSIDList.length) {
       Axios.post("/loadQStoedit", { id: QSIDList[QSindex] }).then(
         (response) => {
+          console.log(response);
           // const loaddata = (resp) => {
           //   return new Promise((resolve, reject) => {
           //     resolve(resp.data[0]);
@@ -309,15 +1218,17 @@ const SalesQS2 = () => {
           // };
           // const ldata = await loaddata(response);
           const ldata = response.data[0];
+          console.log(ldata);
+
           // Define promise to change exchange rate using loaded value
           const changeER = (resp) => {
             return new Promise((resolve, reject) => {
-              if (resp.data[0].exchRate) {
-                setExchangerate(Number(resp.data[0].exchRate));
-                resolve(Number(resp.data[0].exchRate));
+              if (resp.exchRate) {
+                setExchangerate(Number(resp.exchRate));
+                resolve(Number(resp.exchRate));
               }
-              if (!resp.data[0].exchRate) {
-                setExchangerate(Number(resp.data[0].exchRate));
+              if (!resp.exchRate) {
+                setExchangerate(Number(resp.exchRate));
                 resolve(1);
               }
             });
@@ -325,12 +1236,12 @@ const SalesQS2 = () => {
           // Define promise to check if exchange rate exists, otherwise revert back to dollars
           const checkER = (resp) => {
             return new Promise((resolve, reject) => {
-              if (resp.data[0].exchRate) {
+              if (resp.exchRate) {
                 resolve(true);
               }
-              if (!resp.data[0].exchRate && inEuros) {
+              if (!resp.exchRate && inEuros) {
                 setInEuros(false);
-                setExchangerate(Number(resp.data[0].exchRate));
+                setExchangerate(Number(resp.exchRate));
                 confirmAlert({
                   title: "Back to $ dollars!",
                   message: `This QS does not have an Exchange Rate defined. Reverting back to $ dollar currency`,
@@ -344,8 +1255,8 @@ const SalesQS2 = () => {
                 });
                 resolve(false);
               }
-              if (!resp.data[0].exchRate && !inEuros) {
-                setExchangerate(Number(resp.data[0].exchRate));
+              if (!resp.exchRate && !inEuros) {
+                setExchangerate(Number(resp.exchRate));
                 resolve(false);
               }
             });
@@ -364,11 +1275,34 @@ const SalesQS2 = () => {
               resolve();
             });
           };
+          // const loadusposition = async (data) => {
+          //   return new Promise((resolve, reject) => {
+          //     // if (data.KTP && data.saleType === 3) {
+          //     const uspos = await Axios.post("/loadusposition", {
+          //       WGS: data["KTP"],
+          //     });
+          //     setUSP(uspos.data[0]);
+          //     //   console.log(uspos.data[0]);
+          //     //   resolve();
+          //     // } else {
+          //     //   resolve();
+          //     // }
+          //   });
+          // };
           const doWork = async () => {
-            const check = await checkER(response);
-            const exrate = await changeER(response);
+            console.log(ldata);
+
+            const check = await checkER(ldata);
+            const exrate = await changeER(ldata);
             // Start loading
             await loading();
+            if (ldata.KTP && ldata.saleTypeID === 3) {
+              const uspos = await Axios.post("/loadusposition", {
+                WGS: ldata["KTP"],
+              });
+              setUSP(uspos.data[0]);
+            }
+            // await loadusposition(ldata);
             // Set Values
             const matvalue = await materialvaluecalc(
               Number(ldata.materialcost.replace("$", "")),
@@ -402,9 +1336,59 @@ const SalesQS2 = () => {
               ldata.tsca ? numerify(ldata.tsca, "$") : 0,
               ldata.isf ? numerify(ldata.isf, "$") : 0
             );
-
+            const centryfeepmt = ldata.quantity
+              ? await centryfeepmtcalc(totalcentryfee, ldata.quantity)
+              : 0;
+            const totalinbound = await totalinboundcalc(
+              ldata.drayage ? numerify(ldata.drayage) : 0,
+              ldata.unloading ? numerify(ldata.unloading) : 0,
+              ldata.collectcharges ? numerify(ldata.collectcharges) : 0,
+              ldata.inboundothers ? numerify(ldata.inboundothers) : 0
+            );
+            const inboundpmt = ldata.payload
+              ? await inboundpmtcalc(totalinbound, ldata.payload)
+              : 0;
+            const totaloutbound = await totaloutboundcalc(
+              ldata.loading ? numerify(ldata.loading) : 0,
+              ldata.bolcharges ? numerify(ldata.bolcharges) : 0,
+              ldata.outboundothers ? numerify(ldata.outboundothers) : 0
+            );
+            const outboundpmt = await outboundpmtcalc(
+              totaloutbound,
+              ldata.payload
+            );
             setQSValues({
               ...QSValues,
+              warehouse: ldata.warehouseID
+                ? warehouseList[ldata.warehouseID - 1].warehouseName
+                : "",
+              whentry: ldata.whentry ? ldata.whentry : "",
+              whexit: ldata.whexit ? ldata.whexit : "",
+              storagepmt:
+                check && inEuros && ldata.storagepmt
+                  ? numcurrex(ldata.storagepmt, exrate)
+                  : check && inEuros && !ldata.storagepmt
+                  ? "€ 0.00"
+                  : ldata.storagepmt,
+              storagefixed:
+                check && inEuros && ldata.storagefixed
+                  ? numcurrex(ldata.storagefixed, exrate)
+                  : check && inEuros && !ldata.storagefixed
+                  ? "€ 0.00"
+                  : ldata.storagefixed,
+              storagevariable:
+                check && inEuros && ldata.storagevariable
+                  ? numcurrex(ldata.storagevariable, exrate)
+                  : check && inEuros && !ldata.storagevariable
+                  ? "€ 0.00"
+                  : ldata.storagevariable,
+              stggraceperiod: ldata.stggraceperiod ? ldata.stggraceperiod : "0",
+              stgaccrualperiod: ldata.stgaccrualperiod
+                ? ldata.stgaccrualperiod
+                : "0",
+              quantitypallets: ldata.quantitypallets
+                ? ldata.quantitypallets
+                : "",
               KTP: ldata.KTP,
               KTS: ldata.KTS,
               QSDate: ldata.QSDate,
@@ -419,12 +1403,21 @@ const SalesQS2 = () => {
               to: ldata.to,
               POL: ldata.POL,
               POD: ldata.POD,
-              saleComplete: ldata.saleComplete === -1 ? "sold" : "indication",
+              saleComplete:
+                ldata.saleComplete === -1
+                  ? "sold"
+                  : ldata.saleComplete === 0
+                  ? "indication"
+                  : ldata.saleComplete === 1
+                  ? "US Allocation"
+                  : "",
               TIC: ldata.trader,
               traffic: ldata.traffic,
               incoterms: ldata.incoterms,
               paymentTerm: ldata.paymentTerm,
               CADintrate: ldata.includedrate,
+              insurancerate: ldata.insurancerate,
+              insurancefactor: ldata.insurancefactor.toFixed(2),
               CADdays: ldata.includedperiod,
               shipmentType: ldata.shipmentType
                 ? ldata.shipmentType
@@ -508,14 +1501,77 @@ const SalesQS2 = () => {
                   ? "€ 0.00"
                   : currencify(totalcentryfee, "$", 2),
               centryfeepmt:
-                check && inEuros && totalcentryfee
-                  ? numcurrex(
-                      (totalcentryfee / ldata.quantity).toFixed(2),
-                      exrate
-                    )
-                  : check && inEuros && !totalcentryfee
+                check && inEuros && centryfeepmt
+                  ? numcurrex(centryfeepmt.toFixed(2), exrate)
+                  : check && inEuros && !centryfeepmt
                   ? "€ 0.00"
-                  : currencify(totalcentryfee / ldata.quantity, "$", 2),
+                  : currencify(centryfeepmt, "$", 2),
+              drayage:
+                check && inEuros && ldata.drayage
+                  ? numcurrex(ldata.drayage, exrate)
+                  : check && inEuros && !ldata.drayage
+                  ? "€ 0.00"
+                  : ldata.drayage,
+              unloading:
+                check && inEuros && ldata.unloading
+                  ? numcurrex(ldata.unloading, exrate)
+                  : check && inEuros && !ldata.unloading
+                  ? "€ 0.00"
+                  : ldata.unloading,
+              collectcharges:
+                check && inEuros && ldata.collectcharges
+                  ? numcurrex(ldata.collectcharges, exrate)
+                  : check && inEuros && !ldata.collectcharges
+                  ? "€ 0.00"
+                  : ldata.collectcharges,
+              inboundothers:
+                check && inEuros && ldata.inboundothers
+                  ? numcurrex(ldata.inboundothers, exrate)
+                  : check && inEuros && !ldata.inboundothers
+                  ? "€ 0.00"
+                  : ldata.inboundothers,
+              totalinbound:
+                check && inEuros && totalinbound
+                  ? numcurrex(totalinbound.toFixed(2), exrate)
+                  : check && inEuros && !totalinbound
+                  ? "€ 0.00"
+                  : currencify(totalinbound, "$", 2),
+              inboundpmt:
+                check && inEuros && inboundpmt
+                  ? numcurrex(inboundpmt.toFixed(2), exrate)
+                  : check && inEuros && !inboundpmt
+                  ? "€ 0.00"
+                  : currencify(inboundpmt, "$", 2),
+              loading:
+                check && inEuros && ldata.loading
+                  ? numcurrex(ldata.loading, exrate)
+                  : check && inEuros && !ldata.loading
+                  ? "€ 0.00"
+                  : ldata.loading,
+              bolcharges:
+                check && inEuros && ldata.bolcharges
+                  ? numcurrex(ldata.bolcharges, exrate)
+                  : check && inEuros && !ldata.bolcharges
+                  ? "€ 0.00"
+                  : ldata.bolcharges,
+              outboundothers:
+                check && inEuros && ldata.outboundothers
+                  ? numcurrex(ldata.outboundothers, exrate)
+                  : check && inEuros && !ldata.outboundothers
+                  ? "€ 0.00"
+                  : ldata.outboundothers,
+              totaloutbound:
+                check && inEuros && totaloutbound
+                  ? numcurrex(totaloutbound.toFixed(2), exrate)
+                  : check && inEuros && !totaloutbound
+                  ? "€ 0.00"
+                  : currencify(totaloutbound, "$", 2),
+              outboundpmt:
+                check && inEuros && outboundpmt
+                  ? numcurrex(outboundpmt.toFixed(2), exrate)
+                  : check && inEuros && !outboundpmt
+                  ? "€ 0.00"
+                  : currencify(outboundpmt, "$", 2),
               pcommission:
                 check && inEuros && ldata.pcommission
                   ? numcurrex(ldata.pcommission, exrate)
@@ -636,6 +1692,25 @@ const SalesQS2 = () => {
             });
             setQSData({
               ...QSData,
+              warehouse: ldata.warehouseID ? ldata.warehouseID : "",
+              whentry: ldata.whentry ? ldata.whentry : "",
+              whexit: ldata.whexit ? ldata.whexit : "",
+              storagepmt: ldata.storagepmt
+                ? numerify(ldata.storagepmt, "$")
+                : 0,
+              storagefixed: ldata.storagefixed
+                ? numerify(ldata.storagefixed, "$")
+                : 0,
+              storagevariable: ldata.storagevariable
+                ? numerify(ldata.storagevariable, "$")
+                : 0,
+              stggraceperiod: ldata.stggraceperiod ? ldata.stggraceperiod : 0,
+              stgaccrualperiod: ldata.stgaccrualperiod
+                ? ldata.stgaccrualperiod
+                : 0,
+              quantitypallets: ldata.quantitypallets
+                ? ldata.quantitypallets
+                : "",
               KTP: ldata.KTP,
               KTS: ldata.KTS,
               QSDate: ldata.QSDate,
@@ -656,6 +1731,8 @@ const SalesQS2 = () => {
               incoterms: ldata.incoterms,
               paymentTerm: ldata.pTermID,
               CADintrate: Number(ldata.includedrate.replace("%", "")) / 100,
+              insurancerate: Number(ldata.insurancerate.replace("%", "")) / 100,
+              insurancefactor: ldata.insurancefactor,
               CADdays: ldata.includedperiod,
               shipmentType: ldata.shipmentTypeID ? ldata.shipmentTypeID : 1,
               freightTotal: ldata.freightTotal
@@ -691,9 +1768,26 @@ const SalesQS2 = () => {
               tsca: ldata.tsca ? numerify(ldata.tsca, "$") : 0,
               isf: ldata.isf ? numerify(ldata.isf, "$") : 0,
               totalcentryfee: totalcentryfee ? totalcentryfee : 0,
-              centryfeepmt: totalcentryfee
-                ? totalcentryfee / ldata.quantity
+              centryfeepmt: centryfeepmt ? centryfeepmt : 0,
+              drayage: ldata.drayage ? numerify(ldata.drayage, "$") : 0,
+              unloading: ldata.unloading ? numerify(ldata.unloading, "$") : 0,
+              collectcharges: ldata.collectcharges
+                ? numerify(ldata.collectcharges, "$")
                 : 0,
+              inboundothers: ldata.inboundothers
+                ? numerify(ldata.inboundothers, "$")
+                : 0,
+              totalinbound: totalinbound ? totalinbound : 0,
+              inboundpmt: inboundpmt ? inboundpmt : 0,
+              loading: ldata.loading ? numerify(ldata.loading, "$") : 0,
+              bolcharges: ldata.bolcharges
+                ? numerify(ldata.bolcharges, "$")
+                : 0,
+              outboundothers: ldata.outboundothers
+                ? numerify(ldata.outboundothers, "$")
+                : 0,
+              totaloutbound: totaloutbound ? totaloutbound : 0,
+              outboundpmt: outboundpmt ? outboundpmt : 0,
               pcommission: ldata.pcommission
                 ? numerify(ldata.pcommission, "$")
                 : 0,
@@ -739,6 +1833,23 @@ const SalesQS2 = () => {
             });
             setQSOriginal({
               ...QSOriginal,
+              warehouse: ldata.warehouseID
+                ? warehouseList[ldata.warehouseID - 1].warehouseName
+                : "",
+              whentry: ldata.whentry ? ldata.whentry : "",
+              whexit: ldata.whexit ? ldata.whexit : "",
+              storagefixed: ldata.storagefixed ? ldata.storagefixed : "$ 0.00",
+              storagepmt: ldata.storagepmt ? ldata.storagepmt : "$ 0.00",
+              storagevariable: ldata.storagevariable
+                ? ldata.storagevariable
+                : "$ 0.00",
+              stggraceperiod: ldata.stggraceperiod ? ldata.stggraceperiod : "0",
+              stgaccrualperiod: ldata.stgaccrualperiod
+                ? ldata.stgaccrualperiod
+                : "0",
+              quantitypallets: ldata.quantitypallets
+                ? ldata.quantitypallets
+                : "",
               KTP: ldata.KTP,
               KTS: ldata.KTS,
               QSDate: ldata.QSDate,
@@ -766,6 +1877,8 @@ const SalesQS2 = () => {
               incoterms: ldata.incoterms,
               paymentTerm: ldata.paymentTerm,
               CADintrate: ldata.includedrate,
+              insurancerate: ldata.insurancerate,
+              insurancefactor: ldata.insurancefactor.toFixed(2),
               CADdays: ldata.includedperiod,
               shipmentType: ldata.shipmentType,
               freightTotal: ldata.freightTotal ? ldata.freightTotal : "",
@@ -795,9 +1908,26 @@ const SalesQS2 = () => {
               totalcentryfee: totalcentryfee
                 ? currencify(totalcentryfee)
                 : "$ 0.00",
-              centryfeepmt: totalcentryfee
-                ? currencify(totalcentryfee / ldata.quantity)
+              centryfeepmt: centryfeepmt ? currencify(centryfeepmt) : "$ 0.00",
+              drayage: ldata.drayage ? ldata.drayage : "$ 0.00",
+              unloading: ldata.unloading ? ldata.unloading : "$ 0.00",
+              collectcharges: ldata.collectcharges
+                ? ldata.collectcharges
                 : "$ 0.00",
+              inboundothers: ldata.inboundothers
+                ? ldata.inboundothers
+                : "$ 0.00",
+              totalinbound: totalinbound ? currencify(totalinbound) : "$ 0.00",
+              inboundpmt: inboundpmt ? currencify(inboundpmt) : "$ 0.00",
+              loading: ldata.loading ? ldata.loading : "$ 0.00",
+              bolcharges: ldata.bolcharges ? ldata.bolcharges : "$ 0.00",
+              outboundothers: ldata.outboundothers
+                ? ldata.outboundothers
+                : "$ 0.00",
+              totaloutbound: totaloutbound
+                ? currencify(totaloutbound)
+                : "$ 0.00",
+              outboundpmt: outboundpmt ? currencify(outboundpmt) : "$ 0.00",
               pcommission: ldata.pcommission ? ldata.pcommission : "$ 0.00",
               pfinancecost: ldata.pfinancecost ? ldata.pfinancecost : "$ 0.00",
               sfinancecost: ldata.sfinancecost ? ldata.sfinancecost : "$ 0.00",
@@ -831,6 +1961,23 @@ const SalesQS2 = () => {
             });
             setQSOriginalData({
               ...QSOriginal,
+              warehouse: ldata.warehouseID ? ldata.warehouseID : "",
+              whentry: ldata.whentry ? ldata.whentry : "",
+              whexit: ldata.whexit ? ldata.whexit : "",
+              storagepmt: ldata.storagepmt ? numerify(ldata.storagepmt) : 0,
+              storagefixed: ldata.storagefixed
+                ? numerify(ldata.storagefixed)
+                : 0,
+              storagevariable: ldata.storagevariable
+                ? numerify(ldata.storagevariable)
+                : 0,
+              stggraceperiod: ldata.stggraceperiod ? ldata.stggraceperiod : 0,
+              stgaccrualperiod: ldata.stgaccrualperiod
+                ? ldata.stgaccrualperiod
+                : 0,
+              quantitypallets: ldata.quantitypallets
+                ? ldata.quantitypallets
+                : "",
               KTP: ldata.KTP,
               KTS: ldata.KTS,
               QSDate: ldata.QSDate,
@@ -851,6 +1998,8 @@ const SalesQS2 = () => {
               incoterms: ldata.incoterms,
               paymentTerm: ldata.pTermID,
               CADintrate: Number(ldata.includedrate.replace("%", "")) / 100,
+              insurancerate: Number(ldata.insurancerate.replace("%", "")) / 100,
+              insurancefactor: ldata.insurancefactor,
               CADdays: ldata.includedperiod,
               shipmentType: ldata.shipmentTypeID ? ldata.shipmentTypeID : 1,
               freightTotal: ldata.freightTotal
@@ -873,7 +2022,6 @@ const SalesQS2 = () => {
                 ? numerify(ldata.additionalduty, "%") / 100
                 : 0,
               totalduty: totalduty ? totalduty / 100 : 0,
-
               dutyfee: dutyfee ? dutyfee : 0,
               harborfeepct: ldata.harborfeepct
                 ? numerify(ldata.harborfeepct, "%") / 100
@@ -886,11 +2034,26 @@ const SalesQS2 = () => {
               cflatfee: ldata.cflatfee ? numerify(ldata.cflatfee) : 0,
               tsca: ldata.tsca ? numerify(ldata.tsca) : 0,
               isf: ldata.isf ? numerify(ldata.isf) : 0,
-              pcommission: ldata.pcommission ? numerify(ldata.pcommission) : 0,
               totalcentryfee: totalcentryfee ? totalcentryfee : 0,
-              centryfeepmt: totalcentryfee
-                ? totalcentryfee / ldata.quantity
+              centryfeepmt: centryfeepmt ? centryfeepmt : 0,
+              drayage: ldata.drayage ? numerify(ldata.drayage) : 0,
+              unloading: ldata.unloading ? numerify(ldata.unloading) : 0,
+              collectcharges: ldata.collectcharges
+                ? numerify(ldata.collectcharges)
                 : 0,
+              inboundothers: ldata.inboundothers
+                ? numerify(ldata.inboundothers)
+                : 0,
+              totalinbound: totalinbound ? totalinbound : 0,
+              inboundpmt: inboundpmt ? inboundpmt : 0,
+              loading: ldata.loading ? numerify(ldata.loading) : 0,
+              bolcharges: ldata.bolcharges ? numerify(ldata.bolcharges) : 0,
+              outboundothers: ldata.outboundothers
+                ? numerify(ldata.outboundothers)
+                : 0,
+              totaloutbound: totaloutbound ? totaloutbound : 0,
+              outboundpmt: outboundpmt ? outboundpmt : 0,
+              pcommission: ldata.pcommission ? numerify(ldata.pcommission) : 0,
               pfinancecost: ldata.pfinancecost
                 ? numerify(ldata.pfinancecost)
                 : 0,
@@ -963,7 +2126,7 @@ const SalesQS2 = () => {
         if (a[x] !== b[x]) {
           // push the value name into c
           c.push(x);
-          // if original value was "" then push (empty) into d, else push the original value into b
+          // if original value was "" then push (empty) into d, else push the original value into d
           if (b[x] === "") {
             d.push("(empty)");
           } else {
@@ -1005,7 +2168,7 @@ const SalesQS2 = () => {
         }
       }
     }
-    if (editMode === true) {
+    if (editMode === true && e.length !== 0) {
       confirmAlert({
         customUI: ({ onClose }) => {
           return (
@@ -1123,43 +2286,141 @@ const SalesQS2 = () => {
   };
 
   const handleSold = () => {
-    setSold(!sold);
-    setAllocated(false);
-    setEditing(true);
-  };
-
-  const handleAllocated = () => {
-    if (!allocated) {
-      setQSValues({
-        ...QSValues,
-        customer: "USA Distribution",
-        CADdays: 100,
-        saleComplete: "US Allocation",
-      });
-      setQSData({
-        ...QSData,
-        customer: 452,
-        CADdays: 100,
-        saleComplete: 1,
-      });
-    }
     if (allocated) {
       setQSValues({
         ...QSValues,
         customer: "",
         CADdays: 10,
         saleComplete: "Indication",
+        generalduty: "0.00%",
+        additionalduty: "0.00%",
+        harborfeepct: "0.00%",
+        merchprocfeepct: "0.00%",
+        cflatfee: inEuros ? "€ 0.00" : "$ 0.00",
+        tsca: inEuros ? "€ 0.00" : "$ 0.00",
+        isf: inEuros ? "€ 0.00" : "$ 0.00",
+        drayage: inEuros ? "€ 0.00" : "$ 0.00",
+        unloading: inEuros ? "€ 0.00" : "$ 0.00",
+        collectcharges: inEuros ? "€ 0.00" : "$ 0.00",
+        inboundothers: inEuros ? "€ 0.00" : "$ 0.00",
+        warehouse: "",
+        whentry: "",
+        storagefixed: inEuros ? "€ 0.00" : "$ 0.00",
+        storagevariable: inEuros ? "€ 0.00" : "$ 0.00",
+        stggraceperiod: "0",
+        stgaccrualperiod: "0",
+        quantitypallets: "",
       });
       setQSData({
         ...QSData,
         customer: "",
         CADdays: 10,
         saleComplete: 0,
+        generalduty: 0,
+        additionalduty: 0,
+        harborfeepct: 0,
+        merchprocfeepct: 0,
+        cflatfee: 0,
+        tsca: 0,
+        isf: 0,
+        drayage: 0,
+        unloading: 0,
+        collectcharges: 0,
+        inboundothers: 0,
+        warehouse: "",
+        whentry: "",
+        storagefixed: 0,
+        storagevariable: 0,
+        stggraceperiod: 0,
+        stgaccrualperiod: 0,
+        quantitypallets: "",
       });
     }
-    setAllocated(!allocated);
-    setSold(false);
+    setSold(!sold);
+    setAllocated(false);
     setEditing(true);
+  };
+
+  const handleAllocated = () => {
+    if (QSData.saleType !== 3) {
+      if (allocated === false) {
+        setQSValues({
+          ...QSValues,
+          customer: "USA Distribution",
+          CADdays: 100,
+          saleComplete: "US Allocation",
+          scommission: inEuros ? "€ 0.00" : "$ 0.00",
+          sfinancecost: inEuros ? "€ 0.00" : "$ 0.00",
+        });
+        setQSData({
+          ...QSData,
+          customer: 452,
+          CADdays: 100,
+          saleComplete: 1,
+          scommission: 0,
+          sfinancecost: 0,
+        });
+        setAllocated(true);
+        setSold(false);
+        setEditing(true);
+      }
+    }
+    if (allocated === true) {
+      setQSValues({
+        ...QSValues,
+        customer: "",
+        CADdays: 10,
+        saleComplete: "Indication",
+        generalduty: "0.00%",
+        additionalduty: "0.00%",
+        harborfeepct: "0.00%",
+        merchprocfeepct: "0.00%",
+        cflatfee: inEuros ? "€ 0.00" : "$ 0.00",
+        tsca: inEuros ? "€ 0.00" : "$ 0.00",
+        isf: inEuros ? "€ 0.00" : "$ 0.00",
+        drayage: inEuros ? "€ 0.00" : "$ 0.00",
+        unloading: inEuros ? "€ 0.00" : "$ 0.00",
+        collectcharges: inEuros ? "€ 0.00" : "$ 0.00",
+        inboundothers: inEuros ? "€ 0.00" : "$ 0.00",
+        warehouse: "",
+        whentry: "",
+        storagefixed: inEuros ? "€ 0.00" : "$ 0.00",
+        storagevariable: inEuros ? "€ 0.00" : "$ 0.00",
+        stggraceperiod: "0",
+        stgaccrualperiod: "0",
+        quantitypallets: "",
+      });
+      setQSData({
+        ...QSData,
+        customer: "",
+        CADdays: 10,
+        saleComplete: 0,
+        generalduty: 0,
+        additionalduty: 0,
+        harborfeepct: 0,
+        merchprocfeepct: 0,
+        cflatfee: 0,
+        tsca: 0,
+        isf: 0,
+        drayage: 0,
+        unloading: 0,
+        collectcharges: 0,
+        inboundothers: 0,
+        warehouse: "",
+        whentry: "",
+        storagefixed: 0,
+        storagevariable: 0,
+        stggraceperiod: 0,
+        stgaccrualperiod: 0,
+        quantitypallets: "",
+      });
+      setAllocated(false);
+      setSold(false);
+      setEditing(true);
+    }
+
+    // resetCustoms();
+    // resetInbound();
   };
 
   useEffect(() => {
@@ -1251,7 +2512,7 @@ const SalesQS2 = () => {
     });
   };
 
-  const QtyChange = (e) => {
+  const QtyChange = (e, decim = 2) => {
     setEditing(true);
     if (inEuros === true && exchangerate && lockER === false) {
       setLockER(true);
@@ -1260,7 +2521,7 @@ const SalesQS2 = () => {
     if (isdecimalnumber.test(e.target.value) || e.target.value === "") {
       setQSData({
         ...QSData,
-        [e.target.name]: Number(Number(e.target.value).toFixed(2)),
+        [e.target.name]: Number(Number(e.target.value).toFixed(decim)),
       });
       setQSValues({
         ...QSValues,
@@ -1269,11 +2530,11 @@ const SalesQS2 = () => {
     }
   };
 
-  const QtyBlur = (e) => {
+  const QtyBlur = (e, decim = 2) => {
     setQSValues({
       ...QSValues,
       [e.target.name]: Number(e.target.value.replace(",", ""))
-        .toFixed(2)
+        .toFixed(decim)
         .replace(/\B(?=(\d{3})+(?!\d))/g, ","),
     });
     if (e.target.value === "") {
@@ -1447,12 +2708,99 @@ const SalesQS2 = () => {
     });
   };
 
-  const insurcalc = (inco, pbi) => {
+  // const insurcalc = (inco, pbi) => {
+  //   return new Promise((resolve, reject) => {
+  //     if (pbi > 0 && (inco === "CPT" || inco === "CFR" || inco === "DAP")) {
+  //       resolve((pbi * 0.07 * 1.1) / 100);
+  //     } else if (pbi > 0 && (inco === "CIP" || inco === "CIF")) {
+  //       resolve((pbi * 0.14 * 1.1) / 100);
+  //     } else {
+  //       resolve(0);
+  //     }
+  //   });
+  // };
+  const asallocate = () => {
     return new Promise((resolve, reject) => {
-      if (pbi > 0 && (inco === "CPT" || inco === "CFR" || inco === "DAP")) {
-        resolve((pbi * 0.07 * 1.1) / 100);
-      } else if (pbi > 0 && (inco === "CIP" || inco === "CIF")) {
-        resolve((pbi * 0.14 * 1.1) / 100);
+      setAllocated(false);
+      resolve();
+    });
+  };
+  const setUSDist = async () => {
+    await asallocate();
+    setQSData({
+      ...QSData,
+      saleComplete: 0,
+      saleType: 3,
+      generalduty: 0,
+      additionalduty: 0,
+      harborfeepct: 0,
+      merchprocfeepct: 0,
+      cflatfee: 0,
+      tsca: 0,
+      isf: 0,
+      drayage: 0,
+      unloading: 0,
+      collectcharges: 0,
+      inboundothers: 0,
+      warehouse: "",
+      whentry: "",
+      storagefixed: 0,
+      storagevariable: 0,
+      stggraceperiod: 0,
+      stgaccrualperiod: 0,
+      quantitypallets: "",
+      KTP: "",
+    });
+    setQSValues({
+      ...QSValues,
+      saleComplete: "indication",
+      saleType: "US Distribution",
+      generalduty: "0.00%",
+      additionalduty: "0.00%",
+      harborfeepct: "0.00%",
+      merchprocfeepct: "0.00%",
+      cflatfee: inEuros ? "€ 0.00" : "$ 0.00",
+      tsca: inEuros ? "€ 0.00" : "$ 0.00",
+      isf: inEuros ? "€ 0.00" : "$ 0.00",
+      drayage: inEuros ? "€ 0.00" : "$ 0.00",
+      unloading: inEuros ? "€ 0.00" : "$ 0.00",
+      collectcharges: inEuros ? "€ 0.00" : "$ 0.00",
+      inboundothers: inEuros ? "€ 0.00" : "$ 0.00",
+      warehouse: "",
+      whentry: "",
+      storagefixed: inEuros ? "€ 0.00" : "$ 0.00",
+      storagevariable: inEuros ? "€ 0.00" : "$ 0.00",
+      stggraceperiod: "0",
+      stgaccrualperiod: "0",
+      quantitypallets: "",
+      KTP: "",
+    });
+  };
+
+  const setinsurvars = (inco) => {
+    return new Promise((resolve, reject) => {
+      if (inco === "CPT" || inco === "CFR") {
+        setQSData({ ...QSData, insurancerate: 0.0007 });
+        setQSValues({ ...QSValues, insurancerate: "0.07%" });
+      }
+      if (inco === "DAP") {
+        setQSData({ ...QSData, insurancerate: 0.0011 });
+        setQSValues({ ...QSValues, insurancerate: "0.11%" });
+      }
+      if (inco === "CIP" || inco === "CIF") {
+        setQSData({ ...QSData, insurancerate: 0.0014, insurancefactor: 1.1 });
+        setQSValues({
+          ...QSValues,
+          insurancerate: "0.14%",
+          insurancefactor: "1.10",
+        });
+      }
+    });
+  };
+  const insurcalc = (pbi, insrate, insfact) => {
+    return new Promise((resolve, reject) => {
+      if (pbi && insrate && insfact) {
+        resolve(pbi * insrate * insfact);
       } else {
         resolve(0);
       }
@@ -1462,6 +2810,8 @@ const SalesQS2 = () => {
   const ttlcostcalc = (
     mc,
     cef,
+    inbpmt,
+    outpmt,
     pc,
     pf,
     sf,
@@ -1472,11 +2822,27 @@ const SalesQS2 = () => {
     int,
     lg,
     pal,
-    oth
+    oth,
+    strg
   ) => {
     return new Promise((resolve, reject) => {
       resolve(
-        mc + cef + pc + pf + sf + frt + ins + insp + sc + int + lg + pal + oth
+        mc +
+          cef +
+          inbpmt +
+          outpmt +
+          pc +
+          pf +
+          sf +
+          frt +
+          ins +
+          insp +
+          sc +
+          int +
+          lg +
+          pal +
+          oth +
+          strg
       );
     });
   };
@@ -1521,10 +2887,58 @@ const SalesQS2 = () => {
       resolve(tcfee / qty);
     });
   };
+  const totalinboundcalc = (dryg, unload, coll, inboth) => {
+    return new Promise((resolve, reject) => {
+      resolve(dryg + unload + coll + inboth);
+    });
+  };
+  const inboundpmtcalc = (tinbound, pload) => {
+    return new Promise((resolve, reject) => {
+      if (pload) {
+        resolve(tinbound / pload);
+      } else {
+        resolve(0);
+      }
+    });
+  };
+  const totaloutboundcalc = (load, bol, outoth) => {
+    return new Promise((resolve, reject) => {
+      resolve(load + bol + outoth);
+    });
+  };
+  const outboundpmtcalc = (ttlout, pload) => {
+    return new Promise((resolve, reject) => {
+      if (pload) {
+        resolve(ttlout / pload);
+      } else {
+        resolve(0);
+      }
+    });
+  };
+
+  useEffect(() => {
+    setinsurvars(QSData.incoterms);
+  }, [QSData.incoterms]);
 
   // QS CALCULATIONS
   useEffect(() => {
     const docalcs = async () => {
+      let storagepmt = 0;
+      if (QSData.saleType === 3) {
+        const daysinwh = await whdayscalc(
+          QSData.whentry ? QSData.whentry : USP.whentry,
+          QSData.whexit ? QSData.whexit : USP.whentry
+        );
+        const daysinstg = await stgdayscalc(daysinwh, USP.stggraceperiod);
+        storagepmt = await storagepmtcalc(
+          daysinstg,
+          USP.storagefixed,
+          USP.storagevariable,
+          USP.quantity,
+          USP.quantitypallets,
+          USP.stgaccrualperiod
+        );
+      }
       const frtpmt = await freightcalc(QSData.freightTotal, QSData.payload);
       const intcost = await intcostcalc(
         QSData.CADintrate,
@@ -1540,7 +2954,13 @@ const SalesQS2 = () => {
         QSData.totalinspection,
         QSData.quantity
       );
-      const insur = await insurcalc(QSData.incoterms, QSData.pricebeforeint);
+      // await setinsurvars(QSData.incoterms);
+      // const insur = await insurcalc(QSData.incoterms, QSData.pricebeforeint);
+      const insur = await insurcalc(
+        QSData.pricebeforeint,
+        QSData.insurancerate,
+        QSData.insurancefactor
+      );
 
       const materialvalue = await materialvaluecalc(
         QSData.materialcost,
@@ -1567,9 +2987,26 @@ const SalesQS2 = () => {
       const centryfeepmt = QSData.quantity
         ? await centryfeepmtcalc(totalcentryfee, QSData.quantity)
         : 0;
+      const totalinbound = await totalinboundcalc(
+        QSData.drayage,
+        QSData.unloading,
+        QSData.collectcharges,
+        QSData.inboundothers
+      );
+      const inboundpmt = QSData.payload
+        ? await inboundpmtcalc(totalinbound, QSData.payload)
+        : 0;
+      const totaloutbound = await totaloutboundcalc(
+        QSData.loading,
+        QSData.bolcharges,
+        QSData.outboundothers
+      );
+      const outboundpmt = await outboundpmtcalc(totaloutbound, QSData.payload);
       const ttlcost = await ttlcostcalc(
         QSData.materialcost,
         centryfeepmt,
+        inboundpmt,
+        outboundpmt,
         QSData.pcommission,
         QSData.pfinancecost,
         QSData.sfinancecost,
@@ -1580,9 +3017,11 @@ const SalesQS2 = () => {
         intcost,
         QSData.legal,
         QSData.pallets,
-        QSData.other
+        QSData.other,
+        QSData.storagepmt
       );
       const praftint = await paicalc(QSData.pricebeforeint, slsint);
+
       setQSData({
         ...QSData,
         freightpmt: frtpmt,
@@ -1596,9 +3035,14 @@ const SalesQS2 = () => {
         merchprocfee: merchprocfee,
         totalcentryfee: totalcentryfee,
         centryfeepmt: centryfeepmt,
+        totalinbound: totalinbound,
+        totaloutbound: totaloutbound,
+        inboundpmt: inboundpmt,
+        outboundpmt: outboundpmt,
         totalcost: ttlcost,
         salesinterest: slsint,
         priceafterint: praftint,
+        storagepmt: storagepmt,
         profit:
           QSData.quantity !== 0 && QSData.pricebeforeint !== 0
             ? Number((QSData.pricebeforeint - ttlcost).toFixed(4))
@@ -1638,16 +3082,18 @@ const SalesQS2 = () => {
           insurance: "$ " + insur.toFixed(2),
           inspectionpmt: "$ " + inspcost.toFixed(2),
           interestcost: "$ " + intcost.toFixed(2),
-          materialvalue:
-            "$ " +
-            materialvalue.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+          materialvalue: currencify(materialvalue),
           totalduty: Number(totalduty * 100).toFixed(2) + "%",
-          dutyfee:
-            "$ " + dutyfee.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-          harborfee: "$ " + harborfee.toFixed(2),
-          merchprocfee: "$ " + merchprocfee.toFixed(2),
-          totalcentryfee: "$ " + totalcentryfee.toFixed(2),
-          centryfeepmt: "$ " + centryfeepmt.toFixed(2),
+          dutyfee: currencify(dutyfee),
+          harborfee: currencify(harborfee),
+          merchprocfee: currencify(merchprocfee),
+          totalcentryfee: currencify(totalcentryfee),
+          centryfeepmt: currencify(centryfeepmt),
+          totalinbound: currencify(totalinbound),
+          totaloutbound: currencify(totaloutbound),
+          inboundpmt: currencify(inboundpmt),
+          outboundpmt: currencify(outboundpmt),
+          storagepmt: currencify(storagepmt),
           totalcost:
             "$ " + ttlcost.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ","),
           salesinterest: "$ " + slsint.toFixed(2),
@@ -1698,22 +3144,17 @@ const SalesQS2 = () => {
           insurance: "€ " + (insur / exchangerate).toFixed(2),
           inspectionpmt: "€ " + (inspcost / exchangerate).toFixed(2),
           interestcost: "€ " + (intcost / exchangerate).toFixed(2),
-          materialvalue:
-            "€ " +
-            (materialvalue / exchangerate)
-              .toFixed(2)
-              .replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+          materialvalue: numcurrex(materialvalue.toFixed(2), exchangerate),
           totalduty: Number(totalduty * 100).toFixed(2) + "%",
-          dutyfee:
-            "€ " +
-            (dutyfee / exchangerate)
-              .toFixed(2)
-              .replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-          harborfee: "€ " + Number(harborfee / exchangerate).toFixed(2),
-          merchprocfee: "€ " + Number(merchprocfee / exchangerate).toFixed(2),
-          totalcentryfee:
-            "€ " + Number(totalcentryfee / exchangerate).toFixed(2),
-          centryfeepmt: "€ " + Number(centryfeepmt / exchangerate).toFixed(2),
+          dutyfee: numcurrex(dutyfee.toFixed(2), exchangerate),
+          harborfee: numcurrex(harborfee.toFixed(2), exchangerate),
+          merchprocfee: numcurrex(merchprocfee.toFixed(2), exchangerate),
+          totalcentryfee: numcurrex(totalcentryfee.toFixed(2), exchangerate),
+          centryfeepmt: numcurrex(centryfeepmt.toFixed(2), exchangerate),
+          totalinbound: numcurrex(totalinbound.toFixed(2), exchangerate),
+          totaloutbound: numcurrex(totaloutbound.toFixed(2), exchangerate),
+          inboundpmt: numcurrex(inboundpmt.toFixed(2), exchangerate),
+          outboundpmt: numcurrex(outboundpmt.toFixed(2), exchangerate),
           totalcost:
             "€ " +
             (ttlcost / exchangerate)
@@ -1774,6 +3215,7 @@ const SalesQS2 = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
+    QSData.whexit,
     QSData.freightTotal,
     QSData.payload,
     // QSData.freightpmt,
@@ -1784,7 +3226,9 @@ const SalesQS2 = () => {
     QSData.interestdays,
     QSData.totalinspection,
     QSData.quantity,
-    QSData.incoterms,
+    // QSData.incoterms,
+    QSData.insurancerate,
+    QSData.insurancefactor,
     QSData.materialcost,
     QSData.pcommission,
     QSData.generalduty,
@@ -1794,12 +3238,19 @@ const SalesQS2 = () => {
     QSData.cflatfee,
     QSData.tsca,
     QSData.isf,
+    QSData.drayage,
+    QSData.unloading,
+    QSData.collectcharges,
+    QSData.inboundothers,
     QSData.scommission,
     QSData.pfinancecost,
     QSData.sfinancecost,
     QSData.legal,
     QSData.pallets,
     QSData.other,
+    QSData.loading,
+    QSData.bolcharges,
+    QSData.outboundothers,
   ]);
 
   // CONVERT TO EUROS
@@ -1819,6 +3270,12 @@ const SalesQS2 = () => {
         isf: currencify(QSData.isf / exchangerate, "€"),
         totalcentryfee: currencify(QSData.totalcentryfee / exchangerate, "€"),
         centryfeepmt: currencify(QSData.centryfeepmt / exchangerate, "€"),
+        drayage: currencify(QSData.drayage / exchangerate, "€"),
+        unloading: currencify(QSData.unloading / exchangerate, "€"),
+        collectcharges: currencify(QSData.collectcharges / exchangerate, "€"),
+        inboundothers: currencify(QSData.inboundothers / exchangerate, "€"),
+        totalinbound: currencify(QSData.totalinbound / exchangerate, "€"),
+        inboundpmt: currencify(QSData.inboundpmt / exchangerate, "€"),
         pcommission: currencify(QSData.pcommission / exchangerate, "€"),
         pfinancecost: currencify(QSData.pfinancecost / exchangerate, "€"),
         sfinancecost: currencify(QSData.sfinancecost / exchangerate, "€"),
@@ -1855,6 +3312,12 @@ const SalesQS2 = () => {
         isf: currencify(QSData.isf, "$"),
         totalcentryfee: currencify(QSData.totalcentryfee, "$"),
         centryfeepmt: currencify(QSData.centryfeepmt, "$"),
+        drayage: currencify(QSData.drayage, "$"),
+        unloading: currencify(QSData.unloading, "$"),
+        collectcharges: currencify(QSData.collectcharges, "$"),
+        inboundothers: currencify(QSData.inboundothers, "$"),
+        totalinbound: currencify(QSData.totalinbound, "$"),
+        inboundpmt: currencify(QSData.inboundpmt, "$"),
         pcommission: currencify(QSData.pcommission, "$"),
         pfinancecost: currencify(QSData.pfinancecost, "$"),
         sfinancecost: currencify(QSData.sfinancecost, "$"),
@@ -1915,6 +3378,8 @@ const SalesQS2 = () => {
     if (!editMode) {
       e.preventDefault();
       await Axios.post("/saveQS", { QSData }).then((response) => {
+        setQSresponsemsg(response.data["message"]);
+        setShowmsg(!showmsg);
         toggleQSrefresh();
         setQSSaved(!QSsaved);
       });
@@ -1938,32 +3403,115 @@ const SalesQS2 = () => {
   const setPosition = (val) => {
     setEditing(true);
     let position = positionsddown[val];
-    setQSValues({
-      ...QSValues,
-      abbreviation: position.product,
-      supplier: position.Supplier,
-      from: position.start,
-      to: position.end,
-      KTP: position.KTP,
-      materialcost:
-        "$ " +
-        Number(position.Price.replace("$", "").replace(",", "")).toFixed(2),
+    if (val === "") {
+      setQSValues({
+        ...QSValues,
+        abbreviation: "",
+        supplier: "",
+        from: "",
+        to: "",
+        KTP: "",
+        materialcost: !inEuros ? "$ 0.00" : "€ 0.00",
+      });
+      setQSData({
+        ...QSData,
+        abbreviation: "",
+        supplier: "",
+        from: "",
+        to: "",
+        KTP: "",
+        materialcost: 0,
+      });
+    } else {
+      setQSValues({
+        ...QSValues,
+        abbreviation: position.product,
+        supplier: position.Supplier,
+        from: position.start,
+        to: position.end,
+        KTP: position.KTP,
+        materialcost:
+          "$ " +
+          Number(position.Price.replace("$", "").replace(",", "")).toFixed(2),
+      });
+      setQSData({
+        ...QSData,
+        abbreviation: position.productID,
+        supplier: position.supplierID,
+        from: position.start,
+        to: position.end,
+        KTP: position.KTP,
+        materialcost: Number(position.Price.replace("$", "").replace(",", "")),
+      });
+    }
+  };
+
+  const whdayscalc = (whentry, whexit) => {
+    return new Promise((resolve, reject) => {
+      if (whentry && whexit) {
+        if (moment(whexit).diff(moment(whentry), "days") > 0) {
+          resolve(moment(whexit).diff(moment(whentry), "days"));
+        } else {
+          resolve(0);
+        }
+      } else {
+        resolve(0);
+      }
     });
-    setQSData({
-      ...QSData,
-      abbreviation: position.productID,
-      supplier: position.supplierID,
-      from: position.start,
-      to: position.end,
-      KTP: position.KTP,
-      materialcost: Number(position.Price.replace("$", "").replace(",", "")),
+  };
+  const stgdayscalc = (whd, gprd) => {
+    return new Promise((resolve, reject) => {
+      if (whd && gprd) {
+        if (whd < gprd) {
+          resolve("");
+        } else {
+          resolve(whd - gprd);
+        }
+      } else {
+        resolve("");
+      }
+    });
+  };
+  const storagepmtcalc = (
+    stgdays,
+    stgfix,
+    stgvar,
+    qty,
+    qtypallets,
+    accrualpd
+  ) => {
+    return new Promise((resolve, reject) => {
+      resolve(
+        stgfix / qty +
+          (Math.ceil(stgdays / accrualpd) * stgvar * qtypallets) / qty
+      );
     });
   };
 
-  const setUSPosition = (val) => {
+  const setUSPosition = async (val) => {
     setEditing(true);
     let usposition = USPositionsddown[val];
-    console.log(usposition);
+    setUSP(usposition);
+    // setWhentryinfo(usposition.whentry);
+    const daysinwh = await whdayscalc(
+      usposition.whentry,
+      QSData.whexit ? QSData.whexit : usposition.whentry
+    );
+    const daysinstg = await stgdayscalc(daysinwh, usposition.stggraceperiod);
+    const storagepmt = await storagepmtcalc(
+      daysinstg,
+      usposition.storagefixed,
+      usposition.storagevariable,
+      usposition.quantity,
+      usposition.quantitypallets,
+      usposition.stgaccrualperiod
+    );
+    console.log("WH Entry Date: " + usposition.whentry);
+    console.log("Current Date: " + moment().format("YYYY-MM-DD"));
+    console.log("Days in WH: " + daysinwh);
+    console.log("Days in Storage: " + daysinstg);
+    console.log("Storage Cost $/mt: " + storagepmt);
+    // console.log(usposition);
     setQSValues({
       ...QSValues,
       KTP: usposition.USWGP,
@@ -1971,6 +3519,9 @@ const SalesQS2 = () => {
       supplier: usposition.supplier,
       packsize: usposition.packaging ? usposition.packaging : "",
       marks: usposition.marks ? usposition.marks : "",
+      whentry: usposition.whentry,
+      whexit: QSData.whexit ? QSData.whexit : usposition.whentry,
+      storagepmt: currencify(storagepmt),
       materialcost:
         "$ " +
         Number(usposition.EWPrice.replace("$", "").replace(",", "")).toFixed(2),
@@ -1982,9 +3533,91 @@ const SalesQS2 = () => {
       supplier: usposition.supplierID,
       packsize: usposition.packaging ? usposition.packaging : "",
       marks: usposition.marks ? usposition.marks : "",
+      whentry: usposition.whentry,
+      whexit: QSData.whexit ? QSData.whexit : usposition.whentry,
+      storagepmt: storagepmt,
       materialcost: Number(
         usposition.EWPrice.replace("$", "").replace(",", "")
       ),
+    });
+  };
+
+  const setWarehouse = (val) => {
+    setEditing(true);
+    let wh = warehouseList[val];
+    if (val === "") {
+      setQSValues({
+        ...QSValues,
+        warehouse: "",
+      });
+      setQSData({
+        ...QSData,
+        warehouse: "",
+      });
+    } else {
+      setQSValues({
+        ...QSValues,
+        warehouse: wh.warehouseName,
+      });
+      setQSData({
+        ...QSData,
+        warehouse: wh.warehouseID,
+      });
+    }
+  };
+
+  const resetCustoms = () => {
+    setQSData({
+      ...QSData,
+      generalduty: 0,
+      additionalduty: 0,
+      harborfeepct: 0,
+      merchprocfeepct: 0,
+      cflatfee: 0,
+      tsca: 0,
+      isf: 0,
+    });
+    setQSValues({
+      ...QSValues,
+      generalduty: "0.00%",
+      additionalduty: "0.00%",
+      harborfeepct: "0.00%",
+      merchprocfeepct: "0.00%",
+      cflatfee: inEuros ? "€ 0.00" : "$ 0.00",
+      tsca: inEuros ? "€ 0.00" : "$ 0.00",
+      isf: inEuros ? "€ 0.00" : "$ 0.00",
+    });
+  };
+
+  const resetInbound = () => {
+    setQSData({
+      ...QSData,
+      drayage: 0,
+      unloading: 0,
+      collectcharges: 0,
+      inboundothers: 0,
+    });
+    setQSValues({
+      ...QSValues,
+      drayage: inEuros ? "€ 0.00" : "$ 0.00",
+      unloading: inEuros ? "€ 0.00" : "$ 0.00",
+      collectcharges: inEuros ? "€ 0.00" : "$ 0.00",
+      inboundothers: inEuros ? "€ 0.00" : "$ 0.00",
+    });
+  };
+
+  const resetOutbound = () => {
+    setQSData({
+      ...QSData,
+      loading: 0,
+      bolcharges: 0,
+      outboundothers: 0,
+    });
+    setQSValues({
+      ...QSValues,
+      loading: inEuros ? "€ 0.00" : "$ 0.00",
+      bolcharges: inEuros ? "€ 0.00" : "$ 0.00",
+      outboundothers: inEuros ? "€ 0.00" : "$ 0.00",
     });
   };
 
@@ -2009,6 +3642,29 @@ const SalesQS2 = () => {
       e.preventDefault();
       if (e.target.name === "centryfeepmt") {
         setShowcustomscalculator(!showcustomscalculator);
+        setShowinboundcalculator(false);
+        setShowstoragecalculator(false);
+      }
+      if (e.target.name === "inboundpmt") {
+        setShowinboundcalculator(!showinboundcalculator);
+        setShowcustomscalculator(false);
+        setShowstoragecalculator(false);
+      }
+      if (e.target.name === "storagepmt") {
+        setShowstoragecalculator(!showstoragecalculator);
+        setShowcustomscalculator(false);
+        setShowinboundcalculator(false);
+      }
+      if (e.target.name === "insurance") {
+        setShowinsurancecalculator(!showinsurancecalculator);
+        setShowcustomscalculator(false);
+        setShowinboundcalculator(false);
+      }
+      if (e.target.name === "outboundpmt") {
+        setShowoutboundcalculator(!showoutboundcalculator);
+        setShowcustomscalculator(false);
+        setShowinboundcalculator(false);
+        setShowinsurancecalculator(false);
       }
     }
   };
@@ -2181,8 +3837,22 @@ const SalesQS2 = () => {
                 required
                 onClick={(e) => {
                   setEditing(true);
-                  setQSData({ ...QSData, saleType: 1 });
-                  setQSValues({ ...QSValues, saleType: "Back-to-back" });
+                  setQSData({
+                    ...QSData,
+                    saleType: 1,
+                    loading: 0,
+                    bolcharges: 0,
+                    outboundothers: 0,
+                    KTP: "",
+                  });
+                  setQSValues({
+                    ...QSValues,
+                    saleType: "Back-to-back",
+                    loading: "$ 0.00",
+                    bolcharges: "$ 0.00",
+                    outboundothers: "$ 0.00",
+                    KTP: "",
+                  });
                 }}
                 onKeyDown={ignoreEnter}
               />
@@ -2196,8 +3866,22 @@ const SalesQS2 = () => {
                 required
                 onClick={(e) => {
                   setEditing(true);
-                  setQSData({ ...QSData, saleType: 2 });
-                  setQSValues({ ...QSValues, saleType: "Position" });
+                  setQSData({
+                    ...QSData,
+                    saleType: 2,
+                    loading: 0,
+                    bolcharges: 0,
+                    outboundothers: 0,
+                    KTP: "",
+                  });
+                  setQSValues({
+                    ...QSValues,
+                    saleType: "Position",
+                    loading: "$ 0.00",
+                    bolcharges: "$ 0.00",
+                    outboundothers: "$ 0.00",
+                    KTP: "",
+                  });
                   loadPositions();
                 }}
                 onKeyDown={ignoreEnter}
@@ -2208,7 +3892,7 @@ const SalesQS2 = () => {
                   className="WGPSelect"
                   onChange={(e) => setPosition(e.target.value)}
                 >
-                  <option>Select...</option>
+                  <option value="">Select...</option>
                   {positionsddown
                     ? positionsddown.map((pos, i) => {
                         return (
@@ -2236,15 +3920,14 @@ const SalesQS2 = () => {
                 type="radio"
                 checked={QSData && QSData.saleType === 3 ? true : false}
                 required
-                onClick={(e) => {
+                onClick={async function (e) {
                   setEditing(true);
-                  setQSData({ ...QSData, saleType: 3 });
-                  setQSValues({ ...QSValues, saleType: "US Distribution" });
+                  setUSDist();
                   loadUSPositions();
                 }}
               />
               <label>US Distribution</label>
-              {QSData && QSData.saleType == 3 ? (
+              {QSData && QSData.saleType === 3 ? (
                 <select
                   className="USWGPSelect"
                   onChange={(e) => setUSPosition(e.target.value)}
@@ -2302,7 +3985,6 @@ const SalesQS2 = () => {
                 required
               />
             </div>
-
             <div className="form-group">
               <label htmlFor="">Supplier:</label>
               <input
@@ -2314,6 +3996,7 @@ const SalesQS2 = () => {
                 onKeyDown={ignoreEnter}
               />
             </div>
+
             <div className="form-group">
               <label htmlFor="">Customer:</label>
               <QSSearchField
@@ -2328,6 +4011,7 @@ const SalesQS2 = () => {
                 required
               />
             </div>
+
             <div className="form-group">
               <label htmlFor="">Contact:</label>
               <input
@@ -2611,7 +4295,9 @@ const SalesQS2 = () => {
                 setQSValues({ ...QSValues, shipmentType: "Container" });
               }}
             />
-            <label htmlFor="">Container</label>
+            <label style={{ minWidth: "auto" }} htmlFor="">
+              Container
+            </label>
 
             <input
               name="shipmenttype"
@@ -2623,7 +4309,9 @@ const SalesQS2 = () => {
                 setQSValues({ ...QSValues, shipmentType: "Breakbulk" });
               }}
             />
-            <label htmlFor="">Breakbulk</label>
+            <label style={{ minWidth: "auto" }} htmlFor="">
+              Breakbulk
+            </label>
             <input
               name="shipmenttype"
               type="radio"
@@ -2634,79 +4322,122 @@ const SalesQS2 = () => {
                 setQSValues({ ...QSValues, shipmentType: "Truck" });
               }}
             />
-            <label htmlFor="">Truck</label>
+            <label style={{ minWidth: "auto" }} htmlFor="">
+              Truck
+            </label>
           </div>
 
-          {QSData && QSData.shipmentType === 1 ? (
-            <fieldset>
-              <legend>Freight</legend>
-              <div className="form-group">
-                <label htmlFor="">Freight ID:</label>
-                <input
-                  placeholder="[Leave Blank]"
-                  type="text"
-                  onKeyDown={ignoreEnter}
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="">Freight Total:</label>
-                <input
-                  type="text"
-                  name="freightTotal"
-                  className="QSfig2 canceldrag"
-                  value={QSValues.freightTotal}
-                  onChange={CurrencyChange}
-                  onBlur={CurrencyBlur}
-                  onKeyDown={ignoreEnter}
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="">Shipping Line:</label>
-                <input
-                  className="canceldrag"
-                  placeholder="Shipping Line..."
-                  name="shippingline"
-                  onChange={handleChange}
-                  value={QSValues ? QSValues.shippingline || "" : ""}
-                  type="text"
-                  onKeyDown={ignoreEnter}
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="">Payload:</label>
-                <input
-                  type="text"
-                  name="payload"
-                  className="QSfig2 canceldrag"
-                  value={QSValues.payload}
-                  onChange={QtyChange}
-                  onBlur={QtyBlur}
-                  onKeyDown={ignoreEnter}
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="">Total Inspection:</label>
-                <input
-                  name="totalinspection"
-                  className="QSfig2 canceldrag"
-                  value={QSValues.totalinspection}
-                  onChange={CurrencyChange}
-                  onBlur={CurrencyBlur}
-                  type="text"
-                  onKeyDown={ignoreEnter}
-                />
-              </div>
-            </fieldset>
-          ) : QSData && QSData.shipmentType == 2 ? (
+          {/* {QSData && QSData.shipmentType === 1 ? ( */}
+          <fieldset>
+            <legend>Freight</legend>
+            <div className="form-group">
+              <label htmlFor="">Freight ID:</label>
+              <input
+                placeholder="[Leave Blank]"
+                type="text"
+                onKeyDown={ignoreEnter}
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="">Freight Total:</label>
+              <input
+                type="text"
+                name="freightTotal"
+                className="QSfig2 canceldrag"
+                value={QSValues.freightTotal}
+                onChange={CurrencyChange}
+                onBlur={CurrencyBlur}
+                onKeyDown={ignoreEnter}
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="">Shipping Line:</label>
+              <input
+                className="canceldrag"
+                placeholder="Shipping Line..."
+                name="shippingline"
+                onChange={handleChange}
+                value={QSValues ? QSValues.shippingline || "" : ""}
+                type="text"
+                onKeyDown={ignoreEnter}
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="">Payload (mt/FCL):</label>
+              <input
+                type="text"
+                name="payload"
+                className="QSfig2 canceldrag"
+                value={QSValues.payload}
+                onChange={QtyChange}
+                onBlur={QtyBlur}
+                onKeyDown={ignoreEnter}
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="">Total Inspection:</label>
+              <input
+                name="totalinspection"
+                className="QSfig2 canceldrag"
+                value={QSValues.totalinspection}
+                onChange={CurrencyChange}
+                onBlur={CurrencyBlur}
+                type="text"
+                onKeyDown={ignoreEnter}
+              />
+            </div>
+          </fieldset>
+          {/* ) : QSData && QSData.shipmentType == 2 ? (
             "Under Construction"
           ) : (
             "Under Construction Too :)"
+          )} */}
+          {QSData.saleType === 3 ? (
+            <>
+              <div className="form-group">
+                <label htmlFor="">WH Entry Date:</label>
+                <input
+                  style={{
+                    backgroundColor: "rgb(244,244,244)",
+                    marginLeft: 0,
+                    flexBasis: "50%",
+                    minWidth: "50%",
+                  }}
+                  type="date"
+                  value={QSData.whentry}
+                  onKeyDown={ignoreEnter}
+                  readOnly
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="">WH Exit Date:</label>
+                <input
+                  style={{
+                    marginLeft: 0,
+                    flexBasis: "50%",
+                    minWidth: "50%",
+                  }}
+                  name="whexit"
+                  type="date"
+                  value={QSData.whexit}
+                  onChange={handleChange}
+                  onDoubleClick={(e) => {
+                    e.target.select();
+                  }}
+                  className="canceldrag"
+                  required
+                  onKeyDown={ignoreEnter}
+                />
+              </div>
+            </>
+          ) : (
+            ""
           )}
         </section>
         <section id="salesQS-3">
           <fieldset id="salesQS-3-fieldset" style={{ paddingBottom: "2rem" }}>
             <legend>Figures</legend>
-            <section id="salesQS-3-col1">
+            <section id="salesQS-3-col1" style={{ flexBasis: "50%" }}>
               <div className="form-group">
                 <label htmlFor="">Quantity:</label>
                 <input
@@ -2743,6 +4474,212 @@ const SalesQS2 = () => {
                     onKeyDown={ignoreEnter}
                   />
                 </div>
+                {QSData.saleType === 3 ? (
+                  <div className="form-group">
+                    <label htmlFor="" style={{ position: "relative" }}>
+                      Outbound Cost:{" "}
+                      <FontAwesomeIcon
+                        icon={faCalculator}
+                        onClick={(e) => {
+                          setShowoutboundcalculator(!showoutboundcalculator);
+                          if (showinboundcalculator === true) {
+                            setShowinboundcalculator(false);
+                          }
+                          if (showinsurancecalculator === true) {
+                            setShowinsurancecalculator(false);
+                          }
+                          if (showstorageinfo === true) {
+                            setShowstorageinfo(false);
+                          }
+                        }}
+                      />
+                    </label>
+                    <input
+                      style={{ backgroundColor: "rgb(244,244,244)" }}
+                      className="QSfig canceldrag"
+                      value={QSValues.outboundpmt}
+                      // onDoubleClick={(e) => {
+                      //   e.target.select();
+                      // }}
+                      name="outboundpmt"
+                      placeholder="...Outbound Cost pmt"
+                      onChange={CurrencyChange}
+                      onBlur={CurrencyBlur}
+                      type="text"
+                      required
+                      readOnly
+                      onKeyDown={ignoreEnter}
+                    />
+                  </div>
+                ) : (
+                  ""
+                )}
+                {showoutboundcalculator && QSData.saleComplete !== 1 ? (
+                  <div
+                    className="bottompopupcalculator"
+                    style={{ position: "absolute" }}
+                  >
+                    <div className="form-group">
+                      <label htmlFor="">Payload (mt/FCL):</label>
+                      <input
+                        type="text"
+                        name="payload"
+                        className="QSfig2 canceldrag"
+                        value={QSValues.payload}
+                        onChange={QtyChange}
+                        onBlur={QtyBlur}
+                        onKeyDown={ignoreEnter}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="">Loading per FCL:</label>
+                      <input
+                        className="QSfig canceldrag"
+                        name="loading"
+                        value={QSValues.loading}
+                        onChange={CurrencyChange}
+                        type="text"
+                        placeholder="Loading/FCL $"
+                        onBlur={CurrencyBlur}
+                        required
+                        onKeyDown={ignoreEnter}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="">BOL Charges:</label>
+                      <input
+                        className="QSfig canceldrag"
+                        name="bolcharges"
+                        value={QSValues.bolcharges}
+                        onChange={CurrencyChange}
+                        type="text"
+                        placeholder="BOL Charges $"
+                        onBlur={CurrencyBlur}
+                        required
+                        onKeyDown={ignoreEnter}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="">Outbound Others:</label>
+                      <input
+                        className="QSfig canceldrag"
+                        name="outboundothers"
+                        value={QSValues.outboundothers}
+                        onChange={CurrencyChange}
+                        type="text"
+                        placeholder="Outbound Others $"
+                        onBlur={CurrencyBlur}
+                        required
+                        onKeyDown={ignoreEnter}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="">Total Outbound:</label>
+                      <input
+                        style={{
+                          backgroundColor: "rgb(230,230,230",
+                          borderBottom: "None",
+                        }}
+                        className="QSfig canceldrag"
+                        name="totaloutbound"
+                        value={QSValues.totaloutbound}
+                        onChange={CurrencyChange}
+                        type="text"
+                        placeholder="Total Outbound $"
+                        onBlur={CurrencyBlur}
+                        required
+                        readOnly
+                        onKeyDown={ignoreEnter}
+                      />
+                    </div>
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setEditing(true);
+                        resetOutbound();
+                      }}
+                    >
+                      Reset
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setShowoutboundcalculator(false);
+                      }}
+                    >
+                      OK
+                    </button>
+                  </div>
+                ) : (
+                  ""
+                )}
+                {QSData.saleType === 3 ? (
+                  <div className="form-group">
+                    <label htmlFor="" style={{ position: "relative" }}>
+                      Storage:{" "}
+                      <FontAwesomeIcon
+                        icon={faInfoCircle}
+                        onClick={(e) => {
+                          setShowstorageinfo(!showstorageinfo);
+                          setShowoutboundcalculator(false);
+                        }}
+                      />
+                    </label>
+                    <input
+                      style={{ backgroundColor: "rgb(244,244,244)" }}
+                      className="QSfig canceldrag"
+                      type="text"
+                      placeholder="...Storage $"
+                      onChange={CurrencyChange}
+                      name="storagepmt"
+                      value={QSValues.storagepmt}
+                      onBlur={CurrencyBlur}
+                      required
+                      readOnly
+                      onKeyDown={ignoreEnter}
+                    />
+                  </div>
+                ) : (
+                  ""
+                )}
+                {showstorageinfo && QSData.saleType === 3 ? (
+                  <div className="bottompopupcalculator">
+                    <p>
+                      Storage Cost of {currencify(QSData.storagepmt)}/mt is
+                      based on:
+                    </p>
+                    <ul>
+                      <li>
+                        WH Entry Date: {QSData.whentry ? QSData.whentry : "N/A"}
+                      </li>
+                      <li>
+                        WH Exit Date: {QSData.whexit ? QSData.whexit : "N/A"}
+                      </li>
+                      <li>
+                        Fixed Storage Cost:{" "}
+                        {USP ? currencify(USP.storagefixed) : "N/A"}
+                      </li>
+                      <li>
+                        Variable Storage Cost:{" "}
+                        {USP
+                          ? currencify(USP.storagevariable) + "/pallet"
+                          : "N/A"}
+                      </li>
+                      <li>
+                        Position Quantity: {USP ? USP.quantity + "mt" : "N/A"}
+                      </li>
+                      <li>
+                        Total Pallets: {USP ? USP.quantitypallets : "N/A"}
+                      </li>
+                      <li>Grace Period: {USP ? USP.stggraceperiod : "N/A"}</li>
+                      <li>
+                        Accrual Period: {USP ? USP.stgaccrualperiod : "N/A"}
+                      </li>
+                    </ul>
+                  </div>
+                ) : (
+                  ""
+                )}
 
                 {QSData.saleComplete !== 1 ? (
                   <div className="form-group">
@@ -2765,7 +4702,7 @@ const SalesQS2 = () => {
                 ) : (
                   ""
                 )}
-                {QSData.saleComplete === 1 ? (
+                {QSData.saleComplete === 1 && QSData.saleType !== 3 ? (
                   <div className="form-group">
                     <label htmlFor="" style={{ position: "relative" }}>
                       Customs Entry:{" "}
@@ -2773,6 +4710,12 @@ const SalesQS2 = () => {
                         icon={faCalculator}
                         onClick={(e) => {
                           setShowcustomscalculator(!showcustomscalculator);
+                          if (showinboundcalculator === true) {
+                            setShowinboundcalculator(false);
+                          }
+                          if (showinsurancecalculator === true) {
+                            setShowinsurancecalculator(false);
+                          }
                         }}
                       />
                     </label>
@@ -2796,8 +4739,12 @@ const SalesQS2 = () => {
                 ) : (
                   ""
                 )}
-                {showcustomscalculator & (QSData.saleComplete === 1) ? (
-                  <div className="customscalc" style={{ position: "absolute" }}>
+                {showcustomscalculator &
+                (QSData.saleComplete === 1 && QSData.saleType !== 3) ? (
+                  <div
+                    className="bottompopupcalculator"
+                    style={{ position: "absolute" }}
+                  >
                     <div className="form-group">
                       <label htmlFor="">Quantity:</label>
                       <input
@@ -2807,9 +4754,6 @@ const SalesQS2 = () => {
                         onChange={QtyChange}
                         type="text"
                         placeholder="MT"
-                        // onDoubleClick={(e) => {
-                        //   e.target.select();
-                        // }}
                         onBlur={QtyBlur}
                         required
                         onKeyDown={ignoreEnter}
@@ -3043,13 +4987,16 @@ const SalesQS2 = () => {
                     </div>
                     <button
                       onClick={(e) => {
-                        setShowcustomscalculator(false);
+                        e.preventDefault();
+                        setEditing(true);
+                        resetCustoms();
                       }}
                     >
                       Reset
                     </button>
                     <button
                       onClick={(e) => {
+                        e.preventDefault();
                         setShowcustomscalculator(false);
                       }}
                     >
@@ -3059,6 +5006,330 @@ const SalesQS2 = () => {
                 ) : (
                   ""
                 )}
+                {QSData.saleComplete === 1 && QSData.saleType !== 3 ? (
+                  <div className="form-group">
+                    <label htmlFor="" style={{ position: "relative" }}>
+                      Inbound Cost:{" "}
+                      <FontAwesomeIcon
+                        icon={faCalculator}
+                        onClick={(e) => {
+                          setShowinboundcalculator(!showinboundcalculator);
+                          if (showcustomscalculator === true) {
+                            setShowcustomscalculator(false);
+                          }
+                          if (showinsurancecalculator === true) {
+                            setShowinsurancecalculator(false);
+                          }
+                        }}
+                      />
+                    </label>
+                    <input
+                      style={{ backgroundColor: "rgb(244,244,244)" }}
+                      className="QSfig canceldrag"
+                      value={QSValues.inboundpmt}
+                      // onDoubleClick={(e) => {
+                      //   e.target.select();
+                      // }}
+                      name="inboundpmt"
+                      placeholder="...Inbound costs pmt"
+                      onChange={CurrencyChange}
+                      onBlur={CurrencyBlur}
+                      type="text"
+                      required
+                      readOnly
+                      onKeyDown={ignoreEnter}
+                    />
+                  </div>
+                ) : (
+                  ""
+                )}
+                {showinboundcalculator &
+                (QSData.saleComplete === 1 && QSData.saleType !== 3) ? (
+                  <div
+                    className="bottompopupcalculator"
+                    style={{ position: "absolute" }}
+                  >
+                    <div className="form-group">
+                      <label htmlFor="">Payload (mt/FCL):</label>
+                      <input
+                        type="text"
+                        name="payload"
+                        className="QSfig2 canceldrag"
+                        value={QSValues.payload}
+                        onChange={QtyChange}
+                        onBlur={QtyBlur}
+                        onKeyDown={ignoreEnter}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="">Drayage per FCL:</label>
+                      <input
+                        className="QSfig canceldrag"
+                        name="drayage"
+                        value={QSValues.drayage}
+                        onChange={CurrencyChange}
+                        type="text"
+                        placeholder="Drayage/FCL $"
+                        onBlur={CurrencyBlur}
+                        required
+                        onKeyDown={ignoreEnter}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="">Unloading per FCL:</label>
+                      <input
+                        className="QSfig canceldrag"
+                        name="unloading"
+                        value={QSValues.unloading}
+                        onChange={CurrencyChange}
+                        type="text"
+                        placeholder="Unloading/FCL $"
+                        onBlur={CurrencyBlur}
+                        required
+                        onKeyDown={ignoreEnter}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="">Collect Charges:</label>
+                      <input
+                        className="QSfig canceldrag"
+                        name="collectcharges"
+                        value={QSValues.collectcharges}
+                        onChange={CurrencyChange}
+                        type="text"
+                        placeholder="Collect Charges $"
+                        onBlur={CurrencyBlur}
+                        required
+                        onKeyDown={ignoreEnter}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="">Inbound Others:</label>
+                      <input
+                        className="QSfig canceldrag"
+                        name="inboundothers"
+                        value={QSValues.inboundothers}
+                        onChange={CurrencyChange}
+                        type="text"
+                        placeholder="Inbound Others $"
+                        onBlur={CurrencyBlur}
+                        required
+                        onKeyDown={ignoreEnter}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="">Total Inbound:</label>
+                      <input
+                        style={{
+                          backgroundColor: "rgb(230,230,230",
+                          borderBottom: "None",
+                        }}
+                        className="QSfig canceldrag"
+                        name="totalinbound"
+                        value={QSValues.totalinbound}
+                        onChange={CurrencyChange}
+                        type="text"
+                        placeholder="Total Inbound $"
+                        onBlur={CurrencyBlur}
+                        required
+                        readOnly
+                        onKeyDown={ignoreEnter}
+                      />
+                    </div>
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setEditing(true);
+                        resetInbound();
+                      }}
+                    >
+                      Reset
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setShowinboundcalculator(false);
+                      }}
+                    >
+                      OK
+                    </button>
+                  </div>
+                ) : (
+                  ""
+                )}
+
+                {/* {QSData.saleComplete === 1 ? (
+                  <div className="form-group">
+                    <label htmlFor="" style={{ position: "relative" }}>
+                      Storage:{" "}
+                      <FontAwesomeIcon
+                        icon={faCalculator}
+                        onClick={(e) => {
+                          setShowstoragecalculator(!showstoragecalculator);
+                          setShowinboundcalculator(false);
+                          setShowcustomscalculator(false);
+                        }}
+                      />
+                    </label>
+                    <input
+                      style={{ backgroundColor: "rgb(244,244,244)" }}
+                      className="QSfig canceldrag"
+                      value={QSValues.storagepmt}
+                      // onDoubleClick={(e) => {
+                      //   e.target.select();
+                      // }}
+                      name="storagepmt"
+                      placeholder="...Storage costs pmt"
+                      onChange={CurrencyChange}
+                      onBlur={CurrencyBlur}
+                      type="text"
+                      required
+                      readOnly
+                      onKeyDown={ignoreEnter}
+                    />
+                  </div>
+                ) : (
+                  ""
+                )}
+                {showstoragecalculator & (QSData.saleComplete === 1) ? (
+                  <div
+                    className="bottompopupcalculatorlg"
+                    style={{ position: "absolute", minWidth: "420px" }}
+                  >
+                    <div className="bottompopupcalculatorlg-1">
+                      <div className="form-group">
+                        <label htmlFor="">Warehouse</label>
+                        <select
+                          style={{
+                            flexBasis: "42%",
+                            marginRight: 0,
+                            marginLeft: "15px",
+                            border: "none",
+                            padding: "0.25rem 0",
+                          }}
+                          onChange={(e) => {
+                            setWarehouse(e.target.value);
+                          }}
+                        >
+                          <option value={"select"}>Select...</option>
+                          {warehouseList
+                            ? warehouseList.map((wh, i) => {
+                                if (wh.warehouseName === "Miami") {
+                                  return (
+                                    <option selected value={i}>
+                                      {wh.warehouseName}
+                                    </option>
+                                  );
+                                } else {
+                                  return (
+                                    <option value={i}>
+                                      {wh.warehouseName}
+                                    </option>
+                                  );
+                                }
+                              })
+                            : ""}
+                        </select>
+                      </div>
+                      <div className="form-group">
+                        <label htmlFor="">WH Entry Date</label>
+                        <input
+                          name="whentry"
+                          onChange={handleChange}
+                          value={QSData.whentry}
+                          type="date"
+                          onDoubleClick={(e) => {
+                            e.target.select();
+                          }}
+                          className="canceldrag"
+                          required
+                          onKeyDown={ignoreEnter}
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label htmlFor="">WH Fixed Cost:</label>
+                        <input
+                          className="QSfig canceldrag"
+                          name="storagefixed"
+                          value={QSValues.storagefixed}
+                          onChange={CurrencyChange}
+                          type="text"
+                          placeholder="Storage Fixed Cost $"
+                          onBlur={CurrencyBlur}
+                          required
+                          onKeyDown={ignoreEnter}
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label htmlFor="">WH cost ($/pallet):</label>
+                        <input
+                          className="QSfig canceldrag"
+                          name="storagevariable"
+                          value={QSValues.storagevariable}
+                          onChange={CurrencyChange}
+                          type="text"
+                          placeholder="Storage Variable Cost $"
+                          onBlur={CurrencyBlur}
+                          required
+                          onKeyDown={ignoreEnter}
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label htmlFor="">Grace Period (days):</label>
+                        <input
+                          className="QSfig canceldrag"
+                          name="stggraceperiod"
+                          value={QSValues.stggraceperiod}
+                          onChange={(e) => QtyChange(e, 0)}
+                          type="text"
+                          placeholder="(days)"
+                          onBlur={(e) => QtyBlur(e, 0)}
+                          required
+                          onKeyDown={ignoreEnter}
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label htmlFor="">Accrual Period (days):</label>
+                        <input
+                          className="QSfig canceldrag"
+                          name="stgaccrualperiod"
+                          value={QSValues.stgaccrualperiod}
+                          onChange={(e) => QtyChange(e, 0)}
+                          type="text"
+                          placeholder="(days)"
+                          onBlur={(e) => QtyBlur(e, 0)}
+                          required
+                          onKeyDown={ignoreEnter}
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label htmlFor="">Total Pallets (#):</label>
+                        <input
+                          className="QSfig canceldrag"
+                          name="quantitypallets"
+                          value={QSValues.quantitypallets}
+                          onChange={(e) => QtyChange(e, 0)}
+                          type="text"
+                          placeholder="(# of pallets)"
+                          onBlur={(e) => QtyBlur(e, 0)}
+                          required
+                          onKeyDown={ignoreEnter}
+                        />
+                      </div>
+                    </div>
+                    <div className="bottompopupcalculatorlg-2">
+                      <p>Days in WH: {whdays ? whdays : ""}</p>
+                      <p>Status: {whstatus ? whstatus : ""}</p>
+                      <p>Days in Storage: {stgdays ? stgdays : ""}</p>
+                      <p>
+                        Accrued Storage per pallet:{" "}
+                        {stgaccruedpallet ? "$ " + stgaccruedpallet : ""}
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  ""
+                )} */}
                 <div className="form-group">
                   <label htmlFor="">P Commission:</label>
                   <input
@@ -3117,7 +5388,21 @@ const SalesQS2 = () => {
                   />
                 </div>
                 <div className="form-group">
-                  <label htmlFor="">Insurance Cost:</label>
+                  <label htmlFor="" style={{ position: "relative" }}>
+                    Insurance Cost:
+                    <FontAwesomeIcon
+                      icon={faCalculator}
+                      onClick={(e) => {
+                        setShowinsurancecalculator(!showinsurancecalculator);
+                        if (showcustomscalculator === true) {
+                          setShowcustomscalculator(false);
+                        }
+                        if (showinboundcalculator === true) {
+                          setShowinboundcalculator(false);
+                        }
+                      }}
+                    />
+                  </label>
                   <input
                     style={{ backgroundColor: "rgb(244,244,244)" }}
                     className="QSfig canceldrag"
@@ -3135,6 +5420,65 @@ const SalesQS2 = () => {
                     onKeyDown={ignoreEnter}
                   />
                 </div>
+                {showinsurancecalculator ? (
+                  <div
+                    className="bottompopupcalculator"
+                    style={{ position: "absolute" }}
+                  >
+                    <div className="form-group">
+                      <label htmlFor="">Incoterms:</label>
+                      <input
+                        placeholder="Incoterms..."
+                        onChange={handleChange}
+                        name="incoterms"
+                        value={QSValues.incoterms}
+                        type="text"
+                        onDoubleClick={(e) => {
+                          e.target.select();
+                        }}
+                        className="canceldrag"
+                        required
+                        onKeyDown={ignoreEnter}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="">Insurance Rate %:</label>
+                      <input
+                        type="text"
+                        name="insurancerate"
+                        className="QSfig2 canceldrag"
+                        value={QSValues.insurancerate}
+                        onChange={PercentageChange}
+                        onBlur={PercentageBlur}
+                        onKeyDown={ignoreEnter}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="">Insurance Factor:</label>
+                      <input
+                        type="text"
+                        name="insurancefactor"
+                        className="QSfig2 canceldrag"
+                        value={QSValues.insurancefactor}
+                        onChange={(e) => {
+                          QtyChange(e, 2);
+                        }}
+                        onBlur={QtyBlur}
+                        onKeyDown={ignoreEnter}
+                      />
+                    </div>
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setShowinsurancecalculator(false);
+                      }}
+                    >
+                      OK
+                    </button>
+                  </div>
+                ) : (
+                  ""
+                )}
                 <div className="form-group">
                   <label htmlFor="">Inspection Cost:</label>
                   <input
@@ -3154,23 +5498,28 @@ const SalesQS2 = () => {
                     onKeyDown={ignoreEnter}
                   />
                 </div>
-                <div className="form-group">
-                  <label htmlFor="">S Commission:</label>
-                  <input
-                    className="QSfig canceldrag"
-                    value={QSValues.scommission}
-                    // onDoubleClick={(e) => {
-                    //   e.target.select();
-                    // }}
-                    name="scommission"
-                    placeholder="...S Commission pmt"
-                    onChange={CurrencyChange}
-                    onBlur={CurrencyBlur}
-                    type="text"
-                    required
-                    onKeyDown={ignoreEnter}
-                  />
-                </div>
+                {QSData.saleComplete !== 1 ? (
+                  <div className="form-group">
+                    <label htmlFor="">S Commission:</label>
+                    <input
+                      className="QSfig canceldrag"
+                      value={QSValues.scommission}
+                      // onDoubleClick={(e) => {
+                      //   e.target.select();
+                      // }}
+                      name="scommission"
+                      placeholder="...S Commission pmt"
+                      onChange={CurrencyChange}
+                      onBlur={CurrencyBlur}
+                      type="text"
+                      required
+                      onKeyDown={ignoreEnter}
+                    />
+                  </div>
+                ) : (
+                  ""
+                )}
+
                 <div className="form-group">
                   <label htmlFor="">Interest Cost:</label>
                   <input
@@ -3253,80 +5602,11 @@ const SalesQS2 = () => {
                   onKeyDown={ignoreEnter}
                 />
               </div>
-            </section>
-            <section id="salesQS-3-col2">
-              <fieldset>
-                <legend>Sales Interest</legend>
-                <div className="form-group">
-                  <label htmlFor="">Interest Rate:</label>
-                  <input
-                    className="QSfig canceldrag"
-                    value={QSValues.interestrate}
-                    placeholder="...Interest Rate"
-                    name="interestrate"
-                    // onDoubleClick={(e) => {
-                    //   e.target.select();
-                    // }}
-                    onChange={(e) => {
-                      if (inEuros === true && !exchangerate) {
-                        confirmAlert({
-                          title: "No Exchange Rate",
-                          message: `Please input an Exchange Rate ($/€)`,
-                          buttons: [
-                            {
-                              label: "OK",
-                            },
-                          ],
-                          closeOnClickOutside: true,
-                          closeOnEscape: true,
-                        });
-                      } else {
-                        PercentageChange(e);
-                      }
-                    }}
-                    onBlur={PercentageBlur}
-                    type="text"
-                    required
-                    onKeyDown={ignoreEnter}
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="">Interest Days:</label>
-                  <input
-                    className="QSfig canceldrag"
-                    value={QSValues.interestdays}
-                    name="interestdays"
-                    onChange={(e) => {
-                      if (inEuros === true && !exchangerate) {
-                        confirmAlert({
-                          title: "No Exchange Rate",
-                          message: `Please input an Exchange Rate ($/€)`,
-                          buttons: [
-                            {
-                              label: "OK",
-                            },
-                          ],
-                          closeOnClickOutside: true,
-                          closeOnEscape: true,
-                        });
-                      } else {
-                        QtyChange(e);
-                      }
-                    }}
-                    placeholder="...Interest Days"
-                    // onDoubleClick={(e) => {
-                    //   e.target.select();
-                    // }}
-                    type="text"
-                    required
-                    onKeyDown={ignoreEnter}
-                  />
-                </div>
-              </fieldset>
-              <fieldset>
+              {QSData.saleComplete === 1 ? (
                 <div className="form-group">
                   <label htmlFor="">Price Before Int.:</label>
                   <input
+                    style={{ paddingRight: "15px" }}
                     className="QSfig canceldrag"
                     value={QSValues.pricebeforeint}
                     // onDoubleClick={(e) => {
@@ -3341,172 +5621,398 @@ const SalesQS2 = () => {
                     onKeyDown={ignoreEnter}
                   />
                 </div>
+              ) : (
+                ""
+              )}
+            </section>
+            {QSData.saleComplete !== 1 ? (
+              <section id="salesQS-3-col2">
+                <fieldset>
+                  <legend>Sales Interest</legend>
+                  <div className="form-group">
+                    <label htmlFor="">Interest Rate:</label>
+                    <input
+                      className="QSfig canceldrag"
+                      value={QSValues.interestrate}
+                      placeholder="...Interest Rate"
+                      name="interestrate"
+                      // onDoubleClick={(e) => {
+                      //   e.target.select();
+                      // }}
+                      onChange={(e) => {
+                        if (inEuros === true && !exchangerate) {
+                          confirmAlert({
+                            title: "No Exchange Rate",
+                            message: `Please input an Exchange Rate ($/€)`,
+                            buttons: [
+                              {
+                                label: "OK",
+                              },
+                            ],
+                            closeOnClickOutside: true,
+                            closeOnEscape: true,
+                          });
+                        } else {
+                          PercentageChange(e);
+                        }
+                      }}
+                      onBlur={PercentageBlur}
+                      type="text"
+                      required
+                      onKeyDown={ignoreEnter}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="">Interest Days:</label>
+                    <input
+                      className="QSfig canceldrag"
+                      value={QSValues.interestdays}
+                      name="interestdays"
+                      onChange={(e) => {
+                        if (inEuros === true && !exchangerate) {
+                          confirmAlert({
+                            title: "No Exchange Rate",
+                            message: `Please input an Exchange Rate ($/€)`,
+                            buttons: [
+                              {
+                                label: "OK",
+                              },
+                            ],
+                            closeOnClickOutside: true,
+                            closeOnEscape: true,
+                          });
+                        } else {
+                          QtyChange(e);
+                        }
+                      }}
+                      placeholder="...Interest Days"
+                      // onDoubleClick={(e) => {
+                      //   e.target.select();
+                      // }}
+                      type="text"
+                      required
+                      onKeyDown={ignoreEnter}
+                    />
+                  </div>
+                </fieldset>
+                <fieldset>
+                  <div className="form-group">
+                    <label htmlFor="">Price Before Int.:</label>
+                    <input
+                      className="QSfig canceldrag"
+                      value={QSValues.pricebeforeint}
+                      // onDoubleClick={(e) => {
+                      //   e.target.select();
+                      // }}
+                      name="pricebeforeint"
+                      placeholder="...Price Before Int pmt"
+                      onChange={CurrencyChange}
+                      onBlur={CurrencyBlur}
+                      type="text"
+                      required
+                      onKeyDown={ignoreEnter}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="">Sales Interest:</label>
+                    <input
+                      className="QSfig canceldrag"
+                      value={QSValues.salesinterest}
+                      readOnly
+                      type="text"
+                      required
+                      onKeyDown={ignoreEnter}
+                    />
+                  </div>
+                </fieldset>
                 <div className="form-group">
-                  <label htmlFor="">Sales Interest:</label>
+                  <label htmlFor="">Price After Int.:</label>
                   <input
-                    className="QSfig canceldrag"
-                    value={QSValues.salesinterest}
                     readOnly
+                    className="QSfig2 canceldrag"
+                    value={QSValues.priceafterint}
                     type="text"
                     required
                     onKeyDown={ignoreEnter}
                   />
                 </div>
-              </fieldset>
-              <div className="form-group">
-                <label htmlFor="">Price After Int.:</label>
-                <input
-                  readOnly
-                  className="QSfig2 canceldrag"
-                  value={QSValues.priceafterint}
-                  type="text"
-                  required
-                  onKeyDown={ignoreEnter}
-                />
-              </div>
-              <fieldset>
-                <legend>Economics</legend>
-                <div className="form-group">
-                  <label htmlFor="">Profit:</label>
+                <fieldset>
+                  <legend>Economics</legend>
+                  <div className="form-group">
+                    <label htmlFor="">Profit:</label>
+                    <input
+                      readOnly
+                      className="QSfig canceldrag"
+                      value={QSValues.profit}
+                      type="text"
+                      required
+                      onKeyDown={ignoreEnter}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="">Margin:</label>
+                    <input
+                      readOnly
+                      className="QSfig canceldrag"
+                      value={QSValues.margin}
+                      type="text"
+                      required
+                      onKeyDown={ignoreEnter}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="">Turnover:</label>
+                    <input
+                      readOnly
+                      className="QSfig canceldrag"
+                      value={QSValues.turnover}
+                      type="text"
+                      required
+                      onKeyDown={ignoreEnter}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="">% Margin:</label>
+                    <input
+                      readOnly
+                      className="QSfig canceldrag"
+                      value={QSValues.pctmargin}
+                      type="text"
+                      required
+                      onKeyDown={ignoreEnter}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="">Netback:</label>
+                    <input
+                      readOnly
+                      className="QSfig canceldrag"
+                      value={QSValues.netback}
+                      type="text"
+                      required
+                      onKeyDown={ignoreEnter}
+                    />
+                  </div>
+                </fieldset>
+                <div id="exchangerate" className="form-group">
+                  <label>Exch. Rate ($/€):</label>
                   <input
-                    readOnly
-                    className="QSfig canceldrag"
-                    value={QSValues.profit}
-                    type="text"
-                    required
+                    className="canceldrag"
+                    onChange={(e) => {
+                      e.preventDefault();
+                      setEditing(true);
+                      const isdecimalnumber = RegExp("^[0-9.]+$");
+                      if (
+                        isdecimalnumber.test(e.target.value) ||
+                        e.target.value === ""
+                      ) {
+                        // console.log("hey u");
+                        setExchangerate(e.target.value);
+                      }
+                    }}
+                    value={exchangerate ? exchangerate : ""}
+                    placeholder="$/€ (up to 4 decimals)"
+                    readOnly={lockER}
                     onKeyDown={ignoreEnter}
                   />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="">Margin:</label>
-                  <input
-                    readOnly
-                    className="QSfig canceldrag"
-                    value={QSValues.margin}
-                    type="text"
-                    required
-                    onKeyDown={ignoreEnter}
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="">Turnover:</label>
-                  <input
-                    readOnly
-                    className="QSfig canceldrag"
-                    value={QSValues.turnover}
-                    type="text"
-                    required
-                    onKeyDown={ignoreEnter}
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="">% Margin:</label>
-                  <input
-                    readOnly
-                    className="QSfig canceldrag"
-                    value={QSValues.pctmargin}
-                    type="text"
-                    required
-                    onKeyDown={ignoreEnter}
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="">Netback:</label>
-                  <input
-                    readOnly
-                    className="QSfig canceldrag"
-                    value={QSValues.netback}
-                    type="text"
-                    required
-                    onKeyDown={ignoreEnter}
-                  />
-                </div>
-              </fieldset>
-              <div id="exchangerate" className="form-group">
-                <label>Exch. Rate ($/€):</label>
-                <input
-                  className="canceldrag"
-                  onChange={(e) => {
-                    e.preventDefault();
-                    setEditing(true);
-                    const isdecimalnumber = RegExp("^[0-9.]+$");
-                    if (
-                      isdecimalnumber.test(e.target.value) ||
-                      e.target.value === ""
-                    ) {
-                      // console.log("hey u");
-                      setExchangerate(e.target.value);
+                  <FontAwesomeIcon
+                    icon={faUnlock}
+                    onClick={(e) => {
+                      setLockER(!lockER);
+                    }}
+                    className={
+                      !lockER
+                        ? "unlockicon display-block"
+                        : "unlockicon display-none"
                     }
-                  }}
-                  value={exchangerate ? exchangerate : ""}
-                  placeholder="$/€ (up to 4 decimals)"
-                  readOnly={lockER}
-                  onKeyDown={ignoreEnter}
-                />
-                <FontAwesomeIcon
-                  icon={faUnlock}
-                  onClick={(e) => {
-                    setLockER(!lockER);
-                  }}
-                  className={
-                    !lockER
-                      ? "unlockicon display-block"
-                      : "unlockicon display-none"
-                  }
-                />
-                <FontAwesomeIcon
-                  icon={faLock}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    confirmAlert({
-                      title: "Warning",
-                      message: `If you have already entered data with a different exchange rate. Changing the rate at this point will likely cause currency and calculation inconsistencies in the QS.`,
-                      buttons: [
-                        {
-                          label: "Go ahead",
-                          onClick: () => setLockER(!lockER),
-                        },
-                        {
-                          label: "Cancel",
-                        },
-                      ],
-                      closeOnClickOutside: true,
-                      closeOnEscape: true,
-                    });
-                  }}
-                  className={
-                    lockER ? "lockicon display-block" : "lockicon display-none"
-                  }
-                />
-                <button
-                  onClick={(e) => {
-                    e.preventDefault();
-                    if (!exchangerate || exchangerate === "") {
+                  />
+                  <FontAwesomeIcon
+                    icon={faLock}
+                    onClick={(e) => {
+                      e.preventDefault();
                       confirmAlert({
-                        title: "No Exchange Rate",
-                        message: `Please input an Exchange Rate ($/€)`,
+                        title: "Warning",
+                        message: `If you have already entered data with a different exchange rate. Changing the rate at this point will likely cause currency and calculation inconsistencies in the QS.`,
                         buttons: [
                           {
-                            label: "OK",
+                            label: "Go ahead",
+                            onClick: () => setLockER(!lockER),
+                          },
+                          {
+                            label: "Cancel",
                           },
                         ],
                         closeOnClickOutside: true,
                         closeOnEscape: true,
                       });
-                    } else {
-                      setInEuros(!inEuros);
+                    }}
+                    className={
+                      lockER
+                        ? "lockicon display-block"
+                        : "lockicon display-none"
                     }
-                  }}
-                >
-                  {!inEuros ? "Convert To Euros" : "Convert To USD"}
-                </button>
-              </div>
-            </section>
+                  />
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (!exchangerate || exchangerate === "") {
+                        confirmAlert({
+                          title: "No Exchange Rate",
+                          message: `Please input an Exchange Rate ($/€)`,
+                          buttons: [
+                            {
+                              label: "OK",
+                            },
+                          ],
+                          closeOnClickOutside: true,
+                          closeOnEscape: true,
+                        });
+                      } else {
+                        setInEuros(!inEuros);
+                      }
+                    }}
+                  >
+                    {!inEuros ? "Convert To Euros" : "Convert To USD"}
+                  </button>
+                </div>
+              </section>
+            ) : (
+              <section id="salesQS-3-col2" className="storagefields">
+                <fieldset>
+                  <legend>Storage Details</legend>
+                  <div className="form-group">
+                    <label style={{ minWidth: "90px" }} htmlFor="">
+                      Warehouse
+                    </label>
+                    <select
+                      style={{
+                        flexBasis: "42%",
+                        marginRight: 0,
+                        marginLeft: "15px",
+                        // border: "none",
+                        padding: "0.25rem 0",
+                      }}
+                      required
+                      onChange={(e) => {
+                        setWarehouse(e.target.value);
+                      }}
+                    >
+                      <option value={""}>Select...</option>
+                      {warehouseList
+                        ? warehouseList.map((wh, i) => {
+                            if (wh.warehouseName === QSValues.warehouse) {
+                              return (
+                                <option selected value={i}>
+                                  {wh.warehouseName}
+                                </option>
+                              );
+                            } else {
+                              return (
+                                <option value={i}>{wh.warehouseName}</option>
+                              );
+                            }
+                          })
+                        : ""}
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="" style={{ minWidth: "95px" }}>
+                      Entry Date:
+                    </label>
+                    <input
+                      style={{ minWidth: "55%" }}
+                      name="whentry"
+                      onChange={handleChange}
+                      value={QSData.whentry}
+                      type="date"
+                      onDoubleClick={(e) => {
+                        e.target.select();
+                      }}
+                      className="canceldrag"
+                      required
+                      onKeyDown={ignoreEnter}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="">Fixed Cost:</label>
+                    <input
+                      className="QSfig canceldrag"
+                      name="storagefixed"
+                      value={QSValues.storagefixed}
+                      onChange={CurrencyChange}
+                      type="text"
+                      placeholder="Storage Fixed Cost $"
+                      onBlur={CurrencyBlur}
+                      required
+                      onKeyDown={ignoreEnter}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="">Var. Cost ($/pallet):</label>
+                    <input
+                      className="QSfig canceldrag"
+                      name="storagevariable"
+                      value={QSValues.storagevariable}
+                      onChange={CurrencyChange}
+                      type="text"
+                      placeholder="Storage Variable Cost $"
+                      onBlur={CurrencyBlur}
+                      required
+                      onKeyDown={ignoreEnter}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="">Grace Period (days):</label>
+                    <input
+                      className="QSfig canceldrag"
+                      name="stggraceperiod"
+                      value={QSValues.stggraceperiod}
+                      onChange={(e) => QtyChange(e, 0)}
+                      type="text"
+                      placeholder="(days)"
+                      onBlur={(e) => QtyBlur(e, 0)}
+                      required
+                      onKeyDown={ignoreEnter}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="">Accrual Period (days):</label>
+                    <input
+                      className="QSfig canceldrag"
+                      name="stgaccrualperiod"
+                      value={QSValues.stgaccrualperiod}
+                      onChange={(e) => QtyChange(e, 0)}
+                      type="text"
+                      placeholder="(days)"
+                      onBlur={(e) => QtyBlur(e, 0)}
+                      required
+                      onKeyDown={ignoreEnter}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="">Total Pallets (#):</label>
+                    <input
+                      className="QSfig canceldrag"
+                      name="quantitypallets"
+                      value={QSValues.quantitypallets}
+                      onChange={(e) => QtyChange(e, 0)}
+                      type="text"
+                      placeholder="(# of pallets)"
+                      onBlur={(e) => QtyBlur(e, 0)}
+                      required
+                      onKeyDown={ignoreEnter}
+                    />
+                  </div>
+                </fieldset>
+              </section>
+            )}
           </fieldset>
           <div id="QSbuttons">
             {QSIDtoedit === "" || !QSIDtoedit ? (
               <>
+                <span ref={refrespmsg}>{QSresponsemsg}</span>
                 <button
+                  className="saveQSbutton"
                   type="button"
                   onClick={(e) => {
                     clearQSData();
@@ -3514,12 +6020,14 @@ const SalesQS2 = () => {
                 >
                   Clear
                 </button>
-                <button type="submit">Save and New</button>
+                <button className="saveQSbutton" type="submit">
+                  Save and New
+                </button>
               </>
             ) : (
               <>
                 <span ref={refrespmsg}>{QSresponsemsg}</span>
-                <button className="saveQSeditsbutton" type="submit">
+                <button className="saveQSbutton" type="submit">
                   Save Edits
                 </button>
               </>
