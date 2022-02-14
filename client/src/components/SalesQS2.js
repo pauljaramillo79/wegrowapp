@@ -2747,6 +2747,7 @@ const SalesQS2 = () => {
       inboundothers: 0,
       warehouse: "",
       whentry: "",
+      whexit: "",
       storagefixed: 0,
       storagevariable: 0,
       stggraceperiod: 0,
@@ -2771,6 +2772,7 @@ const SalesQS2 = () => {
       inboundothers: inEuros ? "€ 0.00" : "$ 0.00",
       warehouse: "",
       whentry: "",
+      whexit: "",
       storagefixed: inEuros ? "€ 0.00" : "$ 0.00",
       storagevariable: inEuros ? "€ 0.00" : "$ 0.00",
       stggraceperiod: "0",
@@ -3846,6 +3848,8 @@ const SalesQS2 = () => {
                     loading: 0,
                     bolcharges: 0,
                     outboundothers: 0,
+                    whexit: "",
+                    whentry: "",
                     KTP: "",
                   });
                   setQSValues({
@@ -3854,6 +3858,8 @@ const SalesQS2 = () => {
                     loading: "$ 0.00",
                     bolcharges: "$ 0.00",
                     outboundothers: "$ 0.00",
+                    whexit: "",
+                    whentry: "",
                     KTP: "",
                   });
                 }}
@@ -3875,6 +3881,8 @@ const SalesQS2 = () => {
                     loading: 0,
                     bolcharges: 0,
                     outboundothers: 0,
+                    whexit: "",
+                    whentry: "",
                     KTP: "",
                   });
                   setQSValues({
@@ -3883,6 +3891,8 @@ const SalesQS2 = () => {
                     loading: "$ 0.00",
                     bolcharges: "$ 0.00",
                     outboundothers: "$ 0.00",
+                    whexit: "",
+                    whentry: "",
                     KTP: "",
                   });
                   loadPositions();
