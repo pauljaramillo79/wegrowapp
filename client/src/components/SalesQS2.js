@@ -19,7 +19,8 @@ import { gsap } from "gsap";
 
 const SalesQS2 = () => {
   const { toggleQSrefresh } = useContext(RefreshPositionsContext);
-  const { QStoload, diffQS, duplicateBoolean } = useContext(LoadQSContext);
+  const { QStoload, loaduser, diffQS, duplicateBoolean } =
+    useContext(LoadQSContext);
 
   const refrespmsg = useRef(null);
   const [showmsg, setShowmsg] = useState(false);
@@ -262,12 +263,14 @@ const SalesQS2 = () => {
   );
 
   // Load and set warehouse list for dropdown menu
-  // useEffect(() => {
-  //   Axios.post("/warehouses").then((response) => {
-  //     // console.log(response.data);
-  //     setWarehouseList(response.data);
-  //   });
-  // }, []);
+  useEffect(() => {
+    if (!QStoload) {
+      Axios.post("/warehouses").then((response) => {
+        // console.log(response.data);
+        setWarehouseList(response.data);
+      });
+    }
+  }, []);
 
   // Load and set trader list for dropdown menus
   const [traders, setTraders] = useState();
@@ -280,19 +283,21 @@ const SalesQS2 = () => {
   // load and set a user-dependent QSID list for navigation
   //Refresh QSID List everytime a QS is saved, userID is changed, or QS is duplicated
   useEffect(() => {
-    Axios.post("/QSIDList", { user: userID }).then((response) => {
-      const loadQSList = (resp) => {
-        return new Promise((resolve, reject) => {
-          const QSlist = [...new Set(resp.data.map((item) => item.QSID))];
-          setQSIDList(QSlist);
-          resolve();
-        });
-      };
-      const doWork = async () => {
-        await loadQSList(response);
-      };
-      doWork();
-    });
+    if (!QStoload) {
+      Axios.post("/QSIDList", { user: userID }).then((response) => {
+        const loadQSList = (resp) => {
+          return new Promise((resolve, reject) => {
+            const QSlist = [...new Set(resp.data.map((item) => item.QSID))];
+            setQSIDList(QSlist);
+            resolve();
+          });
+        };
+        const doWork = async () => {
+          await loadQSList(response);
+        };
+        doWork();
+      });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [QSsaved, userID, duplicateBoolean]);
 
@@ -463,6 +468,7 @@ const SalesQS2 = () => {
   const setwarehouses = (resp) => {
     return new Promise((resolve, reject) => {
       setWarehouseList(resp);
+      setUserID(loaduser);
       resolve();
     });
   };
@@ -1205,20 +1211,21 @@ const SalesQS2 = () => {
   };
 
   useEffect(() => {
-    Axios.post("/warehouses").then(async (res) => {
-      setwarehouses(res.data).then(() => {
-        Axios.post("/QSIDList", { user: userID }).then((res1) => {
-          loadQSList1(res1).then((result) => {
-            console.log(result);
-            if (QStoload) {
+    if (QStoload) {
+      Axios.post("/warehouses").then(async (res) => {
+        setwarehouses(res.data).then(() => {
+          Axios.post("/QSIDList", { user: loaduser }).then((res1) => {
+            loadQSList1(res1).then((result) => {
+              console.log(result);
+
               setQSindex(result.indexOf(QStoload));
               setQSIDtoedit(QStoload);
-              loadQS(QStoload);
-            }
+              // loadQS(QStoload);
+            });
           });
         });
       });
-    });
+    }
   }, []);
 
   useEffect(() => {
@@ -1226,7 +1233,7 @@ const SalesQS2 = () => {
     if (QSindex < QSIDList.length) {
       Axios.post("/loadQStoedit", { id: QSIDList[QSindex] }).then(
         (response) => {
-          console.log(response);
+          // console.log(response);
           // const loaddata = (resp) => {
           //   return new Promise((resolve, reject) => {
           //     resolve(resp.data[0]);
@@ -1234,7 +1241,7 @@ const SalesQS2 = () => {
           // };
           // const ldata = await loaddata(response);
           const ldata = response.data[0];
-          console.log(ldata);
+          // console.log(ldata);
 
           // Define promise to change exchange rate using loaded value
           const changeER = (resp) => {
@@ -1306,7 +1313,7 @@ const SalesQS2 = () => {
           //   });
           // };
           const doWork = async () => {
-            console.log(ldata);
+            // console.log(ldata);
 
             const check = await checkER(ldata);
             const exrate = await changeER(ldata);

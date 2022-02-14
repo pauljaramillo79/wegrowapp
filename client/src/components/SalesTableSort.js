@@ -18,7 +18,7 @@ const SalesTableSort = (props) => {
 
   const { state } = useContext(AuthContext);
   const { QSrefresh, toggleQSrefresh } = useContext(RefreshPositionsContext);
-  const { toggleQSload, setQStoload, toggleDuplicate } =
+  const { toggleQSload, loaduser, QStoload, setQStoload, toggleDuplicate } =
     useContext(LoadQSContext);
   // Get token values from UseContext and Local Storage
   // let accesstoken = state.accesstoken;

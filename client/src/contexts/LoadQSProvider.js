@@ -5,6 +5,7 @@ export const LoadQSContext = React.createContext();
 export const LoadQSProvider = ({ children }) => {
   const [QStoload, setQStoload] = useState();
   const [diffQS, setdiffQS] = useState(true);
+  const [loaduser, setLoaduser] = useState();
   const toggleQSload = (e) => {
     setdiffQS((prevdiffQS) => !prevdiffQS);
   };
@@ -22,6 +23,8 @@ export const LoadQSProvider = ({ children }) => {
         diffQS,
         toggleDuplicate,
         duplicateBoolean,
+        loaduser,
+        setLoaduser,
       }}
     >
       {children}

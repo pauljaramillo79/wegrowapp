@@ -4,12 +4,16 @@ import SalesTableSort from "./SalesTableSort";
 import "./Sales.css";
 import { ReactComponent as RefreshIcon } from "../assets/_images/refreshicon.svg";
 import { RefreshPositionsContext } from "../contexts/RefreshPositionsProvider";
+import { LoadQSContext } from "../contexts/LoadQSProvider";
 
 const Sales = (props) => {
   const { toggleQSrefresh } = useContext(RefreshPositionsContext);
+  const { loaduser, QStoload } = useContext(LoadQSContext);
   const [traders, setTraders] = useState();
   const [userID, setUserID] = useState(
-    JSON.parse(localStorage.getItem("WGusercode"))
+    QStoload && loaduser
+      ? loaduser
+      : JSON.parse(localStorage.getItem("WGusercode"))
   );
   const [limit, setLimit] = useState(300);
   const [columns, setColumns] = useState();
@@ -20,6 +24,12 @@ const Sales = (props) => {
       setTraders(response.data);
     });
   }, []);
+
+  // useEffect(() => {
+  //   if (QStoload) {
+  //     setUserID(loaduser);
+  //   }
+  // }, []);
 
   var CONFIG = {
     sort: { column: "QSID", order: "desc" },
