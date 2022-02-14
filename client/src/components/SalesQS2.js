@@ -468,8 +468,6 @@ const SalesQS2 = () => {
   };
 
   const loadQS = async (QSid) => {
-    const warehouses = await Axios.post("/warehouses");
-    await setwarehouses(warehouses.data);
     let response;
     try {
       response = await Axios.post("/loadQStoedit", { id: QSid });
@@ -1200,9 +1198,14 @@ const SalesQS2 = () => {
   };
 
   useEffect(() => {
-    if (QStoload) {
-      loadQS(QStoload);
-    }
+    // const warehouses = await Axios.post("/warehouses");
+    // await setwarehouses(warehouses.data);
+    Axios.post("/warehouses").then(async (res) => {
+      await setwarehouses(res.data);
+      if (QStoload) {
+        loadQS(QStoload);
+      }
+    });
   }, []);
 
   useEffect(() => {
