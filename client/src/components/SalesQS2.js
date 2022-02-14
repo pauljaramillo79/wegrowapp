@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useRef } from "react";
+import React, { useState, useEffect, useContext, useRef, useMemo } from "react";
 import "./SalesQS.css";
 import moment from "moment";
 import QSSearchField from "./QSSearchField";
@@ -239,7 +239,7 @@ const SalesQS2 = () => {
   const [inEuros, setInEuros] = useState(false);
   const [exchangerate, setExchangerate] = useState();
   const [lockER, setLockER] = useState(false);
-  const [editMode, setEditMode] = useState(false);
+  const [editMode, setEditMode] = useState(true);
   const [QSOriginal, setQSOriginal] = useState({});
   const [QSOriginalData, setQSOriginalData] = useState({});
   const [editing, setEditing] = useState(false);
@@ -283,7 +283,7 @@ const SalesQS2 = () => {
     Axios.post("/QSIDList", { user: userID }).then((response) => {
       const loadQSList = (resp) => {
         return new Promise((resolve, reject) => {
-          const QSlist = [...new Set(response.data.map((item) => item.QSID))];
+          const QSlist = [...new Set(resp.data.map((item) => item.QSID))];
           setQSIDList(QSlist);
           resolve();
         });
@@ -297,9 +297,9 @@ const SalesQS2 = () => {
   }, [QSsaved, userID, duplicateBoolean]);
 
   useEffect(() => {
-    // if (QStoload === "") {
-    setQSindex(QSIDList.length);
-    // }
+    if (!QStoload) {
+      setQSindex(QSIDList.length);
+    }
     // if (QStoload !== "") {
     //   setQSindex(QSIDList.indexOf(QStoload));
     // }
@@ -464,6 +464,13 @@ const SalesQS2 = () => {
     return new Promise((resolve, reject) => {
       setWarehouseList(resp);
       resolve();
+    });
+  };
+  const loadQSList1 = (resp) => {
+    return new Promise((resolve, reject) => {
+      const QSlist = [...new Set(resp.data.map((item) => item.QSID))];
+      setQSIDList(QSlist);
+      resolve(QSlist);
     });
   };
 
@@ -1198,13 +1205,19 @@ const SalesQS2 = () => {
   };
 
   useEffect(() => {
-    // const warehouses = await Axios.post("/warehouses");
-    // await setwarehouses(warehouses.data);
     Axios.post("/warehouses").then(async (res) => {
-      await setwarehouses(res.data);
-      if (QStoload) {
-        loadQS(QStoload);
-      }
+      setwarehouses(res.data).then(() => {
+        Axios.post("/QSIDList", { user: userID }).then((res1) => {
+          loadQSList1(res1).then((result) => {
+            console.log(result);
+            if (QStoload) {
+              setQSindex(result.indexOf(QStoload));
+              setQSIDtoedit(QStoload);
+              loadQS(QStoload);
+            }
+          });
+        });
+      });
     });
   }, []);
 
