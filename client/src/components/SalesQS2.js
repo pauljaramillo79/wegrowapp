@@ -480,735 +480,735 @@ const SalesQS2 = () => {
     });
   };
 
-  const loadQS = async (QSid) => {
-    let response;
-    try {
-      response = await Axios.post("/loadQStoedit", { id: QSid });
-    } catch (err) {
-      console.error(err);
-    }
-    // const ldata = response["data"][0];
-    const ldata = await setloadeddata(response);
-    const check = await checkER(ldata);
-    const exrate = await changeER(ldata);
-    // Start loading
-    await loadingQS();
-    if (ldata.KTP && ldata.saleTypeID === 3) {
-      const uspos = await Axios.post("/loadusposition", {
-        WGS: ldata["KTP"],
-      });
-      setUSP(uspos.data[0]);
-      // console.log(uspos);
-    }
-    const matvalue = await materialvaluecalc(
-      Number(ldata.materialcost.replace("$", "")),
-      ldata.quantity
-    );
-    const totalduty =
-      ldata.generalduty && ldata.additionalduty
-        ? await totaldutycalc(
-            Number(ldata.generalduty.replace("%", "")),
-            Number(ldata.additionalduty.replace("%", ""))
-          )
-        : 0;
-    const dutyfee = await dutyfeecalc(matvalue, totalduty / 100);
-    const harborfee = ldata.harborfeepct
-      ? await harborfeecalc(
-          matvalue,
-          Number(ldata.harborfeepct.replace("%", "") / 100)
-        )
-      : 0;
-    const merchprocfee = ldata.merchprocfeepct
-      ? await mercprocfeecalc(
-          matvalue,
-          Number(ldata.merchprocfeepct.replace("%", "") / 100)
-        )
-      : 0;
-    const totalcentryfee = await totalcentryfeecalc(
-      dutyfee ? dutyfee : 0,
-      harborfee ? harborfee : 0,
-      merchprocfee ? merchprocfee : 0,
-      ldata.cflatfee ? numerify(ldata.cflatfee, "$") : 0,
-      ldata.tsca ? numerify(ldata.tsca, "$") : 0,
-      ldata.isf ? numerify(ldata.isf, "$") : 0
-    );
-    const centryfeepmt = ldata.quantity
-      ? await centryfeepmtcalc(totalcentryfee, ldata.quantity)
-      : 0;
-    const totalinbound = await totalinboundcalc(
-      ldata.drayage ? numerify(ldata.drayage) : 0,
-      ldata.unloading ? numerify(ldata.unloading) : 0,
-      ldata.collectcharges ? numerify(ldata.collectcharges) : 0,
-      ldata.inboundothers ? numerify(ldata.inboundothers) : 0
-    );
-    const inboundpmt = ldata.payload
-      ? await inboundpmtcalc(totalinbound, ldata.payload)
-      : 0;
-    const totaloutbound = await totaloutboundcalc(
-      ldata.loading ? numerify(ldata.loading) : 0,
-      ldata.bolcharges ? numerify(ldata.bolcharges) : 0,
-      ldata.outboundothers ? numerify(ldata.outboundothers) : 0
-    );
-    const outboundpmt = await outboundpmtcalc(totaloutbound, ldata.payload);
+  // const loadQS = async (QSid) => {
+  //   let response;
+  //   try {
+  //     response = await Axios.post("/loadQStoedit", { id: QSid });
+  //   } catch (err) {
+  //     console.error(err);
+  //   }
+  //   // const ldata = response["data"][0];
+  //   const ldata = await setloadeddata(response);
+  //   const check = await checkER(ldata);
+  //   const exrate = await changeER(ldata);
+  //   // Start loading
+  //   await loadingQS();
+  //   if (ldata.KTP && ldata.saleTypeID === 3) {
+  //     const uspos = await Axios.post("/loadusposition", {
+  //       WGS: ldata["KTP"],
+  //     });
+  //     setUSP(uspos.data[0]);
+  //     // console.log(uspos);
+  //   }
+  //   const matvalue = await materialvaluecalc(
+  //     Number(ldata.materialcost.replace("$", "")),
+  //     ldata.quantity
+  //   );
+  //   const totalduty =
+  //     ldata.generalduty && ldata.additionalduty
+  //       ? await totaldutycalc(
+  //           Number(ldata.generalduty.replace("%", "")),
+  //           Number(ldata.additionalduty.replace("%", ""))
+  //         )
+  //       : 0;
+  //   const dutyfee = await dutyfeecalc(matvalue, totalduty / 100);
+  //   const harborfee = ldata.harborfeepct
+  //     ? await harborfeecalc(
+  //         matvalue,
+  //         Number(ldata.harborfeepct.replace("%", "") / 100)
+  //       )
+  //     : 0;
+  //   const merchprocfee = ldata.merchprocfeepct
+  //     ? await mercprocfeecalc(
+  //         matvalue,
+  //         Number(ldata.merchprocfeepct.replace("%", "") / 100)
+  //       )
+  //     : 0;
+  //   const totalcentryfee = await totalcentryfeecalc(
+  //     dutyfee ? dutyfee : 0,
+  //     harborfee ? harborfee : 0,
+  //     merchprocfee ? merchprocfee : 0,
+  //     ldata.cflatfee ? numerify(ldata.cflatfee, "$") : 0,
+  //     ldata.tsca ? numerify(ldata.tsca, "$") : 0,
+  //     ldata.isf ? numerify(ldata.isf, "$") : 0
+  //   );
+  //   const centryfeepmt = ldata.quantity
+  //     ? await centryfeepmtcalc(totalcentryfee, ldata.quantity)
+  //     : 0;
+  //   const totalinbound = await totalinboundcalc(
+  //     ldata.drayage ? numerify(ldata.drayage) : 0,
+  //     ldata.unloading ? numerify(ldata.unloading) : 0,
+  //     ldata.collectcharges ? numerify(ldata.collectcharges) : 0,
+  //     ldata.inboundothers ? numerify(ldata.inboundothers) : 0
+  //   );
+  //   const inboundpmt = ldata.payload
+  //     ? await inboundpmtcalc(totalinbound, ldata.payload)
+  //     : 0;
+  //   const totaloutbound = await totaloutboundcalc(
+  //     ldata.loading ? numerify(ldata.loading) : 0,
+  //     ldata.bolcharges ? numerify(ldata.bolcharges) : 0,
+  //     ldata.outboundothers ? numerify(ldata.outboundothers) : 0
+  //   );
+  //   const outboundpmt = await outboundpmtcalc(totaloutbound, ldata.payload);
 
-    // await setvalues(
-    //   ldata,
-    //   check,
-    //   exrate,
-    //   outboundpmt,
-    //   totaloutbound,
-    //   inboundpmt,
-    //   totalinbound,
-    //   centryfeepmt,
-    //   totalcentryfee,
-    //   merchprocfee,
-    //   harborfee,
-    //   dutyfee,
-    //   matvalue,
-    //   totalduty
-    // );
-    setQSValues({
-      ...QSValues,
-      warehouse: ldata.warehouseName ? ldata.warehouseName : "",
-      whentry: ldata.whentry ? ldata.whentry : "",
-      whexit: ldata.whexit ? ldata.whexit : "",
-      storagepmt:
-        check && inEuros && ldata.storagepmt
-          ? numcurrex(ldata.storagepmt, exrate)
-          : check && inEuros && !ldata.storagepmt
-          ? "€ 0.00"
-          : ldata.storagepmt,
-      storagefixed:
-        check && inEuros && ldata.storagefixed
-          ? numcurrex(ldata.storagefixed, exrate)
-          : check && inEuros && !ldata.storagefixed
-          ? "€ 0.00"
-          : ldata.storagefixed,
-      storagevariable:
-        check && inEuros && ldata.storagevariable
-          ? numcurrex(ldata.storagevariable, exrate)
-          : check && inEuros && !ldata.storagevariable
-          ? "€ 0.00"
-          : ldata.storagevariable,
-      stggraceperiod: ldata.stggraceperiod ? ldata.stggraceperiod : "0",
-      stgaccrualperiod: ldata.stgaccrualperiod ? ldata.stgaccrualperiod : "0",
-      quantitypallets: ldata.quantitypallets ? ldata.quantitypallets : "",
-      KTP: ldata.KTP,
-      KTS: ldata.KTS,
-      QSDate: ldata.QSDate,
-      saleType: ldata.saleType,
-      QSID: ldata.QSID,
-      abbreviation: ldata.abbreviation,
-      supplier: ldata.supplier,
-      customer: ldata.customer,
-      packsize: ldata.packsize,
-      marks: ldata.marks,
-      from: ldata.from,
-      to: ldata.to,
-      POL: ldata.POL,
-      POD: ldata.POD,
-      saleComplete:
-        ldata.saleComplete === -1
-          ? "sold"
-          : ldata.saleComplete === 0
-          ? "indication"
-          : ldata.saleComplete === 1
-          ? "US Allocation"
-          : "",
-      TIC: ldata.trader,
-      traffic: ldata.traffic,
-      incoterms: ldata.incoterms,
-      paymentTerm: ldata.paymentTerm,
-      CADintrate: ldata.includedrate,
-      insurancerate: ldata.insurancerate,
-      insurancefactor: ldata.insurancefactor.toFixed(2),
-      CADdays: ldata.includedperiod,
-      shipmentType: ldata.shipmentType ? ldata.shipmentType : "Container",
-      freightTotal:
-        check && inEuros && ldata.freightTotal
-          ? numcurrex(ldata.freightTotal, exrate)
-          : check && inEuros && !ldata.freightTotal
-          ? "€ 0.00"
-          : ldata.freightTotal,
-      shippingline: ldata.shippingline,
-      payload: ldata.payload,
-      totalinspection:
-        check && inEuros && ldata.totalinspection
-          ? numcurrex(ldata.totalinspection, exrate)
-          : check && inEuros && !ldata.totalinspection
-          ? "€ 0.00"
-          : ldata.totalinspection,
-      quantity: ldata.quantity,
-      materialcost:
-        check && inEuros && ldata.materialcost
-          ? numcurrex(ldata.materialcost, exrate)
-          : check && inEuros && !ldata.materialcost
-          ? "€ 0.00"
-          : ldata.materialcost,
-      materialvalue:
-        check && inEuros && matvalue
-          ? numcurrex(matvalue.toFixed(2), exrate)
-          : check && inEuros && !matvalue
-          ? "€ 0.00"
-          : currencify(matvalue, "$", 2),
-      generalduty: ldata.generalduty ? ldata.generalduty : "0.00%",
-      additionalduty: ldata.additionalduty ? ldata.additionalduty : "0.00%",
-      totalduty: totalduty ? totalduty + "%" : "0.00%",
-      dutyfee:
-        check && inEuros && dutyfee
-          ? numcurrex(dutyfee.toFixed(2), exrate)
-          : check && inEuros && !dutyfee
-          ? "€ 0.00"
-          : currencify(dutyfee, "$", 2),
-      harborfeepct: ldata.harborfeepct ? ldata.harborfeepct : "0.00%",
-      harborfee:
-        check && inEuros && harborfee
-          ? numcurrex(harborfee.toFixed(2), exrate)
-          : check && inEuros && !harborfee
-          ? "€ 0.00"
-          : currencify(harborfee, "$", 2),
-      merchprocfeepct: ldata.merchprocfeepct ? ldata.merchprocfeepct : "0.00%",
-      merchprocfee:
-        check && inEuros && merchprocfee
-          ? numcurrex(merchprocfee.toFixed(2), exrate)
-          : check && inEuros && !merchprocfee
-          ? "€ 0.00"
-          : currencify(merchprocfee, "$", 2),
-      cflatfee:
-        check && inEuros && ldata.cflatfee
-          ? numcurrex(ldata.cflatfee, exrate)
-          : check && inEuros && !ldata.cflatfee
-          ? "€ 0.00"
-          : ldata.cflatfee,
-      tsca:
-        check && inEuros && ldata.tsca
-          ? numcurrex(ldata.tsca, exrate)
-          : check && inEuros && !ldata.tsca
-          ? "€ 0.00"
-          : ldata.tsca,
-      isf:
-        check && inEuros && ldata.isf
-          ? numcurrex(ldata.isf, exrate)
-          : check && inEuros && !ldata.isf
-          ? "€ 0.00"
-          : ldata.isf,
-      totalcentryfee:
-        check && inEuros && totalcentryfee
-          ? numcurrex(totalcentryfee.toFixed(2), exrate)
-          : check && inEuros && !totalcentryfee
-          ? "€ 0.00"
-          : currencify(totalcentryfee, "$", 2),
-      centryfeepmt:
-        check && inEuros && centryfeepmt
-          ? numcurrex(centryfeepmt.toFixed(2), exrate)
-          : check && inEuros && !centryfeepmt
-          ? "€ 0.00"
-          : currencify(centryfeepmt, "$", 2),
-      drayage:
-        check && inEuros && ldata.drayage
-          ? numcurrex(ldata.drayage, exrate)
-          : check && inEuros && !ldata.drayage
-          ? "€ 0.00"
-          : ldata.drayage,
-      unloading:
-        check && inEuros && ldata.unloading
-          ? numcurrex(ldata.unloading, exrate)
-          : check && inEuros && !ldata.unloading
-          ? "€ 0.00"
-          : ldata.unloading,
-      collectcharges:
-        check && inEuros && ldata.collectcharges
-          ? numcurrex(ldata.collectcharges, exrate)
-          : check && inEuros && !ldata.collectcharges
-          ? "€ 0.00"
-          : ldata.collectcharges,
-      inboundothers:
-        check && inEuros && ldata.inboundothers
-          ? numcurrex(ldata.inboundothers, exrate)
-          : check && inEuros && !ldata.inboundothers
-          ? "€ 0.00"
-          : ldata.inboundothers,
-      totalinbound:
-        check && inEuros && totalinbound
-          ? numcurrex(totalinbound.toFixed(2), exrate)
-          : check && inEuros && !totalinbound
-          ? "€ 0.00"
-          : currencify(totalinbound, "$", 2),
-      inboundpmt:
-        check && inEuros && inboundpmt
-          ? numcurrex(inboundpmt.toFixed(2), exrate)
-          : check && inEuros && !inboundpmt
-          ? "€ 0.00"
-          : currencify(inboundpmt, "$", 2),
-      loading:
-        check && inEuros && ldata.loading
-          ? numcurrex(ldata.loading, exrate)
-          : check && inEuros && !ldata.loading
-          ? "€ 0.00"
-          : ldata.loading,
-      bolcharges:
-        check && inEuros && ldata.bolcharges
-          ? numcurrex(ldata.bolcharges, exrate)
-          : check && inEuros && !ldata.bolcharges
-          ? "€ 0.00"
-          : ldata.bolcharges,
-      outboundothers:
-        check && inEuros && ldata.outboundothers
-          ? numcurrex(ldata.outboundothers, exrate)
-          : check && inEuros && !ldata.outboundothers
-          ? "€ 0.00"
-          : ldata.outboundothers,
-      totaloutbound:
-        check && inEuros && totaloutbound
-          ? numcurrex(totaloutbound.toFixed(2), exrate)
-          : check && inEuros && !totaloutbound
-          ? "€ 0.00"
-          : currencify(totaloutbound, "$", 2),
-      outboundpmt:
-        check && inEuros && outboundpmt
-          ? numcurrex(outboundpmt.toFixed(2), exrate)
-          : check && inEuros && !outboundpmt
-          ? "€ 0.00"
-          : currencify(outboundpmt, "$", 2),
-      pcommission:
-        check && inEuros && ldata.pcommission
-          ? numcurrex(ldata.pcommission, exrate)
-          : check && inEuros && !ldata.pcommission
-          ? "€ 0.00"
-          : ldata.pcommission,
-      pfinancecost:
-        check && inEuros && ldata.pfinancecost
-          ? numcurrex(ldata.pfinancecost, exrate)
-          : check && inEuros && !ldata.pfinancecost
-          ? "€ 0.00"
-          : ldata.pfinancecost,
-      sfinancecost:
-        check && inEuros && ldata.sfinancecost
-          ? numcurrex(ldata.sfinancecost, exrate)
-          : check && inEuros && !ldata.sfinancecost
-          ? "€ 0.00"
-          : ldata.sfinancecost,
-      freightpmt:
-        check && inEuros && ldata.freightpmt
-          ? numcurrex(ldata.freightpmt, exrate)
-          : check && inEuros && !ldata.freightpmt
-          ? "€ 0.00"
-          : ldata.freightpmt,
-      insurance:
-        check && inEuros && ldata.insurance
-          ? numcurrex(ldata.insurance, exrate)
-          : check && inEuros && !ldata.insurance
-          ? "€ 0.00"
-          : ldata.insurance,
-      inspectionpmt:
-        check && inEuros && ldata.inspectionpmt
-          ? numcurrex(ldata.inspectionpmt, exrate)
-          : check && inEuros && !ldata.inspectionpmt
-          ? "€ 0.00"
-          : ldata.inspectionpmt,
-      scommission:
-        check && inEuros && ldata.scommission
-          ? numcurrex(ldata.scommission, exrate)
-          : check && inEuros && !ldata.scommission
-          ? "€ 0.00"
-          : ldata.scommission,
-      interestcost:
-        check && inEuros && ldata.interestcost
-          ? numcurrex(ldata.interestcost, exrate)
-          : check && inEuros && !ldata.interestcost
-          ? "€ 0.00"
-          : ldata.interestcost,
-      legal:
-        check && inEuros && ldata.legal
-          ? numcurrex(ldata.legal, exrate)
-          : check && inEuros && !ldata.legal
-          ? "€ 0.00"
-          : ldata.legal,
-      pallets:
-        check && inEuros && ldata.pallets
-          ? numcurrex(ldata.pallets, exrate)
-          : check && inEuros && !ldata.pallets
-          ? "€ 0.00"
-          : ldata.pallets,
-      other:
-        check && inEuros && ldata.other
-          ? numcurrex(ldata.other, exrate)
-          : check && inEuros && !ldata.other
-          ? "€ 0.00"
-          : ldata.other,
-      totalcost:
-        check && inEuros && ldata.totalcost
-          ? numcurrex(ldata.totalcost, exrate)
-          : check && inEuros && !ldata.totalcost
-          ? "€ 0.00"
-          : ldata.totalcost,
-      interestrate: ldata.interestrate,
-      interestdays: ldata.interestdays,
-      pricebeforeint:
-        check && inEuros && ldata.pricebeforeint
-          ? numcurrex(ldata.pricebeforeint, exrate)
-          : check && inEuros && !ldata.pricebeforeint
-          ? "€ 0.00"
-          : ldata.pricebeforeint,
-      salesinterest:
-        check && inEuros && ldata.salesinterest
-          ? numcurrex(ldata.salesinterest, exrate)
-          : check && inEuros && !ldata.salesinterest
-          ? "€ 0.00"
-          : ldata.salesinterest,
-      priceafterint:
-        check && inEuros && ldata.priceafterint
-          ? numcurrex(ldata.priceafterint, exrate)
-          : check && inEuros && !ldata.priceafterint
-          ? "€ 0.00"
-          : ldata.priceafterint,
-      profit:
-        check && inEuros && ldata.profit
-          ? numcurrex(ldata.profit, exrate)
-          : check && inEuros && !ldata.pricebeforeint
-          ? "€ 0.00"
-          : ldata.profit,
-      margin:
-        check && inEuros && ldata.margin
-          ? numcurrex(ldata.margin, exrate)
-          : check && inEuros && !ldata.margin
-          ? "€ 0.00"
-          : ldata.margin,
-      turnover:
-        check && inEuros && ldata.turnover
-          ? numcurrex(ldata.turnover, exrate)
-          : check && inEuros && !ldata.turnover
-          ? "€ 0.00"
-          : ldata.turnover,
-      pctmargin: check && ldata.pctmargin ? ldata.pctmargin : "0.00%",
-      netback:
-        check && inEuros && ldata.netback
-          ? numcurrex(ldata.netback, exrate)
-          : check && inEuros && !ldata.netback
-          ? "€ 0.00"
-          : ldata.netback,
-    });
-    setQSData({
-      ...QSData,
-      warehouse: ldata.warehouseID ? ldata.warehouseID : "",
-      whentry: ldata.whentry ? ldata.whentry : "",
-      whexit: ldata.whexit ? ldata.whexit : "",
-      storagepmt: ldata.storagepmt ? numerify(ldata.storagepmt, "$") : 0,
-      storagefixed: ldata.storagefixed ? numerify(ldata.storagefixed, "$") : 0,
-      storagevariable: ldata.storagevariable
-        ? numerify(ldata.storagevariable, "$")
-        : 0,
-      stggraceperiod: ldata.stggraceperiod ? ldata.stggraceperiod : 0,
-      stgaccrualperiod: ldata.stgaccrualperiod ? ldata.stgaccrualperiod : 0,
-      quantitypallets: ldata.quantitypallets ? ldata.quantitypallets : "",
-      KTP: ldata.KTP,
-      KTS: ldata.KTS,
-      QSDate: ldata.QSDate,
-      saleType: ldata.saleTypeID,
-      QSID: ldata.QSID,
-      abbreviation: ldata.productID,
-      supplier: ldata.supplierID,
-      customer: ldata.customerID,
-      packsize: ldata.packsize,
-      marks: ldata.marks,
-      from: ldata.from,
-      to: ldata.to,
-      POL: ldata.POLID,
-      POD: ldata.PODID,
-      saleComplete: ldata.saleComplete,
-      TIC: ldata.traderID,
-      traffic: ldata.trafficID,
-      incoterms: ldata.incoterms,
-      paymentTerm: ldata.pTermID,
-      CADintrate: Number(ldata.includedrate.replace("%", "")) / 100,
-      insurancerate: Number(ldata.insurancerate.replace("%", "")) / 100,
-      insurancefactor: ldata.insurancefactor,
-      CADdays: ldata.includedperiod,
-      shipmentType: ldata.shipmentTypeID ? ldata.shipmentTypeID : 1,
-      freightTotal: ldata.freightTotal ? numerify(ldata.freightTotal, "$") : 0,
-      shippingline: ldata.shippingline,
-      payload: ldata.payload,
-      totalinspection: ldata.totalinspection
-        ? numerify(ldata.totalinspection, "$")
-        : 0,
-      quantity: Number(ldata.quantity.replace(",", "")),
-      materialcost: ldata.materialcost ? numerify(ldata.materialcost, "$") : 0,
-      materialvalue: matvalue ? matvalue : 0,
-      generalduty: ldata.generalduty
-        ? Number(ldata.generalduty.replace("%", "")) / 100
-        : 0,
-      additionalduty: ldata.additionalduty
-        ? Number(ldata.additionalduty.replace("%", "")) / 100
-        : 0,
-      totalduty: totalduty ? totalduty / 100 : 0,
-      dutyfee: dutyfee ? dutyfee : 0,
-      harborfeepct: ldata.harborfeepct
-        ? Number(ldata.harborfeepct.replace("%", "")) / 100
-        : 0,
-      harborfee: harborfee ? harborfee : 0,
-      merchprocfeepct: ldata.merchprocfeepct
-        ? Number(ldata.merchprocfeepct.replace("%", "")) / 100
-        : 0,
-      merchprocfee: merchprocfee ? merchprocfee : 0,
-      cflatfee: ldata.cflatfee ? numerify(ldata.cflatfee, "$") : 0,
-      tsca: ldata.tsca ? numerify(ldata.tsca, "$") : 0,
-      isf: ldata.isf ? numerify(ldata.isf, "$") : 0,
-      totalcentryfee: totalcentryfee ? totalcentryfee : 0,
-      centryfeepmt: centryfeepmt ? centryfeepmt : 0,
-      drayage: ldata.drayage ? numerify(ldata.drayage, "$") : 0,
-      unloading: ldata.unloading ? numerify(ldata.unloading, "$") : 0,
-      collectcharges: ldata.collectcharges
-        ? numerify(ldata.collectcharges, "$")
-        : 0,
-      inboundothers: ldata.inboundothers
-        ? numerify(ldata.inboundothers, "$")
-        : 0,
-      totalinbound: totalinbound ? totalinbound : 0,
-      inboundpmt: inboundpmt ? inboundpmt : 0,
-      loading: ldata.loading ? numerify(ldata.loading, "$") : 0,
-      bolcharges: ldata.bolcharges ? numerify(ldata.bolcharges, "$") : 0,
-      outboundothers: ldata.outboundothers
-        ? numerify(ldata.outboundothers, "$")
-        : 0,
-      totaloutbound: totaloutbound ? totaloutbound : 0,
-      outboundpmt: outboundpmt ? outboundpmt : 0,
-      pcommission: ldata.pcommission ? numerify(ldata.pcommission, "$") : 0,
-      pfinancecost: ldata.pfinancecost ? numerify(ldata.pfinancecost, "$") : 0,
-      sfinancecost: ldata.sfinancecost ? numerify(ldata.sfinancecost, "$") : 0,
-      freightpmt: ldata.freightpmt ? numerify(ldata.freightpmt, "$") : 0,
-      insurance: ldata.insurance ? numerify(ldata.insurance, "$") : 0,
-      inspectionpmt: ldata.inspectionpmt
-        ? numerify(ldata.inspectionpmt, "$")
-        : 0,
-      scommission: ldata.scommission ? numerify(ldata.scommission, "$") : 0,
-      interestcost: ldata.interestcost ? numerify(ldata.interestcost, "$") : 0,
-      legal: ldata.legal ? numerify(ldata.legal, "$") : 0,
-      pallets: ldata.pallets ? numerify(ldata.pallets, "$") : 0,
-      other: ldata.other ? numerify(ldata.other, "$") : 0,
-      totalcost: ldata.totalcost ? numerify(ldata.totalcost, "$") : 0,
-      interestrate: Number(ldata.interestrate.replace("%", "")) / 100,
-      interestdays: ldata.interestdays,
-      pricebeforeint: ldata.pricebeforeint
-        ? numerify(ldata.pricebeforeint, "$")
-        : 0,
-      salesinterest: ldata.salesinterest
-        ? numerify(ldata.salesinterest, "$")
-        : 0,
-      priceafterint: ldata.priceafterint
-        ? numerify(ldata.priceafterint, "$")
-        : 0,
-      profit: ldata.profit ? numerify(ldata.profit, "$") : 0,
-      margin: ldata.margin ? numerify(ldata.margin, "$") : 0,
-      turnover: ldata.turnover ? numerify(ldata.turnover, "$") : 0,
-      pctmargin: Number(ldata.pctmargin.replace("%", "")) / 100,
-      netback: ldata.netback ? numerify(ldata.netback, "$") : 0,
-    });
-    setQSOriginal({
-      ...QSOriginal,
-      warehouse: ldata.warehouseName ? ldata.warehouseName : "",
-      whentry: ldata.whentry ? ldata.whentry : "",
-      whexit: ldata.whexit ? ldata.whexit : "",
-      storagefixed: ldata.storagefixed ? ldata.storagefixed : "$ 0.00",
-      storagepmt: ldata.storagepmt ? ldata.storagepmt : "$ 0.00",
-      storagevariable: ldata.storagevariable ? ldata.storagevariable : "$ 0.00",
-      stggraceperiod: ldata.stggraceperiod ? ldata.stggraceperiod : "0",
-      stgaccrualperiod: ldata.stgaccrualperiod ? ldata.stgaccrualperiod : "0",
-      quantitypallets: ldata.quantitypallets ? ldata.quantitypallets : "",
-      KTP: ldata.KTP,
-      KTS: ldata.KTS,
-      QSDate: ldata.QSDate,
-      saleType: ldata.saleType,
-      QSID: ldata.QSID,
-      abbreviation: ldata.abbreviation,
-      supplier: ldata.supplier,
-      customer: ldata.customer,
-      packsize: ldata.packsize,
-      marks: ldata.marks,
-      from: ldata.from,
-      to: ldata.to,
-      POL: ldata.POL,
-      POD: ldata.POD,
-      saleComplete:
-        ldata.saleComplete === -1
-          ? "sold"
-          : ldata.saleComplete === 0
-          ? "indication"
-          : ldata.saleComplete === 1
-          ? "US Allocation"
-          : "",
-      TIC: ldata.trader,
-      traffic: ldata.traffic,
-      incoterms: ldata.incoterms,
-      paymentTerm: ldata.paymentTerm,
-      CADintrate: ldata.includedrate,
-      insurancerate: ldata.insurancerate,
-      insurancefactor: ldata.insurancefactor.toFixed(2),
-      CADdays: ldata.includedperiod,
-      shipmentType: ldata.shipmentType,
-      freightTotal: ldata.freightTotal ? ldata.freightTotal : "",
-      shippingline: ldata.shippingline,
-      payload: ldata.payload,
-      totalinspection: ldata.totalinspection ? ldata.totalinspection : "",
-      quantity: ldata.quantity,
-      materialcost: ldata.materialcost ? ldata.materialcost : "$ 0.00",
-      materialvalue: matvalue ? currencify(matvalue) : "$ 0.00",
-      generalduty: ldata.generalduty ? ldata.generalduty : "0.00%",
-      additionalduty: ldata.additionalduty ? ldata.additionalduty : "0.00%",
-      totalduty: totalduty ? totalduty + "%" : "0.00%",
-      dutyfee: dutyfee ? currencify(dutyfee) : "$ 0.00",
-      harborfeepct: ldata.harborfeepct ? ldata.harborfeepct : "0.00%",
-      harborfee: harborfee ? currencify(harborfee) : "$ 0.00",
-      merchprocfeepct: ldata.merchprocfeepct ? ldata.merchprocfeepct : "0.00%",
-      merchprocfee: merchprocfee ? currencify(merchprocfee) : "$ 0.00",
-      cflatfee: ldata.cflatfee ? ldata.cflatfee : "$ 0.00",
-      tsca: ldata.tsca ? ldata.tsca : "$ 0.00",
-      isf: ldata.isf ? ldata.isf : "$ 0.00",
-      totalcentryfee: totalcentryfee ? currencify(totalcentryfee) : "$ 0.00",
-      centryfeepmt: centryfeepmt ? currencify(centryfeepmt) : "$ 0.00",
-      drayage: ldata.drayage ? ldata.drayage : "$ 0.00",
-      unloading: ldata.unloading ? ldata.unloading : "$ 0.00",
-      collectcharges: ldata.collectcharges ? ldata.collectcharges : "$ 0.00",
-      inboundothers: ldata.inboundothers ? ldata.inboundothers : "$ 0.00",
-      totalinbound: totalinbound ? currencify(totalinbound) : "$ 0.00",
-      inboundpmt: inboundpmt ? currencify(inboundpmt) : "$ 0.00",
-      loading: ldata.loading ? ldata.loading : "$ 0.00",
-      bolcharges: ldata.bolcharges ? ldata.bolcharges : "$ 0.00",
-      outboundothers: ldata.outboundothers ? ldata.outboundothers : "$ 0.00",
-      totaloutbound: totaloutbound ? currencify(totaloutbound) : "$ 0.00",
-      outboundpmt: outboundpmt ? currencify(outboundpmt) : "$ 0.00",
-      pcommission: ldata.pcommission ? ldata.pcommission : "$ 0.00",
-      pfinancecost: ldata.pfinancecost ? ldata.pfinancecost : "$ 0.00",
-      sfinancecost: ldata.sfinancecost ? ldata.sfinancecost : "$ 0.00",
-      freightpmt: ldata.freightpmt ? ldata.freightpmt : "$ 0.00",
-      insurance: ldata.insurance ? ldata.insurance : "$ 0.00",
-      inspectionpmt: ldata.inspectionpmt ? ldata.inspectionpmt : "$ 0.00",
-      scommission: ldata.scommission ? ldata.scommission : "$ 0.00",
-      interestcost: ldata.interestcost ? ldata.interestcost : "$ 0.00",
-      legal: ldata.legal ? ldata.legal : "$ 0.00",
-      pallets: ldata.pallets ? ldata.pallets : "$ 0.00",
-      other: ldata.other ? ldata.other : "$ 0.00",
-      totalcost: ldata.totalcost ? ldata.totalcost : "$ 0.00",
-      interestrate: ldata.interestrate,
-      interestdays: ldata.interestdays,
-      pricebeforeint: ldata.pricebeforeint ? ldata.pricebeforeint : "$ 0.00",
-      salesinterest: ldata.salesinterest ? ldata.salesinterest : "$ 0.00",
-      priceafterint: ldata.priceafterint ? ldata.priceafterint : "$ 0.00",
-      profit: ldata.profit ? ldata.profit : "$ 0.00",
-      margin: ldata.margin ? ldata.margin : "$ 0.00",
-      turnover: ldata.turnover ? ldata.turnover : "$ 0.00",
-      pctmargin: ldata.pctmargin,
-      netback: ldata.netback ? ldata.netback : "$ 0.00",
-    });
-    setQSOriginalData({
-      ...QSOriginal,
-      warehouse: ldata.warehouseID ? ldata.warehouseID : "",
-      whentry: ldata.whentry ? ldata.whentry : "",
-      whexit: ldata.whexit ? ldata.whexit : "",
-      storagepmt: ldata.storagepmt ? numerify(ldata.storagepmt) : 0,
-      storagefixed: ldata.storagefixed ? numerify(ldata.storagefixed) : 0,
-      storagevariable: ldata.storagevariable
-        ? numerify(ldata.storagevariable)
-        : 0,
-      stggraceperiod: ldata.stggraceperiod ? ldata.stggraceperiod : 0,
-      stgaccrualperiod: ldata.stgaccrualperiod ? ldata.stgaccrualperiod : 0,
-      quantitypallets: ldata.quantitypallets ? ldata.quantitypallets : "",
-      KTP: ldata.KTP,
-      KTS: ldata.KTS,
-      QSDate: ldata.QSDate,
-      saleType: ldata.saleTypeID,
-      QSID: ldata.QSID,
-      abbreviation: ldata.productID,
-      supplier: ldata.supplierID,
-      customer: ldata.customerID,
-      packsize: ldata.packsize,
-      marks: ldata.marks,
-      from: ldata.from,
-      to: ldata.to,
-      POL: ldata.POLID,
-      POD: ldata.PODID,
-      saleComplete: ldata.saleComplete,
-      TIC: ldata.traderID,
-      traffic: ldata.trafficID,
-      incoterms: ldata.incoterms,
-      paymentTerm: ldata.pTermID,
-      CADintrate: Number(ldata.includedrate.replace("%", "")) / 100,
-      insurancerate: Number(ldata.insurancerate.replace("%", "")) / 100,
-      insurancefactor: ldata.insurancefactor,
-      CADdays: ldata.includedperiod,
-      shipmentType: ldata.shipmentTypeID ? ldata.shipmentTypeID : 1,
-      freightTotal: ldata.freightTotal ? numerify(ldata.freightTotal) : 0,
-      shippingline: ldata.shippingline,
-      payload: ldata.payload,
-      totalinspection: ldata.totalinspection
-        ? numerify(ldata.totalinspection)
-        : 0,
-      quantity: Number(ldata.quantity.replace(",", "")),
-      materialcost: ldata.materialcost ? numerify(ldata.materialcost) : 0,
-      materialvalue: matvalue ? matvalue : 0,
-      generalduty: ldata.generalduty
-        ? numerify(ldata.generalduty, "%") / 100
-        : 0,
-      additionalduty: ldata.additionalduty
-        ? numerify(ldata.additionalduty, "%") / 100
-        : 0,
-      totalduty: totalduty ? totalduty / 100 : 0,
-      dutyfee: dutyfee ? dutyfee : 0,
-      harborfeepct: ldata.harborfeepct
-        ? numerify(ldata.harborfeepct, "%") / 100
-        : 0,
-      harborfee: harborfee ? harborfee : 0,
-      merchprocfeepct: ldata.merchprocfeepct
-        ? numerify(ldata.merchprocfeepct, "%") / 100
-        : 0,
-      merchprocfee: merchprocfee ? merchprocfee : 0,
-      cflatfee: ldata.cflatfee ? numerify(ldata.cflatfee) : 0,
-      tsca: ldata.tsca ? numerify(ldata.tsca) : 0,
-      isf: ldata.isf ? numerify(ldata.isf) : 0,
-      totalcentryfee: totalcentryfee ? totalcentryfee : 0,
-      centryfeepmt: centryfeepmt ? centryfeepmt : 0,
-      drayage: ldata.drayage ? numerify(ldata.drayage) : 0,
-      unloading: ldata.unloading ? numerify(ldata.unloading) : 0,
-      collectcharges: ldata.collectcharges ? numerify(ldata.collectcharges) : 0,
-      inboundothers: ldata.inboundothers ? numerify(ldata.inboundothers) : 0,
-      totalinbound: totalinbound ? totalinbound : 0,
-      inboundpmt: inboundpmt ? inboundpmt : 0,
-      loading: ldata.loading ? numerify(ldata.loading) : 0,
-      bolcharges: ldata.bolcharges ? numerify(ldata.bolcharges) : 0,
-      outboundothers: ldata.outboundothers ? numerify(ldata.outboundothers) : 0,
-      totaloutbound: totaloutbound ? totaloutbound : 0,
-      outboundpmt: outboundpmt ? outboundpmt : 0,
-      pcommission: ldata.pcommission ? numerify(ldata.pcommission) : 0,
-      pfinancecost: ldata.pfinancecost ? numerify(ldata.pfinancecost) : 0,
-      sfinancecost: ldata.sfinancecost ? numerify(ldata.sfinancecost) : 0,
-      freightpmt: ldata.freightpmt ? numerify(ldata.freightpmt) : 0,
-      insurance: ldata.insurance ? numerify(ldata.insurance) : 0,
-      inspectionpmt: ldata.inspectionpmt ? numerify(ldata.inspectionpmt) : 0,
-      scommission: ldata.scommission ? numerify(ldata.scommission) : 0,
-      interestcost: ldata.interestcost ? numerify(ldata.interestcost) : 0,
-      legal: ldata.legal ? numerify(ldata.legal) : 0,
-      pallets: ldata.pallets ? numerify(ldata.pallets) : 0,
-      other: ldata.other ? numerify(ldata.other) : 0,
-      interestrate: Number(ldata.interestrate.replace("%", "")) / 100,
-      interestdays: ldata.interestdays,
-      pricebeforeint: ldata.pricebeforeint ? numerify(ldata.pricebeforeint) : 0,
-      salesinterest: ldata.salesinterest ? numerify(ldata.salesinterest) : 0,
-      priceafterint: ldata.priceafterint ? numerify(ldata.priceafterint) : 0,
-    });
-    if (ldata.saleComplete === -1) {
-      setSold(true);
-      setAllocated(false);
-    }
-    if (ldata.saleComplete === 1) {
-      setAllocated(true);
-      setSold(false);
-    }
-    if (ldata.saleComplete === 0) {
-      setSold(false);
-      setAllocated(false);
-    }
-    // Finish loading
-    await doneloading();
-  };
+  //   // await setvalues(
+  //   //   ldata,
+  //   //   check,
+  //   //   exrate,
+  //   //   outboundpmt,
+  //   //   totaloutbound,
+  //   //   inboundpmt,
+  //   //   totalinbound,
+  //   //   centryfeepmt,
+  //   //   totalcentryfee,
+  //   //   merchprocfee,
+  //   //   harborfee,
+  //   //   dutyfee,
+  //   //   matvalue,
+  //   //   totalduty
+  //   // );
+  //   setQSValues({
+  //     ...QSValues,
+  //     warehouse: ldata.warehouseName ? ldata.warehouseName : "",
+  //     whentry: ldata.whentry ? ldata.whentry : "",
+  //     whexit: ldata.whexit ? ldata.whexit : "",
+  //     storagepmt:
+  //       check && inEuros && ldata.storagepmt
+  //         ? numcurrex(ldata.storagepmt, exrate)
+  //         : check && inEuros && !ldata.storagepmt
+  //         ? "€ 0.00"
+  //         : ldata.storagepmt,
+  //     storagefixed:
+  //       check && inEuros && ldata.storagefixed
+  //         ? numcurrex(ldata.storagefixed, exrate)
+  //         : check && inEuros && !ldata.storagefixed
+  //         ? "€ 0.00"
+  //         : ldata.storagefixed,
+  //     storagevariable:
+  //       check && inEuros && ldata.storagevariable
+  //         ? numcurrex(ldata.storagevariable, exrate)
+  //         : check && inEuros && !ldata.storagevariable
+  //         ? "€ 0.00"
+  //         : ldata.storagevariable,
+  //     stggraceperiod: ldata.stggraceperiod ? ldata.stggraceperiod : "0",
+  //     stgaccrualperiod: ldata.stgaccrualperiod ? ldata.stgaccrualperiod : "0",
+  //     quantitypallets: ldata.quantitypallets ? ldata.quantitypallets : "",
+  //     KTP: ldata.KTP,
+  //     KTS: ldata.KTS,
+  //     QSDate: ldata.QSDate,
+  //     saleType: ldata.saleType,
+  //     QSID: ldata.QSID,
+  //     abbreviation: ldata.abbreviation,
+  //     supplier: ldata.supplier,
+  //     customer: ldata.customer,
+  //     packsize: ldata.packsize,
+  //     marks: ldata.marks,
+  //     from: ldata.from,
+  //     to: ldata.to,
+  //     POL: ldata.POL,
+  //     POD: ldata.POD,
+  //     saleComplete:
+  //       ldata.saleComplete === -1
+  //         ? "sold"
+  //         : ldata.saleComplete === 0
+  //         ? "indication"
+  //         : ldata.saleComplete === 1
+  //         ? "US Allocation"
+  //         : "",
+  //     TIC: ldata.trader,
+  //     traffic: ldata.traffic,
+  //     incoterms: ldata.incoterms,
+  //     paymentTerm: ldata.paymentTerm,
+  //     CADintrate: ldata.includedrate,
+  //     insurancerate: ldata.insurancerate,
+  //     insurancefactor: ldata.insurancefactor.toFixed(2),
+  //     CADdays: ldata.includedperiod,
+  //     shipmentType: ldata.shipmentType ? ldata.shipmentType : "Container",
+  //     freightTotal:
+  //       check && inEuros && ldata.freightTotal
+  //         ? numcurrex(ldata.freightTotal, exrate)
+  //         : check && inEuros && !ldata.freightTotal
+  //         ? "€ 0.00"
+  //         : ldata.freightTotal,
+  //     shippingline: ldata.shippingline,
+  //     payload: ldata.payload,
+  //     totalinspection:
+  //       check && inEuros && ldata.totalinspection
+  //         ? numcurrex(ldata.totalinspection, exrate)
+  //         : check && inEuros && !ldata.totalinspection
+  //         ? "€ 0.00"
+  //         : ldata.totalinspection,
+  //     quantity: ldata.quantity,
+  //     materialcost:
+  //       check && inEuros && ldata.materialcost
+  //         ? numcurrex(ldata.materialcost, exrate)
+  //         : check && inEuros && !ldata.materialcost
+  //         ? "€ 0.00"
+  //         : ldata.materialcost,
+  //     materialvalue:
+  //       check && inEuros && matvalue
+  //         ? numcurrex(matvalue.toFixed(2), exrate)
+  //         : check && inEuros && !matvalue
+  //         ? "€ 0.00"
+  //         : currencify(matvalue, "$", 2),
+  //     generalduty: ldata.generalduty ? ldata.generalduty : "0.00%",
+  //     additionalduty: ldata.additionalduty ? ldata.additionalduty : "0.00%",
+  //     totalduty: totalduty ? totalduty + "%" : "0.00%",
+  //     dutyfee:
+  //       check && inEuros && dutyfee
+  //         ? numcurrex(dutyfee.toFixed(2), exrate)
+  //         : check && inEuros && !dutyfee
+  //         ? "€ 0.00"
+  //         : currencify(dutyfee, "$", 2),
+  //     harborfeepct: ldata.harborfeepct ? ldata.harborfeepct : "0.00%",
+  //     harborfee:
+  //       check && inEuros && harborfee
+  //         ? numcurrex(harborfee.toFixed(2), exrate)
+  //         : check && inEuros && !harborfee
+  //         ? "€ 0.00"
+  //         : currencify(harborfee, "$", 2),
+  //     merchprocfeepct: ldata.merchprocfeepct ? ldata.merchprocfeepct : "0.00%",
+  //     merchprocfee:
+  //       check && inEuros && merchprocfee
+  //         ? numcurrex(merchprocfee.toFixed(2), exrate)
+  //         : check && inEuros && !merchprocfee
+  //         ? "€ 0.00"
+  //         : currencify(merchprocfee, "$", 2),
+  //     cflatfee:
+  //       check && inEuros && ldata.cflatfee
+  //         ? numcurrex(ldata.cflatfee, exrate)
+  //         : check && inEuros && !ldata.cflatfee
+  //         ? "€ 0.00"
+  //         : ldata.cflatfee,
+  //     tsca:
+  //       check && inEuros && ldata.tsca
+  //         ? numcurrex(ldata.tsca, exrate)
+  //         : check && inEuros && !ldata.tsca
+  //         ? "€ 0.00"
+  //         : ldata.tsca,
+  //     isf:
+  //       check && inEuros && ldata.isf
+  //         ? numcurrex(ldata.isf, exrate)
+  //         : check && inEuros && !ldata.isf
+  //         ? "€ 0.00"
+  //         : ldata.isf,
+  //     totalcentryfee:
+  //       check && inEuros && totalcentryfee
+  //         ? numcurrex(totalcentryfee.toFixed(2), exrate)
+  //         : check && inEuros && !totalcentryfee
+  //         ? "€ 0.00"
+  //         : currencify(totalcentryfee, "$", 2),
+  //     centryfeepmt:
+  //       check && inEuros && centryfeepmt
+  //         ? numcurrex(centryfeepmt.toFixed(2), exrate)
+  //         : check && inEuros && !centryfeepmt
+  //         ? "€ 0.00"
+  //         : currencify(centryfeepmt, "$", 2),
+  //     drayage:
+  //       check && inEuros && ldata.drayage
+  //         ? numcurrex(ldata.drayage, exrate)
+  //         : check && inEuros && !ldata.drayage
+  //         ? "€ 0.00"
+  //         : ldata.drayage,
+  //     unloading:
+  //       check && inEuros && ldata.unloading
+  //         ? numcurrex(ldata.unloading, exrate)
+  //         : check && inEuros && !ldata.unloading
+  //         ? "€ 0.00"
+  //         : ldata.unloading,
+  //     collectcharges:
+  //       check && inEuros && ldata.collectcharges
+  //         ? numcurrex(ldata.collectcharges, exrate)
+  //         : check && inEuros && !ldata.collectcharges
+  //         ? "€ 0.00"
+  //         : ldata.collectcharges,
+  //     inboundothers:
+  //       check && inEuros && ldata.inboundothers
+  //         ? numcurrex(ldata.inboundothers, exrate)
+  //         : check && inEuros && !ldata.inboundothers
+  //         ? "€ 0.00"
+  //         : ldata.inboundothers,
+  //     totalinbound:
+  //       check && inEuros && totalinbound
+  //         ? numcurrex(totalinbound.toFixed(2), exrate)
+  //         : check && inEuros && !totalinbound
+  //         ? "€ 0.00"
+  //         : currencify(totalinbound, "$", 2),
+  //     inboundpmt:
+  //       check && inEuros && inboundpmt
+  //         ? numcurrex(inboundpmt.toFixed(2), exrate)
+  //         : check && inEuros && !inboundpmt
+  //         ? "€ 0.00"
+  //         : currencify(inboundpmt, "$", 2),
+  //     loading:
+  //       check && inEuros && ldata.loading
+  //         ? numcurrex(ldata.loading, exrate)
+  //         : check && inEuros && !ldata.loading
+  //         ? "€ 0.00"
+  //         : ldata.loading,
+  //     bolcharges:
+  //       check && inEuros && ldata.bolcharges
+  //         ? numcurrex(ldata.bolcharges, exrate)
+  //         : check && inEuros && !ldata.bolcharges
+  //         ? "€ 0.00"
+  //         : ldata.bolcharges,
+  //     outboundothers:
+  //       check && inEuros && ldata.outboundothers
+  //         ? numcurrex(ldata.outboundothers, exrate)
+  //         : check && inEuros && !ldata.outboundothers
+  //         ? "€ 0.00"
+  //         : ldata.outboundothers,
+  //     totaloutbound:
+  //       check && inEuros && totaloutbound
+  //         ? numcurrex(totaloutbound.toFixed(2), exrate)
+  //         : check && inEuros && !totaloutbound
+  //         ? "€ 0.00"
+  //         : currencify(totaloutbound, "$", 2),
+  //     outboundpmt:
+  //       check && inEuros && outboundpmt
+  //         ? numcurrex(outboundpmt.toFixed(2), exrate)
+  //         : check && inEuros && !outboundpmt
+  //         ? "€ 0.00"
+  //         : currencify(outboundpmt, "$", 2),
+  //     pcommission:
+  //       check && inEuros && ldata.pcommission
+  //         ? numcurrex(ldata.pcommission, exrate)
+  //         : check && inEuros && !ldata.pcommission
+  //         ? "€ 0.00"
+  //         : ldata.pcommission,
+  //     pfinancecost:
+  //       check && inEuros && ldata.pfinancecost
+  //         ? numcurrex(ldata.pfinancecost, exrate)
+  //         : check && inEuros && !ldata.pfinancecost
+  //         ? "€ 0.00"
+  //         : ldata.pfinancecost,
+  //     sfinancecost:
+  //       check && inEuros && ldata.sfinancecost
+  //         ? numcurrex(ldata.sfinancecost, exrate)
+  //         : check && inEuros && !ldata.sfinancecost
+  //         ? "€ 0.00"
+  //         : ldata.sfinancecost,
+  //     freightpmt:
+  //       check && inEuros && ldata.freightpmt
+  //         ? numcurrex(ldata.freightpmt, exrate)
+  //         : check && inEuros && !ldata.freightpmt
+  //         ? "€ 0.00"
+  //         : ldata.freightpmt,
+  //     insurance:
+  //       check && inEuros && ldata.insurance
+  //         ? numcurrex(ldata.insurance, exrate)
+  //         : check && inEuros && !ldata.insurance
+  //         ? "€ 0.00"
+  //         : ldata.insurance,
+  //     inspectionpmt:
+  //       check && inEuros && ldata.inspectionpmt
+  //         ? numcurrex(ldata.inspectionpmt, exrate)
+  //         : check && inEuros && !ldata.inspectionpmt
+  //         ? "€ 0.00"
+  //         : ldata.inspectionpmt,
+  //     scommission:
+  //       check && inEuros && ldata.scommission
+  //         ? numcurrex(ldata.scommission, exrate)
+  //         : check && inEuros && !ldata.scommission
+  //         ? "€ 0.00"
+  //         : ldata.scommission,
+  //     interestcost:
+  //       check && inEuros && ldata.interestcost
+  //         ? numcurrex(ldata.interestcost, exrate)
+  //         : check && inEuros && !ldata.interestcost
+  //         ? "€ 0.00"
+  //         : ldata.interestcost,
+  //     legal:
+  //       check && inEuros && ldata.legal
+  //         ? numcurrex(ldata.legal, exrate)
+  //         : check && inEuros && !ldata.legal
+  //         ? "€ 0.00"
+  //         : ldata.legal,
+  //     pallets:
+  //       check && inEuros && ldata.pallets
+  //         ? numcurrex(ldata.pallets, exrate)
+  //         : check && inEuros && !ldata.pallets
+  //         ? "€ 0.00"
+  //         : ldata.pallets,
+  //     other:
+  //       check && inEuros && ldata.other
+  //         ? numcurrex(ldata.other, exrate)
+  //         : check && inEuros && !ldata.other
+  //         ? "€ 0.00"
+  //         : ldata.other,
+  //     totalcost:
+  //       check && inEuros && ldata.totalcost
+  //         ? numcurrex(ldata.totalcost, exrate)
+  //         : check && inEuros && !ldata.totalcost
+  //         ? "€ 0.00"
+  //         : ldata.totalcost,
+  //     interestrate: ldata.interestrate,
+  //     interestdays: ldata.interestdays,
+  //     pricebeforeint:
+  //       check && inEuros && ldata.pricebeforeint
+  //         ? numcurrex(ldata.pricebeforeint, exrate)
+  //         : check && inEuros && !ldata.pricebeforeint
+  //         ? "€ 0.00"
+  //         : ldata.pricebeforeint,
+  //     salesinterest:
+  //       check && inEuros && ldata.salesinterest
+  //         ? numcurrex(ldata.salesinterest, exrate)
+  //         : check && inEuros && !ldata.salesinterest
+  //         ? "€ 0.00"
+  //         : ldata.salesinterest,
+  //     priceafterint:
+  //       check && inEuros && ldata.priceafterint
+  //         ? numcurrex(ldata.priceafterint, exrate)
+  //         : check && inEuros && !ldata.priceafterint
+  //         ? "€ 0.00"
+  //         : ldata.priceafterint,
+  //     profit:
+  //       check && inEuros && ldata.profit
+  //         ? numcurrex(ldata.profit, exrate)
+  //         : check && inEuros && !ldata.pricebeforeint
+  //         ? "€ 0.00"
+  //         : ldata.profit,
+  //     margin:
+  //       check && inEuros && ldata.margin
+  //         ? numcurrex(ldata.margin, exrate)
+  //         : check && inEuros && !ldata.margin
+  //         ? "€ 0.00"
+  //         : ldata.margin,
+  //     turnover:
+  //       check && inEuros && ldata.turnover
+  //         ? numcurrex(ldata.turnover, exrate)
+  //         : check && inEuros && !ldata.turnover
+  //         ? "€ 0.00"
+  //         : ldata.turnover,
+  //     pctmargin: check && ldata.pctmargin ? ldata.pctmargin : "0.00%",
+  //     netback:
+  //       check && inEuros && ldata.netback
+  //         ? numcurrex(ldata.netback, exrate)
+  //         : check && inEuros && !ldata.netback
+  //         ? "€ 0.00"
+  //         : ldata.netback,
+  //   });
+  //   setQSData({
+  //     ...QSData,
+  //     warehouse: ldata.warehouseID ? ldata.warehouseID : "",
+  //     whentry: ldata.whentry ? ldata.whentry : "",
+  //     whexit: ldata.whexit ? ldata.whexit : "",
+  //     storagepmt: ldata.storagepmt ? numerify(ldata.storagepmt, "$") : 0,
+  //     storagefixed: ldata.storagefixed ? numerify(ldata.storagefixed, "$") : 0,
+  //     storagevariable: ldata.storagevariable
+  //       ? numerify(ldata.storagevariable, "$")
+  //       : 0,
+  //     stggraceperiod: ldata.stggraceperiod ? ldata.stggraceperiod : 0,
+  //     stgaccrualperiod: ldata.stgaccrualperiod ? ldata.stgaccrualperiod : 0,
+  //     quantitypallets: ldata.quantitypallets ? ldata.quantitypallets : "",
+  //     KTP: ldata.KTP,
+  //     KTS: ldata.KTS,
+  //     QSDate: ldata.QSDate,
+  //     saleType: ldata.saleTypeID,
+  //     QSID: ldata.QSID,
+  //     abbreviation: ldata.productID,
+  //     supplier: ldata.supplierID,
+  //     customer: ldata.customerID,
+  //     packsize: ldata.packsize,
+  //     marks: ldata.marks,
+  //     from: ldata.from,
+  //     to: ldata.to,
+  //     POL: ldata.POLID,
+  //     POD: ldata.PODID,
+  //     saleComplete: ldata.saleComplete,
+  //     TIC: ldata.traderID,
+  //     traffic: ldata.trafficID,
+  //     incoterms: ldata.incoterms,
+  //     paymentTerm: ldata.pTermID,
+  //     CADintrate: Number(ldata.includedrate.replace("%", "")) / 100,
+  //     insurancerate: Number(ldata.insurancerate.replace("%", "")) / 100,
+  //     insurancefactor: ldata.insurancefactor,
+  //     CADdays: ldata.includedperiod,
+  //     shipmentType: ldata.shipmentTypeID ? ldata.shipmentTypeID : 1,
+  //     freightTotal: ldata.freightTotal ? numerify(ldata.freightTotal, "$") : 0,
+  //     shippingline: ldata.shippingline,
+  //     payload: ldata.payload,
+  //     totalinspection: ldata.totalinspection
+  //       ? numerify(ldata.totalinspection, "$")
+  //       : 0,
+  //     quantity: Number(ldata.quantity.replace(",", "")),
+  //     materialcost: ldata.materialcost ? numerify(ldata.materialcost, "$") : 0,
+  //     materialvalue: matvalue ? matvalue : 0,
+  //     generalduty: ldata.generalduty
+  //       ? Number(ldata.generalduty.replace("%", "")) / 100
+  //       : 0,
+  //     additionalduty: ldata.additionalduty
+  //       ? Number(ldata.additionalduty.replace("%", "")) / 100
+  //       : 0,
+  //     totalduty: totalduty ? totalduty / 100 : 0,
+  //     dutyfee: dutyfee ? dutyfee : 0,
+  //     harborfeepct: ldata.harborfeepct
+  //       ? Number(ldata.harborfeepct.replace("%", "")) / 100
+  //       : 0,
+  //     harborfee: harborfee ? harborfee : 0,
+  //     merchprocfeepct: ldata.merchprocfeepct
+  //       ? Number(ldata.merchprocfeepct.replace("%", "")) / 100
+  //       : 0,
+  //     merchprocfee: merchprocfee ? merchprocfee : 0,
+  //     cflatfee: ldata.cflatfee ? numerify(ldata.cflatfee, "$") : 0,
+  //     tsca: ldata.tsca ? numerify(ldata.tsca, "$") : 0,
+  //     isf: ldata.isf ? numerify(ldata.isf, "$") : 0,
+  //     totalcentryfee: totalcentryfee ? totalcentryfee : 0,
+  //     centryfeepmt: centryfeepmt ? centryfeepmt : 0,
+  //     drayage: ldata.drayage ? numerify(ldata.drayage, "$") : 0,
+  //     unloading: ldata.unloading ? numerify(ldata.unloading, "$") : 0,
+  //     collectcharges: ldata.collectcharges
+  //       ? numerify(ldata.collectcharges, "$")
+  //       : 0,
+  //     inboundothers: ldata.inboundothers
+  //       ? numerify(ldata.inboundothers, "$")
+  //       : 0,
+  //     totalinbound: totalinbound ? totalinbound : 0,
+  //     inboundpmt: inboundpmt ? inboundpmt : 0,
+  //     loading: ldata.loading ? numerify(ldata.loading, "$") : 0,
+  //     bolcharges: ldata.bolcharges ? numerify(ldata.bolcharges, "$") : 0,
+  //     outboundothers: ldata.outboundothers
+  //       ? numerify(ldata.outboundothers, "$")
+  //       : 0,
+  //     totaloutbound: totaloutbound ? totaloutbound : 0,
+  //     outboundpmt: outboundpmt ? outboundpmt : 0,
+  //     pcommission: ldata.pcommission ? numerify(ldata.pcommission, "$") : 0,
+  //     pfinancecost: ldata.pfinancecost ? numerify(ldata.pfinancecost, "$") : 0,
+  //     sfinancecost: ldata.sfinancecost ? numerify(ldata.sfinancecost, "$") : 0,
+  //     freightpmt: ldata.freightpmt ? numerify(ldata.freightpmt, "$") : 0,
+  //     insurance: ldata.insurance ? numerify(ldata.insurance, "$") : 0,
+  //     inspectionpmt: ldata.inspectionpmt
+  //       ? numerify(ldata.inspectionpmt, "$")
+  //       : 0,
+  //     scommission: ldata.scommission ? numerify(ldata.scommission, "$") : 0,
+  //     interestcost: ldata.interestcost ? numerify(ldata.interestcost, "$") : 0,
+  //     legal: ldata.legal ? numerify(ldata.legal, "$") : 0,
+  //     pallets: ldata.pallets ? numerify(ldata.pallets, "$") : 0,
+  //     other: ldata.other ? numerify(ldata.other, "$") : 0,
+  //     totalcost: ldata.totalcost ? numerify(ldata.totalcost, "$") : 0,
+  //     interestrate: Number(ldata.interestrate.replace("%", "")) / 100,
+  //     interestdays: ldata.interestdays,
+  //     pricebeforeint: ldata.pricebeforeint
+  //       ? numerify(ldata.pricebeforeint, "$")
+  //       : 0,
+  //     salesinterest: ldata.salesinterest
+  //       ? numerify(ldata.salesinterest, "$")
+  //       : 0,
+  //     priceafterint: ldata.priceafterint
+  //       ? numerify(ldata.priceafterint, "$")
+  //       : 0,
+  //     profit: ldata.profit ? numerify(ldata.profit, "$") : 0,
+  //     margin: ldata.margin ? numerify(ldata.margin, "$") : 0,
+  //     turnover: ldata.turnover ? numerify(ldata.turnover, "$") : 0,
+  //     pctmargin: Number(ldata.pctmargin.replace("%", "")) / 100,
+  //     netback: ldata.netback ? numerify(ldata.netback, "$") : 0,
+  //   });
+  //   setQSOriginal({
+  //     ...QSOriginal,
+  //     warehouse: ldata.warehouseName ? ldata.warehouseName : "",
+  //     whentry: ldata.whentry ? ldata.whentry : "",
+  //     whexit: ldata.whexit ? ldata.whexit : "",
+  //     storagefixed: ldata.storagefixed ? ldata.storagefixed : "$ 0.00",
+  //     storagepmt: ldata.storagepmt ? ldata.storagepmt : "$ 0.00",
+  //     storagevariable: ldata.storagevariable ? ldata.storagevariable : "$ 0.00",
+  //     stggraceperiod: ldata.stggraceperiod ? ldata.stggraceperiod : "0",
+  //     stgaccrualperiod: ldata.stgaccrualperiod ? ldata.stgaccrualperiod : "0",
+  //     quantitypallets: ldata.quantitypallets ? ldata.quantitypallets : "",
+  //     KTP: ldata.KTP,
+  //     KTS: ldata.KTS,
+  //     QSDate: ldata.QSDate,
+  //     saleType: ldata.saleType,
+  //     QSID: ldata.QSID,
+  //     abbreviation: ldata.abbreviation,
+  //     supplier: ldata.supplier,
+  //     customer: ldata.customer,
+  //     packsize: ldata.packsize,
+  //     marks: ldata.marks,
+  //     from: ldata.from,
+  //     to: ldata.to,
+  //     POL: ldata.POL,
+  //     POD: ldata.POD,
+  //     saleComplete:
+  //       ldata.saleComplete === -1
+  //         ? "sold"
+  //         : ldata.saleComplete === 0
+  //         ? "indication"
+  //         : ldata.saleComplete === 1
+  //         ? "US Allocation"
+  //         : "",
+  //     TIC: ldata.trader,
+  //     traffic: ldata.traffic,
+  //     incoterms: ldata.incoterms,
+  //     paymentTerm: ldata.paymentTerm,
+  //     CADintrate: ldata.includedrate,
+  //     insurancerate: ldata.insurancerate,
+  //     insurancefactor: ldata.insurancefactor.toFixed(2),
+  //     CADdays: ldata.includedperiod,
+  //     shipmentType: ldata.shipmentType,
+  //     freightTotal: ldata.freightTotal ? ldata.freightTotal : "",
+  //     shippingline: ldata.shippingline,
+  //     payload: ldata.payload,
+  //     totalinspection: ldata.totalinspection ? ldata.totalinspection : "",
+  //     quantity: ldata.quantity,
+  //     materialcost: ldata.materialcost ? ldata.materialcost : "$ 0.00",
+  //     materialvalue: matvalue ? currencify(matvalue) : "$ 0.00",
+  //     generalduty: ldata.generalduty ? ldata.generalduty : "0.00%",
+  //     additionalduty: ldata.additionalduty ? ldata.additionalduty : "0.00%",
+  //     totalduty: totalduty ? totalduty + "%" : "0.00%",
+  //     dutyfee: dutyfee ? currencify(dutyfee) : "$ 0.00",
+  //     harborfeepct: ldata.harborfeepct ? ldata.harborfeepct : "0.00%",
+  //     harborfee: harborfee ? currencify(harborfee) : "$ 0.00",
+  //     merchprocfeepct: ldata.merchprocfeepct ? ldata.merchprocfeepct : "0.00%",
+  //     merchprocfee: merchprocfee ? currencify(merchprocfee) : "$ 0.00",
+  //     cflatfee: ldata.cflatfee ? ldata.cflatfee : "$ 0.00",
+  //     tsca: ldata.tsca ? ldata.tsca : "$ 0.00",
+  //     isf: ldata.isf ? ldata.isf : "$ 0.00",
+  //     totalcentryfee: totalcentryfee ? currencify(totalcentryfee) : "$ 0.00",
+  //     centryfeepmt: centryfeepmt ? currencify(centryfeepmt) : "$ 0.00",
+  //     drayage: ldata.drayage ? ldata.drayage : "$ 0.00",
+  //     unloading: ldata.unloading ? ldata.unloading : "$ 0.00",
+  //     collectcharges: ldata.collectcharges ? ldata.collectcharges : "$ 0.00",
+  //     inboundothers: ldata.inboundothers ? ldata.inboundothers : "$ 0.00",
+  //     totalinbound: totalinbound ? currencify(totalinbound) : "$ 0.00",
+  //     inboundpmt: inboundpmt ? currencify(inboundpmt) : "$ 0.00",
+  //     loading: ldata.loading ? ldata.loading : "$ 0.00",
+  //     bolcharges: ldata.bolcharges ? ldata.bolcharges : "$ 0.00",
+  //     outboundothers: ldata.outboundothers ? ldata.outboundothers : "$ 0.00",
+  //     totaloutbound: totaloutbound ? currencify(totaloutbound) : "$ 0.00",
+  //     outboundpmt: outboundpmt ? currencify(outboundpmt) : "$ 0.00",
+  //     pcommission: ldata.pcommission ? ldata.pcommission : "$ 0.00",
+  //     pfinancecost: ldata.pfinancecost ? ldata.pfinancecost : "$ 0.00",
+  //     sfinancecost: ldata.sfinancecost ? ldata.sfinancecost : "$ 0.00",
+  //     freightpmt: ldata.freightpmt ? ldata.freightpmt : "$ 0.00",
+  //     insurance: ldata.insurance ? ldata.insurance : "$ 0.00",
+  //     inspectionpmt: ldata.inspectionpmt ? ldata.inspectionpmt : "$ 0.00",
+  //     scommission: ldata.scommission ? ldata.scommission : "$ 0.00",
+  //     interestcost: ldata.interestcost ? ldata.interestcost : "$ 0.00",
+  //     legal: ldata.legal ? ldata.legal : "$ 0.00",
+  //     pallets: ldata.pallets ? ldata.pallets : "$ 0.00",
+  //     other: ldata.other ? ldata.other : "$ 0.00",
+  //     totalcost: ldata.totalcost ? ldata.totalcost : "$ 0.00",
+  //     interestrate: ldata.interestrate,
+  //     interestdays: ldata.interestdays,
+  //     pricebeforeint: ldata.pricebeforeint ? ldata.pricebeforeint : "$ 0.00",
+  //     salesinterest: ldata.salesinterest ? ldata.salesinterest : "$ 0.00",
+  //     priceafterint: ldata.priceafterint ? ldata.priceafterint : "$ 0.00",
+  //     profit: ldata.profit ? ldata.profit : "$ 0.00",
+  //     margin: ldata.margin ? ldata.margin : "$ 0.00",
+  //     turnover: ldata.turnover ? ldata.turnover : "$ 0.00",
+  //     pctmargin: ldata.pctmargin,
+  //     netback: ldata.netback ? ldata.netback : "$ 0.00",
+  //   });
+  //   setQSOriginalData({
+  //     ...QSOriginal,
+  //     warehouse: ldata.warehouseID ? ldata.warehouseID : "",
+  //     whentry: ldata.whentry ? ldata.whentry : "",
+  //     whexit: ldata.whexit ? ldata.whexit : "",
+  //     storagepmt: ldata.storagepmt ? numerify(ldata.storagepmt) : 0,
+  //     storagefixed: ldata.storagefixed ? numerify(ldata.storagefixed) : 0,
+  //     storagevariable: ldata.storagevariable
+  //       ? numerify(ldata.storagevariable)
+  //       : 0,
+  //     stggraceperiod: ldata.stggraceperiod ? ldata.stggraceperiod : 0,
+  //     stgaccrualperiod: ldata.stgaccrualperiod ? ldata.stgaccrualperiod : 0,
+  //     quantitypallets: ldata.quantitypallets ? ldata.quantitypallets : "",
+  //     KTP: ldata.KTP,
+  //     KTS: ldata.KTS,
+  //     QSDate: ldata.QSDate,
+  //     saleType: ldata.saleTypeID,
+  //     QSID: ldata.QSID,
+  //     abbreviation: ldata.productID,
+  //     supplier: ldata.supplierID,
+  //     customer: ldata.customerID,
+  //     packsize: ldata.packsize,
+  //     marks: ldata.marks,
+  //     from: ldata.from,
+  //     to: ldata.to,
+  //     POL: ldata.POLID,
+  //     POD: ldata.PODID,
+  //     saleComplete: ldata.saleComplete,
+  //     TIC: ldata.traderID,
+  //     traffic: ldata.trafficID,
+  //     incoterms: ldata.incoterms,
+  //     paymentTerm: ldata.pTermID,
+  //     CADintrate: Number(ldata.includedrate.replace("%", "")) / 100,
+  //     insurancerate: Number(ldata.insurancerate.replace("%", "")) / 100,
+  //     insurancefactor: ldata.insurancefactor,
+  //     CADdays: ldata.includedperiod,
+  //     shipmentType: ldata.shipmentTypeID ? ldata.shipmentTypeID : 1,
+  //     freightTotal: ldata.freightTotal ? numerify(ldata.freightTotal) : 0,
+  //     shippingline: ldata.shippingline,
+  //     payload: ldata.payload,
+  //     totalinspection: ldata.totalinspection
+  //       ? numerify(ldata.totalinspection)
+  //       : 0,
+  //     quantity: Number(ldata.quantity.replace(",", "")),
+  //     materialcost: ldata.materialcost ? numerify(ldata.materialcost) : 0,
+  //     materialvalue: matvalue ? matvalue : 0,
+  //     generalduty: ldata.generalduty
+  //       ? numerify(ldata.generalduty, "%") / 100
+  //       : 0,
+  //     additionalduty: ldata.additionalduty
+  //       ? numerify(ldata.additionalduty, "%") / 100
+  //       : 0,
+  //     totalduty: totalduty ? totalduty / 100 : 0,
+  //     dutyfee: dutyfee ? dutyfee : 0,
+  //     harborfeepct: ldata.harborfeepct
+  //       ? numerify(ldata.harborfeepct, "%") / 100
+  //       : 0,
+  //     harborfee: harborfee ? harborfee : 0,
+  //     merchprocfeepct: ldata.merchprocfeepct
+  //       ? numerify(ldata.merchprocfeepct, "%") / 100
+  //       : 0,
+  //     merchprocfee: merchprocfee ? merchprocfee : 0,
+  //     cflatfee: ldata.cflatfee ? numerify(ldata.cflatfee) : 0,
+  //     tsca: ldata.tsca ? numerify(ldata.tsca) : 0,
+  //     isf: ldata.isf ? numerify(ldata.isf) : 0,
+  //     totalcentryfee: totalcentryfee ? totalcentryfee : 0,
+  //     centryfeepmt: centryfeepmt ? centryfeepmt : 0,
+  //     drayage: ldata.drayage ? numerify(ldata.drayage) : 0,
+  //     unloading: ldata.unloading ? numerify(ldata.unloading) : 0,
+  //     collectcharges: ldata.collectcharges ? numerify(ldata.collectcharges) : 0,
+  //     inboundothers: ldata.inboundothers ? numerify(ldata.inboundothers) : 0,
+  //     totalinbound: totalinbound ? totalinbound : 0,
+  //     inboundpmt: inboundpmt ? inboundpmt : 0,
+  //     loading: ldata.loading ? numerify(ldata.loading) : 0,
+  //     bolcharges: ldata.bolcharges ? numerify(ldata.bolcharges) : 0,
+  //     outboundothers: ldata.outboundothers ? numerify(ldata.outboundothers) : 0,
+  //     totaloutbound: totaloutbound ? totaloutbound : 0,
+  //     outboundpmt: outboundpmt ? outboundpmt : 0,
+  //     pcommission: ldata.pcommission ? numerify(ldata.pcommission) : 0,
+  //     pfinancecost: ldata.pfinancecost ? numerify(ldata.pfinancecost) : 0,
+  //     sfinancecost: ldata.sfinancecost ? numerify(ldata.sfinancecost) : 0,
+  //     freightpmt: ldata.freightpmt ? numerify(ldata.freightpmt) : 0,
+  //     insurance: ldata.insurance ? numerify(ldata.insurance) : 0,
+  //     inspectionpmt: ldata.inspectionpmt ? numerify(ldata.inspectionpmt) : 0,
+  //     scommission: ldata.scommission ? numerify(ldata.scommission) : 0,
+  //     interestcost: ldata.interestcost ? numerify(ldata.interestcost) : 0,
+  //     legal: ldata.legal ? numerify(ldata.legal) : 0,
+  //     pallets: ldata.pallets ? numerify(ldata.pallets) : 0,
+  //     other: ldata.other ? numerify(ldata.other) : 0,
+  //     interestrate: Number(ldata.interestrate.replace("%", "")) / 100,
+  //     interestdays: ldata.interestdays,
+  //     pricebeforeint: ldata.pricebeforeint ? numerify(ldata.pricebeforeint) : 0,
+  //     salesinterest: ldata.salesinterest ? numerify(ldata.salesinterest) : 0,
+  //     priceafterint: ldata.priceafterint ? numerify(ldata.priceafterint) : 0,
+  //   });
+  //   if (ldata.saleComplete === -1) {
+  //     setSold(true);
+  //     setAllocated(false);
+  //   }
+  //   if (ldata.saleComplete === 1) {
+  //     setAllocated(true);
+  //     setSold(false);
+  //   }
+  //   if (ldata.saleComplete === 0) {
+  //     setSold(false);
+  //     setAllocated(false);
+  //   }
+  //   // Finish loading
+  //   await doneloading();
+  // };
 
   useEffect(() => {
     if (QStoload) {
@@ -1326,10 +1326,11 @@ const SalesQS2 = () => {
               setUSP(uspos.data[0]);
             }
             // await loadusposition(ldata);
+            // console.log("we are here");
             // Set Values
             const matvalue = await materialvaluecalc(
               Number(ldata.materialcost.replace("$", "")),
-              ldata.quantity
+              Number(ldata.quantity)
             );
             const totalduty =
               ldata.generalduty && ldata.additionalduty
