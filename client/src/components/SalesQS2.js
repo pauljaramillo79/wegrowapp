@@ -1451,7 +1451,7 @@ const SalesQS2 = () => {
           //     // }
           //   });
           // };
-          const doWork = async () => {
+          const doWork = async (ldata) => {
             // console.log(ldata);
 
             const check = await checkER(ldata);
@@ -1466,9 +1466,11 @@ const SalesQS2 = () => {
             }
             // await loadusposition(ldata);
             console.log("we are here");
+            console.log(ldata.materialcost);
+            console.log(ldata.quantity);
             // Set Values
             const matvalue = await materialvaluecalc(
-              Number(ldata.materialcost.replace("$", "")),
+              Number(ldata.materialcost.replace("$", "").replace(",", "")),
               Number(ldata.quantity)
             );
             console.log(matvalue);
@@ -2264,7 +2266,7 @@ const SalesQS2 = () => {
             await doneloading();
           };
           // Call the do work function
-          doWork();
+          doWork(ldata);
         }
       );
     }
