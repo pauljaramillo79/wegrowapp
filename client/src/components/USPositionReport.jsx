@@ -7,7 +7,8 @@ import { LoadQSContext } from "../contexts/LoadQSProvider";
 import USPosMatchingToolTip from "./USPosMatchingToolTip";
 
 const USPositionReport = () => {
-  const { setQStoload, setLoaduser } = useContext(LoadQSContext);
+  const { setQStoload, setLoaduser, setFromdropdown } =
+    useContext(LoadQSContext);
   // eslint-disable-next-line no-extend-native
   Array.prototype.groupBy = function (key) {
     return this.reduce(function (groups, item) {
@@ -111,6 +112,7 @@ const USPositionReport = () => {
                               >
                                 <NavLink
                                   onClick={(e) => {
+                                    setFromdropdown(false);
                                     setQStoload(x.QSID);
                                     setLoaduser(x.tCode);
                                   }}

@@ -5,7 +5,9 @@ export const LoadQSContext = React.createContext();
 export const LoadQSProvider = ({ children }) => {
   const [QStoload, setQStoload] = useState();
   const [diffQS, setdiffQS] = useState(true);
-  const [loaduser, setLoaduser] = useState();
+  const [loaduser, setLoaduser] = useState(
+    JSON.parse(localStorage.getItem("WGusercode"))
+  );
   const toggleQSload = (e) => {
     setdiffQS((prevdiffQS) => !prevdiffQS);
   };
@@ -13,6 +15,7 @@ export const LoadQSProvider = ({ children }) => {
   const toggleDuplicate = (e) => {
     setDuplicateBoolean((prevduplicateBoolean) => !prevduplicateBoolean);
   };
+  const [fromdropdown, setFromdropdown] = useState(false);
 
   return (
     <LoadQSContext.Provider
@@ -25,6 +28,8 @@ export const LoadQSProvider = ({ children }) => {
         duplicateBoolean,
         loaduser,
         setLoaduser,
+        fromdropdown,
+        setFromdropdown,
       }}
     >
       {children}

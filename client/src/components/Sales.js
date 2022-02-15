@@ -8,12 +8,14 @@ import { LoadQSContext } from "../contexts/LoadQSProvider";
 
 const Sales = (props) => {
   const { toggleQSrefresh } = useContext(RefreshPositionsContext);
-  const { loaduser, QStoload } = useContext(LoadQSContext);
+  const { loaduser, setLoaduser, QStoload, setFromdropdown } =
+    useContext(LoadQSContext);
   const [traders, setTraders] = useState();
   const [userID, setUserID] = useState(
-    QStoload && loaduser
-      ? loaduser
-      : JSON.parse(localStorage.getItem("WGusercode"))
+    // QStoload && loaduser
+    //   ? loaduser
+    //   : JSON.parse(localStorage.getItem("WGusercode"))
+    loaduser
   );
   const [limit, setLimit] = useState(300);
   const [columns, setColumns] = useState();
@@ -119,11 +121,20 @@ const Sales = (props) => {
           <option value={1000}>1000</option>
           <option value={"no limit"}>no limit</option>
         </select>
-        <select onChange={(e) => setUserID(e.target.value)}>
+        <select
+          // onClick={(e) => {
+          //   console.log("hiya");
+
+          // }}
+          onChange={(e) => {
+            setFromdropdown(true);
+            setLoaduser(e.target.value);
+          }}
+        >
           <option value="all">All</option>
           {traders
             ? traders.map((trader) => {
-                if (trader.trader === userID) {
+                if (trader.trader === loaduser) {
                   return (
                     <option selected value={trader.trader}>
                       {trader.trader}
@@ -144,7 +155,7 @@ const Sales = (props) => {
       </div>
       <SalesTableSort
         config={CONFIG}
-        userID={userID}
+        userID={loaduser}
         limit={limit}
         showEditModal={props.showEditModal}
         hideEditModal={props.hideEditModal}

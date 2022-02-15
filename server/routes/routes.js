@@ -248,7 +248,7 @@ router.post("/positionreport", authenticateToken, async (req, res) => {
 router.post("/usapositionreport", async (req, res) => {
   await db.query(
     // "SELECT KTP, prodName, productGroup, companyCode, saleComplete, priceAfterInterest FROM quotationsheet INNER JOIN ((prodNames INNER JOIN productGroups ON prodNames.prodGroupID = productGroups.prodGroupID) INNER JOIN productList ON prodNames.prodNameID = productList.productName) ON quotationsheet.productID = productList.productID INNER JOIN supplierlist ON quotationsheet.supplierID = supplierlist.supplierID WHERE saleComplete = 1",
-    "SELECT USpositionreport.*, warehouseName, DATE_FORMAT(whentry, '%Y-%m-%d') AS whentry, storagefixed, storagevariable, stggraceperiod, stgaccrualperiod, quantitypallets, uspositionsview.QSID, tCode FROM USpositionreport RIGHT JOIN uspositionsview ON USpositionreport.USWGP = uspositionsview.USWGP INNER JOIN traderList ON uspositionsview.traderID = traderList.traderID",
+    "SELECT USpositionreport.*, warehouseName, DATE_FORMAT(whentry, '%Y-%m-%d') AS whentry, storagefixed, storagevariable, stggraceperiod, stgaccrualperiod, quantitypallets, uspositionsview.QSID, tCode FROM USpositionreport RIGHT JOIN uspositionsview ON USpositionreport.USWGP = uspositionsview.USWGP INNER JOIN traderList ON uspositionsview.traderID = traderList.traderID WHERE USpositionreport.quantity >0",
     (err, results) => {
       if (err) {
         console.log(err);

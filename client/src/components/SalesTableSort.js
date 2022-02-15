@@ -18,8 +18,14 @@ const SalesTableSort = (props) => {
 
   const { state } = useContext(AuthContext);
   const { QSrefresh, toggleQSrefresh } = useContext(RefreshPositionsContext);
-  const { toggleQSload, loaduser, QStoload, setQStoload, toggleDuplicate } =
-    useContext(LoadQSContext);
+  const {
+    toggleQSload,
+    loaduser,
+    QStoload,
+    setFromdropdown,
+    setQStoload,
+    toggleDuplicate,
+  } = useContext(LoadQSContext);
   // Get token values from UseContext and Local Storage
   // let accesstoken = state.accesstoken;
   let accesstoken = JSON.parse(localStorage.getItem("accesstoken"));
@@ -307,6 +313,7 @@ const SalesTableSort = (props) => {
             className="editbutton"
             onClick={(e) => {
               e.preventDefault();
+              setFromdropdown(true);
               duplicateQS(item.QSID);
             }}
           >
