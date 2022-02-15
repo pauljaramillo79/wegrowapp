@@ -4,9 +4,10 @@ import moment from "moment";
 import "./USPositionReport.css";
 import { NavLink } from "react-router-dom";
 import { LoadQSContext } from "../contexts/LoadQSProvider";
+import USPosMatchingToolTip from "./USPosMatchingToolTip";
 
 const USPositionReport = () => {
-  const { setQStoload } = useContext(LoadQSContext);
+  const { setQStoload, setLoaduser } = useContext(LoadQSContext);
   // eslint-disable-next-line no-extend-native
   Array.prototype.groupBy = function (key) {
     return this.reduce(function (groups, item) {
@@ -44,6 +45,12 @@ const USPositionReport = () => {
     return (
       stgfix / qty + (Math.ceil(daysinstg / stgaccrual) * stgvar * qtypal) / qty
     );
+  };
+
+  const [usposmatchnumber, setUSposmatchnumber] = useState(0);
+
+  const getUSPosMatchingData = (x) => {
+    setUSposmatchnumber(x);
   };
 
   var group = "";
@@ -93,14 +100,29 @@ const USPositionReport = () => {
                         <tr>
                           <td>
                             {
-                              <NavLink
-                                onClick={(e) => {
-                                  setQStoload(x.QSID);
+                              <div
+                                className="postooltipsource"
+                                onMouseOver={(e) => {
+                                  getUSPosMatchingData(x.USWGP);
                                 }}
-                                to="/sales"
+                                onMouseLeave={(e) => {
+                                  setUSposmatchnumber(0);
+                                }}
                               >
-                                {x.USWGP}
-                              </NavLink>
+                                <NavLink
+                                  onClick={(e) => {
+                                    setQStoload(x.QSID);
+                                    setLoaduser(x.tCode);
+                                  }}
+                                  to="/sales"
+                                >
+                                  {x.USWGP}
+                                </NavLink>
+                                <USPosMatchingToolTip
+                                  usposnumber={x.USWGP}
+                                  usposmatchnumber={usposmatchnumber}
+                                />
+                              </div>
                             }
                           </td>
                           <td className="fig">

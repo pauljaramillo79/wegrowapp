@@ -1618,6 +1618,25 @@ router.post("/posmatching", (req, res) => {
   );
 });
 
+router.post("/usposmatching", (req, res) => {
+  let usposnumber = req.body.usposnumber;
+  db.query(
+    "SELECT tCode, KTS, quantity, companyCode, saleComplete, saleTypeID, FORMAT(tradingProfit,2) AS tradingProfit, FORMAT(priceAfterInterest,2) AS priceAfterInterest, DATE_FORMAT(whexit,'%Y-%m-%d') AS whexit FROM quotationsheet INNER JOIN customerList ON quotationsheet.customerID = customerList.customerID INNER JOIN traderList ON quotationsheet.traderID = traderList.traderID WHERE KTP = ? AND saleComplete=-1 AND saleTypeID=3 ORDER BY tradingProfit DESC",
+    [usposnumber],
+    (err, results) => {
+      if (err) {
+        console.log(err);
+      }
+      if (results.length > 0) {
+        return res.status(200).send(results);
+      }
+      if (results.length == 0) {
+        return res.status(204).send("204 No Content");
+      }
+    }
+  );
+});
+
 router.post("/lysales", (req, res) => {
   let fromdate = req.body.fromdate;
   let todate = req.body.todate;

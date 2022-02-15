@@ -21,7 +21,7 @@ const PosMatchingToolTip = ({ posnumber, posmatchnumber }) => {
       <ul>
         <li className="posmatchitem">
           <h4>Trader</h4>
-          <h4>KTS</h4>
+          <h4>WGS</h4>
           <h4>Customer</h4>
           <h4>Quantity (mt)</h4>
           <h4>Profit (pmt)</h4>

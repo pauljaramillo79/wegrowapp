@@ -1465,15 +1465,12 @@ const SalesQS2 = () => {
               setUSP(uspos.data[0]);
             }
             // await loadusposition(ldata);
-            console.log("we are here");
-            console.log(ldata.materialcost);
-            console.log(ldata.quantity);
+
             // Set Values
             const matvalue = await materialvaluecalc(
               Number(ldata.materialcost.replace("$", "").replace(",", "")),
               Number(ldata.quantity)
             );
-            console.log(matvalue);
             const totalduty =
               ldata.generalduty && ldata.additionalduty
                 ? await totaldutycalc(
