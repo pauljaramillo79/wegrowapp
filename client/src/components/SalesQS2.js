@@ -1228,6 +1228,145 @@ const SalesQS2 = () => {
     }
   }, []);
 
+  const setinsurvars = (inco) => {
+    return new Promise((resolve, reject) => {
+      if (inco === "CPT" || inco === "CFR") {
+        setQSData({ ...QSData, insurancerate: 0.0007 });
+        setQSValues({ ...QSValues, insurancerate: "0.07%" });
+      }
+      if (inco === "DAP") {
+        setQSData({ ...QSData, insurancerate: 0.0011 });
+        setQSValues({ ...QSValues, insurancerate: "0.11%" });
+      }
+      if (inco === "CIP" || inco === "CIF") {
+        setQSData({ ...QSData, insurancerate: 0.0014, insurancefactor: 1.1 });
+        setQSValues({
+          ...QSValues,
+          insurancerate: "0.14%",
+          insurancefactor: "1.10",
+        });
+      }
+    });
+  };
+  const insurcalc = (pbi, insrate, insfact) => {
+    return new Promise((resolve, reject) => {
+      if (pbi && insrate && insfact) {
+        resolve(pbi * insrate * insfact);
+      } else {
+        resolve(0);
+      }
+    });
+  };
+
+  const ttlcostcalc = (
+    mc,
+    cef,
+    inbpmt,
+    outpmt,
+    pc,
+    pf,
+    sf,
+    frt,
+    ins,
+    insp,
+    sc,
+    int,
+    lg,
+    pal,
+    oth,
+    strg
+  ) => {
+    return new Promise((resolve, reject) => {
+      resolve(
+        mc +
+          cef +
+          inbpmt +
+          outpmt +
+          pc +
+          pf +
+          sf +
+          frt +
+          ins +
+          insp +
+          sc +
+          int +
+          lg +
+          pal +
+          oth +
+          strg
+      );
+    });
+  };
+
+  const paicalc = (pbi, slsint) => {
+    return new Promise((resolve, reject) => {
+      resolve(pbi + slsint);
+    });
+  };
+  const materialvaluecalc = (matcost, qty) => {
+    return new Promise((resolve, reject) => {
+      resolve(matcost * qty);
+    });
+  };
+  const totaldutycalc = (gduty, aduty) => {
+    return new Promise((resolve, reject) => {
+      resolve(gduty + aduty);
+    });
+  };
+  const dutyfeecalc = (entryfee, tduty) => {
+    return new Promise((resolve, reject) => {
+      resolve(entryfee * tduty);
+    });
+  };
+  const harborfeecalc = (entryfee, hpct) => {
+    return new Promise((resolve, reject) => {
+      resolve(entryfee * hpct);
+    });
+  };
+  const mercprocfeecalc = (entryfee, mppct) => {
+    return new Promise((resolve, reject) => {
+      resolve(entryfee * mppct);
+    });
+  };
+  const totalcentryfeecalc = (dfee, hfee, mpfee, ffee, tsca, isf) => {
+    return new Promise((resolve, reject) => {
+      resolve(dfee + hfee + mpfee + ffee + tsca + isf);
+    });
+  };
+  const centryfeepmtcalc = (tcfee, qty) => {
+    return new Promise((resolve, reject) => {
+      resolve(tcfee / qty);
+    });
+  };
+  const totalinboundcalc = (dryg, unload, coll, inboth) => {
+    return new Promise((resolve, reject) => {
+      resolve(dryg + unload + coll + inboth);
+    });
+  };
+  const inboundpmtcalc = (tinbound, pload) => {
+    return new Promise((resolve, reject) => {
+      if (pload) {
+        resolve(tinbound / pload);
+      } else {
+        resolve(0);
+      }
+    });
+  };
+  const totaloutboundcalc = (load, bol, outoth) => {
+    return new Promise((resolve, reject) => {
+      resolve(load + bol + outoth);
+    });
+  };
+  const outboundpmtcalc = (ttlout, pload) => {
+    return new Promise((resolve, reject) => {
+      if (pload) {
+        resolve(ttlout / pload);
+      } else {
+        resolve(0);
+      }
+    });
+  };
+
   useEffect(() => {
     // if navigating, load values from database based on QSindex selected
     if (QSindex < QSIDList.length) {
@@ -1326,12 +1465,13 @@ const SalesQS2 = () => {
               setUSP(uspos.data[0]);
             }
             // await loadusposition(ldata);
-            // console.log("we are here");
+            console.log("we are here");
             // Set Values
             const matvalue = await materialvaluecalc(
               Number(ldata.materialcost.replace("$", "")),
               Number(ldata.quantity)
             );
+            console.log(matvalue);
             const totalduty =
               ldata.generalduty && ldata.additionalduty
                 ? await totaldutycalc(
@@ -2800,145 +2940,6 @@ const SalesQS2 = () => {
       stgaccrualperiod: "0",
       quantitypallets: "",
       KTP: "",
-    });
-  };
-
-  const setinsurvars = (inco) => {
-    return new Promise((resolve, reject) => {
-      if (inco === "CPT" || inco === "CFR") {
-        setQSData({ ...QSData, insurancerate: 0.0007 });
-        setQSValues({ ...QSValues, insurancerate: "0.07%" });
-      }
-      if (inco === "DAP") {
-        setQSData({ ...QSData, insurancerate: 0.0011 });
-        setQSValues({ ...QSValues, insurancerate: "0.11%" });
-      }
-      if (inco === "CIP" || inco === "CIF") {
-        setQSData({ ...QSData, insurancerate: 0.0014, insurancefactor: 1.1 });
-        setQSValues({
-          ...QSValues,
-          insurancerate: "0.14%",
-          insurancefactor: "1.10",
-        });
-      }
-    });
-  };
-  const insurcalc = (pbi, insrate, insfact) => {
-    return new Promise((resolve, reject) => {
-      if (pbi && insrate && insfact) {
-        resolve(pbi * insrate * insfact);
-      } else {
-        resolve(0);
-      }
-    });
-  };
-
-  const ttlcostcalc = (
-    mc,
-    cef,
-    inbpmt,
-    outpmt,
-    pc,
-    pf,
-    sf,
-    frt,
-    ins,
-    insp,
-    sc,
-    int,
-    lg,
-    pal,
-    oth,
-    strg
-  ) => {
-    return new Promise((resolve, reject) => {
-      resolve(
-        mc +
-          cef +
-          inbpmt +
-          outpmt +
-          pc +
-          pf +
-          sf +
-          frt +
-          ins +
-          insp +
-          sc +
-          int +
-          lg +
-          pal +
-          oth +
-          strg
-      );
-    });
-  };
-
-  const paicalc = (pbi, slsint) => {
-    return new Promise((resolve, reject) => {
-      resolve(pbi + slsint);
-    });
-  };
-  const materialvaluecalc = (matcost, qty) => {
-    return new Promise((resolve, reject) => {
-      resolve(matcost * qty);
-    });
-  };
-  const totaldutycalc = (gduty, aduty) => {
-    return new Promise((resolve, reject) => {
-      resolve(gduty + aduty);
-    });
-  };
-  const dutyfeecalc = (entryfee, tduty) => {
-    return new Promise((resolve, reject) => {
-      resolve(entryfee * tduty);
-    });
-  };
-  const harborfeecalc = (entryfee, hpct) => {
-    return new Promise((resolve, reject) => {
-      resolve(entryfee * hpct);
-    });
-  };
-  const mercprocfeecalc = (entryfee, mppct) => {
-    return new Promise((resolve, reject) => {
-      resolve(entryfee * mppct);
-    });
-  };
-  const totalcentryfeecalc = (dfee, hfee, mpfee, ffee, tsca, isf) => {
-    return new Promise((resolve, reject) => {
-      resolve(dfee + hfee + mpfee + ffee + tsca + isf);
-    });
-  };
-  const centryfeepmtcalc = (tcfee, qty) => {
-    return new Promise((resolve, reject) => {
-      resolve(tcfee / qty);
-    });
-  };
-  const totalinboundcalc = (dryg, unload, coll, inboth) => {
-    return new Promise((resolve, reject) => {
-      resolve(dryg + unload + coll + inboth);
-    });
-  };
-  const inboundpmtcalc = (tinbound, pload) => {
-    return new Promise((resolve, reject) => {
-      if (pload) {
-        resolve(tinbound / pload);
-      } else {
-        resolve(0);
-      }
-    });
-  };
-  const totaloutboundcalc = (load, bol, outoth) => {
-    return new Promise((resolve, reject) => {
-      resolve(load + bol + outoth);
-    });
-  };
-  const outboundpmtcalc = (ttlout, pload) => {
-    return new Promise((resolve, reject) => {
-      if (pload) {
-        resolve(ttlout / pload);
-      } else {
-        resolve(0);
-      }
     });
   };
 
