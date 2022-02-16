@@ -323,6 +323,8 @@ const SalesTableSort = (props) => {
             <button
               className="editbutton"
               onClick={(e) => {
+                setFromdropdown(true);
+
                 confirmAlert({
                   title: "Are you sure?",
                   message: `You are about to delete QS (${item.QSID}). This deletion is irreversible. Click Delete to continue or Cancel`,

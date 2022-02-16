@@ -1058,7 +1058,7 @@ const SalesQS2 = () => {
                   : check && inEuros && !ldata.turnover
                   ? "€ 0.00"
                   : ldata.turnover,
-              pctmargin: check && ldata.pctmargin ? ldata.pctmargin : "0.00%",
+              pctmargin: ldata.pctmargin ? ldata.pctmargin : "0.00%",
               netback:
                 check && inEuros && ldata.netback
                   ? numcurrex(ldata.netback, exrate)
@@ -1204,7 +1204,9 @@ const SalesQS2 = () => {
               profit: ldata.profit ? numerify(ldata.profit, "$") : 0,
               margin: ldata.margin ? numerify(ldata.margin, "$") : 0,
               turnover: ldata.turnover ? numerify(ldata.turnover, "$") : 0,
-              pctmargin: Number(ldata.pctmargin.replace("%", "")) / 100,
+              pctmargin: ldata.pctmargin
+                ? Number(ldata.pctmargin.replace("%", "")) / 100
+                : 0,
               netback: ldata.netback ? numerify(ldata.netback, "$") : 0,
             });
             setQSOriginal({
@@ -1332,7 +1334,7 @@ const SalesQS2 = () => {
               profit: ldata.profit ? ldata.profit : "$ 0.00",
               margin: ldata.margin ? ldata.margin : "$ 0.00",
               turnover: ldata.turnover ? ldata.turnover : "$ 0.00",
-              pctmargin: ldata.pctmargin,
+              pctmargin: ldata.pctmargin ? ldata.pctmargin : "0.00%",
               netback: ldata.netback ? ldata.netback : "$ 0.00",
             });
             setQSOriginalData({
@@ -1459,6 +1461,13 @@ const SalesQS2 = () => {
               priceafterint: ldata.priceafterint
                 ? numerify(ldata.priceafterint)
                 : 0,
+              profit: ldata.profit ? numerify(ldata.profit) : 0,
+              margin: ldata.margin ? numerify(ldata.margin) : 0,
+              turnover: ldata.turnover ? numerify(ldata.turnover) : 0,
+              pctmargin: ldata.pctmargin
+                ? Number(ldata.pctmargin.replace("%", "")) / 100
+                : 0,
+              netback: ldata.netback ? numerify(ldata.netback) : 0,
             });
             if (ldata.saleComplete === -1) {
               setSold(true);
