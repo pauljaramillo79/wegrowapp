@@ -541,7 +541,7 @@ router.post("/positiondropdown", (req, res) => {
 });
 router.post("/uspositiondropdown", (req, res) => {
   db.query(
-    "SELECT USpositionreport.USWGP, USpositionreport.product, USpositionreport.supplier, USpositionreport.EWPrice, USpositionreport.Inventory, productID, supplierID, packaging, marks, warehouseID, warehouseName, DATE_FORMAT(whentry, '%Y-%m-%d') AS whentry, storagefixed, storagevariable, stggraceperiod, stgaccrualperiod, quantitypallets, uspositionsview.quantity FROM USpositionreport RIGHT JOIN uspositionsview ON USpositionreport.USWGP = uspositionsview.USWGP",
+    "SELECT USpositionreport.USWGP, USpositionreport.product, USpositionreport.supplier, USpositionreport.EWPrice, USpositionreport.Inventory, productID, supplierID, packaging, marks, warehouseID, warehouseName, DATE_FORMAT(whentry, '%Y-%m-%d') AS whentry, storagefixed, storagevariable, stggraceperiod, stgaccrualperiod, quantitypallets, uspositionsview.quantity FROM USpositionreport RIGHT JOIN uspositionsview ON USpositionreport.USWGP = uspositionsview.USWGP WHERE USpositionreport.Inventory>0",
     (err, results) => {
       if (err) {
         console.log(err);
