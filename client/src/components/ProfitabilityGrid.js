@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import Axios from "axios";
 import "../../node_modules/react-grid-layout/css/styles.css";
 import "../../node_modules/react-resizable/css/styles.css";
@@ -8,13 +8,59 @@ import "./ProfitabilityGrid.css";
 import ProfitabilityReport from "./ProfitabilityReport";
 import WaterfallChart from "./WaterFall";
 import moment from "moment";
+import { ProfitabilityContext } from "../contexts/ProfitabilityProvider";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
 const ProfitabilityGrid = () => {
+  const {
+    prdata,
+    setPrdata,
+    setPrcustomers,
+    setPrcustomerfilter,
+    prcustomerfilter,
+    setPrcustomerchecks,
+  } = useContext(ProfitabilityContext);
+
+  const sumtotal = (data, param) => {
+    let totalval = 0;
+    for (const x of data) {
+      if (prcustomerfilter && prcustomerfilter.includes(x["customer"])) {
+        totalval += x[param];
+      }
+    }
+    return totalval;
+    // console.log(data[0]);
+  };
+
+  const sumprod = (data, param1, param2) => {
+    let totalprod = 0;
+    for (const x of data) {
+      if (prcustomerfilter && prcustomerfilter.includes(x["customer"])) {
+        totalprod += x[param1] * x[param2];
+      }
+    }
+    return totalprod;
+  };
+
+  const currencify = (val, symbol = "$", decim = 2) => {
+    return (
+      symbol + " " + val.toFixed(decim).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+    );
+  };
+  // sumtotal(prdata, "quantity");
+  // console.log(prdata);
+
   const [data1, setData1] = useState();
   let accesstoken = JSON.parse(localStorage.getItem("accesstoken"));
   let refreshtoken = JSON.parse(localStorage.getItem("refreshtoken"));
+  const [prstats, setPrstats] = useState({
+    quantity: 0,
+    revenue: 0,
+    profit: 0,
+    avgprofit: 0,
+    pctprofit: 0,
+  });
 
   const authAxios = Axios.create({
     headers: {
@@ -103,7 +149,25 @@ const ProfitabilityGrid = () => {
     "Custom",
   ];
 
+  const groupbyfilters = [
+    "Month",
+    "Customer",
+    "Product Group",
+    "Product Category",
+    "Product",
+    "Trader",
+  ];
+  const groupbyfiltervalues = [
+    "month",
+    "customer",
+    "productGroup",
+    "prodCatName",
+    "product",
+    "tCode",
+  ];
+
   const [clickedId, setClickedId] = useState(0);
+  const [clickedGroupID, setClickedGroupID] = useState(0);
 
   let currentyear = moment().format("YYYY");
   let currentmonth = moment().format("MM");
@@ -154,6 +218,30 @@ const ProfitabilityGrid = () => {
     }
   };
 
+  const [profitreportgroupby, setProfitreportroupby] = useState("month");
+
+  const handleGroupbyClick = (e, i) => {
+    e.preventDefault();
+    setClickedGroupID(i);
+    setProfitreportroupby(e.target.name);
+    setRefreshreport(!refreshreport);
+  };
+  // const [prdata, setPrdata] = useState();
+
+  useEffect(() => {
+    Axios.post("/profitabilityreport", { reportstartdate, reportenddate }).then(
+      (response) => {
+        setPrdata(response.data);
+        const customers = [
+          ...new Set(response.data.map((item) => item.customer)),
+        ].sort();
+        setPrcustomers(customers);
+        setPrcustomerfilter(customers);
+        setPrcustomerchecks(new Array(customers.length).fill(true));
+      }
+    );
+  }, [refreshreport]);
+
   return (
     <>
       <ResponsiveGridLayout
@@ -171,6 +259,7 @@ const ProfitabilityGrid = () => {
       >
         <div id="profitability" key="h">
           <h3>Profitability Report</h3>
+
           <div className="periodfilter">
             <div className="periodfilterbuttons">
               <p>Period:</p>
@@ -220,20 +309,84 @@ const ProfitabilityGrid = () => {
                 : ""}
             </div>
           </div>
-
+          <div className="prgroupby">
+            <p>Group By:</p>
+            {groupbyfilters.map((buttonlabel, i) => (
+              <button
+                key={i}
+                name={groupbyfiltervalues[i]}
+                onClick={(event) => handleGroupbyClick(event, i)}
+                className={
+                  i === clickedGroupID
+                    ? "periodfilterbutton active"
+                    : "periodfilterbutton"
+                }
+              >
+                {buttonlabel}
+              </button>
+            ))}
+          </div>
+          <div className="prsummarystats">
+            <div className="prstatgroup">
+              <p>
+                {prdata ? currencify(sumtotal(prdata, "quantity"), "", 0) : ""}
+              </p>
+              <h4>Quantity</h4>
+            </div>
+            <div className="prstatgroup">
+              <p>
+                {prdata
+                  ? currencify(sumprod(prdata, "quantity", "price"), "$", 0)
+                  : ""}
+              </p>
+              <h4>Revenue</h4>
+            </div>
+            <div className="prstatgroup">
+              <p>
+                {prdata ? currencify(sumtotal(prdata, "profit"), "$", 0) : ""}
+              </p>
+              <h4>Profit</h4>
+            </div>
+            <div className="prstatgroup">
+              <p>
+                {prdata
+                  ? currencify(
+                      sumtotal(prdata, "profit") / sumtotal(prdata, "quantity"),
+                      "$",
+                      2
+                    )
+                  : ""}
+              </p>
+              <h4>Average Profit</h4>
+            </div>
+            <div className="prstatgroup">
+              <p>
+                {prdata
+                  ? (
+                      (sumtotal(prdata, "profit") /
+                        sumprod(prdata, "quantity", "price")) *
+                      100
+                    ).toFixed(2) + "%"
+                  : ""}
+              </p>
+              <h4>Margin</h4>
+            </div>
+          </div>
           {/* ((<label>From:</label>),
                   (<input className="check" type="date" />),
                   (<label>To:</label>),
                   (<input className="check2" type="date" />)) */}
           <ProfitabilityReport
+            key="profitabilityreport"
             reportstartdate={reportstartdate}
             reportenddate={reportenddate}
             refreshreport={refreshreport}
+            profitreportgroupby={profitreportgroupby}
           />
         </div>
         <div id="profitabilitychart" key="j">
           <h3>Profit Waterfall Chart, 2020</h3>
-          <WaterfallChart data={data1 ? data1 : ""} />
+          <WaterfallChart key="waterfallchart" data={data1 ? data1 : ""} />
         </div>
       </ResponsiveGridLayout>
     </>

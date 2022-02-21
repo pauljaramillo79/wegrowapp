@@ -1,25 +1,31 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 import Axios from "axios";
 import "./ProfitabilityReport.css";
 import moment from "moment";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEllipsisH } from "@fortawesome/free-solid-svg-icons";
+import { ProfitabilityContext } from "../contexts/ProfitabilityProvider";
 
 const ProfitabilityReport = ({
   reportstartdate,
   reportenddate,
   refreshreport,
+  profitreportgroupby,
 }) => {
-  // let currentyear = Number(moment().format("YYYY"));
-  // let currentmonth = Number(moment().format("MM"));
-  const [profitabilitydata, setProfitabilitydata] = useState();
+  const {
+    prdata,
+    prcustomers,
+    setPrcustomerfilter,
+    prcustomerfilter,
+    setPrcustomerchecks,
+    prcustomerchecks,
+  } = useContext(ProfitabilityContext);
 
-  // const [reportdate, setReportdate] = useState(
-  //   currentyear + "-0" + currentmonth
-  // );
-  // const [reportdate, setReportdate] = useState(currentyear - 1);
-
-  const [sortorderr, setSortorderr] = useState({ product: "" });
+  const [productlist, setProductlist] = useState();
+  const [prodFilter, setProdFilter] = useState([]);
+  const [prodchecks, setProdchecks] = useState();
+  const [showcustomfiltmenu, setShowcustomfiltmenu] = useState(false);
+  const [showprodfiltmenu, setShowprodfiltmenu] = useState(false);
 
   Array.prototype.groupBy = function (key) {
     return this.reduce(function (groups, item) {
@@ -34,152 +40,353 @@ const ProfitabilityReport = ({
     // console.log(reportdate);
     Axios.post("/profitabilityreport", { reportstartdate, reportenddate }).then(
       (response) => {
-        const rep = response.data.groupBy("month");
-        setProfitabilitydata(rep);
+        const products = [
+          ...new Set(response.data.map((item) => item.product)),
+        ];
+        setProductlist(products);
+        setProdFilter(products);
+        setProdchecks(new Array(products.length).fill(true));
       }
     );
   }, [refreshreport]);
 
-  useEffect(() => {
-    // console.log(Object.keys(profitabilitydata));
-    if (profitabilitydata) {
-      setProfitabilitydata({
-        ...profitabilitydata,
-        ["January-2021"]: profitabilitydata["January-2021"].sort(function (
-          a,
-          b
-        ) {
-          var nameA = a.product.toUpperCase();
-          var nameB = b.product.toUpperCase();
-          if (nameA < nameB) {
-            return -1;
-          }
-          if (nameA > nameB) {
-            return 1;
-          }
-          return 0;
-        }),
-      });
+  const handleCustomerchange = (e, ind = null, all = false) => {
+    let updatedcustomchecks;
+    if (ind !== null && all === false) {
+      updatedcustomchecks = prcustomerchecks.map((item, index) =>
+        index === ind ? !item : item
+      );
+      setPrcustomerchecks(updatedcustomchecks);
     }
-  }, [sortorderr.product]);
+    if (all === true) {
+      updatedcustomchecks = prcustomerchecks.map(() => true);
+      setPrcustomerchecks(updatedcustomchecks);
+    }
+    if (ind === null && all === false) {
+      updatedcustomchecks = prcustomerchecks.map(() => false);
+      setPrcustomerchecks(updatedcustomchecks);
+    }
+    const updatedcustomfilter = updatedcustomchecks.map((item, index) =>
+      item === true ? prcustomers[index] : ""
+    );
+    const updatedcustomfilterclean = updatedcustomfilter.filter((el) => {
+      return el !== "";
+    });
+    setPrcustomerfilter(updatedcustomfilterclean);
+  };
+
+  const handleProdchange = (e, ind = null, all = false) => {
+    let updatedprodchecks;
+    if (ind !== null && all === false) {
+      updatedprodchecks = prodchecks.map((item, index) =>
+        index === ind ? !item : item
+      );
+      setProdchecks(updatedprodchecks);
+    }
+    if (all === true) {
+      updatedprodchecks = prodchecks.map(() => true);
+      setProdchecks(updatedprodchecks);
+    }
+    if (ind === null && all === false) {
+      updatedprodchecks = prodchecks.map(() => false);
+      setProdchecks(updatedprodchecks);
+    }
+    const updatedprodfilter = updatedprodchecks.map((item, index) =>
+      item === true ? productlist[index] : ""
+    );
+    const updatedprodfilterclean = updatedprodfilter.filter((el) => {
+      return el !== "";
+    });
+    setProdFilter(updatedprodfilterclean);
+  };
+
+  function useOutsideAlerter(ref) {
+    useEffect(() => {
+      /**
+       * Alert if clicked on outside of element
+       */
+      function handleClickOutside(event) {
+        if (ref.current && !ref.current.contains(event.target)) {
+          console.log("clicked outside");
+          if (showcustomfiltmenu === true) {
+            setShowcustomfiltmenu(false);
+          }
+        }
+      }
+      // Bind the event listener
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => {
+        // Unbind the event listener on clean up
+        document.removeEventListener("mousedown", handleClickOutside);
+      };
+    }, [ref]);
+  }
+
+  const wrapperRef = useRef(null);
+  useOutsideAlerter(wrapperRef);
 
   var group = "";
   var u = 0;
+  var v = 0;
+
+  const sumtotal = (data, param) => {
+    let totalval = 0;
+    for (const x of data) {
+      if (prcustomerfilter && prcustomerfilter.includes(x["customer"])) {
+        totalval += x[param];
+      }
+    }
+    return totalval;
+    // console.log(data[0]);
+  };
 
   return (
     <div className="profitabilityreport">
       <ul>
-        <li className="profitabilityreportline prheader">
-          <p className="profitabilityreportcolumn ">
+        <li
+          key="profitabilityreportheader"
+          className="profitabilityreportline prheader"
+        >
+          <p
+            className="profitabilityreportcolumn"
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+            }}
+          >
             QSDate
             <FontAwesomeIcon
-              style={{ color: "gray", marginLeft: "1rem" }}
-              icon={faEllipsisH}
-            />
-          </p>
-          <p className="profitabilityreportcolumn ">
-            ShipmentDate
-            <FontAwesomeIcon
-              style={{ color: "gray", marginLeft: "1rem" }}
-              icon={faEllipsisH}
-            />
-          </p>
-          <p className="profitabilityreportcolumn ">
-            Customer{" "}
-            <FontAwesomeIcon
-              style={{ color: "gray", marginLeft: "1rem" }}
+              key="icon1"
+              style={{ color: "gray", marginLeft: 0 }}
               icon={faEllipsisH}
             />
           </p>
           <p
             className="profitabilityreportcolumn "
-            onClick={(e) => {
-              setSortorderr({
-                ...sortorderr,
-                product:
-                  sortorderr.product === ""
-                    ? "ASC"
-                    : sortorderr.product === "ASC"
-                    ? "DSC"
-                    : "",
-              });
-              // setProfitabilitydata({
-              //   ...profitabilitydata,
-              //   January: profitabilitydata["January"].sort(function (a, b) {
-              //     var nameA = a.product.toUpperCase();
-              //     var nameB = b.product.toUpperCase();
-              //     if (nameA < nameB) {
-              //       return -1;
-              //     }
-              //     if (nameA > nameB) {
-              //       return 1;
-              //     }
-              //     return 0;
-              //   }),
-              // });
+            style={{
+              // position: "relative",
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
             }}
           >
-            Product
+            ShipmentDate
+            <FontAwesomeIcon
+              key="icon2"
+              style={{ color: "gray", marginLeft: 0 }}
+              icon={faEllipsisH}
+            />
           </p>
+          <p
+            className="profitabilityreportcolumn "
+            style={{
+              // position: "relative",
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+            }}
+          >
+            Customer{" "}
+            <FontAwesomeIcon
+              className="ellipsis"
+              key="icon3"
+              style={{ color: "gray", marginLeft: 0 }}
+              icon={faEllipsisH}
+              onClick={(e) => {
+                setShowcustomfiltmenu(!showcustomfiltmenu);
+              }}
+            />
+            {showcustomfiltmenu ? (
+              <div ref={wrapperRef} className="prfiltermenu">
+                <p
+                  className="prselect"
+                  onClick={(e) => handleCustomerchange(e, null, true)}
+                >
+                  Select All
+                </p>
+                <p
+                  className="prselect"
+                  onClick={(e) => handleCustomerchange(e, null, false)}
+                >
+                  Clear All
+                </p>
+                {prcustomers
+                  ? prcustomers.map((customer, index) => (
+                      <div className="prcheckgroup">
+                        <input
+                          type="checkbox"
+                          id={customer}
+                          name={customer}
+                          value={customer}
+                          checked={
+                            prcustomerchecks ? prcustomerchecks[index] : true
+                          }
+                          onChange={(e) => handleCustomerchange(e, index)}
+                        />
+                        <label for={customer}>{customer}</label>
+                      </div>
+                    ))
+                  : ""}
+              </div>
+            ) : (
+              ""
+            )}
+          </p>
+          <p className="profitabilityreportcolumn prfig">Product Group</p>
+          <p className="profitabilityreportcolumn prfig">Prod Category</p>
+          <p className="profitabilityreportcolumn ">
+            Product
+            <FontAwesomeIcon
+              className="ellipsis"
+              key="icon3"
+              style={{ color: "gray", marginLeft: 0 }}
+              icon={faEllipsisH}
+              onClick={(e) => {
+                setShowprodfiltmenu(!showprodfiltmenu);
+              }}
+            />
+            {showprodfiltmenu ? (
+              <div className="prfiltermenu">
+                <p
+                  className="prselect"
+                  onClick={(e) => handleProdchange(e, null, true)}
+                >
+                  Select All
+                </p>
+                <p
+                  className="prselect"
+                  onClick={(e) => handleProdchange(e, null, false)}
+                >
+                  Clear All
+                </p>
+                {productlist
+                  ? productlist.map((product, index) => (
+                      <div className="prcheckgroup">
+                        <input
+                          type="checkbox"
+                          id={product}
+                          name={product}
+                          value={product}
+                          checked={prodchecks ? prodchecks[index] : true}
+                          onChange={(e) => handleProdchange(e, index)}
+                        />
+                        <label for={product}>{product}</label>
+                      </div>
+                    ))
+                  : ""}
+              </div>
+            ) : (
+              ""
+            )}
+          </p>
+
           <p className="profitabilityreportcolumn prfig">Quantity</p>
           <p className="profitabilityreportcolumn prfig">Price</p>
           <p className="profitabilityreportcolumn prfig">Profit(pmt)</p>
           <p className="profitabilityreportcolumn prfig">Profit</p>
         </li>
-        {profitabilitydata
-          ? Object.entries(profitabilitydata).map((i, key) => {
-              group = Object.keys(profitabilitydata)[key];
-              u = 0;
-              console.log(profitabilitydata);
-              return [
-                <h3 className="prmonth">{group}</h3>,
-                i[1].map((x) => {
-                  u = u + Number(x.profit);
-                  return (
-                    <li className="profitabilityreportline">
-                      <p className="profitabilityreportcolumn">{x.date}</p>
-                      <p className="profitabilityreportcolumn">
-                        {x.startship} - {x.endship}
-                      </p>
-                      <p className="profitabilityreportcolumn">{x.customer}</p>
-                      <p className="profitabilityreportcolumn">{x.product}</p>
+        {prdata
+          ? Object.entries(prdata.groupBy(profitreportgroupby)).map(
+              (i, key) => {
+                // console.log(i[1]);
 
-                      <p className="profitabilityreportcolumn prfig">
-                        {x.quantity.toFixed(2)}
-                      </p>
-                      <p className="profitabilityreportcolumn prfig">
-                        {x.price.toFixed(2)}
-                      </p>
-                      <p className="profitabilityreportcolumn prfig">
-                        {x ? x.profitpmt.toFixed(2) : ""}
-                      </p>
-                      <p className="profitabilityreportcolumn prfig">
-                        {x.profit
-                          ? "$" +
-                            x.profit
-                              .toFixed(2)
-                              .toString()
-                              .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                group = Object.keys(prdata.groupBy(profitreportgroupby))[key];
+                u = 0;
+                v = 0;
+
+                // console.log(profitabilitydata);
+                return [
+                  <h3 className="prmonth">
+                    {group}
+                    {/* {sumtotal(i[1], "quantity")} */}
+                  </h3>,
+                  i[1].map((x) => {
+                    if (
+                      prcustomerfilter &&
+                      prcustomerfilter.includes(x.customer) &&
+                      prodFilter.includes(x.product)
+                    ) {
+                      u = u + Number(x.profit);
+                      v = v + Number(x.quantity);
+                    }
+                    return (
+                      <li key={x.QSID} className="profitabilityreportline">
+                        {prcustomerfilter &&
+                        prcustomerfilter.includes(x.customer) &&
+                        prodFilter.includes(x.product)
+                          ? [
+                              <p className="profitabilityreportcolumn">
+                                {x.date}
+                              </p>,
+
+                              <p className="profitabilityreportcolumn">
+                                {x.startship} - {x.endship}
+                              </p>,
+
+                              <p className="profitabilityreportcolumn">
+                                {x.customer}
+                              </p>,
+                              <p className="profitabilityreportcolumn">
+                                {x.productGroup}
+                              </p>,
+                              <p className="profitabilityreportcolumn">
+                                {x.prodCatName}
+                              </p>,
+
+                              <p className="profitabilityreportcolumn">
+                                {x.product}
+                              </p>,
+
+                              <p className="profitabilityreportcolumn prfig">
+                                {x.quantity.toFixed(2)}
+                              </p>,
+                              <p className="profitabilityreportcolumn prfig">
+                                {x.price.toFixed(2)}
+                              </p>,
+                              <p className="profitabilityreportcolumn prfig">
+                                {x ? x.profitpmt.toFixed(2) : ""}
+                              </p>,
+                              <p className="profitabilityreportcolumn prfig">
+                                {x.profit
+                                  ? "$" +
+                                    x.profit
+                                      .toFixed(2)
+                                      .toString()
+                                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                  : ""}
+                              </p>,
+                            ]
                           : ""}
-                      </p>
-                    </li>
-                  );
-                }),
-                <li className="profitabilityreportline">
-                  <p className="profitabilityreportcolumn"></p>
-                  <p className="profitabilityreportcolumn"></p>
-                  <p className="profitabilityreportcolumn"></p>
-                  <p className="profitabilityreportcolumn"></p>
-                  <p className="profitabilityreportcolumn prfig prtotal">
-                    {"$" +
-                      u
+                      </li>
+                    );
+                  }),
+                  <li className="profitabilityreportline">
+                    <p className="profitabilityreportcolumn"></p>
+                    <p className="profitabilityreportcolumn"></p>
+                    <p className="profitabilityreportcolumn"></p>
+                    <p className="profitabilityreportcolumn"></p>
+                    <p className="profitabilityreportcolumn"></p>
+                    <p className="profitabilityreportcolumn"></p>
+                    <p className="profitabilityreportcolumn prfig prtotal">
+                      {v
                         .toFixed(2)
                         .toString()
                         .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-                  </p>
-                </li>,
-              ];
-            })
+                    </p>
+                    <p className="profitabilityreportcolumn prfig"></p>
+                    <p className="profitabilityreportcolumn prfig"></p>
+                    <p className="profitabilityreportcolumn prfig prtotal">
+                      {"$" +
+                        u
+                          .toFixed(2)
+                          .toString()
+                          .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                    </p>
+                  </li>,
+                ];
+              }
+            )
           : ""}
       </ul>
     </div>

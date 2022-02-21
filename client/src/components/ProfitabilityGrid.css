@@ -8,6 +8,7 @@
 .periodfilter {
   font-size: 0.9rem;
   padding-bottom: 0.5rem;
+  padding-top: 0.5rem;
   display: flex;
   flex-direction: row;
   width: 100%;
@@ -58,4 +59,31 @@
 .active:hover {
   background-color: rgb(68, 65, 162);
   color: white;
+}
+.prsummarystats {
+  display: flex;
+  flex-direction: row;
+  padding: 1.3rem;
+  justify-content: space-between;
+}
+.prstatgroup {
+  display: flex;
+  flex-direction: column;
+  flex-basis: 15%;
+}
+.prstatgroup h4 {
+  font-size: 1rem;
+}
+.prstatgroup p {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.prgroupby {
+  display: flex;
+  flex-direction: row;
+  font-size: 0.9rem;
+  width: 770px;
+  justify-content: space-between;
+  padding: 0.5rem 0;
 }

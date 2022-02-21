@@ -15,6 +15,7 @@ import Admin from "./components/Admin";
 import SunburstData from "./components/SunburstData";
 import AnalysisGrid from "./components/AnalysisGrid";
 import { LoadQSProvider } from "./contexts/LoadQSProvider";
+// import { ProfitabilityProvider } from "./contexts/ProfitabilityProvider";
 
 // Export Auth Context to be used in Login.js
 export const AuthContext = createContext();
@@ -85,6 +86,7 @@ const reducer = (state, action) => {
 function App() {
   const [state, dispatch] = useReducer(reducer, initialState);
   return (
+    // <ProfitabilityProvider>
     <LoadQSProvider>
       <RefreshPositionsProvider>
         <AuthContext.Provider value={{ state, dispatch }}>
@@ -123,6 +125,7 @@ function App() {
         </AuthContext.Provider>
       </RefreshPositionsProvider>
     </LoadQSProvider>
+    // </ProfitabilityProvider>
   );
 }
 
