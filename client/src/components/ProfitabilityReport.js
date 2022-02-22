@@ -4,6 +4,7 @@ import "./ProfitabilityReport.css";
 import moment from "moment";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEllipsisH } from "@fortawesome/free-solid-svg-icons";
+import { faFilter } from "@fortawesome/free-solid-svg-icons";
 import { ProfitabilityContext } from "../contexts/ProfitabilityProvider";
 
 const ProfitabilityReport = ({
@@ -15,17 +16,30 @@ const ProfitabilityReport = ({
   const {
     prdata,
     prcustomers,
+    setPrcustomers,
     setPrcustomerfilter,
     prcustomerfilter,
     setPrcustomerchecks,
     prcustomerchecks,
+    prproducts,
+    setPrproducts,
+    setPrproductfilter,
+    prproductfilter,
+    setPrproductchecks,
+    prproductchecks,
+    prpgroupchecks,
+    setPrpgroupchecks,
+    prpgroups,
+    setPrpgroupfilter,
+    prpgroupfilter,
   } = useContext(ProfitabilityContext);
 
-  const [productlist, setProductlist] = useState();
-  const [prodFilter, setProdFilter] = useState([]);
-  const [prodchecks, setProdchecks] = useState();
+  // const [productlist, setProductlist] = useState();
+  // const [prodFilter, setProdFilter] = useState([]);
+  // const [prodchecks, setProdchecks] = useState();
   const [showcustomfiltmenu, setShowcustomfiltmenu] = useState(false);
   const [showprodfiltmenu, setShowprodfiltmenu] = useState(false);
+  const [showpgroupfiltmenu, setShowpgroupfiltmenu] = useState(false);
 
   Array.prototype.groupBy = function (key) {
     return this.reduce(function (groups, item) {
@@ -36,19 +50,19 @@ const ProfitabilityReport = ({
     }, {});
   };
 
-  useEffect(() => {
-    // console.log(reportdate);
-    Axios.post("/profitabilityreport", { reportstartdate, reportenddate }).then(
-      (response) => {
-        const products = [
-          ...new Set(response.data.map((item) => item.product)),
-        ];
-        setProductlist(products);
-        setProdFilter(products);
-        setProdchecks(new Array(products.length).fill(true));
-      }
-    );
-  }, [refreshreport]);
+  // useEffect(() => {
+  //   // console.log(reportdate);
+  //   Axios.post("/profitabilityreport", { reportstartdate, reportenddate }).then(
+  //     (response) => {
+  //       const products = [
+  //         ...new Set(response.data.map((item) => item.product)),
+  //       ];
+  //       setProductlist(products);
+  //       setProdFilter(products);
+  //       setProdchecks(new Array(products.length).fill(true));
+  //     }
+  //   );
+  // }, [refreshreport]);
 
   const handleCustomerchange = (e, ind = null, all = false) => {
     let updatedcustomchecks;
@@ -75,29 +89,76 @@ const ProfitabilityReport = ({
     setPrcustomerfilter(updatedcustomfilterclean);
   };
 
+  // useEffect(() => {
+  //   let prods;
+  //   if (prcustomerfilter && prproductfilter) {
+  //     prods = prdata.filter(
+  //       (item) =>
+  //         prcustomerfilter.includes(item["customer"]) &&
+  //         prproductfilter.includes(item["product"])
+  //     );
+  //     if (prcustomerfilter.length > 0) {
+  //       setPrproducts([...new Set(prods.map((item) => item.product))].sort());
+  //     }
+  //     // setPrcustomers([...new Set(prods.map((item) => item.customer))].sort());
+  //     if (prcustomerfilter.length === 0) {
+  //       setPrproducts([...new Set(prdata.map((item) => item.product))].sort());
+  //       // setPrcustomers(
+  //       //   [...new Set(prdata.map((item) => item.customer))].sort()
+  //       // );
+  //     }
+  //   }
+  //   console.log(prods);
+  // }, [prcustomerfilter, prproductfilter]);
+
   const handleProdchange = (e, ind = null, all = false) => {
     let updatedprodchecks;
     if (ind !== null && all === false) {
-      updatedprodchecks = prodchecks.map((item, index) =>
+      updatedprodchecks = prproductchecks.map((item, index) =>
         index === ind ? !item : item
       );
-      setProdchecks(updatedprodchecks);
+      setPrproductchecks(updatedprodchecks);
     }
     if (all === true) {
-      updatedprodchecks = prodchecks.map(() => true);
-      setProdchecks(updatedprodchecks);
+      updatedprodchecks = prproductchecks.map(() => true);
+      setPrproductchecks(updatedprodchecks);
     }
     if (ind === null && all === false) {
-      updatedprodchecks = prodchecks.map(() => false);
-      setProdchecks(updatedprodchecks);
+      updatedprodchecks = prproductchecks.map(() => false);
+      setPrproductchecks(updatedprodchecks);
     }
     const updatedprodfilter = updatedprodchecks.map((item, index) =>
-      item === true ? productlist[index] : ""
+      item === true ? prproducts[index] : ""
     );
     const updatedprodfilterclean = updatedprodfilter.filter((el) => {
       return el !== "";
     });
-    setProdFilter(updatedprodfilterclean);
+    setPrproductfilter(updatedprodfilterclean);
+  };
+
+  const handlePgroupchange = (e, ind = null, all = false) => {
+    let updatedpgroupchecks;
+    if (ind !== null && all === false) {
+      updatedpgroupchecks = prpgroupchecks.map((item, index) =>
+        index === ind ? !item : item
+      );
+      setPrpgroupchecks(updatedpgroupchecks);
+    }
+    if (all === true) {
+      updatedpgroupchecks = prpgroupchecks.map(() => true);
+      setPrpgroupchecks(updatedpgroupchecks);
+    }
+    if (ind === null && all === false) {
+      updatedpgroupchecks = prpgroupchecks.map(() => false);
+      setPrpgroupchecks(updatedpgroupchecks);
+    }
+    const updatedprpgroupfilter = updatedpgroupchecks.map((item, index) =>
+      item === true ? prpgroups[index] : ""
+    );
+    const updatedprpgroupfilterclean = updatedprpgroupfilter.filter((el) => {
+      return el !== "";
+    });
+    setPrpgroupfilter(updatedprpgroupfilterclean);
   };
 
   function useOutsideAlerter(ref) {
@@ -132,7 +193,14 @@ const ProfitabilityReport = ({
   const sumtotal = (data, param) => {
     let totalval = 0;
     for (const x of data) {
-      if (prcustomerfilter && prcustomerfilter.includes(x["customer"])) {
+      if (
+        prcustomerfilter &&
+        prcustomerfilter.includes(x["customer"]) &&
+        prproductfilter &&
+        prproductfilter.includes(x["product"]) &&
+        prpgroupfilter &&
+        prpgroupfilter.includes(x["productGroup"])
+      ) {
         totalval += x[param];
       }
     }
@@ -156,11 +224,6 @@ const ProfitabilityReport = ({
             }}
           >
             QSDate
-            <FontAwesomeIcon
-              key="icon1"
-              style={{ color: "gray", marginLeft: 0 }}
-              icon={faEllipsisH}
-            />
           </p>
           <p
             className="profitabilityreportcolumn "
@@ -172,11 +235,6 @@ const ProfitabilityReport = ({
             }}
           >
             ShipmentDate
-            <FontAwesomeIcon
-              key="icon2"
-              style={{ color: "gray", marginLeft: 0 }}
-              icon={faEllipsisH}
-            />
           </p>
           <p
             className="profitabilityreportcolumn "
@@ -192,7 +250,12 @@ const ProfitabilityReport = ({
               className="ellipsis"
               key="icon3"
               style={{ color: "gray", marginLeft: 0 }}
-              icon={faEllipsisH}
+              icon={
+                prcustomerchecks &&
+                prcustomerchecks.filter(Boolean).length === prcustomers.length
+                  ? faEllipsisH
+                  : faFilter
+              }
               onClick={(e) => {
                 setShowcustomfiltmenu(!showcustomfiltmenu);
               }}
@@ -233,15 +296,71 @@ const ProfitabilityReport = ({
               ""
             )}
           </p>
-          <p className="profitabilityreportcolumn prfig">Product Group</p>
-          <p className="profitabilityreportcolumn prfig">Prod Category</p>
+          <p className="profitabilityreportcolumn">
+            ProdGroup{" "}
+            <FontAwesomeIcon
+              className="ellipsis"
+              key="icon3"
+              style={{ color: "gray", marginLeft: 0 }}
+              icon={
+                prpgroupchecks &&
+                prpgroupchecks.filter(Boolean).length === prpgroups.length
+                  ? faEllipsisH
+                  : faFilter
+              }
+              onClick={(e) => {
+                setShowpgroupfiltmenu(!showpgroupfiltmenu);
+              }}
+            />
+            {showpgroupfiltmenu ? (
+              <div ref={wrapperRef} className="prfiltermenu">
+                <p
+                  className="prselect"
+                  onClick={(e) => handlePgroupchange(e, null, true)}
+                >
+                  Select All
+                </p>
+                <p
+                  className="prselect"
+                  onClick={(e) => handlePgroupchange(e, null, false)}
+                >
+                  Clear All
+                </p>
+                {prpgroups
+                  ? prpgroups.map((customer, index) => (
+                      <div className="prcheckgroup">
+                        <input
+                          type="checkbox"
+                          id={customer}
+                          name={customer}
+                          value={customer}
+                          checked={
+                            prpgroupchecks ? prpgroupchecks[index] : true
+                          }
+                          onChange={(e) => handlePgroupchange(e, index)}
+                        />
+                        <label for={customer}>{customer}</label>
+                      </div>
+                    ))
+                  : ""}
+              </div>
+            ) : (
+              ""
+            )}
+          </p>
+          <p className="profitabilityreportcolumn">ProdCat</p>
           <p className="profitabilityreportcolumn ">
             Product
             <FontAwesomeIcon
               className="ellipsis"
               key="icon3"
               style={{ color: "gray", marginLeft: 0 }}
-              icon={faEllipsisH}
+              icon={
+                prproductchecks &&
+                prproductchecks.filter(Boolean).length === prproducts.length
+                  ? faEllipsisH
+                  : faFilter
+              }
               onClick={(e) => {
                 setShowprodfiltmenu(!showprodfiltmenu);
               }}
@@ -260,15 +379,17 @@ const ProfitabilityReport = ({
                 >
                   Clear All
                 </p>
-                {productlist
-                  ? productlist.map((product, index) => (
+                {prproducts
+                  ? prproducts.map((product, index) => (
                       <div className="prcheckgroup">
                         <input
                           type="checkbox"
                           id={product}
                           name={product}
                           value={product}
-                          checked={prodchecks ? prodchecks[index] : true}
+                          checked={
+                            prproductchecks ? prproductchecks[index] : true
+                          }
                           onChange={(e) => handleProdchange(e, index)}
                         />
                         <label for={product}>{product}</label>
@@ -297,15 +418,19 @@ const ProfitabilityReport = ({
 
                 // console.log(profitabilitydata);
                 return [
-                  <h3 className="prmonth">
-                    {group}
-                    {/* {sumtotal(i[1], "quantity")} */}
-                  </h3>,
+                  <div>
+                    {sumtotal(i[1], "quantity") > 0
+                      ? [<h3 className="prmonth">{group}</h3>]
+                      : ""}
+                  </div>,
                   i[1].map((x) => {
                     if (
                       prcustomerfilter &&
+                      prproductfilter &&
+                      prpgroupfilter &&
                       prcustomerfilter.includes(x.customer) &&
-                      prodFilter.includes(x.product)
+                      prproductfilter.includes(x.product) &&
+                      prpgroupfilter.includes(x.productGroup)
                     ) {
                       u = u + Number(x.profit);
                       v = v + Number(x.quantity);
@@ -313,8 +438,11 @@ const ProfitabilityReport = ({
                     return (
                       <li key={x.QSID} className="profitabilityreportline">
                         {prcustomerfilter &&
+                        prproductfilter &&
+                        prpgroupfilter &&
                         prcustomerfilter.includes(x.customer) &&
-                        prodFilter.includes(x.product)
+                        prproductfilter.includes(x.product) &&
+                        prpgroupfilter.includes(x.productGroup)
                           ? [
                               <p className="profitabilityreportcolumn">
                                 {x.date}
@@ -361,29 +489,35 @@ const ProfitabilityReport = ({
                       </li>
                     );
                   }),
-                  <li className="profitabilityreportline">
-                    <p className="profitabilityreportcolumn"></p>
-                    <p className="profitabilityreportcolumn"></p>
-                    <p className="profitabilityreportcolumn"></p>
-                    <p className="profitabilityreportcolumn"></p>
-                    <p className="profitabilityreportcolumn"></p>
-                    <p className="profitabilityreportcolumn"></p>
-                    <p className="profitabilityreportcolumn prfig prtotal">
-                      {v
-                        .toFixed(2)
-                        .toString()
-                        .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-                    </p>
-                    <p className="profitabilityreportcolumn prfig"></p>
-                    <p className="profitabilityreportcolumn prfig"></p>
-                    <p className="profitabilityreportcolumn prfig prtotal">
-                      {"$" +
-                        u
-                          .toFixed(2)
-                          .toString()
-                          .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-                    </p>
-                  </li>,
+                  <div>
+                    {sumtotal(i[1], "quantity") > 0
+                      ? [
+                          <li className="profitabilityreportline">
+                            <p className="profitabilityreportcolumn"></p>
+                            <p className="profitabilityreportcolumn"></p>
+                            <p className="profitabilityreportcolumn"></p>
+                            <p className="profitabilityreportcolumn"></p>
+                            <p className="profitabilityreportcolumn"></p>
+                            <p className="profitabilityreportcolumn"></p>
+                            <p className="profitabilityreportcolumn prfig prtotal">
+                              {v
+                                .toFixed(2)
+                                .toString()
+                                .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                            </p>
+                            <p className="profitabilityreportcolumn prfig"></p>
+                            <p className="profitabilityreportcolumn prfig"></p>
+                            <p className="profitabilityreportcolumn prfig prtotal">
+                              {"$" +
+                                u
+                                  .toFixed(2)
+                                  .toString()
+                                  .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                            </p>
+                          </li>,
+                        ]
+                      : ""}
+                  </div>,
                 ];
               }
             )

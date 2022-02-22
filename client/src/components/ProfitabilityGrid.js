@@ -20,12 +20,30 @@ const ProfitabilityGrid = () => {
     setPrcustomerfilter,
     prcustomerfilter,
     setPrcustomerchecks,
+    setPrproducts,
+    setPrproductfilter,
+    prproductfilter,
+    setPrproductchecks,
+    setPrpgroups,
+    setPrpgroupfilter,
+    setPrpgroupchecks,
+    prpgroupfilter,
+    setPrprodcats,
+    setPrprodcatfilter,
+    setPrprodcatchecks,
   } = useContext(ProfitabilityContext);
 
   const sumtotal = (data, param) => {
     let totalval = 0;
     for (const x of data) {
-      if (prcustomerfilter && prcustomerfilter.includes(x["customer"])) {
+      if (
+        prcustomerfilter &&
+        prcustomerfilter.includes(x["customer"]) &&
+        prproductfilter &&
+        prproductfilter.includes(x["product"]) &&
+        prpgroupfilter &&
+        prpgroupfilter.includes(x["productGroup"])
+      ) {
         totalval += x[param];
       }
     }
@@ -36,7 +54,14 @@ const ProfitabilityGrid = () => {
   const sumprod = (data, param1, param2) => {
     let totalprod = 0;
     for (const x of data) {
-      if (prcustomerfilter && prcustomerfilter.includes(x["customer"])) {
+      if (
+        prcustomerfilter &&
+        prcustomerfilter.includes(x["customer"]) &&
+        prproductfilter &&
+        prproductfilter.includes(x["product"]) &&
+        prpgroupfilter &&
+        prpgroupfilter.includes(x["productGroup"])
+      ) {
         totalprod += x[param1] * x[param2];
       }
     }
@@ -238,6 +263,18 @@ const ProfitabilityGrid = () => {
         setPrcustomers(customers);
         setPrcustomerfilter(customers);
         setPrcustomerchecks(new Array(customers.length).fill(true));
+        const products = [
+          ...new Set(response.data.map((item) => item.product)),
+        ].sort();
+        setPrproducts(products);
+        setPrproductfilter(products);
+        setPrproductchecks(new Array(products.length).fill(true));
+        const prodgroups = [
+          ...new Set(response.data.map((item) => item.productGroup)),
+        ].sort();
+        setPrpgroups(prodgroups);
+        setPrpgroupfilter(prodgroups);
+        setPrpgroupchecks(new Array(prodgroups.length).fill(true));
       }
     );
   }, [refreshreport]);
@@ -296,6 +333,10 @@ const ProfitabilityGrid = () => {
                       value={reportenddate}
                       className="check2"
                       type="date"
+                      onChange={(e) => {
+                        e.preventDefault();
+                        setReportenddate(e.target.value);
+                      }}
                     />,
                     <button
                       onClick={(e) => {
