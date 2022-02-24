@@ -48,12 +48,14 @@ const PRBarChartProf = ({ profitreportgroupby }) => {
   useEffect(() => {
     if (prdata) {
       const dat1 = prdata.groupBy(profitreportgroupby);
-      setLabels(Object.keys(dat1));
+      setLabels(Object.keys(dat1).reverse());
       setDat2(
-        Object.entries(dat1).map((i, key) => {
-          // return [i[1].map((x) => x.profit)];
-          return sumtotal(i[1], "profit");
-        })
+        Object.entries(dat1)
+          .map((i, key) => {
+            // return [i[1].map((x) => x.profit)];
+            return sumtotal(i[1], "profit");
+          })
+          .reverse()
       );
     }
   }, [prdata, profitreportgroupby]);
