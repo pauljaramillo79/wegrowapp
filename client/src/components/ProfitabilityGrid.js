@@ -9,7 +9,8 @@ import ProfitabilityReport from "./ProfitabilityReport";
 import WaterfallChart from "./WaterFall";
 import moment from "moment";
 import { ProfitabilityContext } from "../contexts/ProfitabilityProvider";
-import BarChart from "./BarChart";
+import PrBarChartQty from "./PrBarChartQty";
+import PrBarChartProf from "./PrBarChartProf";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -440,11 +441,22 @@ const ProfitabilityGrid = () => {
             prshowdetail={prshowdetail}
           />
         </div>
-        {/* <div id="profitabilitychart" key="j"> */}
-        {/* <h3>Profit Waterfall Chart, 2020</h3>
+        <div id="profitabilitychart" key="j">
+          {/* <h3>Profit Waterfall Chart, 2020</h3>
           <WaterfallChart key="waterfallchart" data={data1 ? data1 : ""} /> */}
-        {/* <BarChart style={{ size: "100%", overflow: "hidden" }} />
-        </div> */}
+          <PrBarChartQty
+            profitreportgroupby={profitreportgroupby}
+            style={{ size: "100%", overflow: "hidden" }}
+          />
+        </div>
+        <div id="profitabilitychart" key="k">
+          {/* <h3>Profit Waterfall Chart, 2020</h3>
+          <WaterfallChart key="waterfallchart" data={data1 ? data1 : ""} /> */}
+          <PrBarChartProf
+            profitreportgroupby={profitreportgroupby}
+            style={{ size: "100%", overflow: "hidden" }}
+          />
+        </div>
       </ResponsiveGridLayout>
     </>
   );

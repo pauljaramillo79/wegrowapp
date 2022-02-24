@@ -268,7 +268,7 @@ const USPositionReport = () => {
                                 .toString()
                                 .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                           </td>
-                          <td class="mktpriceupdate">
+                          <td className="mktpriceupdate fig">
                             <FontAwesomeIcon
                               style={{ marginRight: "5px" }}
                               onClick={(e) => {
@@ -288,8 +288,10 @@ const USPositionReport = () => {
                             />
                             <p>{handleMktPriceValue(x.QSID)} </p>
                           </td>
-                          <td>{handleMktValue(x.QSID, x.Inventory)}</td>
-                          <td>
+                          <td className="fig">
+                            {handleMktValue(x.QSID, x.Inventory)}
+                          </td>
+                          <td className="fig">
                             {handlePProfit(x.QSID, x.Inventory, x.EWPrice)}
                           </td>
                         </tr>
@@ -309,11 +311,11 @@ const USPositionReport = () => {
                       </h4>
                     </td>
                     <td colSpan={6}></td>
-                    <td>
+                    <td className="fig">
                       <h4>{currencify(currval, "$", 0)}</h4>
                     </td>
                     <td colSpan={2}></td>
-                    <td>
+                    <td className="fig">
                       <h4>{currencify(prof, "$", 0)}</h4>
                     </td>
                   </tr>,
