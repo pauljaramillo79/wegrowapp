@@ -17,6 +17,7 @@ import { NavLink } from "react-router-dom";
 import KeyFigures from "./KeyFigures";
 import { Route } from "react-router-dom";
 import ProfitabilityGrid from "./ProfitabilityGrid";
+import { ProfitabilityProvider } from "../contexts/ProfitabilityProvider";
 
 const ManagementGrid = () => {
   // const [data1, setData1] = useState();
@@ -140,9 +141,11 @@ const ManagementGrid = () => {
         <Route path="/management/sunburstcharts">
           <SunburstData />
         </Route>
-        <Route path="/management/profitability">
-          <ProfitabilityGrid />
-        </Route>
+        <ProfitabilityProvider>
+          <Route path="/management/profitability">
+            <ProfitabilityGrid />
+          </Route>
+        </ProfitabilityProvider>
       </div>
     </div>
   );

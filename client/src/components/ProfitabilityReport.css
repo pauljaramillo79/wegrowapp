@@ -98,3 +98,24 @@
   background-color: rgb(222, 226, 231);
   cursor: pointer;
 }
+.prdisplay-none {
+  display: none !important;
+}
+.profreporttitle {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+.profreporttitle button {
+  background-color: rgb(68, 65, 162);
+  color: white;
+  padding: 0.25rem 2rem;
+  width: 150px;
+  border-radius: 1rem;
+  border: none;
+}
+.profreporttitle button:hover {
+  cursor: pointer;
+  background-color: rgb(96, 93, 184);
+}

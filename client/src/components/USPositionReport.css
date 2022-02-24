@@ -38,3 +38,31 @@
   background-color: rgb(68, 65, 162);
   color: white;
 }
+.mktpriceupdate {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.mktpriceupdatemenu {
+  position: absolute;
+  /* right: 100%; */
+  top: 20px;
+  background-color: white;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  border: 1px solid rgb(68, 65, 162);
+  z-index: 10;
+}
+.mktpriceupdatemenu button {
+  border-radius: 1rem;
+  padding: 0.25rem 2rem;
+  background-color: rgb(160, 182, 103);
+  color: white;
+  margin-top: 0.5rem;
+  border: none;
+}
+.mktpriceupdatemenu button:hover {
+  cursor: pointer;
+  background-color: rgb(179, 197, 133);
+}

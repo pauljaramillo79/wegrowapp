@@ -14,6 +14,7 @@ import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 import "react-tabs/style/react-tabs.css";
 import { ReactComponent as RefreshIcon } from "../assets/_images/refreshicon.svg";
 import { RefreshPositionsContext } from "../contexts/RefreshPositionsProvider";
+import { ProfRepProvider } from "../contexts/ProfRepProvider";
 
 import { Responsive, WidthProvider } from "react-grid-layout";
 import USPositionReport from "./USPositionReport";
@@ -132,19 +133,21 @@ const PositionsGrid = () => {
                 }}
               />
             </div>
-            <Tabs>
-              <TabList>
-                <Tab>Global</Tab>
-                <Tab>USA Distribution</Tab>
-              </TabList>
-              <TabPanel>
-                <PositionReport key="positionreport" />
-              </TabPanel>
-              {/* <TabPanel>USA Position Report Here</TabPanel> */}
-              <TabPanel>
-                <USPositionReport key="usapositionreport" />
-              </TabPanel>
-            </Tabs>
+            <ProfRepProvider>
+              <Tabs>
+                <TabList>
+                  <Tab>Global</Tab>
+                  <Tab>USA Distribution</Tab>
+                </TabList>
+                <TabPanel>
+                  <PositionReport key="positionreport" />
+                </TabPanel>
+                {/* <TabPanel>USA Position Report Here</TabPanel> */}
+                <TabPanel>
+                  <USPositionReport key="usapositionreport" />
+                </TabPanel>
+              </Tabs>
+            </ProfRepProvider>
           </div>
           <div id="positions2" key="b">
             <PositionAdd key="positionadd" showAddProd={showAddProdModal} />

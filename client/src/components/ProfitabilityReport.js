@@ -5,6 +5,9 @@ import moment from "moment";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEllipsisH } from "@fortawesome/free-solid-svg-icons";
 import { faFilter } from "@fortawesome/free-solid-svg-icons";
+import { faSort } from "@fortawesome/free-solid-svg-icons";
+import { faSortDown } from "@fortawesome/free-solid-svg-icons";
+import { faSortUp } from "@fortawesome/free-solid-svg-icons";
 import { ProfitabilityContext } from "../contexts/ProfitabilityProvider";
 
 const ProfitabilityReport = ({
@@ -12,6 +15,7 @@ const ProfitabilityReport = ({
   reportenddate,
   refreshreport,
   profitreportgroupby,
+  prshowdetail,
 }) => {
   const {
     prdata,
@@ -33,6 +37,15 @@ const ProfitabilityReport = ({
     setPrpgroupfilter,
     prpgroupfilter,
   } = useContext(ProfitabilityContext);
+
+  // const [groupsortdata, setGroupsortdata] = useState();
+
+  // useEffect(() => {
+  //   // if (prdata) {
+  //   //   setGroupsortdata(prdata.groupBy(profitreportgroupby));
+  //   // }
+  //   console.log("didit");
+  // }, [profitreportgroupby, reportstartdate, reportenddate, refreshreport]);
 
   // const [productlist, setProductlist] = useState();
   // const [prodFilter, setProdFilter] = useState([]);
@@ -208,6 +221,30 @@ const ProfitabilityReport = ({
     // console.log(data[0]);
   };
 
+  const [sortstring, setSortstring] = useState("");
+  const [sortord, setSortord] = useState("");
+
+  const handleSort = (e, str) => {
+    setSortstring(str);
+    if (sortord === "") {
+      setSortord("DESC");
+    }
+    if (sortord === "DESC") {
+      setSortord("ASC");
+    }
+    if (sortord === "ASC") {
+      setSortord("");
+    }
+  };
+
+  const sumvalues = (data, sstr) => {
+    let total = 0;
+    for (var x of data) {
+      total += x[sstr];
+    }
+    return total;
+  };
+
   return (
     <div className="profitabilityreport">
       <ul>
@@ -236,6 +273,7 @@ const ProfitabilityReport = ({
           >
             ShipmentDate
           </p>
+          <p className="profitabilityreportcolumn ">Country</p>
           <p
             className="profitabilityreportcolumn "
             style={{
@@ -402,27 +440,85 @@ const ProfitabilityReport = ({
             )}
           </p>
 
-          <p className="profitabilityreportcolumn prfig">Quantity</p>
+          <p className="profitabilityreportcolumn prfig">
+            Quantity{" "}
+            <FontAwesomeIcon
+              className="ellipsis"
+              key="icon4"
+              style={{ color: "gray", marginLeft: 0 }}
+              icon={
+                sortord === "DESC" && sortstring === "quantity"
+                  ? faSortDown
+                  : sortord === "ASC" && sortstring === "quantity"
+                  ? faSortUp
+                  : faSort
+              }
+              onClick={(e) => {
+                handleSort(e, "quantity");
+              }}
+            />
+          </p>
           <p className="profitabilityreportcolumn prfig">Price</p>
           <p className="profitabilityreportcolumn prfig">Profit(pmt)</p>
-          <p className="profitabilityreportcolumn prfig">Profit</p>
+          <p className="profitabilityreportcolumn prfig">
+            Profit{" "}
+            <FontAwesomeIcon
+              className="ellipsis"
+              key="icon4"
+              style={{ color: "gray", marginLeft: 0 }}
+              icon={
+                sortord === "DESC" && sortstring === "profit"
+                  ? faSortDown
+                  : sortord === "ASC" && sortstring === "profit"
+                  ? faSortUp
+                  : faSort
+              }
+              onClick={(e) => {
+                handleSort(e, "profit");
+              }}
+            />
+          </p>
         </li>
         {prdata
-          ? Object.entries(prdata.groupBy(profitreportgroupby)).map(
-              (i, key) => {
-                // console.log(i[1]);
-
-                group = Object.keys(prdata.groupBy(profitreportgroupby))[key];
+          ? Object.entries(prdata.groupBy(profitreportgroupby))
+              .sort(([, a], [, b]) => {
+                if (sortstring !== "" && sortord === "DESC") {
+                  return sumvalues(b, sortstring) - sumvalues(a, sortstring);
+                } else if (sortstring !== "" && sortord === "ASC") {
+                  return sumvalues(a, sortstring) - sumvalues(b, sortstring);
+                }
+              })
+              .map((i, key) => {
+                group = Object.keys(
+                  Object.fromEntries(
+                    Object.entries(prdata.groupBy(profitreportgroupby)).sort(
+                      ([, a], [, b]) => {
+                        if (sortstring !== "" && sortord === "DESC") {
+                          return (
+                            sumvalues(b, sortstring) - sumvalues(a, sortstring)
+                          );
+                        } else if (sortstring !== "" && sortord === "ASC") {
+                          return (
+                            sumvalues(a, sortstring) - sumvalues(b, sortstring)
+                          );
+                        }
+                      }
+                    )
+                  )
+                )[key];
+                // group = Object.keys(prdata.groupBy(profitreportgroupby))[key];
                 u = 0;
                 v = 0;
-
+                // console.log(
+                //   groupsortdata || prdata.groupBy(profitreportgroupby)
+                // );
                 // console.log(profitabilitydata);
                 return [
-                  <div>
+                  <>
                     {sumtotal(i[1], "quantity") > 0
                       ? [<h3 className="prmonth">{group}</h3>]
                       : ""}
-                  </div>,
+                  </>,
                   i[1].map((x) => {
                     if (
                       prcustomerfilter &&
@@ -436,7 +532,14 @@ const ProfitabilityReport = ({
                       v = v + Number(x.quantity);
                     }
                     return (
-                      <li key={x.QSID} className="profitabilityreportline">
+                      <li
+                        key={x.QSID}
+                        className={
+                          prshowdetail
+                            ? "profitabilityreportline"
+                            : "profitabilityreportline prdisplay-none"
+                        }
+                      >
                         {prcustomerfilter &&
                         prproductfilter &&
                         prpgroupfilter &&
@@ -450,6 +553,9 @@ const ProfitabilityReport = ({
 
                               <p className="profitabilityreportcolumn">
                                 {x.startship} - {x.endship}
+                              </p>,
+                              <p className="profitabilityreportcolumn">
+                                {x.country}
                               </p>,
 
                               <p className="profitabilityreportcolumn">
@@ -499,6 +605,7 @@ const ProfitabilityReport = ({
                             <p className="profitabilityreportcolumn"></p>
                             <p className="profitabilityreportcolumn"></p>
                             <p className="profitabilityreportcolumn"></p>
+                            <p className="profitabilityreportcolumn"></p>
                             <p className="profitabilityreportcolumn prfig prtotal">
                               {v
                                 .toFixed(2)
@@ -519,8 +626,7 @@ const ProfitabilityReport = ({
                       : ""}
                   </div>,
                 ];
-              }
-            )
+              })
           : ""}
       </ul>
     </div>

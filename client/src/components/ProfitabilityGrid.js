@@ -9,6 +9,7 @@ import ProfitabilityReport from "./ProfitabilityReport";
 import WaterfallChart from "./WaterFall";
 import moment from "moment";
 import { ProfitabilityContext } from "../contexts/ProfitabilityProvider";
+import BarChart from "./BarChart";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -176,6 +177,7 @@ const ProfitabilityGrid = () => {
 
   const groupbyfilters = [
     "Month",
+    "Country",
     "Customer",
     "Product Group",
     "Product Category",
@@ -184,6 +186,7 @@ const ProfitabilityGrid = () => {
   ];
   const groupbyfiltervalues = [
     "month",
+    "country",
     "customer",
     "productGroup",
     "prodCatName",
@@ -279,6 +282,8 @@ const ProfitabilityGrid = () => {
     );
   }, [refreshreport]);
 
+  const [prshowdetail, setPrshowdetail] = useState(true);
+
   return (
     <>
       <ResponsiveGridLayout
@@ -295,7 +300,16 @@ const ProfitabilityGrid = () => {
         draggableCancel=".canceldrag"
       >
         <div id="profitability" key="h">
-          <h3>Profitability Report</h3>
+          <div className="profreporttitle">
+            <h3>Profitability Report</h3>
+            <button
+              onClick={(e) => {
+                setPrshowdetail(!prshowdetail);
+              }}
+            >
+              {prshowdetail ? "Hide Detail" : "Show Detail"}
+            </button>
+          </div>
 
           <div className="periodfilter">
             <div className="periodfilterbuttons">
@@ -423,12 +437,14 @@ const ProfitabilityGrid = () => {
             reportenddate={reportenddate}
             refreshreport={refreshreport}
             profitreportgroupby={profitreportgroupby}
+            prshowdetail={prshowdetail}
           />
         </div>
-        <div id="profitabilitychart" key="j">
-          <h3>Profit Waterfall Chart, 2020</h3>
-          <WaterfallChart key="waterfallchart" data={data1 ? data1 : ""} />
-        </div>
+        {/* <div id="profitabilitychart" key="j"> */}
+        {/* <h3>Profit Waterfall Chart, 2020</h3>
+          <WaterfallChart key="waterfallchart" data={data1 ? data1 : ""} /> */}
+        {/* <BarChart style={{ size: "100%", overflow: "hidden" }} />
+        </div> */}
       </ResponsiveGridLayout>
     </>
   );

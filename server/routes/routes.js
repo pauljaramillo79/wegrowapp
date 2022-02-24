@@ -248,7 +248,7 @@ router.post("/positionreport", authenticateToken, async (req, res) => {
 router.post("/usapositionreport", async (req, res) => {
   await db.query(
     // "SELECT KTP, prodName, productGroup, companyCode, saleComplete, priceAfterInterest FROM quotationsheet INNER JOIN ((prodNames INNER JOIN productGroups ON prodNames.prodGroupID = productGroups.prodGroupID) INNER JOIN productList ON prodNames.prodNameID = productList.productName) ON quotationsheet.productID = productList.productID INNER JOIN supplierlist ON quotationsheet.supplierID = supplierlist.supplierID WHERE saleComplete = 1",
-    "SELECT USpositionreport.*, warehouseName, DATE_FORMAT(whentry, '%Y-%m-%d') AS whentry, storagefixed, storagevariable, stggraceperiod, stgaccrualperiod, quantitypallets, uspositionsview.QSID, tCode FROM USpositionreport RIGHT JOIN uspositionsview ON USpositionreport.USWGP = uspositionsview.USWGP INNER JOIN traderList ON uspositionsview.traderID = traderList.traderID WHERE USpositionreport.quantity >0",
+    "SELECT USpositionreport.*, warehouseName, DATE_FORMAT(whentry, '%Y-%m-%d') AS whentry, storagefixed, storagevariable, stggraceperiod, stgaccrualperiod, quantitypallets, uspositionsview.QSID AS QSID, tCode FROM USpositionreport RIGHT JOIN uspositionsview ON USpositionreport.USWGP = uspositionsview.USWGP INNER JOIN traderList ON uspositionsview.traderID = traderList.traderID WHERE USpositionreport.quantity >0",
     (err, results) => {
       if (err) {
         console.log(err);
@@ -1662,7 +1662,7 @@ router.post("/profitabilityreport", (req, res) => {
   let reportenddate = req.body.reportenddate;
   console.log(reportstartdate);
   db.query(
-    "SELECT QSID, tCode, DATE_FORMAT(`from`, '%M-%Y') AS month, DATE_FORMAT(QSDate, '%d/%m/%Y') AS date, DATE_FORMAT(`from`, '%d %b') AS startship, DATE_FORMAT(`to`, '%d %b') AS endship, quantity, customerList.companyCode AS customer, abbreviation AS product, prodCatName, productGroup,tradingProfit AS profitpmt, tradingMargin AS profit, priceBeforeInterest AS price, QSID FROM quotationsheet INNER JOIN customerList ON quotationsheet.customerID = customerList.customerID INNER JOIN productList ON quotationsheet.productID = productList.productID INNER JOIN (prodNames INNER JOIN prodCatNames ON prodNames.prodCatNameID = prodCatNames.prodCatNameID) ON productList.productName =  prodNames.prodNameID  INNER JOIN productGroups ON prodNames.prodGroupID = productGroups.prodGroupID INNER JOIN traderList on quotationsheet.traderID = traderList.traderID WHERE DATE(`from`) BETWEEN ? AND ? AND saleComplete=-1 ORDER BY `from` DESC",
+    "SELECT QSID, tCode, DATE_FORMAT(`from`, '%M-%Y') AS month, DATE_FORMAT(QSDate, '%d/%m/%Y') AS date, DATE_FORMAT(`from`, '%d %b') AS startship, DATE_FORMAT(`to`, '%d %b') AS endship, quantity, customerList.companyCode AS customer, abbreviation AS product, prodCatName, productGroup,tradingProfit AS profitpmt, tradingMargin AS profit, priceBeforeInterest AS price, QSID, PODList.country FROM quotationsheet INNER JOIN customerList ON quotationsheet.customerID = customerList.customerID INNER JOIN productList ON quotationsheet.productID = productList.productID INNER JOIN (prodNames INNER JOIN prodCatNames ON prodNames.prodCatNameID = prodCatNames.prodCatNameID) ON productList.productName =  prodNames.prodNameID  INNER JOIN productGroups ON prodNames.prodGroupID = productGroups.prodGroupID INNER JOIN traderList on quotationsheet.traderID = traderList.traderID INNER JOIN PODList ON quotationsheet.PODID = PODList.PODID WHERE DATE(`from`) BETWEEN ? AND ? AND saleComplete=-1 ORDER BY `from` DESC",
     [reportstartdate, reportenddate],
     (err, results) => {
       if (err) {
@@ -1685,6 +1685,38 @@ router.post("/warehouses", (req, res) => {
       return res.status(200).send(results);
     }
   });
+});
+router.post("/addusmktprice", (req, res) => {
+  let QSID = req.body.usqsid;
+  let mktpriceupdate = req.body.mktprice;
+  db.query(
+    "INSERT INTO mktpriceupdates (QSID, mktpriceupdate, salecomplete) VALUES (?,?,1)",
+    [QSID, mktpriceupdate],
+    (err) => {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log("Added Mkt Price");
+        return res.json({
+          success: true,
+          message: "Succesfully added New Mkt Price",
+        });
+      }
+    }
+  );
+});
+router.post("/usmktpriceupdates", (req, res) => {
+  db.query(
+    "SELECT mktpriceupdates.mktpriceupdate, mktpriceupdates.QSID from mktpriceupdates,(SELECT QSID, max(createdat) as createdat from mktpriceupdates GROUP BY QSID) lastprices WHERE mktpriceupdates.salecomplete =1 AND mktpriceupdates.QSID=lastprices.QSID AND mktpriceupdates.createdat=lastprices.createdat;",
+    (err, results) => {
+      if (err) {
+        console.log(err);
+      }
+      if (results.length > 0) {
+        return res.status(200).send(results);
+      }
+    }
+  );
 });
 
 module.exports = router;

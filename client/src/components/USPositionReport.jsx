@@ -5,10 +5,15 @@ import "./USPositionReport.css";
 import { NavLink } from "react-router-dom";
 import { LoadQSContext } from "../contexts/LoadQSProvider";
 import USPosMatchingToolTip from "./USPosMatchingToolTip";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlusCircle } from "@fortawesome/free-solid-svg-icons";
+import USMktPriceTooltip from "./USMktPriceTooltip";
+import { ProfRepContext } from "../contexts/ProfRepProvider";
 
 const USPositionReport = () => {
   const { setQStoload, setLoaduser, setFromdropdown } =
     useContext(LoadQSContext);
+  const { mktpricedata } = useContext(ProfRepContext);
   // eslint-disable-next-line no-extend-native
   Array.prototype.groupBy = function (key) {
     return this.reduce(function (groups, item) {
@@ -25,7 +30,7 @@ const USPositionReport = () => {
     Axios.post("/usapositionreport").then((result) => {
       const rep = result.data.groupBy("productGroup");
       setGdata(rep);
-      console.log(rep);
+      // console.log(rep);
     });
   }, []);
 
@@ -49,14 +54,72 @@ const USPositionReport = () => {
   };
 
   const [usposmatchnumber, setUSposmatchnumber] = useState(0);
+  const [usqsidmatch, setUsqsidmatch] = useState(0);
 
   const getUSPosMatchingData = (x) => {
     setUSposmatchnumber(x);
   };
 
+  const currencify = (val, symbol = "$", decim = 2) => {
+    return (
+      symbol + " " + val.toFixed(decim).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+    );
+  };
+
+  const handleMktPriceValue = (id) => {
+    // console.log(mktpricedata);
+    if (mktpricedata) {
+      let result = mktpricedata.filter((item) => {
+        return item.QSID === id;
+      });
+      // console.log(result[0]["mktpriceupdate"]);
+      if (result[0]) {
+        return currencify(result[0]["mktpriceupdate"]);
+      } else {
+        return "N/A";
+      }
+    }
+    // console.log(mktpricedata);
+  };
+
+  const handleMktValue = (id, inv) => {
+    if (mktpricedata) {
+      let result = mktpricedata.filter((item) => {
+        return item.QSID === id;
+      });
+      // console.log(result[0]["mktpriceupdate"]);
+      if (result[0]) {
+        return currencify(result[0]["mktpriceupdate"] * inv, "$", 0);
+      } else {
+        return "N/A";
+      }
+    }
+  };
+
+  const handlePProfit = (id, inv, pr) => {
+    if (mktpricedata) {
+      let result = mktpricedata.filter((item) => {
+        return item.QSID === id;
+      });
+      // console.log(result[0]["mktpriceupdate"]);
+      if (result[0]) {
+        return currencify(
+          result[0]["mktpriceupdate"] * inv -
+            inv * Number(pr.replace(/[^0-9.-]+/g, "")),
+          "$",
+          0
+        );
+      } else {
+        return "N/A";
+      }
+    }
+  };
+
   var group = "";
   var prod = {};
   var u = 0;
+  var prof = 0;
+  var currval = 0;
 
   return (
     <div className="uspositionreport">
@@ -72,7 +135,10 @@ const USPositionReport = () => {
             <th>Supplier</th>
             <th>From</th>
             <th>To</th>
-            <th className="fig">Value</th>
+            <th className="fig">CostValue</th>
+            <th className="fig">MktPrice</th>
+            <th className="fig">MktValue</th>
+            <th className="fig">PProfit</th>
           </tr>
         </thead>
         <tbody>
@@ -82,20 +148,37 @@ const USPositionReport = () => {
             // eslint-disable-next-line no-sparse-arrays
             return [
               <tr>
-                <td className="usprodgroup" colSpan={10}>
+                <td className="usprodgroup" colSpan={13}>
                   <p>{group}</p>
                 </td>
               </tr>,
               Object.entries(prod).map((j, k) => {
                 u = 0;
+                prof = 0;
+                currval = 0;
                 return [
                   <tr>
-                    <td className="usproduct" colSpan={10}>
+                    <td className="usproduct" colSpan={13}>
                       <h4>{Object.keys(prod)[k]}</h4>
                     </td>
                   </tr>,
                   j[1].map((x) => {
                     u = u + Number(x.Inventory);
+                    var res = handlePProfit(x.QSID, x.Inventory, x.EWPrice);
+                    prof = prof + Number(res.replace("$", "").replace(",", ""));
+                    currval =
+                      currval +
+                      x.Inventory *
+                        (Number(x.EWPrice.replace(/[^0-9.-]+/g, "")) +
+                          storagepmtcalc(
+                            x.whentry,
+                            x.storagefixed,
+                            x.storagevariable,
+                            x.stggraceperiod,
+                            x.stgaccrualperiod,
+                            x.quantitypallets,
+                            x.quantity
+                          ));
                     return (
                       <>
                         <tr>
@@ -169,12 +252,45 @@ const USPositionReport = () => {
                           <td className="fig">
                             {"$" +
                               (
-                                x.quantity *
-                                Number(x.EWPrice.replace(/[^0-9.-]+/g, ""))
+                                x.Inventory *
+                                (Number(x.EWPrice.replace(/[^0-9.-]+/g, "")) +
+                                  storagepmtcalc(
+                                    x.whentry,
+                                    x.storagefixed,
+                                    x.storagevariable,
+                                    x.stggraceperiod,
+                                    x.stgaccrualperiod,
+                                    x.quantitypallets,
+                                    x.quantity
+                                  ))
                               )
                                 .toFixed(0)
                                 .toString()
                                 .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                          </td>
+                          <td class="mktpriceupdate">
+                            <FontAwesomeIcon
+                              style={{ marginRight: "5px" }}
+                              onClick={(e) => {
+                                if (x.QSID === usqsidmatch) {
+                                  setUsqsidmatch(0);
+                                } else {
+                                  setUsqsidmatch(x.QSID);
+                                }
+                              }}
+                              name="hi"
+                              icon={faPlusCircle}
+                            />
+                            <USMktPriceTooltip
+                              usqsid={x.QSID}
+                              usqsidmatch={usqsidmatch}
+                              setUsqsidmatch={setUsqsidmatch}
+                            />
+                            <p>{handleMktPriceValue(x.QSID)} </p>
+                          </td>
+                          <td>{handleMktValue(x.QSID, x.Inventory)}</td>
+                          <td>
+                            {handlePProfit(x.QSID, x.Inventory, x.EWPrice)}
                           </td>
                         </tr>
                       </>
@@ -192,7 +308,14 @@ const USPositionReport = () => {
                           .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                       </h4>
                     </td>
-                    <td colSpan={7}></td>
+                    <td colSpan={6}></td>
+                    <td>
+                      <h4>{currencify(currval, "$", 0)}</h4>
+                    </td>
+                    <td colSpan={2}></td>
+                    <td>
+                      <h4>{currencify(prof, "$", 0)}</h4>
+                    </td>
                   </tr>,
                 ];
               }),
