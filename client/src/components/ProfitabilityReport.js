@@ -258,9 +258,32 @@ const ProfitabilityReport = ({
               display: "flex",
               flexDirection: "row",
               alignItems: "center",
+              flexBasis: "14%",
             }}
           >
-            QSDate
+            QSID
+          </p>
+          <p
+            className="profitabilityreportcolumn"
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              flexBasis: "14%",
+            }}
+          >
+            WGP
+          </p>
+          <p
+            className="profitabilityreportcolumn"
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              flexBasis: "14%",
+            }}
+          >
+            WGS
           </p>
           <p
             className="profitabilityreportcolumn "
@@ -547,8 +570,23 @@ const ProfitabilityReport = ({
                         prproductfilter.includes(x.product) &&
                         prpgroupfilter.includes(x.productGroup)
                           ? [
-                              <p className="profitabilityreportcolumn">
-                                {x.date}
+                              <p
+                                style={{ flexBasis: "14%" }}
+                                className="profitabilityreportcolumn"
+                              >
+                                {x.QSID}
+                              </p>,
+                              <p
+                                style={{ flexBasis: "14%" }}
+                                className="profitabilityreportcolumn"
+                              >
+                                {x.KTP}
+                              </p>,
+                              <p
+                                style={{ flexBasis: "14%" }}
+                                className="profitabilityreportcolumn"
+                              >
+                                {x.KTS}
                               </p>,
 
                               <p className="profitabilityreportcolumn">
@@ -599,7 +637,18 @@ const ProfitabilityReport = ({
                     {sumtotal(i[1], "quantity") > 0
                       ? [
                           <li className="profitabilityreportline">
-                            <p className="profitabilityreportcolumn"></p>
+                            <p
+                              style={{ display: "flex", flexBasis: "14%" }}
+                              className="profitabilityreportcolumn"
+                            ></p>
+                            <p
+                              style={{ flexBasis: "14%" }}
+                              className="profitabilityreportcolumn"
+                            ></p>
+                            <p
+                              style={{ flexBasis: "14%" }}
+                              className="profitabilityreportcolumn"
+                            ></p>
                             <p className="profitabilityreportcolumn"></p>
                             <p className="profitabilityreportcolumn"></p>
                             <p className="profitabilityreportcolumn"></p>
