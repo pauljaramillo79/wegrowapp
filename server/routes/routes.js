@@ -1384,6 +1384,96 @@ router.post("/deleteCustomer", async (req, res) => {
   );
 });
 
+// PRODUCER LIST
+
+router.post("/producerlist", (req, res) => {
+  db.query(
+    "SELECT supplierID, companyCode, companyName, country, city, streetAddress, website FROM supplierlist ORDER BY companyCode ASC",
+    (err, results) => {
+      if (err) {
+        console.log(err);
+      }
+      if (results.length > 0) {
+        return res.status(200).send(results);
+      }
+    }
+  );
+});
+
+router.post("/updateproducer", (req, res) => {
+  let {
+    supplierID,
+    companyCode,
+    companyName,
+    country,
+    city,
+    streetAddress,
+    website,
+  } = req.body.selectedproducer;
+  db.query(
+    "UPDATE supplierlist SET companyCode=?, companyName=?, country=?, city=?, streetAddress=?, website=? WHERE supplierID=?",
+    [
+      companyCode,
+      companyName,
+      country,
+      city,
+      streetAddress,
+      website,
+      supplierID,
+    ],
+    (err) => {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log("Supplier Updated");
+        return res.json({
+          success: true,
+          message: "Succesfully edited Supplier",
+        });
+      }
+    }
+  );
+});
+
+router.post("/addNewProducer", async (req, res) => {
+  let { companyCode, companyName, country, city, streetAddress, website } =
+    req.body.newproducer;
+  db.query(
+    "INSERT INTO supplierlist (companyCode, companyName, country, city, streetAddress, website) VALUES (?,?,?,?,?,?)",
+    [companyCode, companyName, country, city, streetAddress, website],
+    (err) => {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log("Added Producer");
+        return res.json({
+          success: true,
+          message: "Succesfully added New Producer",
+        });
+      }
+    }
+  );
+});
+
+router.post("/deleteProducer", async (req, res) => {
+  supplierID = req.body.selectedproducer.supplierID;
+  db.query(
+    "DELETE FROM supplierlist WHERE (supplierID = ?)",
+    [supplierID],
+    (err) => {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log("Deleted Producer");
+        return res.json({
+          success: true,
+          message: "Succesfully deleted Producer",
+        });
+      }
+    }
+  );
+});
+
 // PRODNAMES LIST
 
 router.post("/prodnameslist", (req, res) => {

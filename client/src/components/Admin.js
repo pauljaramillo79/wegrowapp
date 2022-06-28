@@ -5,6 +5,7 @@ import Axios from "axios";
 // import CustomerCard from "./CustomerCard";
 import TradersList from "./TradersList";
 import CustomerList from "./CustomerList";
+import ProducerList from "./ProducerList";
 import ProdNamesList from "./ProdNamesList";
 import GProdList from "./GProdList";
 import SearchField from "./SearchField";
@@ -16,6 +17,7 @@ const Admin = () => {
   //   const [listdata, setListdata] = useState([]);
   const [selectedtrader, setSelectedtrader] = useState();
   const [selectedcustomer, setSelectedcustomer] = useState();
+  const [selectedproducer, setSelectedproducer] = useState();
   const [selectedgprods, setSelectedgprods] = useState([]);
   const [selectedprodgroup, setSelectedprodgroup] = useState();
   const [selectedprodgroup1, setSelectedprodgroup1] = useState();
@@ -23,11 +25,14 @@ const Admin = () => {
   const [selectedprodname, setSelectedprodname] = useState([]);
   const [newtrader, setNewtrader] = useState({ role: "3" });
   const [newcustomer, setNewcustomer] = useState({});
+  const [newproducer, setNewproducer] = useState({});
   const [newprodgroup, setNewprodgroup] = useState();
   const [newprodcatname, setNewprodcatname] = useState();
   const [deletecustomer, setDeletecustomer] = useState();
+  const [deleteproducer, setDeleteproducer] = useState();
   const [updatelist, setUpdatelist] = useState(true);
   const [updatecustomerlist, setUpdatecustomerlist] = useState(true);
+  const [updateproducerlist, setUpdateproducerlist] = useState(true);
   const [updateprodcatnameslist, setUpdateprodcatnameslist] = useState(true);
   const [updateprodnameslist, setUpdateprodnameslist] = useState(true);
 
@@ -35,6 +40,10 @@ const Admin = () => {
   const [showadd, setShowadd] = useState(false);
   const [showaddcustomer, setShowaddcustomer] = useState(false);
   const [showeditcustomer, setShoweditcustomer] = useState(false);
+
+  const [showaddproducer, setShowaddproducer] = useState(false);
+  const [showeditproducer, setShoweditproducer] = useState(false);
+
   const [showaddprodgroup, setShowaddprodgroup] = useState(false);
   const [showeditprodgroup, setShoweditprodgroup] = useState(false);
   const [showaddprodcatname, setShowaddprodcatname] = useState(false);
@@ -49,6 +58,12 @@ const Admin = () => {
     ? "editCustomer displayblock"
     : "editCustomer displaynone";
   const showhideeditcustomer = showeditcustomer
+    ? "editCustomer displayblock"
+    : "editCustomer displaynone";
+  const showhideaddproducer = showaddproducer
+    ? "editCustomer displayblock"
+    : "editCustomer displaynone";
+  const showhideeditproducer = showeditproducer
     ? "editCustomer displayblock"
     : "editCustomer displaynone";
   const showhideaddprodgroup = showaddprodgroup
@@ -85,6 +100,8 @@ const Admin = () => {
     setShowedit(false);
     setShowaddcustomer(false);
     setShoweditcustomer(false);
+    setShowaddproducer(false);
+    setShoweditproducer(false);
     setShowaddprodgroup(false);
     setShoweditprodgroup(false);
     setShoweditprodcatname(false);
@@ -103,6 +120,14 @@ const Admin = () => {
     e.preventDefault();
     setSelectedcustomer({
       ...selectedcustomer,
+      [key]: e.target.value,
+    });
+  };
+
+  const handleProducerChange = (e, key) => {
+    e.preventDefault();
+    setSelectedproducer({
+      ...selectedproducer,
       [key]: e.target.value,
     });
   };
@@ -151,6 +176,13 @@ const Admin = () => {
     });
   };
 
+  const editProducer = (e) => {
+    e.preventDefault();
+    Axios.post("/updateproducer", { selectedproducer }).then((response) => {
+      setUpdateproducerlist(!updateproducerlist);
+    });
+  };
+
   const editProdGroup = (e) => {
     e.preventDefault();
     Axios.post("/updateprodgroup", { selectedprodgroup1 }).then((response) => {
@@ -187,6 +219,11 @@ const Admin = () => {
     setShowaddcustomer(true);
   };
 
+  const addNewProducer = () => {
+    setShoweditproducer(false);
+    setShowaddproducer(true);
+  };
+
   const addNewProdGroup = () => {
     setShowaddprodgroup(true);
     setShoweditprodgroup(false);
@@ -208,10 +245,34 @@ const Admin = () => {
       [e.target.name]: e.target.value,
     });
   };
+
+  const newcustomerInit = {
+    companyCode: "",
+    companyName: "",
+    country: "",
+    city: "",
+    streetAddress: "",
+    website: "",
+  };
+  const newproducerInit = {
+    companyCode: "",
+    companyName: "",
+    country: "",
+    city: "",
+    streetAddress: "",
+    website: "",
+  };
   const handleNewCustomerChange = (e) => {
     e.preventDefault();
     setNewcustomer({
       ...newcustomer,
+      [e.target.name]: e.target.value,
+    });
+  };
+  const handleNewProducerChange = (e) => {
+    e.preventDefault();
+    setNewproducer({
+      ...newproducer,
       [e.target.name]: e.target.value,
     });
   };
@@ -227,6 +288,10 @@ const Admin = () => {
     e.preventDefault();
     setDeletecustomer(e.target.value);
   };
+  const handleProducerDeleteChange = (e) => {
+    e.preventDefault();
+    setDeleteproducer(e.target.value);
+  };
 
   const addTrader = (e) => {
     e.preventDefault();
@@ -239,6 +304,13 @@ const Admin = () => {
     await Axios.post("/addNewCustomer", { newcustomer }).then((response) => {
       // console.log(response);
       setUpdatecustomerlist(!updatecustomerlist);
+    });
+  };
+  const addProducer = async (e) => {
+    e.preventDefault();
+    await Axios.post("/addNewProducer", { newproducer }).then((response) => {
+      // console.log(response);
+      setUpdateproducerlist(!updateproducerlist);
     });
   };
   const addProdGroup = async (e) => {
@@ -264,6 +336,14 @@ const Admin = () => {
       console.log(response);
       setUpdatecustomerlist(!updatecustomerlist);
       setDeletecustomer("");
+    });
+  };
+  const deleteProducer = (e) => {
+    e.preventDefault();
+    Axios.post("/deleteProducer", { selectedproducer }).then((response) => {
+      console.log(response);
+      setUpdateproducerlist(!updateproducerlist);
+      setDeleteproducer("");
     });
   };
 
@@ -341,6 +421,9 @@ const Admin = () => {
         <button name="customerlist" onClick={selectlist}>
           Customers
         </button>
+        <button name="producerlist" onClick={selectlist}>
+          Producers
+        </button>
         <button name="prodnameslist" onClick={selectlist}>
           Products
         </button>
@@ -371,6 +454,20 @@ const Admin = () => {
         ) : (
           ""
         )}
+
+        {selectedlist === "/producerlist" ? (
+          <ProducerList
+            searchcode="/producerlist"
+            updateList={updateproducerlist}
+            setShowaddproducer={setShowaddproducer}
+            setShoweditproducer={setShoweditproducer}
+            setSelectedproducer={setSelectedproducer}
+            addNewProducer={addNewProducer}
+          />
+        ) : (
+          ""
+        )}
+
         {selectedlist === "/prodnameslist"
           ? [
               <ProdNamesList
@@ -667,6 +764,7 @@ const Admin = () => {
           className={showhideaddcustomer}
           onSubmit={(e) => {
             addCustomer(e);
+            setNewcustomer(newcustomerInit);
           }}
         >
           <fieldset>
@@ -681,6 +779,7 @@ const Admin = () => {
                 placeholder="...short company name"
                 name="companyCode"
                 onChange={handleNewCustomerChange}
+                value={newcustomer.companyCode}
                 required
               />
             </div>
@@ -691,6 +790,7 @@ const Admin = () => {
                 placeholder="...full company name"
                 name="companyName"
                 onChange={handleNewCustomerChange}
+                value={newcustomer.companyName}
                 required
               />
             </div>
@@ -700,6 +800,7 @@ const Admin = () => {
                 placeholder="...country"
                 name="country"
                 onChange={handleNewCustomerChange}
+                value={newcustomer.country}
                 required
               />
             </div>
@@ -709,6 +810,7 @@ const Admin = () => {
                 placeholder="...city"
                 name="city"
                 onChange={handleNewCustomerChange}
+                value={newcustomer.city}
                 required
               />
             </div>
@@ -718,6 +820,7 @@ const Admin = () => {
                 placeholder="...street address"
                 name="streetAddress"
                 onChange={handleNewCustomerChange}
+                value={newcustomer.streetAddress}
                 required
               />
             </div>
@@ -727,6 +830,7 @@ const Admin = () => {
                 placeholder="...website"
                 name="website"
                 onChange={handleNewCustomerChange}
+                value={newcustomer.website}
                 required
               />
             </div>
@@ -737,6 +841,7 @@ const Admin = () => {
           className={showhideeditcustomer}
           onSubmit={(e) => {
             deleteCustomer(e);
+            setShoweditcustomer(false);
           }}
         >
           <fieldset>
@@ -764,6 +869,168 @@ const Admin = () => {
             {selectedcustomer &&
             selectedcustomer.companyCode === deletecustomer ? (
               <button type="submit">Delete Customer</button>
+            ) : (
+              ""
+            )}
+          </fieldset>
+        </form>
+
+        {/* ADD/EDIT PRODUCER FORMS*/}
+        <form
+          className={showhideeditproducer}
+          onSubmit={(e) => {
+            editProducer(e);
+          }}
+        >
+          <fieldset>
+            <legend>Edit Producer Info</legend>
+            {selectedproducer
+              ? Object.keys(selectedproducer).map((key, index) => {
+                  if (key === "producerID") {
+                    return (
+                      <div className="editcustomer-form-group">
+                        <label>{key}:</label>
+                        <input value={selectedproducer[key]} readOnly />
+                      </div>
+                    );
+                  } else if (key === "companyName" || key === "streetAddress") {
+                    return (
+                      <div className="editcustomer-form-group">
+                        <label>{key}:</label>
+                        <textarea
+                          value={selectedproducer[key]}
+                          onChange={(e) => handleProducerChange(e, key)}
+                          required
+                        />
+                      </div>
+                    );
+                  } else {
+                    return (
+                      <div className="editcustomer-form-group">
+                        <label>{key}:</label>
+                        <input
+                          value={selectedproducer[key]}
+                          onChange={(e) => handleProducerChange(e, key)}
+                          required
+                        />
+                      </div>
+                    );
+                  }
+                })
+              : ""}
+            <button type="submit">Save Edits</button>
+          </fieldset>
+        </form>
+
+        <form
+          className={showhideaddproducer}
+          onSubmit={(e) => {
+            addProducer(e);
+            setNewproducer(newproducerInit);
+          }}
+        >
+          <fieldset>
+            <legend>Add New Producer</legend>
+            <div className="editcustomer-form-group">
+              <label>producerID:</label>
+              <input placeholder="...Leave Blank" readOnly />
+            </div>
+            <div className="editcustomer-form-group">
+              <label>companyCode:</label>
+              <input
+                placeholder="...short company name"
+                name="companyCode"
+                onChange={handleNewProducerChange}
+                value={newproducer.companyCode}
+                required
+              />
+            </div>
+            <div className="editcustomer-form-group">
+              <label>companyName:</label>
+              <textarea
+                placeholder="...full company name"
+                name="companyName"
+                onChange={handleNewProducerChange}
+                value={newproducer.companyName}
+                required
+              />
+            </div>
+            <div className="editcustomer-form-group">
+              <label>country:</label>
+              <input
+                placeholder="...country"
+                name="country"
+                onChange={handleNewProducerChange}
+                value={newproducer.country}
+                required
+              />
+            </div>
+            <div className="editcustomer-form-group">
+              <label>city:</label>
+              <input
+                placeholder="...city"
+                name="city"
+                onChange={handleNewProducerChange}
+                value={newproducer.city}
+                required
+              />
+            </div>
+            <div className="editcustomer-form-group">
+              <label>streetAddress:</label>
+              <textarea
+                placeholder="...street address"
+                name="streetAddress"
+                onChange={handleNewProducerChange}
+                value={newproducer.streetAddress}
+                required
+              />
+            </div>
+            <div className="editcustomer-form-group">
+              <label>website:</label>
+              <input
+                placeholder="...website"
+                name="website"
+                onChange={handleNewProducerChange}
+                value={newproducer.website}
+                required
+              />
+            </div>
+            <button type="submit">Add New Producer</button>
+          </fieldset>
+        </form>
+
+        <form
+          className={showhideeditproducer}
+          onSubmit={(e) => {
+            deleteProducer(e);
+            setShoweditproducer(false);
+          }}
+        >
+          <fieldset>
+            <legend>Delete Producer</legend>
+            <div className="editcustomer-form-group">
+              <label>companyCode:</label>
+              {selectedproducer ? (
+                <input
+                  value={selectedproducer.companyCode}
+                  onChange={handleNewProducerChange}
+                  readOnly
+                />
+              ) : (
+                ""
+              )}
+            </div>
+            <div className="editcustomer-form-group">
+              <label>reType:</label>
+              <input
+                value={deleteproducer}
+                placeholder="retype company name to delete"
+                onChange={handleProducerDeleteChange}
+              />
+            </div>
+            {selectedproducer &&
+            selectedproducer.companyCode === deleteproducer ? (
+              <button type="submit">Delete Producer</button>
             ) : (
               ""
             )}
