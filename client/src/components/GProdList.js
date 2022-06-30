@@ -9,6 +9,8 @@ const GProdList = ({
 }) => {
   const [selectedproducts, setSelectedproducts] = useState();
   const [prodnameID, setProdnameID] = useState();
+  const [prodname, setProdname] = useState();
+  const [selectedproddetails, setSelectedproddetails] = useState();
 
   useEffect(() => {
     Axios.post("/selectgroupedprods", {
@@ -24,28 +26,51 @@ const GProdList = ({
       // await setSelectedproducts(selectedgprods);
 
       console.log(prodnameID);
-      console.log("called this");
+      // console.log("called this");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [prodnameID, updateList, selectedgprods]);
+
+  const handleProdClick = (nameID) => {
+    Axios.post("/selectproducts", { prodnameID: nameID }).then((response) => {
+      setSelectedproddetails(response.data);
+    });
+  };
+
   return (
-    <div className="selectedprodgroup">
-      <h4>{selectedprodgroup}</h4>
-      {selectedproducts
-        ? selectedproducts.map((item) => (
-            <p
-              className="prodnameadmin"
-              onClick={(e) => {
-                e.preventDefault();
-                setProdnameID(item.prodNameID);
-                handleProdNameClick(item.prodNameID);
-              }}
-              name={item.prodNameID}
-            >
-              PG: {item.prodGroupID} - {item.abbreviation}
-            </p>
-          ))
-        : ""}
+    <div className="selectedprods">
+      <div className="selectedprodgroup">
+        <h4>{selectedprodgroup}</h4>
+        {selectedproducts
+          ? selectedproducts.map((item) => (
+              <p
+                name={item.prodNameID}
+                className="prodnameadmin"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setProdnameID(item.prodNameID);
+                  setProdname(item.abbreviation);
+                  handleProdNameClick(item.prodNameID);
+                  handleProdClick(item.prodNameID);
+                }}
+              >
+                PG: {item.prodGroupID} - {item.abbreviation}
+              </p>
+            ))
+          : ""}
+      </div>
+      <div className="selectedproddetails">
+        {prodname
+          ? [<h4> {prodname} </h4>, <h4> productID - supplier</h4>]
+          : ""}
+        {selectedproddetails
+          ? selectedproddetails.map((item) => (
+              <p>
+                {item.productID} - {item.companyCode}
+              </p>
+            ))
+          : ""}
+      </div>
     </div>
   );
 };

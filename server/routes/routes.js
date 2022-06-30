@@ -1688,6 +1688,24 @@ router.post("/updateprodname", (req, res) => {
   );
 });
 
+// SELECT PRODUCTS //
+
+router.post("/selectproducts", (req, res) => {
+  let prodnameID = req.body.prodnameID;
+  db.query(
+    "SELECT productID, productName, abbreviation, supplierlist.supplierID, companyCode from productList INNER JOIN prodNames ON productList.productName = prodNames.prodNameID INNER JOIN supplierlist ON productList.supplierID = supplierlist.supplierID WHERE productName=?",
+    [prodnameID],
+    (err, results) => {
+      if (err) {
+        console.log(err);
+      }
+      if (results.length > 0) {
+        return res.status(200).send(results);
+      }
+    }
+  );
+});
+
 router.post("/posmatching", (req, res) => {
   let posnumber = req.body.posnumber;
   db.query(

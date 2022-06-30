@@ -271,6 +271,19 @@
   font-weight: bold;
 }
 .selectedprodgroup {
+  display: flex;
+  flex-direction: column;
+  flex-basis: 50%;
+  padding-left: 2rem;
+}
+.selectedprods {
+  display: flex;
+  flex-direction: column;
+}
+.selectedproddetails {
+  display: flex;
+  flex-direction: column;
+  flex-basis: 40%;
   padding-left: 2rem;
 }
 .prodaddcard {
