@@ -14,6 +14,7 @@ import ManagementGrid from "./components/ManagementGrid";
 import Admin from "./components/Admin";
 import SunburstData from "./components/SunburstData";
 import AnalysisGrid from "./components/AnalysisGrid";
+import LogisticsGrid from "./components/LogisticsGrid";
 import { LoadQSProvider } from "./contexts/LoadQSProvider";
 // import { ProfitabilityProvider } from "./contexts/ProfitabilityProvider";
 
@@ -116,6 +117,9 @@ function App() {
                     </Route>
                     <Route path="/analysis">
                       <AnalysisGrid />
+                    </Route>
+                    <Route path="/logistics">
+                      <LogisticsGrid />
                     </Route>
                   </Switch>
                 </Router>

@@ -1827,4 +1827,45 @@ router.post("/usmktpriceupdates", (req, res) => {
   );
 });
 
+router.post("/matchingposreport", (req, res) => {
+  db.query(
+    "SELECT uspositionsview.USWGP, uspositionsview.abbreviation, companyCode, quantity, IFNULL(TotalSold,0), (quantity-IFNULL(TotalSold,0)) AS inventory FROM uspositionsview LEFT JOIN usinventoryupdates ON uspositionsview.USWGP = usinventoryupdates.USWGP ORDER BY USWGP",
+    (err, results) => {
+      if (err) {
+        console.log(err);
+      }
+      if (results.length > 0) {
+        return res.status(200).send(results);
+      }
+    }
+  );
+});
+router.post("/poslist", (req, res) => {
+  db.query("SELECT USWGP FROM uspositionsview", (err, results) => {
+    if (err) {
+      console.log(err);
+    }
+    if (results.length > 0) {
+      return res.status(200).send(results);
+    }
+  });
+});
+router.post("/matchingpossales", (req, res) => {
+  let matchposlist = req.body.posl1;
+  // console.log(matchposlist);
+  db.query(
+    `SELECT tCode, KTS, KTP, quantity, companyCode, saleComplete, saleTypeID, FORMAT(tradingProfit,2) AS tradingProfit, FORMAT(priceAfterInterest,2) AS priceAfterInterest, DATE_FORMAT(whexit,'%Y-%m-%d') AS whexit FROM quotationsheet INNER JOIN customerList ON quotationsheet.customerID = customerList.customerID INNER JOIN traderList ON quotationsheet.traderID = traderList.traderID WHERE KTP IN (${matchposlist}) AND saleComplete=-1 AND saleTypeID=3 ORDER BY tradingProfit DESC`,
+    // [matchposlist],
+    (err, results) => {
+      console.log(results);
+      if (err) {
+        console.log(err);
+      }
+      if (results.length > 0) {
+        return res.status(200).send(results);
+      }
+    }
+  );
+});
+
 module.exports = router;

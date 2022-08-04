@@ -40,6 +40,11 @@ const Nav = () => {
             Sales
           </NavLink>
         </li>
+        <li>
+          <NavLink activeClassName="navbaractive" to="/logistics/matching">
+            Logistics
+          </NavLink>
+        </li>
         {/* {role === 1 ? (
           <li>
             <NavLink activeClassName="navbaractive" to="/sales2">

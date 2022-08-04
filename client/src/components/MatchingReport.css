@@ -1,0 +1,65 @@
+.matchreport {
+  margin-top: 2rem;
+  overflow: scroll;
+  height: 90%;
+}
+
+.matchaccordion_button {
+  /* background-color: #f4f4f4; */
+  color: #444;
+  cursor: pointer;
+  padding: 5px 20px;
+  width: 100%;
+  text-align: left;
+  border: none;
+  display: flex;
+  font-family: "Roboto", sans-serif;
+  font-size: 0.9rem;
+}
+.matchaccordion:nth-child(even) {
+  background-color: #f4f4f4;
+}
+.matchaccordion_button:before {
+  display: inline-block;
+  content: "";
+  height: 5px;
+  width: 5px;
+  margin-right: 12px;
+  margin-top: 5px;
+  border-bottom: 2px solid currentColor;
+  border-right: 2px solid currentColor;
+  transform: rotate(-45deg);
+}
+.matchaccordion_button[aria-expanded="true"]::before,
+.matchaccordion_button[aria-selected="true"]::before {
+  transform: rotate(45deg);
+}
+.matchaccordion_button ul {
+  display: flex;
+  width: 100%;
+}
+.matchaccordion_button ul li {
+  /* display: flex; */
+  flex-basis: 30%;
+}
+.matchpossales {
+  display: flex;
+  width: 95%;
+  flex-direction: column;
+  font-family: "Roboto", sans-serif;
+  font-size: 0.9rem;
+  margin-left: 3rem;
+  margin-right: 3rem;
+}
+.matchpossales li {
+  display: flex;
+  flex-direction: row;
+  min-width: 100%;
+}
+.matchpossales li p {
+  display: flex;
+  flex-basis: 30%;
+}
+.matchpossalesheader {
+  border-bottom: 1px solid black;
+}
