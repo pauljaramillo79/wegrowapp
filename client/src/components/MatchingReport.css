@@ -14,7 +14,7 @@
   border: none;
   display: flex;
   font-family: "Roboto", sans-serif;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
 }
 .matchaccordion:nth-child(even) {
   background-color: #f4f4f4;
@@ -40,14 +40,18 @@
 }
 .matchaccordion_button ul li {
   /* display: flex; */
-  flex-basis: 30%;
+  flex-basis: 15%;
+  margin-right: 2rem;
+}
+.matchaccordion_button .prodli {
+  flex-basis: 25%;
 }
 .matchpossales {
   display: flex;
-  width: 95%;
+  width: 50%;
   flex-direction: column;
   font-family: "Roboto", sans-serif;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   margin-left: 3rem;
   margin-right: 3rem;
 }
@@ -57,9 +61,12 @@
   min-width: 100%;
 }
 .matchpossales li p {
-  display: flex;
+  /* display: flex; */
   flex-basis: 30%;
 }
 .matchpossalesheader {
   border-bottom: 1px solid black;
+}
+.matchpossales .matchfig {
+  text-align: right;
 }

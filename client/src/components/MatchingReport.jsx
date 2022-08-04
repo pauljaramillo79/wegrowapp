@@ -37,9 +37,24 @@ const MatchingReport = ({ posdata, matchingpossales }) => {
                 <AccordionItemHeading>
                   <AccordionItemButton className="matchaccordion_button">
                     <ul>
-                      <li>USWGP: {item.USWGP}</li>
-                      <li>Quantity: {item.quantity}</li>
-                      <li>Inventory: {item.inventory ? item.inventory : 0}</li>
+                      <li>
+                        <b>USWGP:</b> {item.USWGP}
+                      </li>
+                      <li>
+                        <b>WGP:</b> {item.USpositionID}
+                      </li>
+                      <li className="prodli">
+                        <b>Product:</b> {item.abbreviation}
+                      </li>
+                      <li>
+                        <b>Quantity:</b> {item.quantity}mt
+                      </li>
+                      <li>
+                        <b>Sold:</b> {item.totalSold}mt
+                      </li>
+                      <li>
+                        <b>Unsold:</b> {item.inventory}mt
+                      </li>
                     </ul>
                   </AccordionItemButton>
                 </AccordionItemHeading>
@@ -48,7 +63,7 @@ const MatchingReport = ({ posdata, matchingpossales }) => {
                     <li className="matchpossalesheader">
                       <p>WGS</p>
                       <p>Customer</p>
-                      <p>Quantity</p>
+                      <p className="matchfig">Quantity</p>
                     </li>
                     {matchingpossales
                       ? matchingpossales.map((x) =>
@@ -56,7 +71,7 @@ const MatchingReport = ({ posdata, matchingpossales }) => {
                             <li>
                               <p>{x.KTS}</p>
                               <p>{x.companyCode}</p>
-                              <p>{x.quantity}</p>
+                              <p className="matchfig">{x.quantity}</p>
                             </li>
                           ) : (
                             ""
