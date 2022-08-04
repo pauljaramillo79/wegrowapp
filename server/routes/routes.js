@@ -1829,7 +1829,7 @@ router.post("/usmktpriceupdates", (req, res) => {
 
 router.post("/matchingposreport", (req, res) => {
   db.query(
-    "SELECT uspositionsview.USWGP, uspositionsview.abbreviation, companyCode, quantity, IFNULL(TotalSold,0), (quantity-IFNULL(TotalSold,0)) AS inventory FROM uspositionsview LEFT JOIN usinventoryupdates ON uspositionsview.USWGP = usinventoryupdates.USWGP ORDER BY USWGP",
+    "SELECT uspositionsview.USWGP, uspositionsview.USpositionID, uspositionsview.abbreviation, companyCode, quantity, IFNULL(TotalSold,0) AS totalSold, (quantity-IFNULL(TotalSold,0)) AS inventory FROM uspositionsview LEFT JOIN usinventoryupdates ON uspositionsview.USWGP = usinventoryupdates.USWGP ORDER BY USWGP",
     (err, results) => {
       if (err) {
         console.log(err);
