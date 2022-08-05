@@ -3,6 +3,14 @@
   overflow: scroll;
   height: 90%;
 }
+.matchsearch {
+  margin-bottom: 1rem;
+  margin-top: 1rem;
+  margin-left: 1rem;
+  padding: 0.2rem 1rem;
+  border-radius: 0.2rem;
+  border: 1px solid rgb(192, 192, 192);
+}
 
 .matchaccordion_button {
   /* background-color: #f4f4f4; */
@@ -15,6 +23,9 @@
   display: flex;
   font-family: "Roboto", sans-serif;
   font-size: 0.8rem;
+}
+.matchaccordion_button:hover {
+  background-color: rgb(227, 237, 250);
 }
 .matchaccordion:nth-child(even) {
   background-color: #f4f4f4;

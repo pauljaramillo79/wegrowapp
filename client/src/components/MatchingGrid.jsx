@@ -42,10 +42,12 @@ const MatchingGrid = () => {
 
   const [positions, setPositions] = useState();
   const [matchingpossales, setMatchingpossales] = useState();
+  const [filteredPosList, setFilteredPosList] = useState();
 
   useEffect(() => {
     Axios.post("/matchingposreport").then((response) => {
       setPositions(response.data);
+      setFilteredPosList(response.data);
       Axios.post("/poslist").then((res) => {
         console.log(res.data);
         const posl = [];
@@ -89,6 +91,8 @@ const MatchingGrid = () => {
             : ""} */}
           <MatchingReport
             posdata={positions}
+            filteredPosList={filteredPosList}
+            setFilteredPosList={setFilteredPosList}
             matchingpossales={matchingpossales}
           />
         </div>
