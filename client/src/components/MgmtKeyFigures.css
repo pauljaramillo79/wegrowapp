@@ -1,7 +1,8 @@
 .keyfigures-list {
   display: flex;
   width: 100%;
-  flex-wrap: wrap;
+  flex-direction: row;
+  /* flex-wrap: wrap; */
   /* margin-top: 0.5rem; */
   /* padding: 1rem; */
   text-align: center;
@@ -12,35 +13,60 @@
   color: rgb(68, 65, 162);
 }
 .keyfigure-volume {
-  flex: 1;
-  flex-basis: 50%;
+  display: flex;
+  flex-direction: column;
+  flex-basis: 20%;
   padding: 2rem 0 1rem 0;
-  border-bottom: dashed 1px rgb(160, 182, 103);
+  /* border-bottom: dashed 1px rgb(160, 182, 103); */
 }
 .keyfigure-revenue {
-  flex: 1;
-  flex-basis: 50%;
+  display: flex;
+  flex-basis: 20%;
+  flex-direction: column;
+
   padding: 2rem 0 1rem 0;
-  border-bottom: dashed 1px rgb(160, 182, 103);
+  /* border-bottom: dashed 1px rgb(160, 182, 103); */
 }
 .keyfigure-profit {
-  flex: 1;
-  flex-basis: 50%;
+  display: flex;
+  flex-basis: 20%;
+  flex-direction: column;
+
   padding: 2rem 0 1rem 0;
-  border-bottom: dashed 1px rgb(160, 182, 103);
+  /* border-bottom: dashed 1px rgb(160, 182, 103); */
 }
 .keyfigure-profitpmt {
-  flex: 1;
-  flex-basis: 50%;
+  display: flex;
+  flex-basis: 20%;
+  flex-direction: column;
+
   padding: 2rem 0 1rem 0;
-  border-bottom: dashed 1px rgb(160, 182, 103);
+  /* border-bottom: dashed 1px rgb(160, 182, 103); */
 }
 .keyfigure-profitpct {
-  flex: 1;
-  flex-basis: 100%;
+  display: flex;
+  flex-basis: 20%;
+  flex-direction: column;
+
   padding: 2rem 0 1rem 0;
 }
 .kfig {
+  /* display: flex;
+  flex-basis: 100%;
+  flex-wrap: wrap; */
   margin-bottom: 1rem;
   color: rgb(160, 182, 103);
+}
+.keyfigures-buttons {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin: 0 3rem;
+}
+.keyfigures-buttons button {
+  margin: 0 1rem;
+  padding: 0.2rem 1rem;
+  border-radius: 1rem;
+  border: rgb(68, 65, 162) 1px solid;
+  background-color: white;
 }

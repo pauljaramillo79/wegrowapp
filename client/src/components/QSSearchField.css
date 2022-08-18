@@ -17,6 +17,7 @@
   border: solid 1px gray;
   max-height: 20rem;
   overflow-y: auto;
+  z-index: 2;
 
   /* display: table; */
 }

@@ -1,0 +1,61 @@
+.inprogresslist {
+  margin-top: 2rem;
+  overflow: scroll;
+  height: 90%;
+  width: 100%;
+  font-family: "Roboto", sans-serif;
+  font-size: 0.8rem;
+}
+.inprogresslist li {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+}
+.inprogresslist li:nth-child(odd) {
+  background-color: rgb(239, 237, 237);
+}
+.inprogresslist li p {
+  flex-basis: 5%;
+  margin: 0.4rem 0;
+}
+.inprog-center {
+  text-align: center;
+}
+.inprogresslist li p input {
+  width: 90%;
+  font-family: "Roboto", sans-serif;
+  font-size: 0.8rem;
+}
+.inprogresslist li .inprogress-lrg-p {
+  flex-basis: 10%;
+  margin: 0.4rem 0;
+}
+.inprogresslist li .inprogress-med-p {
+  flex-basis: 6%;
+}
+.inprogresslist li button {
+  margin: 0.2rem 0;
+  padding: 0.25rem 1rem;
+  margin-left: 2rem;
+  border-radius: 0.75rem;
+  border: none;
+  color: white;
+  background-color: rgb(68, 65, 162);
+}
+.inprogresslist li button:hover {
+  cursor: pointer;
+}
+.inprogresslist li select {
+  margin: 0.2rem 0;
+  /* border: none; */
+}
+
+.inprogresslist-header {
+  font-weight: 600;
+  border-bottom: 1px solid gray;
+}
+.inprogresslist h4 {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+}

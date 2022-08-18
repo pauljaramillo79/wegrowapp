@@ -35,9 +35,11 @@ const NivoPie2 = () => {
               valueFormat=">-$,"
               startAngle={-90}
               endAngle={270}
-              radialLabelsSkipAngle={20}
-              sliceLabelsSkipAngle={25}
+              arcLinkLabelsSkipAngle={15}
+              // radialLabelsSkipAngle={25}
+              // sliceLabelsSkipAngle={25}
               sliceLabelsTextColor="white"
+              enableArcLabels={false}
             />
             <ResponsivePie
               data={data1}
@@ -51,9 +53,12 @@ const NivoPie2 = () => {
               valueFormat=">-,"
               startAngle={-90}
               endAngle={270}
-              radialLabelsSkipAngle={15}
-              sliceLabelsSkipAngle={15}
+              arcLinkLabelsSkipAngle={15}
+              // radialLabelsSkipAngle={60}
+              // arcLabelsSkipAngle={60}
+              // sliceLabelsSkipAngle={60}
               sliceLabelsTextColor="white"
+              enableArcLabels={false}
             />
           </>
         ) : (

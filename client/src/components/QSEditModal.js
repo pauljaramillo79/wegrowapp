@@ -104,6 +104,9 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
           salesinterest: Number(
             response.data[0].salesinterest.replace("$", "").replace(",", "")
           ),
+          pricebeforeint: Number(
+            response.data[0].pricebeforeint.replace("$", "").replace(",", "")
+          ),
           priceafterint: Number(
             response.data[0].priceafterint.replace("$", "").replace(",", "")
           ),
@@ -363,6 +366,23 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
       setQSedits({ ...QSedits, saleComplete: 0 });
     }
   }, [sold]);
+
+  const [finalized, setFinalized] = useState(false);
+
+  const handleFinalized = () => {
+    setFinalized(!finalized);
+  };
+
+  useEffect(() => {
+    if (finalized) {
+      setQSeditable({ ...QSeditable, finalComplete: 1 });
+      setQSedits({ ...QSedits, finalComplete: 1 });
+    }
+    if (!finalized) {
+      setQSeditable({ ...QSeditable, finalComplete: 0 });
+      setQSedits({ ...QSedits, finalComplete: 0 });
+    }
+  }, [finalized]);
 
   // FROM and TO
   ///////////////
@@ -1541,6 +1561,16 @@ const QSEditModal = ({ handleClose, show, QStoedit }) => {
                 />
               </div>
             </fieldset>
+            <div>
+              <input
+                type="checkbox"
+                className="canceldrag"
+                name="finalComplete"
+                checked={finalized}
+                onClick={handleFinalized}
+              />
+              <label htmlFor="">Finalized</label>
+            </div>
           </section>
           <section id="editQS-3">
             <fieldset>

@@ -134,6 +134,7 @@ const SalesQS2 = () => {
     pctmargin: 0,
     netback: 0,
     saleComplete: 0,
+    finalComplete: 0,
     outboundpmt: 0,
     loading: 0,
     bolcharges: 0,
@@ -223,6 +224,7 @@ const SalesQS2 = () => {
     pctmargin: "0.00%",
     netback: "$ 0.00",
     saleComplete: "indication",
+    finalComplete: "in progress",
     outboundpmt: "$ 0.00",
     loading: "$ 0.00",
     bolcharges: "$ 0.00",
@@ -237,6 +239,7 @@ const SalesQS2 = () => {
   const [USPositionsddown, setUSPositionsddown] = useState();
   const [resetfield, setResetfield] = useState(false);
   const [sold, setSold] = useState(false);
+  const [finalized, setFinalized] = useState(false);
   const [allocated, setAllocated] = useState(false);
   const [QSsaved, setQSSaved] = useState(false);
   const [QSIDList, setQSIDList] = useState([]);
@@ -378,6 +381,7 @@ const SalesQS2 = () => {
       setEditMode(false);
       setSold(false);
       setAllocated(false);
+      setFinalized(false);
     } else {
       setEditMode(true);
     }
@@ -787,6 +791,8 @@ const SalesQS2 = () => {
                   : ldata.saleComplete === 1
                   ? "US Allocation"
                   : "",
+              finalComplete:
+                ldata.finalComplete === 1 ? "finalized" : "in progress",
               TIC: ldata.trader,
               traffic: ldata.traffic,
               incoterms: ldata.incoterms,
@@ -1102,6 +1108,7 @@ const SalesQS2 = () => {
               POL: ldata.POLID,
               POD: ldata.PODID,
               saleComplete: ldata.saleComplete,
+              finalComplete: ldata.finalComplete,
               TIC: ldata.traderID,
               traffic: ldata.trafficID,
               incoterms: ldata.incoterms,
@@ -1250,6 +1257,8 @@ const SalesQS2 = () => {
                   : ldata.saleComplete === 1
                   ? "US Allocation"
                   : "",
+              finalComplete:
+                ldata.finalComplete === 1 ? "finalized" : "in progress",
               TIC: ldata.trader,
               traffic: ldata.traffic,
               incoterms: ldata.incoterms,
@@ -1371,6 +1380,7 @@ const SalesQS2 = () => {
               POL: ldata.POLID,
               POD: ldata.PODID,
               saleComplete: ldata.saleComplete,
+              finalComplete: ldata.finalComplete,
               TIC: ldata.traderID,
               traffic: ldata.trafficID,
               incoterms: ldata.incoterms,
@@ -1480,6 +1490,12 @@ const SalesQS2 = () => {
             if (ldata.saleComplete === 0) {
               setSold(false);
               setAllocated(false);
+            }
+            if (ldata.finalComplete === 1) {
+              setFinalized(true);
+            }
+            if (ldata.finalComplete === 0) {
+              setFinalized(false);
             }
             // Finish loading
             await doneloading();
@@ -1610,6 +1626,7 @@ const SalesQS2 = () => {
                     setQSID("");
                     setSold(false);
                     setAllocated(false);
+                    setFinalized(false);
                   }
                   onClose();
                 }}
@@ -1724,6 +1741,17 @@ const SalesQS2 = () => {
     setSold(!sold);
     setAllocated(false);
     setEditing(true);
+  };
+
+  const handleFinalized = () => {
+    if (finalized) {
+      setQSValues({ ...QSValues, finalComplete: "in progress" });
+      setQSData({ ...QSData, finalComplete: 0 });
+    } else {
+      setQSValues({ ...QSValues, finalComplete: "finalized" });
+      setQSData({ ...QSData, finalComplete: 1 });
+    }
+    setFinalized(!finalized);
   };
 
   const handleAllocated = () => {
@@ -2880,6 +2908,7 @@ const SalesQS2 = () => {
     setQSValues(QSValuesInit);
     setQSData(QSDataInit);
     setSold(false);
+    setFinalized(false);
     setAllocated(false);
     setLockER(false);
     setEditing(false);
@@ -3185,7 +3214,7 @@ const SalesQS2 = () => {
                 type="radio"
                 checked={QSData && QSData.saleType === 3 ? true : false}
                 required
-                onClick={async function (e) {
+                onClick={async function(e) {
                   setEditing(true);
                   setUSDist();
                   loadUSPositions();
@@ -3652,6 +3681,7 @@ const SalesQS2 = () => {
               />
             </div>
           </fieldset>
+
           {/* ) : QSData && QSData.shipmentType == 2 ? (
             "Under Construction"
           ) : (
@@ -3698,6 +3728,17 @@ const SalesQS2 = () => {
           ) : (
             ""
           )}
+          <div className="soldcheckbox">
+            <input
+              className="canceldrag"
+              name="finalComplete"
+              type="checkbox"
+              checked={finalized}
+              onClick={handleFinalized}
+              onKeyDown={ignoreEnter}
+            />
+            <label>Finalized</label>
+          </div>
         </section>
         <section id="salesQS-3">
           <fieldset id="salesQS-3-fieldset" style={{ paddingBottom: "2rem" }}>
