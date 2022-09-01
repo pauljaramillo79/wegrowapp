@@ -513,7 +513,7 @@ const InProgress = () => {
                 </li>
               ))
             : ""}
-          <h4>Unassigned</h4>
+          <h4>Assigned</h4>
           <li className="inprogresslist-header">
             <p>QSID</p>
             <p>Trader</p>

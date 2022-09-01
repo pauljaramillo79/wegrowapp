@@ -1,4 +1,4 @@
-require("dotenv").config({ path: __dirname + "/../config/.env" });
+// require("dotenv").config({ path: __dirname + "/../config/.env" });
 const moment = require("moment");
 const express = require("express");
 const router = express();
