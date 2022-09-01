@@ -117,401 +117,432 @@ const InProgress = () => {
             <p>P Inco</p>
             <p>S Inco</p>
             <p className="inprog-center">Inspec.</p>
-            <p className="inprog-center">PN</p>
+            <p className="inprog-center">LC</p>
             <p className="inprog-center">WH</p>
             <p>Score</p>
 
             <p>TMC</p>
           </li>
           {inprogresslist
-            ? inprogresslist.map((item) => (
-                <li>
-                  <p>{item.QSID}</p>
-                  <p>{item.trader}</p>
-                  {editing.includes(String(item.QSID)) ? (
-                    <p>
-                      <input
-                        className="canceldrag"
-                        name="KTS"
-                        type="text"
-                        onChange={(e) => {
-                          addChange(e, item.QSID);
-                        }}
-                        value={
-                          (assignments1[item.QSID] &&
-                            assignments1[item.QSID]["KTS"]) ||
-                          (assignments1[item.QSID] &&
-                            assignments1[item.QSID]["KTS"] === "")
-                            ? assignments1[item.QSID]["KTS"]
-                            : item.KTS
-                        }
-                      />
-                    </p>
-                  ) : (
-                    <p>{item.KTS}</p>
-                  )}
-                  {editing.includes(String(item.QSID)) ? (
-                    <p>
-                      <input
-                        className="canceldrag"
-                        name="KTP"
-                        type="text"
-                        onChange={(e) => {
-                          addChange(e, item.QSID);
-                        }}
-                        value={
-                          (assignments1[item.QSID] &&
-                            assignments1[item.QSID]["KTP"]) ||
-                          (assignments1[item.QSID] &&
-                            assignments1[item.QSID]["KTP"] === "")
-                            ? assignments1[item.QSID]["KTP"]
-                            : item.KTP
-                        }
-                      />
-                    </p>
-                  ) : (
-                    <p>{item.KTP}</p>
-                  )}
+            ? inprogresslist.map((item) => {
+                let x = 0;
+                if (item.pincoterms === "CPT" || item.pincoterms === "CFR") {
+                  x += 1;
+                } else if (
+                  item.pincoterms === "FOB" ||
+                  item.pincoterms === "CIP" ||
+                  item.pincoterms === "CIF"
+                ) {
+                  x += 2;
+                }
+                if (item.incoterms === "DAP") {
+                  x += 1;
+                }
+                if (item.hasInspection === "yes") {
+                  x += 1;
+                }
+                if (item.hasPromisory === "yes") {
+                  x += 1;
+                }
+                if (item.hasWH === "yes") {
+                  x += 1;
+                }
 
-                  <p className="inprogress-lrg-p">{item.abbreviation}</p>
-                  <p className="inprogress-lrg-p">{item.companyCode}</p>
-                  <p>{item.quantity}</p>
-                  {editing.includes(String(item.QSID)) ? (
-                    <p>
-                      <input
-                        className="canceldrag"
-                        name="pincoterms"
-                        type="text"
+                return (
+                  <li>
+                    <p>{item.QSID}</p>
+                    <p>{item.trader}</p>
+                    {editing.includes(String(item.QSID)) ? (
+                      <p>
+                        <input
+                          className="canceldrag"
+                          name="KTS"
+                          type="text"
+                          onChange={(e) => {
+                            addChange(e, item.QSID);
+                          }}
+                          value={
+                            (assignments1[item.QSID] &&
+                              assignments1[item.QSID]["KTS"]) ||
+                            (assignments1[item.QSID] &&
+                              assignments1[item.QSID]["KTS"] === "")
+                              ? assignments1[item.QSID]["KTS"]
+                              : item.KTS
+                          }
+                        />
+                      </p>
+                    ) : (
+                      <p>{item.KTS}</p>
+                    )}
+                    {editing.includes(String(item.QSID)) ? (
+                      <p>
+                        <input
+                          className="canceldrag"
+                          name="KTP"
+                          type="text"
+                          onChange={(e) => {
+                            addChange(e, item.QSID);
+                          }}
+                          value={
+                            (assignments1[item.QSID] &&
+                              assignments1[item.QSID]["KTP"]) ||
+                            (assignments1[item.QSID] &&
+                              assignments1[item.QSID]["KTP"] === "")
+                              ? assignments1[item.QSID]["KTP"]
+                              : item.KTP
+                          }
+                        />
+                      </p>
+                    ) : (
+                      <p>{item.KTP}</p>
+                    )}
+
+                    <p className="inprogress-lrg-p">{item.abbreviation}</p>
+                    <p className="inprogress-lrg-p">{item.companyCode}</p>
+                    <p>{item.quantity}</p>
+                    {editing.includes(String(item.QSID)) ? (
+                      <p>
+                        <input
+                          className="canceldrag"
+                          name="pincoterms"
+                          type="text"
+                          onChange={(e) => {
+                            addChange(e, item.QSID);
+                          }}
+                          value={
+                            (assignments1[item.QSID] &&
+                              assignments1[item.QSID]["pincoterms"]) ||
+                            (assignments1[item.QSID] &&
+                              assignments1[item.QSID]["pincoterms"] === "")
+                              ? assignments1[item.QSID]["pincoterms"]
+                              : item.pincoterms
+                          }
+                        />
+                      </p>
+                    ) : (
+                      <p>{item.pincoterms}</p>
+                    )}
+                    {editing.includes(String(item.QSID)) ? (
+                      <p>
+                        <input
+                          className="canceldrag"
+                          name="incoterms"
+                          type="text"
+                          onChange={(e) => {
+                            addChange(e, item.QSID);
+                          }}
+                          value={
+                            (assignments1[item.QSID] &&
+                              assignments1[item.QSID]["incoterms"]) ||
+                            (assignments1[item.QSID] &&
+                              assignments1[item.QSID]["incoterms"] === "")
+                              ? assignments1[item.QSID]["incoterms"]
+                              : item.incoterms
+                          }
+                        />
+                      </p>
+                    ) : (
+                      <p>{item.incoterms}</p>
+                    )}
+                    {editing.includes(String(item.QSID)) ? (
+                      <p className="inprog-center">
+                        <input
+                          type="checkbox"
+                          checked={
+                            !assignments1[item.QSID]
+                              ? item.hasInspection === "yes"
+                                ? true
+                                : false
+                              : assignments1[item.QSID]["hasInspectionBool"]
+                          }
+                          onClick={(e) => {
+                            if (
+                              assignments1[item.QSID] &&
+                              assignments1[item.QSID]["hasInspection"]
+                            ) {
+                              if (
+                                assignments1[item.QSID]["hasInspection"] ===
+                                "yes"
+                              ) {
+                                console.log("heyyy");
+                                setAssignments1({
+                                  ...assignments1,
+                                  [item.QSID]: {
+                                    ...assignments1[item.QSID],
+                                    ["hasInspection"]: "no",
+                                    ["hasInspectionBool"]: false,
+                                  },
+                                });
+                              } else {
+                                console.log("hooo");
+                                setAssignments1({
+                                  ...assignments1,
+                                  [item.QSID]: {
+                                    ...assignments1[item.QSID],
+                                    ["hasInspection"]: "yes",
+                                    ["hasInspectionBool"]: true,
+                                  },
+                                });
+                              }
+                            } else {
+                              if (item.hasInspection === "yes") {
+                                setAssignments1({
+                                  ...assignments1,
+                                  [item.QSID]: {
+                                    ...assignments1[item.QSID],
+                                    ["hasInspection"]: "no",
+                                    ["hasInspectionBool"]: false,
+                                  },
+                                });
+                              } else {
+                                setAssignments1({
+                                  ...assignments1,
+                                  [item.QSID]: {
+                                    ...assignments1[item.QSID],
+                                    ["hasInspection"]: "yes",
+                                    ["hasInspectionBool"]: true,
+                                  },
+                                });
+                              }
+                            }
+                          }}
+                        />
+                      </p>
+                    ) : (
+                      <p className="inprog-center">{item.hasInspection}</p>
+                    )}
+                    {editing.includes(String(item.QSID)) ? (
+                      <p className="inprog-center">
+                        <input
+                          type="checkbox"
+                          checked={
+                            !assignments1[item.QSID]
+                              ? item.hasPromisory === "yes"
+                                ? true
+                                : false
+                              : assignments1[item.QSID]["hasPromisoryBool"]
+                          }
+                          onClick={(e) => {
+                            if (
+                              assignments1[item.QSID] &&
+                              assignments1[item.QSID]["hasPromisory"]
+                            ) {
+                              if (
+                                assignments1[item.QSID]["hasPromisory"] ===
+                                "yes"
+                              ) {
+                                console.log("heyyy");
+                                setAssignments1({
+                                  ...assignments1,
+                                  [item.QSID]: {
+                                    ...assignments1[item.QSID],
+                                    ["hasPromisory"]: "no",
+                                    ["hasPromisoryBool"]: false,
+                                  },
+                                });
+                              } else {
+                                console.log("hooo");
+                                setAssignments1({
+                                  ...assignments1,
+                                  [item.QSID]: {
+                                    ...assignments1[item.QSID],
+                                    ["hasPromisory"]: "yes",
+                                    ["hasPromisoryBool"]: true,
+                                  },
+                                });
+                              }
+                            } else {
+                              if (item.hasPromisory === "yes") {
+                                setAssignments1({
+                                  ...assignments1,
+                                  [item.QSID]: {
+                                    ...assignments1[item.QSID],
+                                    ["hasPromisory"]: "no",
+                                    ["hasPromisoryBool"]: false,
+                                  },
+                                });
+                              } else {
+                                setAssignments1({
+                                  ...assignments1,
+                                  [item.QSID]: {
+                                    ...assignments1[item.QSID],
+                                    ["hasPromisory"]: "yes",
+                                    ["hasPromisoryBool"]: true,
+                                  },
+                                });
+                              }
+                            }
+                          }}
+                        />
+                      </p>
+                    ) : (
+                      <p className="inprog-center">{item.hasPromisory}</p>
+                    )}
+                    {editing.includes(String(item.QSID)) ? (
+                      <p className="inprog-center">
+                        <input
+                          type="checkbox"
+                          checked={
+                            !assignments1[item.QSID]
+                              ? item.hasWH === "yes"
+                                ? true
+                                : false
+                              : assignments1[item.QSID]["hasWHBool"]
+                          }
+                          onClick={(e) => {
+                            if (
+                              assignments1[item.QSID] &&
+                              assignments1[item.QSID]["hasWH"]
+                            ) {
+                              if (assignments1[item.QSID]["hasWH"] === "yes") {
+                                console.log("heyyy");
+                                setAssignments1({
+                                  ...assignments1,
+                                  [item.QSID]: {
+                                    ...assignments1[item.QSID],
+                                    ["hasWH"]: "no",
+                                    ["hasWHBool"]: false,
+                                  },
+                                });
+                              } else {
+                                console.log("hooo");
+                                setAssignments1({
+                                  ...assignments1,
+                                  [item.QSID]: {
+                                    ...assignments1[item.QSID],
+                                    ["hasWH"]: "yes",
+                                    ["hasWHBool"]: true,
+                                  },
+                                });
+                              }
+                            } else {
+                              if (item.hasWH === "yes") {
+                                setAssignments1({
+                                  ...assignments1,
+                                  [item.QSID]: {
+                                    ...assignments1[item.QSID],
+                                    ["hasWH"]: "no",
+                                    ["hasWHBool"]: false,
+                                  },
+                                });
+                              } else {
+                                setAssignments1({
+                                  ...assignments1,
+                                  [item.QSID]: {
+                                    ...assignments1[item.QSID],
+                                    ["hasWH"]: "yes",
+                                    ["hasWHBool"]: true,
+                                  },
+                                });
+                              }
+                            }
+                          }}
+                        />
+                      </p>
+                    ) : (
+                      <p className="inprog-center">{item.hasWH}</p>
+                    )}
+                    <p>{x.toFixed(1)}</p>
+                    {editing.includes(String(item.QSID)) ? (
+                      <select
+                        className="inprogress-med-p"
+                        name={item.QSID}
                         onChange={(e) => {
-                          addChange(e, item.QSID);
+                          setAssignments1({
+                            ...assignments1,
+                            [e.target.name]: {
+                              ...assignments1[e.target.name],
+                              trafficID: Number(e.target.value),
+                            },
+                          });
                         }}
                         value={
                           (assignments1[item.QSID] &&
-                            assignments1[item.QSID]["pincoterms"]) ||
+                            assignments1[item.QSID]["trafficID"]) ||
                           (assignments1[item.QSID] &&
-                            assignments1[item.QSID]["pincoterms"] === "")
-                            ? assignments1[item.QSID]["pincoterms"]
-                            : item.pincoterms
+                            assignments1[item.QSID]["trafficID"] === 0)
+                            ? assignments1[item.QSID]["trafficID"]
+                            : item.trafficID
                         }
-                      />
-                    </p>
-                  ) : (
-                    <p>{item.pincoterms}</p>
-                  )}
-                  {editing.includes(String(item.QSID)) ? (
-                    <p>
-                      <input
-                        className="canceldrag"
-                        name="incoterms"
-                        type="text"
-                        onChange={(e) => {
-                          addChange(e, item.QSID);
-                        }}
-                        value={
-                          (assignments1[item.QSID] &&
-                            assignments1[item.QSID]["incoterms"]) ||
-                          (assignments1[item.QSID] &&
-                            assignments1[item.QSID]["incoterms"] === "")
-                            ? assignments1[item.QSID]["incoterms"]
-                            : item.incoterms
+                      >
+                        <option>Select...</option>
+                        {trafficmgrs
+                          ? trafficmgrs.map((item1) => {
+                              return (
+                                <option selected={"na"} value={item1.trafficID}>
+                                  {item1.trafficID} - {item1.traffic}
+                                </option>
+                              );
+                            })
+                          : ""}
+                      </select>
+                    ) : (
+                      <p className="inprogress-med-p">{item.traffic}</p>
+                    )}
+                    {editing.includes(String(item.QSID)) ? (
+                      ""
+                    ) : (
+                      <button
+                        name={item.QSID}
+                        onClick={(e) =>
+                          editing.includes(e.target.name)
+                            ? ""
+                            : setEditing([...editing, e.target.name])
                         }
-                      />
-                    </p>
-                  ) : (
-                    <p>{item.incoterms}</p>
-                  )}
-                  {editing.includes(String(item.QSID)) ? (
-                    <p className="inprog-center">
-                      <input
-                        type="checkbox"
-                        checked={
-                          !assignments1[item.QSID]
-                            ? item.hasInspection === "yes"
-                              ? true
-                              : false
-                            : assignments1[item.QSID]["hasInspectionBool"]
-                        }
-                        onClick={(e) => {
-                          if (
-                            assignments1[item.QSID] &&
-                            assignments1[item.QSID]["hasInspection"]
-                          ) {
-                            if (
-                              assignments1[item.QSID]["hasInspection"] === "yes"
-                            ) {
-                              console.log("heyyy");
-                              setAssignments1({
-                                ...assignments1,
-                                [item.QSID]: {
-                                  ...assignments1[item.QSID],
-                                  ["hasInspection"]: "no",
-                                  ["hasInspectionBool"]: false,
-                                },
-                              });
-                            } else {
-                              console.log("hooo");
-                              setAssignments1({
-                                ...assignments1,
-                                [item.QSID]: {
-                                  ...assignments1[item.QSID],
-                                  ["hasInspection"]: "yes",
-                                  ["hasInspectionBool"]: true,
-                                },
-                              });
-                            }
-                          } else {
-                            if (item.hasInspection === "yes") {
-                              setAssignments1({
-                                ...assignments1,
-                                [item.QSID]: {
-                                  ...assignments1[item.QSID],
-                                  ["hasInspection"]: "no",
-                                  ["hasInspectionBool"]: false,
-                                },
-                              });
-                            } else {
-                              setAssignments1({
-                                ...assignments1,
-                                [item.QSID]: {
-                                  ...assignments1[item.QSID],
-                                  ["hasInspection"]: "yes",
-                                  ["hasInspectionBool"]: true,
-                                },
-                              });
-                            }
-                          }
-                        }}
-                      />
-                    </p>
-                  ) : (
-                    <p className="inprog-center">{item.hasInspection}</p>
-                  )}
-                  {editing.includes(String(item.QSID)) ? (
-                    <p className="inprog-center">
-                      <input
-                        type="checkbox"
-                        checked={
-                          !assignments1[item.QSID]
-                            ? item.hasPromisory === "yes"
-                              ? true
-                              : false
-                            : assignments1[item.QSID]["hasPromisoryBool"]
-                        }
-                        onClick={(e) => {
-                          if (
-                            assignments1[item.QSID] &&
-                            assignments1[item.QSID]["hasPromisory"]
-                          ) {
-                            if (
-                              assignments1[item.QSID]["hasPromisory"] === "yes"
-                            ) {
-                              console.log("heyyy");
-                              setAssignments1({
-                                ...assignments1,
-                                [item.QSID]: {
-                                  ...assignments1[item.QSID],
-                                  ["hasPromisory"]: "no",
-                                  ["hasPromisoryBool"]: false,
-                                },
-                              });
-                            } else {
-                              console.log("hooo");
-                              setAssignments1({
-                                ...assignments1,
-                                [item.QSID]: {
-                                  ...assignments1[item.QSID],
-                                  ["hasPromisory"]: "yes",
-                                  ["hasPromisoryBool"]: true,
-                                },
-                              });
-                            }
-                          } else {
-                            if (item.hasPromisory === "yes") {
-                              setAssignments1({
-                                ...assignments1,
-                                [item.QSID]: {
-                                  ...assignments1[item.QSID],
-                                  ["hasPromisory"]: "no",
-                                  ["hasPromisoryBool"]: false,
-                                },
-                              });
-                            } else {
-                              setAssignments1({
-                                ...assignments1,
-                                [item.QSID]: {
-                                  ...assignments1[item.QSID],
-                                  ["hasPromisory"]: "yes",
-                                  ["hasPromisoryBool"]: true,
-                                },
-                              });
-                            }
-                          }
-                        }}
-                      />
-                    </p>
-                  ) : (
-                    <p className="inprog-center">{item.hasPromisory}</p>
-                  )}
-                  {editing.includes(String(item.QSID)) ? (
-                    <p className="inprog-center">
-                      <input
-                        type="checkbox"
-                        checked={
-                          !assignments1[item.QSID]
-                            ? item.hasWH === "yes"
-                              ? true
-                              : false
-                            : assignments1[item.QSID]["hasWHBool"]
-                        }
-                        onClick={(e) => {
-                          if (
-                            assignments1[item.QSID] &&
-                            assignments1[item.QSID]["hasWH"]
-                          ) {
-                            if (assignments1[item.QSID]["hasWH"] === "yes") {
-                              console.log("heyyy");
-                              setAssignments1({
-                                ...assignments1,
-                                [item.QSID]: {
-                                  ...assignments1[item.QSID],
-                                  ["hasWH"]: "no",
-                                  ["hasWHBool"]: false,
-                                },
-                              });
-                            } else {
-                              console.log("hooo");
-                              setAssignments1({
-                                ...assignments1,
-                                [item.QSID]: {
-                                  ...assignments1[item.QSID],
-                                  ["hasWH"]: "yes",
-                                  ["hasWHBool"]: true,
-                                },
-                              });
-                            }
-                          } else {
-                            if (item.hasWH === "yes") {
-                              setAssignments1({
-                                ...assignments1,
-                                [item.QSID]: {
-                                  ...assignments1[item.QSID],
-                                  ["hasWH"]: "no",
-                                  ["hasWHBool"]: false,
-                                },
-                              });
-                            } else {
-                              setAssignments1({
-                                ...assignments1,
-                                [item.QSID]: {
-                                  ...assignments1[item.QSID],
-                                  ["hasWH"]: "yes",
-                                  ["hasWHBool"]: true,
-                                },
-                              });
-                            }
-                          }
-                        }}
-                      />
-                    </p>
-                  ) : (
-                    <p className="inprog-center">{item.hasWH}</p>
-                  )}
-                  <p>{item.incoterms === "FOB" ? 2 : 1}</p>
-                  {editing.includes(String(item.QSID)) ? (
-                    <select
-                      className="inprogress-med-p"
-                      name={item.QSID}
-                      onChange={(e) => {
-                        setAssignments1({
-                          ...assignments1,
-                          [e.target.name]: {
-                            ...assignments1[e.target.name],
-                            trafficID: Number(e.target.value),
-                          },
-                        });
-                      }}
-                      value={
-                        (assignments1[item.QSID] &&
-                          assignments1[item.QSID]["trafficID"]) ||
-                        (assignments1[item.QSID] &&
-                          assignments1[item.QSID]["trafficID"] === 0)
-                          ? assignments1[item.QSID]["trafficID"]
-                          : item.trafficID
-                      }
-                    >
-                      <option>Select...</option>
-                      {trafficmgrs
-                        ? trafficmgrs.map((item1) => {
-                            return (
-                              <option selected={"na"} value={item1.trafficID}>
-                                {item1.trafficID} - {item1.traffic}
-                              </option>
-                            );
-                          })
-                        : ""}
-                    </select>
-                  ) : (
-                    <p className="inprogress-med-p">{item.traffic}</p>
-                  )}
-                  {editing.includes(String(item.QSID)) ? (
-                    ""
-                  ) : (
-                    <button
-                      name={item.QSID}
-                      onClick={(e) =>
-                        editing.includes(e.target.name)
-                          ? ""
-                          : setEditing([...editing, e.target.name])
-                      }
-                    >
-                      Edit
-                    </button>
-                  )}
-                  {/* {Object.keys(assignments1).includes(String(item.QSID))
-                   */}
-                  {editing.includes(String(item.QSID))
-                    ? [
-                        <button
-                          className="inprogsavebtn"
-                          name={item.QSID}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            saveAssignment(
-                              e.target.name,
-                              assignments1[e.target.name]
-                            );
-                            const assig1 = assignments1;
-                            delete assig1[e.target.name];
-                            setAssignments1({ ...assig1 });
-                            const ind = editing.indexOf(String(e.target.name));
-                            setEditing([
-                              ...editing.slice(0, ind),
-                              ...editing.slice(ind + 1, editing.length),
-                            ]);
-                          }}
-                        >
-                          Save
-                        </button>,
-                        <button
-                          className="inprogcancelbtn"
-                          name={item.QSID}
-                          onClick={(e) => {
-                            const assig1 = assignments1;
-                            delete assig1[e.target.name];
-                            setAssignments1({ ...assig1 });
-                            const ind = editing.indexOf(String(e.target.name));
-                            setEditing([
-                              ...editing.slice(0, ind),
-                              ...editing.slice(ind + 1, editing.length),
-                            ]);
-                          }}
-                        >
-                          Cancel
-                        </button>,
-                      ]
-                    : ""}
-                </li>
-              ))
+                      >
+                        Edit
+                      </button>
+                    )}
+                    {/* {Object.keys(assignments1).includes(String(item.QSID))
+                     */}
+                    {editing.includes(String(item.QSID))
+                      ? [
+                          <button
+                            className="inprogsavebtn"
+                            name={item.QSID}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              saveAssignment(
+                                e.target.name,
+                                assignments1[e.target.name]
+                              );
+                              const assig1 = assignments1;
+                              delete assig1[e.target.name];
+                              setAssignments1({ ...assig1 });
+                              const ind = editing.indexOf(
+                                String(e.target.name)
+                              );
+                              setEditing([
+                                ...editing.slice(0, ind),
+                                ...editing.slice(ind + 1, editing.length),
+                              ]);
+                            }}
+                          >
+                            Save
+                          </button>,
+                          <button
+                            className="inprogcancelbtn"
+                            name={item.QSID}
+                            onClick={(e) => {
+                              const assig1 = assignments1;
+                              delete assig1[e.target.name];
+                              setAssignments1({ ...assig1 });
+                              const ind = editing.indexOf(
+                                String(e.target.name)
+                              );
+                              setEditing([
+                                ...editing.slice(0, ind),
+                                ...editing.slice(ind + 1, editing.length),
+                              ]);
+                            }}
+                          >
+                            Cancel
+                          </button>,
+                        ]
+                      : ""}
+                  </li>
+                );
+              })
             : ""}
           <h4>Assigned</h4>
           <li className="inprogresslist-header">
@@ -525,401 +556,431 @@ const InProgress = () => {
             <p>P Inco</p>
             <p>S Inco</p>
             <p className="inprog-center">Inspec.</p>
-            <p className="inprog-center">PN</p>
+            <p className="inprog-center">LC</p>
             <p className="inprog-center">WH</p>
             <p>Score</p>
 
             <p>TMC</p>
           </li>
           {assignedlist
-            ? assignedlist.map((item) => (
-                <li>
-                  <p>{item.QSID}</p>
-                  <p>{item.trader}</p>
-                  {editing.includes(String(item.QSID)) ? (
-                    <p>
-                      <input
-                        className="canceldrag"
-                        name="KTS"
-                        type="text"
-                        onChange={(e) => {
-                          addChange(e, item.QSID);
-                        }}
-                        value={
-                          (assignments1[item.QSID] &&
-                            assignments1[item.QSID]["KTS"]) ||
-                          (assignments1[item.QSID] &&
-                            assignments1[item.QSID]["KTS"] === "")
-                            ? assignments1[item.QSID]["KTS"]
-                            : item.KTS
-                        }
-                      />
-                    </p>
-                  ) : (
-                    <p>{item.KTS}</p>
-                  )}
-                  {editing.includes(String(item.QSID)) ? (
-                    <p>
-                      <input
-                        className="canceldrag"
-                        name="KTP"
-                        type="text"
-                        onChange={(e) => {
-                          addChange(e, item.QSID);
-                        }}
-                        value={
-                          (assignments1[item.QSID] &&
-                            assignments1[item.QSID]["KTP"]) ||
-                          (assignments1[item.QSID] &&
-                            assignments1[item.QSID]["KTP"] === "")
-                            ? assignments1[item.QSID]["KTP"]
-                            : item.KTP
-                        }
-                      />
-                    </p>
-                  ) : (
-                    <p>{item.KTP}</p>
-                  )}
+            ? assignedlist.map((item) => {
+                let x = 0;
+                if (item.pincoterms === "CPT" || item.pincoterms === "CFR") {
+                  x += 1;
+                } else if (
+                  item.pincoterms === "FOB" ||
+                  item.pincoterms === "CIP" ||
+                  item.pincoterms === "CIF"
+                ) {
+                  x += 2;
+                }
+                if (item.incoterms === "DAP") {
+                  x += 1;
+                }
+                if (item.hasInspection === "yes") {
+                  x += 1;
+                }
+                if (item.hasPromisory === "yes") {
+                  x += 1;
+                }
+                if (item.hasWH === "yes") {
+                  x += 1;
+                }
+                return (
+                  <li>
+                    <p>{item.QSID}</p>
+                    <p>{item.trader}</p>
+                    {editing.includes(String(item.QSID)) ? (
+                      <p>
+                        <input
+                          className="canceldrag"
+                          name="KTS"
+                          type="text"
+                          onChange={(e) => {
+                            addChange(e, item.QSID);
+                          }}
+                          value={
+                            (assignments1[item.QSID] &&
+                              assignments1[item.QSID]["KTS"]) ||
+                            (assignments1[item.QSID] &&
+                              assignments1[item.QSID]["KTS"] === "")
+                              ? assignments1[item.QSID]["KTS"]
+                              : item.KTS
+                          }
+                        />
+                      </p>
+                    ) : (
+                      <p>{item.KTS}</p>
+                    )}
+                    {editing.includes(String(item.QSID)) ? (
+                      <p>
+                        <input
+                          className="canceldrag"
+                          name="KTP"
+                          type="text"
+                          onChange={(e) => {
+                            addChange(e, item.QSID);
+                          }}
+                          value={
+                            (assignments1[item.QSID] &&
+                              assignments1[item.QSID]["KTP"]) ||
+                            (assignments1[item.QSID] &&
+                              assignments1[item.QSID]["KTP"] === "")
+                              ? assignments1[item.QSID]["KTP"]
+                              : item.KTP
+                          }
+                        />
+                      </p>
+                    ) : (
+                      <p>{item.KTP}</p>
+                    )}
 
-                  <p className="inprogress-lrg-p">{item.abbreviation}</p>
-                  <p className="inprogress-lrg-p">{item.companyCode}</p>
-                  <p>{item.quantity}</p>
-                  {editing.includes(String(item.QSID)) ? (
-                    <p>
-                      <input
-                        className="canceldrag"
-                        name="pincoterms"
-                        type="text"
+                    <p className="inprogress-lrg-p">{item.abbreviation}</p>
+                    <p className="inprogress-lrg-p">{item.companyCode}</p>
+                    <p>{item.quantity}</p>
+                    {editing.includes(String(item.QSID)) ? (
+                      <p>
+                        <input
+                          className="canceldrag"
+                          name="pincoterms"
+                          type="text"
+                          onChange={(e) => {
+                            addChange(e, item.QSID);
+                          }}
+                          value={
+                            (assignments1[item.QSID] &&
+                              assignments1[item.QSID]["pincoterms"]) ||
+                            (assignments1[item.QSID] &&
+                              assignments1[item.QSID]["pincoterms"] === "")
+                              ? assignments1[item.QSID]["pincoterms"]
+                              : item.pincoterms
+                          }
+                        />
+                      </p>
+                    ) : (
+                      <p>{item.pincoterms}</p>
+                    )}
+                    {editing.includes(String(item.QSID)) ? (
+                      <p>
+                        <input
+                          className="canceldrag"
+                          name="incoterms"
+                          type="text"
+                          onChange={(e) => {
+                            addChange(e, item.QSID);
+                          }}
+                          value={
+                            (assignments1[item.QSID] &&
+                              assignments1[item.QSID]["incoterms"]) ||
+                            (assignments1[item.QSID] &&
+                              assignments1[item.QSID]["incoterms"] === "")
+                              ? assignments1[item.QSID]["incoterms"]
+                              : item.incoterms
+                          }
+                        />
+                      </p>
+                    ) : (
+                      <p>{item.incoterms}</p>
+                    )}
+                    {editing.includes(String(item.QSID)) ? (
+                      <p className="inprog-center">
+                        <input
+                          type="checkbox"
+                          checked={
+                            !assignments1[item.QSID]
+                              ? item.hasInspection === "yes"
+                                ? true
+                                : false
+                              : assignments1[item.QSID]["hasInspectionBool"]
+                          }
+                          onClick={(e) => {
+                            if (
+                              assignments1[item.QSID] &&
+                              assignments1[item.QSID]["hasInspection"]
+                            ) {
+                              if (
+                                assignments1[item.QSID]["hasInspection"] ===
+                                "yes"
+                              ) {
+                                console.log("heyyy");
+                                setAssignments1({
+                                  ...assignments1,
+                                  [item.QSID]: {
+                                    ...assignments1[item.QSID],
+                                    ["hasInspection"]: "no",
+                                    ["hasInspectionBool"]: false,
+                                  },
+                                });
+                              } else {
+                                console.log("hooo");
+                                setAssignments1({
+                                  ...assignments1,
+                                  [item.QSID]: {
+                                    ...assignments1[item.QSID],
+                                    ["hasInspection"]: "yes",
+                                    ["hasInspectionBool"]: true,
+                                  },
+                                });
+                              }
+                            } else {
+                              if (item.hasInspection === "yes") {
+                                setAssignments1({
+                                  ...assignments1,
+                                  [item.QSID]: {
+                                    ...assignments1[item.QSID],
+                                    ["hasInspection"]: "no",
+                                    ["hasInspectionBool"]: false,
+                                  },
+                                });
+                              } else {
+                                setAssignments1({
+                                  ...assignments1,
+                                  [item.QSID]: {
+                                    ...assignments1[item.QSID],
+                                    ["hasInspection"]: "yes",
+                                    ["hasInspectionBool"]: true,
+                                  },
+                                });
+                              }
+                            }
+                          }}
+                        />
+                      </p>
+                    ) : (
+                      <p className="inprog-center">{item.hasInspection}</p>
+                    )}
+                    {editing.includes(String(item.QSID)) ? (
+                      <p className="inprog-center">
+                        <input
+                          type="checkbox"
+                          checked={
+                            !assignments1[item.QSID]
+                              ? item.hasPromisory === "yes"
+                                ? true
+                                : false
+                              : assignments1[item.QSID]["hasPromisoryBool"]
+                          }
+                          onClick={(e) => {
+                            if (
+                              assignments1[item.QSID] &&
+                              assignments1[item.QSID]["hasPromisory"]
+                            ) {
+                              if (
+                                assignments1[item.QSID]["hasPromisory"] ===
+                                "yes"
+                              ) {
+                                console.log("heyyy");
+                                setAssignments1({
+                                  ...assignments1,
+                                  [item.QSID]: {
+                                    ...assignments1[item.QSID],
+                                    ["hasPromisory"]: "no",
+                                    ["hasPromisoryBool"]: false,
+                                  },
+                                });
+                              } else {
+                                console.log("hooo");
+                                setAssignments1({
+                                  ...assignments1,
+                                  [item.QSID]: {
+                                    ...assignments1[item.QSID],
+                                    ["hasPromisory"]: "yes",
+                                    ["hasPromisoryBool"]: true,
+                                  },
+                                });
+                              }
+                            } else {
+                              if (item.hasPromisory === "yes") {
+                                setAssignments1({
+                                  ...assignments1,
+                                  [item.QSID]: {
+                                    ...assignments1[item.QSID],
+                                    ["hasPromisory"]: "no",
+                                    ["hasPromisoryBool"]: false,
+                                  },
+                                });
+                              } else {
+                                setAssignments1({
+                                  ...assignments1,
+                                  [item.QSID]: {
+                                    ...assignments1[item.QSID],
+                                    ["hasPromisory"]: "yes",
+                                    ["hasPromisoryBool"]: true,
+                                  },
+                                });
+                              }
+                            }
+                          }}
+                        />
+                      </p>
+                    ) : (
+                      <p className="inprog-center">{item.hasPromisory}</p>
+                    )}
+                    {editing.includes(String(item.QSID)) ? (
+                      <p className="inprog-center">
+                        <input
+                          type="checkbox"
+                          checked={
+                            !assignments1[item.QSID]
+                              ? item.hasWH === "yes"
+                                ? true
+                                : false
+                              : assignments1[item.QSID]["hasWHBool"]
+                          }
+                          onClick={(e) => {
+                            if (
+                              assignments1[item.QSID] &&
+                              assignments1[item.QSID]["hasWH"]
+                            ) {
+                              if (assignments1[item.QSID]["hasWH"] === "yes") {
+                                console.log("heyyy");
+                                setAssignments1({
+                                  ...assignments1,
+                                  [item.QSID]: {
+                                    ...assignments1[item.QSID],
+                                    ["hasWH"]: "no",
+                                    ["hasWHBool"]: false,
+                                  },
+                                });
+                              } else {
+                                console.log("hooo");
+                                setAssignments1({
+                                  ...assignments1,
+                                  [item.QSID]: {
+                                    ...assignments1[item.QSID],
+                                    ["hasWH"]: "yes",
+                                    ["hasWHBool"]: true,
+                                  },
+                                });
+                              }
+                            } else {
+                              if (item.hasWH === "yes") {
+                                setAssignments1({
+                                  ...assignments1,
+                                  [item.QSID]: {
+                                    ...assignments1[item.QSID],
+                                    ["hasWH"]: "no",
+                                    ["hasWHBool"]: false,
+                                  },
+                                });
+                              } else {
+                                setAssignments1({
+                                  ...assignments1,
+                                  [item.QSID]: {
+                                    ...assignments1[item.QSID],
+                                    ["hasWH"]: "yes",
+                                    ["hasWHBool"]: true,
+                                  },
+                                });
+                              }
+                            }
+                          }}
+                        />
+                      </p>
+                    ) : (
+                      <p className="inprog-center">{item.hasWH}</p>
+                    )}
+                    <p>{x.toFixed(1)}</p>
+                    {editing.includes(String(item.QSID)) ? (
+                      <select
+                        className="inprogress-med-p"
+                        name={item.QSID}
                         onChange={(e) => {
-                          addChange(e, item.QSID);
+                          setAssignments1({
+                            ...assignments1,
+                            [e.target.name]: {
+                              ...assignments1[e.target.name],
+                              trafficID: Number(e.target.value),
+                            },
+                          });
                         }}
                         value={
                           (assignments1[item.QSID] &&
-                            assignments1[item.QSID]["pincoterms"]) ||
+                            assignments1[item.QSID]["trafficID"]) ||
                           (assignments1[item.QSID] &&
-                            assignments1[item.QSID]["pincoterms"] === "")
-                            ? assignments1[item.QSID]["pincoterms"]
-                            : item.pincoterms
+                            assignments1[item.QSID]["trafficID"] === 0)
+                            ? assignments1[item.QSID]["trafficID"]
+                            : item.trafficID
                         }
-                      />
-                    </p>
-                  ) : (
-                    <p>{item.pincoterms}</p>
-                  )}
-                  {editing.includes(String(item.QSID)) ? (
-                    <p>
-                      <input
-                        className="canceldrag"
-                        name="incoterms"
-                        type="text"
-                        onChange={(e) => {
-                          addChange(e, item.QSID);
-                        }}
-                        value={
-                          (assignments1[item.QSID] &&
-                            assignments1[item.QSID]["incoterms"]) ||
-                          (assignments1[item.QSID] &&
-                            assignments1[item.QSID]["incoterms"] === "")
-                            ? assignments1[item.QSID]["incoterms"]
-                            : item.incoterms
+                      >
+                        <option>Select...</option>
+                        {trafficmgrs
+                          ? trafficmgrs.map((item1) => {
+                              return (
+                                <option selected={"na"} value={item1.trafficID}>
+                                  {item1.trafficID} - {item1.traffic}
+                                </option>
+                              );
+                            })
+                          : ""}
+                      </select>
+                    ) : (
+                      <p className="inprogress-med-p">{item.traffic}</p>
+                    )}
+                    {editing.includes(String(item.QSID)) ? (
+                      ""
+                    ) : (
+                      <button
+                        name={item.QSID}
+                        onClick={(e) =>
+                          editing.includes(e.target.name)
+                            ? ""
+                            : setEditing([...editing, e.target.name])
                         }
-                      />
-                    </p>
-                  ) : (
-                    <p>{item.incoterms}</p>
-                  )}
-                  {editing.includes(String(item.QSID)) ? (
-                    <p className="inprog-center">
-                      <input
-                        type="checkbox"
-                        checked={
-                          !assignments1[item.QSID]
-                            ? item.hasInspection === "yes"
-                              ? true
-                              : false
-                            : assignments1[item.QSID]["hasInspectionBool"]
-                        }
-                        onClick={(e) => {
-                          if (
-                            assignments1[item.QSID] &&
-                            assignments1[item.QSID]["hasInspection"]
-                          ) {
-                            if (
-                              assignments1[item.QSID]["hasInspection"] === "yes"
-                            ) {
-                              console.log("heyyy");
-                              setAssignments1({
-                                ...assignments1,
-                                [item.QSID]: {
-                                  ...assignments1[item.QSID],
-                                  ["hasInspection"]: "no",
-                                  ["hasInspectionBool"]: false,
-                                },
-                              });
-                            } else {
-                              console.log("hooo");
-                              setAssignments1({
-                                ...assignments1,
-                                [item.QSID]: {
-                                  ...assignments1[item.QSID],
-                                  ["hasInspection"]: "yes",
-                                  ["hasInspectionBool"]: true,
-                                },
-                              });
-                            }
-                          } else {
-                            if (item.hasInspection === "yes") {
-                              setAssignments1({
-                                ...assignments1,
-                                [item.QSID]: {
-                                  ...assignments1[item.QSID],
-                                  ["hasInspection"]: "no",
-                                  ["hasInspectionBool"]: false,
-                                },
-                              });
-                            } else {
-                              setAssignments1({
-                                ...assignments1,
-                                [item.QSID]: {
-                                  ...assignments1[item.QSID],
-                                  ["hasInspection"]: "yes",
-                                  ["hasInspectionBool"]: true,
-                                },
-                              });
-                            }
-                          }
-                        }}
-                      />
-                    </p>
-                  ) : (
-                    <p className="inprog-center">{item.hasInspection}</p>
-                  )}
-                  {editing.includes(String(item.QSID)) ? (
-                    <p className="inprog-center">
-                      <input
-                        type="checkbox"
-                        checked={
-                          !assignments1[item.QSID]
-                            ? item.hasPromisory === "yes"
-                              ? true
-                              : false
-                            : assignments1[item.QSID]["hasPromisoryBool"]
-                        }
-                        onClick={(e) => {
-                          if (
-                            assignments1[item.QSID] &&
-                            assignments1[item.QSID]["hasPromisory"]
-                          ) {
-                            if (
-                              assignments1[item.QSID]["hasPromisory"] === "yes"
-                            ) {
-                              console.log("heyyy");
-                              setAssignments1({
-                                ...assignments1,
-                                [item.QSID]: {
-                                  ...assignments1[item.QSID],
-                                  ["hasPromisory"]: "no",
-                                  ["hasPromisoryBool"]: false,
-                                },
-                              });
-                            } else {
-                              console.log("hooo");
-                              setAssignments1({
-                                ...assignments1,
-                                [item.QSID]: {
-                                  ...assignments1[item.QSID],
-                                  ["hasPromisory"]: "yes",
-                                  ["hasPromisoryBool"]: true,
-                                },
-                              });
-                            }
-                          } else {
-                            if (item.hasPromisory === "yes") {
-                              setAssignments1({
-                                ...assignments1,
-                                [item.QSID]: {
-                                  ...assignments1[item.QSID],
-                                  ["hasPromisory"]: "no",
-                                  ["hasPromisoryBool"]: false,
-                                },
-                              });
-                            } else {
-                              setAssignments1({
-                                ...assignments1,
-                                [item.QSID]: {
-                                  ...assignments1[item.QSID],
-                                  ["hasPromisory"]: "yes",
-                                  ["hasPromisoryBool"]: true,
-                                },
-                              });
-                            }
-                          }
-                        }}
-                      />
-                    </p>
-                  ) : (
-                    <p className="inprog-center">{item.hasPromisory}</p>
-                  )}
-                  {editing.includes(String(item.QSID)) ? (
-                    <p className="inprog-center">
-                      <input
-                        type="checkbox"
-                        checked={
-                          !assignments1[item.QSID]
-                            ? item.hasWH === "yes"
-                              ? true
-                              : false
-                            : assignments1[item.QSID]["hasWHBool"]
-                        }
-                        onClick={(e) => {
-                          if (
-                            assignments1[item.QSID] &&
-                            assignments1[item.QSID]["hasWH"]
-                          ) {
-                            if (assignments1[item.QSID]["hasWH"] === "yes") {
-                              console.log("heyyy");
-                              setAssignments1({
-                                ...assignments1,
-                                [item.QSID]: {
-                                  ...assignments1[item.QSID],
-                                  ["hasWH"]: "no",
-                                  ["hasWHBool"]: false,
-                                },
-                              });
-                            } else {
-                              console.log("hooo");
-                              setAssignments1({
-                                ...assignments1,
-                                [item.QSID]: {
-                                  ...assignments1[item.QSID],
-                                  ["hasWH"]: "yes",
-                                  ["hasWHBool"]: true,
-                                },
-                              });
-                            }
-                          } else {
-                            if (item.hasWH === "yes") {
-                              setAssignments1({
-                                ...assignments1,
-                                [item.QSID]: {
-                                  ...assignments1[item.QSID],
-                                  ["hasWH"]: "no",
-                                  ["hasWHBool"]: false,
-                                },
-                              });
-                            } else {
-                              setAssignments1({
-                                ...assignments1,
-                                [item.QSID]: {
-                                  ...assignments1[item.QSID],
-                                  ["hasWH"]: "yes",
-                                  ["hasWHBool"]: true,
-                                },
-                              });
-                            }
-                          }
-                        }}
-                      />
-                    </p>
-                  ) : (
-                    <p className="inprog-center">{item.hasWH}</p>
-                  )}
-                  <p>{item.incoterms === "FOB" ? 2 : 1}</p>
-                  {editing.includes(String(item.QSID)) ? (
-                    <select
-                      className="inprogress-med-p"
-                      name={item.QSID}
-                      onChange={(e) => {
-                        setAssignments1({
-                          ...assignments1,
-                          [e.target.name]: {
-                            ...assignments1[e.target.name],
-                            trafficID: Number(e.target.value),
-                          },
-                        });
-                      }}
-                      value={
-                        (assignments1[item.QSID] &&
-                          assignments1[item.QSID]["trafficID"]) ||
-                        (assignments1[item.QSID] &&
-                          assignments1[item.QSID]["trafficID"] === 0)
-                          ? assignments1[item.QSID]["trafficID"]
-                          : item.trafficID
-                      }
-                    >
-                      <option>Select...</option>
-                      {trafficmgrs
-                        ? trafficmgrs.map((item1) => {
-                            return (
-                              <option selected={"na"} value={item1.trafficID}>
-                                {item1.trafficID} - {item1.traffic}
-                              </option>
-                            );
-                          })
-                        : ""}
-                    </select>
-                  ) : (
-                    <p className="inprogress-med-p">{item.traffic}</p>
-                  )}
-                  {editing.includes(String(item.QSID)) ? (
-                    ""
-                  ) : (
-                    <button
-                      name={item.QSID}
-                      onClick={(e) =>
-                        editing.includes(e.target.name)
-                          ? ""
-                          : setEditing([...editing, e.target.name])
-                      }
-                    >
-                      Edit
-                    </button>
-                  )}
-                  {/* {Object.keys(assignments1).includes(String(item.QSID))
-                   */}
-                  {editing.includes(String(item.QSID))
-                    ? [
-                        <button
-                          className="inprogsavebtn"
-                          name={item.QSID}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            saveAssignment(
-                              e.target.name,
-                              assignments1[e.target.name]
-                            );
-                            const assig1 = assignments1;
-                            delete assig1[e.target.name];
-                            setAssignments1({ ...assig1 });
-                            const ind = editing.indexOf(String(e.target.name));
-                            setEditing([
-                              ...editing.slice(0, ind),
-                              ...editing.slice(ind + 1, editing.length),
-                            ]);
-                          }}
-                        >
-                          Save
-                        </button>,
-                        <button
-                          className="inprogcancelbtn"
-                          name={item.QSID}
-                          onClick={(e) => {
-                            const assig1 = assignments1;
-                            delete assig1[e.target.name];
-                            setAssignments1({ ...assig1 });
-                            const ind = editing.indexOf(String(e.target.name));
-                            setEditing([
-                              ...editing.slice(0, ind),
-                              ...editing.slice(ind + 1, editing.length),
-                            ]);
-                          }}
-                        >
-                          Cancel
-                        </button>,
-                      ]
-                    : ""}
-                </li>
-              ))
+                      >
+                        Edit
+                      </button>
+                    )}
+                    {/* {Object.keys(assignments1).includes(String(item.QSID))
+                     */}
+                    {editing.includes(String(item.QSID))
+                      ? [
+                          <button
+                            className="inprogsavebtn"
+                            name={item.QSID}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              saveAssignment(
+                                e.target.name,
+                                assignments1[e.target.name]
+                              );
+                              const assig1 = assignments1;
+                              delete assig1[e.target.name];
+                              setAssignments1({ ...assig1 });
+                              const ind = editing.indexOf(
+                                String(e.target.name)
+                              );
+                              setEditing([
+                                ...editing.slice(0, ind),
+                                ...editing.slice(ind + 1, editing.length),
+                              ]);
+                            }}
+                          >
+                            Save
+                          </button>,
+                          <button
+                            className="inprogcancelbtn"
+                            name={item.QSID}
+                            onClick={(e) => {
+                              const assig1 = assignments1;
+                              delete assig1[e.target.name];
+                              setAssignments1({ ...assig1 });
+                              const ind = editing.indexOf(
+                                String(e.target.name)
+                              );
+                              setEditing([
+                                ...editing.slice(0, ind),
+                                ...editing.slice(ind + 1, editing.length),
+                              ]);
+                            }}
+                          >
+                            Cancel
+                          </button>,
+                        ]
+                      : ""}
+                  </li>
+                );
+              })
             : ""}
           {/* <h4>Assigned</h4>
           <li className="inprogresslist-header">
