@@ -1,4 +1,4 @@
-// require("dotenv").config({ path: __dirname + "/../config/.env" });
+require("dotenv").config({ path: __dirname + "/../config/.env" });
 const moment = require("moment");
 const express = require("express");
 const router = express();
@@ -1884,7 +1884,7 @@ router.post("/salesinprogress", (req, res) => {
 });
 router.post("/salesinprogressassigned", (req, res) => {
   db.query(
-    "SELECT QSID, traderList.tCode AS trader,trafficList.tCode AS traffic, KTS, KTP, abbreviation, FORMAT(quantity,2) AS quantity, companyCode, hasInspection+0 AS hasInspection, pincoterms, incoterms FROM quotationsheet INNER JOIN customerList ON quotationsheet.customerID = customerList.customerID INNER JOIN traderList ON quotationsheet.traderID = traderList.traderID INNER JOIN trafficList ON quotationsheet.trafficID=trafficList.trafficID INNER JOIN productList ON quotationsheet.productID = productList.productID INNER JOIN prodNames ON productList.productName =  prodNames.prodNameID WHERE saleComplete IN (1, -1) AND finalComplete=0 AND trafficList.tCode<>'na'",
+    "SELECT QSID, traderList.tCode AS trader,trafficList.tCode AS traffic, quotationsheet.trafficID, KTS, KTP, abbreviation, FORMAT(quantity,2) AS quantity, companyCode, hasInspection, hasPromisory, hasWH, pincoterms, incoterms FROM quotationsheet INNER JOIN customerList ON quotationsheet.customerID = customerList.customerID INNER JOIN traderList ON quotationsheet.traderID = traderList.traderID INNER JOIN trafficList ON quotationsheet.trafficID=trafficList.trafficID INNER JOIN productList ON quotationsheet.productID = productList.productID INNER JOIN prodNames ON productList.productName =  prodNames.prodNameID WHERE saleComplete IN (1, -1) AND finalComplete=0 AND trafficList.tCode<>'na'",
     (err, results) => {
       if (err) {
         console.log(err);
@@ -1896,23 +1896,64 @@ router.post("/salesinprogressassigned", (req, res) => {
   );
 });
 router.post("/saveassignment", (req, res) => {
-  let qsid = req.body.qsid;
-  let tmc = req.body.tmc;
-  console.log(qsid);
-  console.log(tmc);
-  db.query(
-    `UPDATE quotationsheet SET trafficID='${tmc}' WHERE QSID=${qsid}`,
-    (err1) => {
-      if (err1) {
-        console.log(err1);
-      } else {
-        res.json({
-          success: true,
-          msg: "Password change was successful. Please log in again with your new password.",
-        });
-      }
+  let QSID = req.body.qsid;
+  // let KTS = req.body.datapacket.KTS;
+  // let KTP = req.body.datapacket.KTP;
+  // let pincoterms = req.body.datapacket.pincoterms;
+  // let incoterms = req.body.datapacket.incoterms;
+  // let hasInspection = req.body.datapacket.hasInspection;
+  // let hasPromisory = req.body.datapacket.hasPromisory;
+  // let hasWH = req.body.datapacket.hasWH;
+
+  let data = req.body.datapacket;
+  if ("hasInspectionBool" in data) {
+    delete data.hasInspectionBool;
+  }
+  if ("hasPromisoryBool" in data) {
+    delete data.hasPromisoryBool;
+  }
+  if ("hasWHBool" in data) {
+    delete data.hasWHBool;
+  }
+  let sql = "";
+  // console.log(Object.keys(req.body.datapacket));
+  // console.log(Object.values(req.body.datapacket));
+  for (const property in data) {
+    // console.log(`${property}: ${data[property]}`);
+    if (sql !== "") {
+      sql += ", " + property + "='" + data[property] + "'";
+    } else {
+      sql += property + "='" + data[property] + "'";
     }
-  );
+  }
+  // console.log(sql);
+  db.query(`UPDATE quotationsheet SET ${sql} WHERE QSID='${QSID}'`, (err) => {
+    if (err) {
+      console.log(err);
+    } else {
+      res.json({
+        success: true,
+        msg: "Saved",
+      });
+    }
+  });
+  // let qsid = req.body.qsid;
+  // let tmc = req.body.tmc;
+  // console.log(qsid);
+  // console.log(tmc);
+  // db.query(
+  //   `UPDATE quotationsheet SET trafficID='${tmc}' WHERE QSID=${qsid}`,
+  //   (err1) => {
+  //     if (err1) {
+  //       console.log(err1);
+  //     } else {
+  //       res.json({
+  //         success: true,
+  //         msg: "Password change was successful. Please log in again with your new password.",
+  //       });
+  //     }
+  //   }
+  // );
 });
 
 module.exports = router;

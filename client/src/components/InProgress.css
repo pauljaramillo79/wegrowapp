@@ -45,6 +45,12 @@
 .inprogresslist li button:hover {
   cursor: pointer;
 }
+.inprogresslist .inprogsavebtn {
+  background-color: rgb(160, 182, 103);
+}
+.inprogresslist .inprogcancelbtn {
+  background-color: rgb(146, 44, 46);
+}
 .inprogresslist li select {
   margin: 0.2rem 0;
   /* border: none; */
