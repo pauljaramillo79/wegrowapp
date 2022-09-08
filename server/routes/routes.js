@@ -1884,7 +1884,7 @@ router.post("/salesinprogress", (req, res) => {
 });
 router.post("/salesinprogressassigned", (req, res) => {
   db.query(
-    "SELECT QSID, traderList.tCode AS trader,trafficList.tCode AS traffic, quotationsheet.trafficID, KTS, KTP, abbreviation, FORMAT(quantity,2) AS quantity, companyCode, hasInspection, hasPromisory, hasWH, pincoterms, incoterms FROM quotationsheet INNER JOIN customerList ON quotationsheet.customerID = customerList.customerID INNER JOIN traderList ON quotationsheet.traderID = traderList.traderID INNER JOIN trafficList ON quotationsheet.trafficID=trafficList.trafficID INNER JOIN productList ON quotationsheet.productID = productList.productID INNER JOIN prodNames ON productList.productName =  prodNames.prodNameID WHERE saleComplete IN (1, -1) AND finalComplete=0 AND trafficList.tCode<>'na'",
+    "SELECT QSID, traderList.tCode AS trader,trafficList.tCode AS traffic, quotationsheet.trafficID, KTS, KTP, abbreviation, FORMAT(quantity,2) AS quantity, companyCode, hasInspection, hasPromisory, hasWH, pincoterms, incoterms FROM quotationsheet INNER JOIN customerList ON quotationsheet.customerID = customerList.customerID INNER JOIN traderList ON quotationsheet.traderID = traderList.traderID INNER JOIN trafficList ON quotationsheet.trafficID=trafficList.trafficID INNER JOIN productList ON quotationsheet.productID = productList.productID INNER JOIN prodNames ON productList.productName =  prodNames.prodNameID WHERE saleComplete IN (1, -1) AND finalComplete=0 AND trafficList.tCode<>'na' ORDER BY trafficList.tCode",
     (err, results) => {
       if (err) {
         console.log(err);
