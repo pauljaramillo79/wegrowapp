@@ -16,6 +16,7 @@ import SunburstData from "./components/SunburstData";
 import AnalysisGrid from "./components/AnalysisGrid";
 import LogisticsGrid from "./components/LogisticsGrid";
 import { LoadQSProvider } from "./contexts/LoadQSProvider";
+import { LogisticsProvider } from "./contexts/LogisticsProvider";
 // import { ProfitabilityProvider } from "./contexts/ProfitabilityProvider";
 
 // Export Auth Context to be used in Login.js
@@ -88,6 +89,7 @@ function App() {
   const [state, dispatch] = useReducer(reducer, initialState);
   return (
     // <ProfitabilityProvider>
+
     <LoadQSProvider>
       <RefreshPositionsProvider>
         <AuthContext.Provider value={{ state, dispatch }}>
@@ -118,8 +120,11 @@ function App() {
                     <Route path="/analysis">
                       <AnalysisGrid />
                     </Route>
+
                     <Route path="/logistics">
-                      <LogisticsGrid />
+                      <LogisticsProvider>
+                        <LogisticsGrid />
+                      </LogisticsProvider>
                     </Route>
                   </Switch>
                 </Router>
@@ -129,6 +134,7 @@ function App() {
         </AuthContext.Provider>
       </RefreshPositionsProvider>
     </LoadQSProvider>
+
     // </ProfitabilityProvider>
   );
 }

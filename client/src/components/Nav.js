@@ -41,7 +41,7 @@ const Nav = () => {
           </NavLink>
         </li>
         <li>
-          <NavLink activeClassName="navbaractive" to="/logistics/matching">
+          <NavLink activeClassName="navbaractive" to="/logistics/inprogress">
             Logistics
           </NavLink>
         </li>

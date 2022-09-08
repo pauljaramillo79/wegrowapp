@@ -1,10 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Responsive, WidthProvider } from "react-grid-layout";
 import Axios from "axios";
 import "./InProgress.css";
+import { LogisticsContext } from "../contexts/LogisticsProvider";
+
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
 const InProgress = () => {
+  const { updateScores, setUpdateScores } = useContext(LogisticsContext);
+
   const initlayout = {
     lg: [{ i: "h", x: 0, y: 0, w: 30, h: 14 }],
     md: [{ i: "h", x: 0, y: 0, w: 30, h: 14 }],
@@ -62,7 +66,7 @@ const InProgress = () => {
     Axios.post("/salesinprogressassigned").then((response) => {
       setAssignedlist(response.data);
     });
-  }, [updateassignments]);
+  }, [updateScores]);
 
   const saveAssignment = (qsid, tmc) => {
     Axios.post("/saveassignment", {
@@ -70,7 +74,8 @@ const InProgress = () => {
       datapacket: assignments1[qsid],
     }).then((response) => {
       setAssignedmsg(response.data);
-      setUpdateassignments(!updateassignments);
+      setUpdateScores(!updateScores);
+      // setUpdateassignments(!updateassignments);
     });
   };
 

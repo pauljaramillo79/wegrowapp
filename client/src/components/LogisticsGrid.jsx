@@ -1,10 +1,20 @@
-import React from "react";
+import React, { useEffect, useState, useContext } from "react";
 import "./LogisticsGrid.css";
 import { NavLink, Route } from "react-router-dom";
 import MatchingGrid from "./MatchingGrid";
 import InProgress from "./InProgress";
+import Axios from "axios";
+import { LogisticsContext } from "../contexts/LogisticsProvider";
 
 const LogisticsGrid = () => {
+  const { updateScores } = useContext(LogisticsContext);
+  const [tmcscores, setTmcscores] = useState();
+
+  useEffect(() => {
+    Axios.post("/tmcscores").then((response) => {
+      setTmcscores(response.data);
+    });
+  }, [updateScores]);
   return (
     <div className="logcontainer">
       <div className="lognav">
@@ -18,6 +28,18 @@ const LogisticsGrid = () => {
         <NavLink activeClassName="navbaractive" to="/logistics/matching" exact>
           Matching Report
         </NavLink>
+        <div className="scores">
+          <h4 style={{ marginBottom: "1rem" }}>Scores:</h4>
+          {tmcscores
+            ? tmcscores.map((item) => {
+                return [
+                  <div className="score">
+                    <p>{item.tCode}</p> <p>{item.totalscore.toFixed(1)}</p>
+                  </div>,
+                ];
+              })
+            : ""}
+        </div>
       </div>
       <div className="gridcontainer loggridcontainer">
         <Route path="/logistics/matching">

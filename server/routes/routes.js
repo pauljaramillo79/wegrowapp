@@ -1,4 +1,4 @@
-// require("dotenv").config({ path: __dirname + "/../config/.env" });
+require("dotenv").config({ path: __dirname + "/../config/.env" });
 const moment = require("moment");
 const express = require("express");
 const router = express();
@@ -1954,6 +1954,20 @@ router.post("/saveassignment", (req, res) => {
   //     }
   //   }
   // );
+});
+
+router.post("/tmcscores", (req, res) => {
+  db.query(
+    "SELECT tCode, SUM((CASE WHEN (hasInspection='yes') THEN 1 ELSE 0 END) + (CASE WHEN (hasPromisory='yes') THEN 1 ELSE 0 END) + (CASE WHEN (pincoterms='FOB') THEN 2 WHEN (pincoterms='CIP') THEN 2 WHEN (pincoterms='CIF') THEN 2 WHEN (pincoterms='CFR') THEN 1 WHEN (pincoterms='CPT') THEN 1 ELSE 0 END) +  (CASE WHEN (incoterms='DAP') THEN 1 ELSE 0 END) +  (CASE WHEN (hasWH='yes') THEN 1 ELSE 0 END)) AS totalscore FROM quotationsheet INNER JOIN trafficList ON quotationsheet.trafficID=trafficList.trafficID WHERE finalComplete=0 AND saleComplete IN (1,-1) AND tCode<>'na' GROUP BY tCode ORDER BY totalscore DESC;",
+    (err, results) => {
+      if (err) {
+        console.log(err);
+      }
+      if (results.length > 0) {
+        return res.status(200).send(results);
+      }
+    }
+  );
 });
 
 module.exports = router;
