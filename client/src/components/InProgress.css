@@ -21,7 +21,8 @@
 .inprog-center {
   text-align: center;
 }
-.inprogresslist li p input {
+.inprogresslist li p input,
+.inprogresslist li p select {
   width: 90%;
   font-family: "Roboto", sans-serif;
   font-size: 0.8rem;

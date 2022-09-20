@@ -52,6 +52,8 @@ const InProgress = () => {
 
   const [updateassignments, setUpdateassignments] = useState(false);
 
+  const [editstate, setEditstate] = useState(false);
+
   useEffect(() => {
     Axios.post("/trafficmgrs").then((response) => {
       setTrafficmgrs(response.data);
@@ -125,8 +127,12 @@ const InProgress = () => {
             <p className="inprog-center">LC</p>
             <p className="inprog-center">WH</p>
             <p>Score</p>
-
             <p>TMC</p>
+            {editing.length > 0 ? (
+              <p className="inprog-center">Finalize</p>
+            ) : (
+              <p></p>
+            )}
           </li>
           {inprogresslist
             ? inprogresslist.map((item) => {
@@ -336,7 +342,7 @@ const InProgress = () => {
                                 assignments1[item.QSID]["hasPromisory"] ===
                                 "yes"
                               ) {
-                                console.log("heyyy");
+                                // console.log("heyyy");
                                 setAssignments1({
                                   ...assignments1,
                                   [item.QSID]: {
@@ -346,7 +352,7 @@ const InProgress = () => {
                                   },
                                 });
                               } else {
-                                console.log("hooo");
+                                // console.log("hooo");
                                 setAssignments1({
                                   ...assignments1,
                                   [item.QSID]: {
@@ -450,7 +456,7 @@ const InProgress = () => {
                     <p>{x.toFixed(1)}</p>
                     {editing.includes(String(item.QSID)) ? (
                       <select
-                        className="inprogress-med-p"
+                        // className="inprogress-med-p"
                         name={item.QSID}
                         onChange={(e) => {
                           setAssignments1({
@@ -482,18 +488,86 @@ const InProgress = () => {
                           : ""}
                       </select>
                     ) : (
-                      <p className="inprogress-med-p">{item.traffic}</p>
+                      <p>{item.traffic}</p>
+                    )}
+                    {editing.includes(String(item.QSID)) ? (
+                      <p className="inprog-center">
+                        <input
+                          type="checkbox"
+                          checked={
+                            !assignments1[item.QSID]
+                              ? item.finalComplete === 1
+                                ? true
+                                : false
+                              : assignments1[item.QSID]["finalCompleteBool"]
+                          }
+                          onClick={(e) => {
+                            if (
+                              assignments1[item.QSID] &&
+                              assignments1[item.QSID]["finalComplete"]
+                            ) {
+                              if (
+                                assignments1[item.QSID]["finalComplete"] === 1
+                              ) {
+                                setAssignments1({
+                                  ...assignments1,
+                                  [item.QSID]: {
+                                    ...assignments1[item.QSID],
+                                    ["finalComplete"]: 0,
+                                    ["finalCompleteBool"]: false,
+                                  },
+                                });
+                              } else {
+                                setAssignments1({
+                                  ...assignments1,
+                                  [item.QSID]: {
+                                    ...assignments1[item.QSID],
+                                    ["finalComplete"]: 1,
+                                    ["finalCompleteBool"]: true,
+                                  },
+                                });
+                              }
+                            } else {
+                              if (item.finalComplete === 1) {
+                                setAssignments1({
+                                  ...assignments1,
+                                  [item.QSID]: {
+                                    ...assignments1[item.QSID],
+                                    ["finalComplete"]: 0,
+                                    ["finalCompleteBool"]: false,
+                                  },
+                                });
+                              } else {
+                                setAssignments1({
+                                  ...assignments1,
+                                  [item.QSID]: {
+                                    ...assignments1[item.QSID],
+                                    ["finalComplete"]: 1,
+                                    ["finalCompleteBool"]: true,
+                                  },
+                                });
+                              }
+                            }
+                          }}
+                        />
+                      </p>
+                    ) : (
+                      <p className="inprog-center"></p>
                     )}
                     {editing.includes(String(item.QSID)) ? (
                       ""
                     ) : (
                       <button
                         name={item.QSID}
-                        onClick={(e) =>
-                          editing.includes(e.target.name)
-                            ? ""
-                            : setEditing([...editing, e.target.name])
-                        }
+                        onClick={(e) => {
+                          if (!editing.includes(e.target.name)) {
+                            setEditing([...editing, e.target.name]);
+                          }
+                        }}
+                        // editing.includes(e.target.name)
+                        //   ? ""
+                        //   : setEditing([...editing, e.target.name])
+                        // }
                       >
                         Edit
                       </button>
@@ -564,8 +638,12 @@ const InProgress = () => {
             <p className="inprog-center">LC</p>
             <p className="inprog-center">WH</p>
             <p>Score</p>
-
             <p>TMC</p>
+            {editing.length > 0 ? (
+              <p className="inprog-center">Finalize</p>
+            ) : (
+              <p></p>
+            )}
           </li>
           {assignedlist
             ? assignedlist.map((item) => {
@@ -888,7 +966,7 @@ const InProgress = () => {
                     <p>{x.toFixed(1)}</p>
                     {editing.includes(String(item.QSID)) ? (
                       <select
-                        className="inprogress-med-p"
+                        // className="inprogress-med-p"
                         name={item.QSID}
                         onChange={(e) => {
                           setAssignments1({
@@ -920,7 +998,71 @@ const InProgress = () => {
                           : ""}
                       </select>
                     ) : (
-                      <p className="inprogress-med-p">{item.traffic}</p>
+                      <p>{item.traffic}</p>
+                    )}
+                    {editing.includes(String(item.QSID)) ? (
+                      <p className="inprog-center">
+                        <input
+                          type="checkbox"
+                          checked={
+                            !assignments1[item.QSID]
+                              ? item.finalComplete === 1
+                                ? true
+                                : false
+                              : assignments1[item.QSID]["finalCompleteBool"]
+                          }
+                          onClick={(e) => {
+                            if (
+                              assignments1[item.QSID] &&
+                              assignments1[item.QSID]["finalComplete"]
+                            ) {
+                              if (
+                                assignments1[item.QSID]["finalComplete"] === 1
+                              ) {
+                                setAssignments1({
+                                  ...assignments1,
+                                  [item.QSID]: {
+                                    ...assignments1[item.QSID],
+                                    ["finalComplete"]: 0,
+                                    ["finalCompleteBool"]: false,
+                                  },
+                                });
+                              } else {
+                                setAssignments1({
+                                  ...assignments1,
+                                  [item.QSID]: {
+                                    ...assignments1[item.QSID],
+                                    ["finalComplete"]: 1,
+                                    ["finalCompleteBool"]: true,
+                                  },
+                                });
+                              }
+                            } else {
+                              if (item.finalComplete === 1) {
+                                setAssignments1({
+                                  ...assignments1,
+                                  [item.QSID]: {
+                                    ...assignments1[item.QSID],
+                                    ["finalComplete"]: 0,
+                                    ["finalCompleteBool"]: false,
+                                  },
+                                });
+                              } else {
+                                setAssignments1({
+                                  ...assignments1,
+                                  [item.QSID]: {
+                                    ...assignments1[item.QSID],
+                                    ["finalComplete"]: 1,
+                                    ["finalCompleteBool"]: true,
+                                  },
+                                });
+                              }
+                            }
+                          }}
+                        />
+                      </p>
+                    ) : (
+                      <p className="inprog-center"></p>
                     )}
                     {editing.includes(String(item.QSID)) ? (
                       ""
