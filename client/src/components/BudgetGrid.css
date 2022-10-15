@@ -1,0 +1,340 @@
+.budgetcontainer {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+}
+.budgetnav {
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  flex-basis: 10%;
+  width: 130px;
+  background-color: rgb(65, 64, 73);
+  /* background-color: black; */
+  color: white;
+  padding: 8rem 2rem;
+  height: 100vh;
+}
+.budgetgridcontainer {
+  /* margin-left: 10%; */
+  display: flex;
+  flex-basis: 100%;
+  display: inline-block;
+  /* width: 150%; */
+  position: relative;
+  left: 130px;
+  background-color: white;
+  height: 100vh;
+  margin-top: 2rem;
+  padding-left: 2rem;
+  /* position: fixed; */
+}
+.addprodgroup {
+  position: relative;
+  padding-bottom: 0.5rem;
+  border-bottom: dashed 1px gray;
+}
+.addprodbutton,
+.cancelprodbutton {
+  margin: 0.2rem 0;
+  padding: 0.25rem 1rem;
+  border-radius: 0.75rem;
+  border: none;
+  color: white;
+  background-color: rgb(68, 65, 162);
+  position: relative;
+}
+.cancelprodbutton {
+  background-color: white;
+  border: solid 1px rgb(68, 65, 162);
+  color: rgb(68, 65, 162);
+}
+.addprodbutton:hover {
+  cursor: pointer;
+  background-color: rgb(99, 95, 193);
+}
+
+.cancelprodbutton:hover {
+  cursor: pointer;
+  background-color: rgb(223, 223, 233);
+}
+.addprodpane {
+  position: absolute;
+  top: 25px;
+  height: 300px;
+  width: 230px;
+  border: 1px solid rgb(68, 65, 162);
+  border-radius: 0.75rem;
+  background-color: white;
+  z-index: 10;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.addprodpane ul {
+  display: flex;
+  flex-direction: column;
+  font-family: "Roboto", sans-serif;
+  font-size: 0.8rem;
+  overflow-y: scroll;
+  margin: 0.5rem 0;
+  min-height: 75%;
+}
+.addprodcanceladd {
+  display: flex;
+  justify-content: space-between;
+}
+.addprodcanceladd button {
+  display: flex;
+  flex-basis: 45%;
+}
+.addprodrow {
+  display: flex;
+  flex-direction: row;
+}
+.addprodrow:hover,
+.addprodrow input:hover,
+.addprodrow label:hover {
+  cursor: pointer;
+  background-color: rgb(240, 240, 240);
+}
+.addprodrow input {
+  margin-right: 0.5rem;
+}
+.budgetfilterbuttons {
+  padding-top: 0.5rem;
+}
+.budgetfilterbutton {
+  margin: 0.2rem 0;
+  padding: 0.25rem 1rem;
+  border-radius: 0.75rem;
+  border: rgb(68, 65, 162) solid 1px;
+  color: rgb(68, 65, 162);
+  background-color: white;
+  width: 150px;
+  margin-right: 0.5rem;
+}
+.budgetfilterbutton:hover {
+  cursor: pointer;
+  background-color: rgb(150, 148, 207);
+  color: white;
+}
+.budgetfilterbutton:active {
+  background-color: rgb(68, 65, 162);
+  color: white;
+  border: none;
+}
+.budgetfilterbuttonactive {
+  background-color: rgb(68, 65, 162);
+  color: white;
+  border: none;
+}
+.pgroupfbtns {
+  display: flex;
+  align-items: center;
+  padding-bottom: 0.5rem;
+  border-bottom: dashed 1px gray;
+}
+.pgroupfbtns p {
+  padding-right: 0.5rem;
+  font-family: "Roboto", sans-serif;
+  font-size: 0.8rem;
+}
+.pnamefbtns {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: dashed 1px gray;
+}
+.pnamefbtns p {
+  padding-right: 0.5rem;
+  font-family: "Roboto", sans-serif;
+  font-size: 0.8rem;
+}
+.pnamebutton {
+  margin: 0.2rem 0;
+  padding: 0.25rem 1rem;
+  border-radius: 0.75rem;
+  border: rgb(160, 182, 103) solid 1px;
+  color: rgb(68, 65, 162);
+  background-color: white;
+  width: 150px;
+  margin-right: 0.5rem;
+}
+.pnamebutton:hover {
+  cursor: pointer;
+  background-color: rgb(191, 214, 134);
+  color: white;
+}
+.pnamebutton:active {
+  background-color: rgb(160, 182, 103);
+  color: white;
+  border: none;
+}
+.pnamebuttonactive {
+  background-color: rgb(160, 182, 103);
+  color: white;
+}
+.bdgtpnametable {
+  margin-top: 1rem;
+  margin-right: 2rem;
+  font-family: "Roboto", sans-serif;
+  font-size: 0.8rem;
+}
+.bdgtpnametable table {
+  border-collapse: collapse;
+}
+.bdgtpnametable td {
+  border: 1px solid gray;
+  /* padding: 0.15rem 0; */
+  margin: 0;
+}
+.bdgtpnametable td input {
+  margin: 0;
+  border: none;
+  text-align: right;
+  padding-right: 0.5rem;
+}
+.bdgtpnametable .countrycol {
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+  min-width: 150px;
+}
+.bdgtpnametabletitle {
+  display: flex;
+  position: relative;
+}
+.bdgtpnametabletitle h3 {
+  width: auto;
+  margin-right: 1rem;
+}
+.budgettables {
+  display: flex;
+  flex-direction: column;
+}
+.bdgtpnametable .bdgtdatacol input {
+  width: 70px;
+  text-align: right;
+}
+.bdgtpnametable .bdgtregioncol {
+  padding-left: 0.75rem;
+  background-color: rgb(219, 219, 219);
+}
+.bdgtpnametable thead td {
+  background-color: black;
+  color: white;
+}
+.budgettablesandresponse {
+  display: flex;
+  flex-direction: column;
+}
+.bdgtresponsemsg {
+  color: green;
+  font-family: "Roboto", sans-serif;
+  font-size: 0.8rem;
+  margin-top: 0.5rem;
+}
+.bdgtcountrytotals {
+  font-weight: 600;
+  text-align: right;
+  padding-right: 0.5rem;
+  min-width: 70px;
+}
+.bdgtpnametable .bdgtregioncolttl {
+  padding-left: 0.75rem;
+  background-color: rgb(219, 219, 219);
+  text-align: right;
+  font-weight: 600;
+  padding-right: 0.5rem;
+}
+.bdgttotal {
+  background-color: black;
+  color: white;
+  padding-left: 0.75rem;
+}
+.bdgttotalqty {
+  background-color: black;
+  color: white;
+  text-align: right;
+  padding-right: 0.5rem;
+}
+.bdgtctyrowadd {
+  margin-right: 0.25rem;
+}
+.bdgtctyrowadd:hover {
+  cursor: pointer;
+}
+.bdgtpnametable h3 {
+  z-index: 0;
+}
+.bdgtregionrow {
+  position: relative;
+}
+.bdgtselectcty {
+  position: absolute;
+  min-width: 230px;
+  height: 300px;
+  left: 150px;
+  z-index: 10;
+  top: 0px;
+  border: 1px solid rgb(68, 65, 162);
+  border-radius: 0.75rem;
+  background-color: white;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.bdgtselectallcty {
+  position: absolute;
+  min-width: 230px;
+  height: 300px;
+  z-index: 10;
+  top: 18px;
+  border: 1px solid rgb(68, 65, 162);
+  border-radius: 0.75rem;
+  background-color: white;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.showbdgtpane {
+  display: inline-block;
+}
+.hidebdgtpane {
+  display: none;
+}
+.bdgtselectctycty {
+  margin: 0.5rem 0;
+  max-height: 200px;
+  overflow-y: scroll;
+}
+.addctyrow {
+  display: flex;
+  flex-direction: row;
+}
+.addctyrow:hover,
+.addctyrow input:hover,
+.addctyrow label:hover {
+  cursor: pointer;
+  background-color: rgb(240, 240, 240);
+}
+.addctyrow label {
+  margin-left: 0.25rem;
+}
+.bdgtctydelete {
+  margin-left: 0.5rem;
+  opacity: 0.3;
+}
+.bdgtctydeletebtn {
+  border: none;
+  padding: 0.05rem 0.5rem;
+  margin-bottom: 0.25rem;
+  border-radius: 0.5rem;
+  margin-left: 0.25rem;
+  background-color: rgb(68, 65, 162);
+  color: white;
+  font-size: 0.7rem;
+}

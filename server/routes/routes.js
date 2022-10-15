@@ -1973,4 +1973,231 @@ router.post("/tmcscores", (req, res) => {
   );
 });
 
+router.post("/budgetprodNames", (req, res) => {
+  db.query(
+    "SELECT abbreviation, prodNameID, prodCatNameID FROM prodNames ORDER BY abbreviation ASC;",
+    (err, results) => {
+      if (err) {
+        console.log(err);
+      }
+      if (results.length > 0) {
+        return res.status(200).send(results);
+      }
+    }
+  );
+});
+
+function pad(num, size) {
+  num = num.toString();
+  while (num.length < size) num = "0" + num;
+  return num;
+}
+
+router.post("/addprodbudget", async (req, res) => {
+  let prodstoadd = req.body.prodstoadd;
+  let prodscattoadd = req.body.prodscattoadd;
+  let year = req.body.year;
+  let yearshort = year - 2000;
+  let lastyear = year - 1 + "-12-31";
+  let twolastyear = year - 2 + "-01-01";
+  console.log(lastyear, twolastyear);
+
+  prodstoadd.forEach((prod, j) => {
+    db.query(
+      "SELECT DISTINCT countryID, prodNames.prodCatNameID FROM quotationsheet INNER JOIN PODList ON quotationsheet.PODID = PODList.PODID INNER JOIN (productList INNER JOIN (prodNames INNER JOIN prodCatNames ON prodNames.prodCatNameID=prodCatNames.prodCatNameID)ON productList.productName = prodNames.prodNameID) ON quotationsheet.productID = productList.productID WHERE DATE(`from`) BETWEEN ? AND ? AND saleComplete=-1 AND prodNameID=?",
+      [twolastyear, lastyear, prod],
+      (err, results) => {
+        if (err) {
+          console.log(err);
+        }
+        if (results.length > 0) {
+          results.forEach((el) => {
+            // console.log(el["countryID"]);
+            let prodcatname = el["prodCatNameID"];
+            let country = el["countryID"];
+            let quarter = [1, 4, 7, 10];
+            quarter.forEach((q) => {
+              let padprod = pad(prod, 3);
+              let padcountry = pad(country, 3);
+              let entryid = Number(
+                yearshort + q.toString() + padprod + padcountry
+              );
+              db.query(
+                `INSERT IGNORE INTO budgets (budgetentryID, date, prodNameID, quantity, customerID, countryID, prodCatNameID) VALUES (${entryid},'${year}-${q}-01', ?, 0, 9999, ?, ${prodcatname})`,
+                [prod, country],
+                (err1, res1) => {
+                  if (err1) {
+                    console.log(err1);
+                  }
+                }
+              );
+            });
+          });
+          // db.query(
+          //   "INSERT INTO budgets (date, ?, 0, )"
+          // )
+        } else if (results.length === 0) {
+          let prodcatname = prodscattoadd[j];
+          let country = "32";
+          let quarter = [1, 4, 7, 10];
+          quarter.forEach((q) => {
+            let padprod = pad(prod, 3);
+            let padcountry = pad(country, 3);
+            let entryid = Number(
+              yearshort + q.toString() + padprod + padcountry
+            );
+            db.query(
+              `INSERT IGNORE INTO budgets (budgetentryID, date, prodNameID, quantity, customerID, countryID, prodCatNameID) VALUES (${entryid},'${year}-${q}-01', ?, 0, 9999, ?, ${prodcatname})`,
+              [prod, country],
+              (err1, res1) => {
+                if (err1) {
+                  console.log(err1);
+                }
+              }
+            );
+          });
+        }
+      }
+    );
+    // j = j + 1;
+  });
+  // if (err) {
+  //   console.log(err);
+  // } else {
+  res.json({
+    success: true,
+    msg: "Saved",
+  });
+  // }
+});
+
+router.post("/budgetfilterbtns", (req, res) => {
+  let year = req.body.year;
+  db.query(
+    `SELECT DISTINCT prodCatName, productGroups.productGroup, budgets.prodCatNameID FROM budgets LEFT JOIN ((prodNames INNER JOIN productGroups ON prodNames.prodGroupID=productGroups.prodGroupID) INNER JOIN prodCatNames ON prodNames.prodCatNameID=prodCatNames.prodCatNameID) ON prodNames.prodNameID=budgets.prodNameID WHERE YEAR(date)=${year}`,
+    (err, results) => {
+      if (err) {
+        console.log(err);
+      }
+      if (results.length > 0) {
+        return res.status(200).send(results);
+      }
+    }
+  );
+});
+
+router.post("/getbudgetdata", (req, res) => {
+  let pcat = req.body.prodcat;
+  let year = req.body.year;
+  db.query(
+    `SELECT budgets.*, abbreviation, country, region FROM budgets INNER JOIN prodNames ON budgets.prodNameID = prodNames.prodNameID INNER JOIN countryList ON budgets.countryID=countryList.countryID WHERE budgets.prodCatNameID=${pcat} AND YEAR(date)=${year} ORDER BY abbreviation, region, country ASC, date ASC`,
+    (err, results) => {
+      if (err) {
+        console.log(err);
+      }
+      if (results.length > 0) {
+        return res.status(200).send(results);
+      }
+    }
+  );
+});
+
+router.post("/savebdgtqty", (req, res) => {
+  let newqty = req.body.newqty;
+  let entryID = req.body.entryID;
+  db.query(
+    `UPDATE budgets SET quantity='${newqty}' WHERE budgetentryID='${entryID}'`,
+    (err) => {
+      if (err) {
+        console.log(err);
+      } else {
+        res.json({
+          success: true,
+          msg: "New Quantity Saved",
+        });
+      }
+    }
+  );
+});
+
+router.post("/bdgtloadregcty", (req, res) => {
+  let reg = req.body.reg;
+  db.query(
+    `SELECT countryID, country FROM countryList WHERE region='${reg}'`,
+    (err, results) => {
+      if (err) {
+        console.log(err);
+      }
+      if (results.length > 0) {
+        res.status(200).send(results);
+      }
+    }
+  );
+});
+
+router.post("/bdgtfullcountrylist", (req, res) => {
+  db.query("SELECT countryID, country FROM countryList", (err, results) => {
+    if (err) {
+      console.log(err);
+    }
+    if (results.length > 0) {
+      res.status(200).send(results);
+    }
+  });
+});
+
+router.post("/addbdgtcty", (req, res) => {
+  let countries = req.body.countries;
+  let pname = req.body.pname;
+  let pcatname = req.body.pcatname;
+  let year = req.body.year;
+  let yearshort = year - 2000;
+
+  countries.forEach((cty) => {
+    let quarter = [1, 4, 7, 10];
+    quarter.forEach((q) => {
+      let padprod = pad(pname, 3);
+      let padcountry = pad(Number(cty), 3);
+      let entryid = Number(yearshort + q.toString() + padprod + padcountry);
+      db.query(
+        `INSERT IGNORE INTO budgets (budgetentryID, date, prodNameID, quantity, customerID, countryID, prodCatNameID) VALUES (${entryid}, '${year}-${q}-01', ${pname}, 0, 9999, ${cty},${pcatname})`,
+        (err, results) => {
+          if (err) {
+            console.log(err);
+          }
+        }
+      );
+    });
+  });
+  res.json({
+    success: true,
+    msg: "New Countries Added",
+  });
+});
+
+router.post("/bdgtdelctyrow", (req, res) => {
+  let year = req.body.year;
+  let yearshort = year - 2000;
+  let pname = req.body.pname;
+  let countryid = req.body.countryid;
+  let quarter = [1, 4, 7, 10];
+  quarter.forEach((q) => {
+    let padprod = pad(pname, 3);
+    let padcountry = pad(Number(countryid), 3);
+    let entryid = Number(yearshort + q.toString() + padprod + padcountry);
+    db.query(
+      `DELETE FROM budgets WHERE budgetentryID=${entryid}`,
+      (err, result) => {
+        if (err) {
+          console.log(err);
+        }
+      }
+    );
+  });
+  res.json({
+    success: true,
+    msg: "Country Deleted",
+  });
+});
+
 module.exports = router;

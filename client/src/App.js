@@ -17,6 +17,7 @@ import AnalysisGrid from "./components/AnalysisGrid";
 import LogisticsGrid from "./components/LogisticsGrid";
 import { LoadQSProvider } from "./contexts/LoadQSProvider";
 import { LogisticsProvider } from "./contexts/LogisticsProvider";
+import BudgetGrid from "./components/BudgetGrid";
 // import { ProfitabilityProvider } from "./contexts/ProfitabilityProvider";
 
 // Export Auth Context to be used in Login.js
@@ -125,6 +126,9 @@ function App() {
                       <LogisticsProvider>
                         <LogisticsGrid />
                       </LogisticsProvider>
+                    </Route>
+                    <Route path="/budget">
+                      <BudgetGrid />
                     </Route>
                   </Switch>
                 </Router>

@@ -45,6 +45,15 @@ const Nav = () => {
             Logistics
           </NavLink>
         </li>
+        {role === 1 || role === 2 ? (
+          <li>
+            <NavLink activeClassName="navbaractive" to="/budget/budget2023">
+              Budget
+            </NavLink>
+          </li>
+        ) : (
+          ""
+        )}
         {/* {role === 1 ? (
           <li>
             <NavLink activeClassName="navbaractive" to="/sales2">
