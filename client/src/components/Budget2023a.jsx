@@ -370,9 +370,10 @@ const Budget2023 = () => {
       pcatname: activePCatName,
       year: bdgtyear,
     }).then(() => {
+      setReloadbdgtdata(!reloadbdgdata);
       // if (response.data.success === true) {
     });
-    setReloadbdgtdata(!reloadbdgdata);
+
     // });
   };
 
@@ -422,8 +423,9 @@ const Budget2023 = () => {
       pname: prodkeys[pr],
       countryid: countrykeys[ct],
       year: bdgtyear,
+    }).then((response) => {
+      setReloadbdgtdata(!reloadbdgdata);
     });
-    setReloadbdgtdata(!reloadbdgdata);
   };
 
   const [fullcountrylist, setFullcountrylist] = useState();
