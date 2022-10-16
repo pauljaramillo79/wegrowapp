@@ -2200,4 +2200,38 @@ router.post("/bdgtdelctyrow", (req, res) => {
   });
 });
 
+router.post("/yearbudgetdata", (req, res) => {
+  let year = req.body.year;
+  let lastyear = year - 1;
+  db.query(
+    `SELECT YEAR(date) AS year, abbreviation, prodCatName, sum(quantity) AS quantity FROM budgets INNER JOIN prodCatNames ON budgets.prodCatNameID=prodCatNames.prodCatNameID INNER JOIN prodNames ON budgets.prodNameID=prodNames.prodnameID WHERE YEAR(date)=${year} OR YEAR(date)=${lastyear} GROUP BY prodCatName, abbreviation, YEAR(date) `,
+    (err, results) => {
+      if (err) {
+        console.log(err);
+      }
+      if (results.length > 0) {
+        res.status(200).send(results);
+      }
+    }
+  );
+});
+
+router.post("/budgetlyearsales", (req, res) => {
+  let year = req.body.year;
+  let lastyear = year - 1;
+  let prodcat = req.body.prodcat;
+  db.query(
+    "SELECT abbreviation, countryList.country, countryList.region, SUM(quantity) AS quantity, format(SUM(priceAfterInterest*quantity)/SUM(quantity),0) AS avgprice, format(SUM(priceAfterInterest*quantity),0) AS revenue, format(SUM(tradingProfit*quantity)/SUM(quantity),0) AS avgprofit, format(SUM(tradingMargin),0) AS totalprofit FROM quotationsheet INNER JOIN (productList INNER JOIN prodNames ON productList.productName=prodNames.prodNameID) ON quotationsheet.productID=productList.productID INNER JOIN (PODList INNER JOIN countryList ON PODList.countryID = countryList.countryID) ON quotationsheet.PODID = PODList.PODID WHERE YEAR(`from`)=? AND saleComplete=-1 AND prodCatNameID=? GROUP BY abbreviation,countryList.country, countryList.region",
+    [lastyear, prodcat],
+    (err, results) => {
+      if (err) {
+        console.log(err);
+      }
+      if (results.length > 0) {
+        res.status(200).send(results);
+      }
+    }
+  );
+});
+
 module.exports = router;
