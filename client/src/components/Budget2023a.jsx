@@ -410,8 +410,8 @@ const Budget2023 = () => {
           // console.log(prodind, regind, ctyel["country"], ctyel["quantity"]);
           ctylevel[ctyel["country"]] = {
             quantity: Number(ctyel["quantity"]),
-            avgprice: Number(ctyel["avgprice"]),
-            avgprofit: Number(ctyel["avgprofit"]),
+            avgprice: Number(ctyel["avgprice"].replace(/,/g, "")),
+            avgprofit: Number(ctyel["avgprofit"].replace(/,/g, "")),
           };
         });
         reglevel[regind] = ctylevel;
