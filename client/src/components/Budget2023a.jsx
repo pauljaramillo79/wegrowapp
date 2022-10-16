@@ -13,7 +13,7 @@ const Budget2023 = () => {
     setBdgtresponsemsg("");
   };
 
-  const [bdgtyear, setBdgtyear] = useState(2022);
+  const [bdgtyear, setBdgtyear] = useState(2023);
 
   useEffect(() => {
     const elem = refresmsg.current;
@@ -106,7 +106,7 @@ const Budget2023 = () => {
     });
   }, [updatebuttons]);
 
-  const [numRows, setNumRows] = useState(19);
+  const [numRows, setNumRows] = useState();
   const [numCols, setNumCols] = useState(4);
 
   // const [numRows, numCols] = [19, 4]; // No magic numbers
@@ -133,6 +133,16 @@ const Budget2023 = () => {
     });
   };
 
+  const [reloadyearbdgdata, setReloadyearbdgdata] = useState(false);
+
+  useEffect(() => {
+    Axios.post("/yearbudgetdata", { year: bdgtyear }).then((response) => {
+      // console.log(response.data);
+      setYearbudgetdata(response.data);
+      setBudgetyeartotals(getbudgetyeartotals(response.data));
+    });
+  }, [reloadyearbdgdata]);
+
   const [bdgtresponsemsg, setBdgtresponsemsg] = useState();
 
   const saveNewValue = (e, i, prod, reg, cty, q) => {
@@ -146,6 +156,7 @@ const Budget2023 = () => {
         }).then((response) => {
           setBdgtresponsemsg(response.data.msg);
           setIFormatedData(formatedData);
+          setReloadyearbdgdata(!reloadyearbdgdata);
         });
       }
     }
@@ -160,6 +171,7 @@ const Budget2023 = () => {
       }).then((response) => {
         setBdgtresponsemsg(response.data.msg);
         setIFormatedData(formatedData);
+        setReloadyearbdgdata(!reloadyearbdgdata);
       });
     }
   };
@@ -473,94 +485,169 @@ const Budget2023 = () => {
   }, []);
 
   const [yearbudgetdata, setYearbudgetdata] = useState();
+  const [budgetyeartotals, setBudgetyeartotals] = useState({});
 
-  useEffect(() => {
-    Axios.post("/yearbudgetdata", { year: bdgtyear }).then((response) => {
-      setYearbudgetdata(response.data);
+  const getbudgetyeartotals = (arr) => {
+    let yearqty = 0;
+    let yearrevenue = 0;
+    let yearprofit = 0;
+    let output = {};
+    let yeargrouped = Object.entries(arr.groupBy("year"));
+    yeargrouped.forEach((yearel) => {
+      let yearind = yearel[0];
+      yearel[1].forEach((el) => {
+        yearqty = yearqty + el["quantity"];
+        yearrevenue = yearrevenue + el["revenue"];
+        yearprofit = yearprofit + el["totalprofit"];
+      });
+      output[yearind] = {
+        quantity: yearqty,
+        revenue: yearrevenue,
+        totalprofit: yearprofit,
+      };
+      yearqty = 0;
+      yearrevenue = 0;
+      yearprofit = 0;
     });
-  }, []);
+    return output;
+  };
 
   return (
     <div>
-      <div className="addprodgroup">
-        <button
-          className="addprodbutton"
-          onClick={(e) => {
-            showaddProd();
-          }}
-        >
-          Add Product
-        </button>
-        {showprodnamefilter ? (
-          <div className="addprodpane">
-            <input
-              ref={searchProdRef}
-              value={searchterm}
-              onChange={(e) => {
-                setSearchterm(e.target.value);
-              }}
-              placeholder="Search Product Name"
-              type="text"
-            />
-            <ul>
-              {filteredProdnames
-                ? filteredProdnames.map((item) => {
-                    return [
-                      <div className="addprodrow">
-                        <input
-                          type="checkbox"
-                          name={item.prodNameID}
-                          id={item.prodNameID}
-                          value={item.prodNameID}
-                          onClick={(e) => {
-                            if (e.target.checked) {
-                              prodstoadd.push(item.prodNameID);
-                              prodscattoadd.push(item.prodCatNameID);
-                              // console.log(prodstoadd);
-                              // console.log(prodscattoadd);
-                            } else {
-                              for (var i = 0; i < prodstoadd.length; i++) {
-                                if (prodstoadd[i] === item.prodNameID) {
-                                  prodstoadd.splice(i, 1);
+      <div className="bdgttitles">
+        <h2 className="bdgttitle">{bdgtyear} Budget</h2>
+        <div className="addprodgroup">
+          <button
+            className="addprodbutton"
+            onClick={(e) => {
+              showaddProd();
+            }}
+          >
+            Add Product
+          </button>
+          {showprodnamefilter ? (
+            <div className="addprodpane">
+              <input
+                ref={searchProdRef}
+                value={searchterm}
+                onChange={(e) => {
+                  setSearchterm(e.target.value);
+                }}
+                placeholder="Search Product Name"
+                type="text"
+              />
+              <ul>
+                {filteredProdnames
+                  ? filteredProdnames.map((item) => {
+                      return [
+                        <div className="addprodrow">
+                          <input
+                            type="checkbox"
+                            name={item.prodNameID}
+                            id={item.prodNameID}
+                            value={item.prodNameID}
+                            onClick={(e) => {
+                              if (e.target.checked) {
+                                prodstoadd.push(item.prodNameID);
+                                prodscattoadd.push(item.prodCatNameID);
+                                // console.log(prodstoadd);
+                                // console.log(prodscattoadd);
+                              } else {
+                                for (var i = 0; i < prodstoadd.length; i++) {
+                                  if (prodstoadd[i] === item.prodNameID) {
+                                    prodstoadd.splice(i, 1);
+                                  }
+                                  if (prodscattoadd[i] === item.prodCatNameID) {
+                                    prodscattoadd.splice(i, 1);
+                                  }
                                 }
-                                if (prodscattoadd[i] === item.prodCatNameID) {
-                                  prodscattoadd.splice(i, 1);
-                                }
+                                // console.log(prodstoadd);
                               }
-                              // console.log(prodstoadd);
-                            }
-                          }}
-                        />{" "}
-                        <label for={item.prodNameID}>{item.abbreviation}</label>
-                      </div>,
-                    ];
-                  })
-                : "loading"}
-            </ul>
-            <div className="addprodcanceladd">
-              <button
-                className="cancelprodbutton"
-                onClick={(e) => {
-                  setShowprodnamefilter(false);
-                  setSearchterm("");
-                }}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={(e) => {
-                  addprod();
-                }}
-                className="addprodbutton"
-              >
-                Confirm
-              </button>
+                            }}
+                          />{" "}
+                          <label for={item.prodNameID}>
+                            {item.abbreviation}
+                          </label>
+                        </div>,
+                      ];
+                    })
+                  : "Please add a product."}
+              </ul>
+              <div className="addprodcanceladd">
+                <button
+                  className="cancelprodbutton"
+                  onClick={(e) => {
+                    setShowprodnamefilter(false);
+                    setSearchterm("");
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={(e) => {
+                    addprod();
+                  }}
+                  className="addprodbutton"
+                >
+                  Confirm
+                </button>
+              </div>
             </div>
-          </div>
-        ) : (
-          ""
-        )}
+          ) : (
+            ""
+          )}
+        </div>
       </div>
+      <div className="bdgttotals">
+        <ul className="bdgttotalsul">
+          <li>
+            <p className="bdgttyearfig">
+              {budgetyeartotals &&
+              budgetyeartotals[bdgtyear] &&
+              budgetyeartotals[bdgtyear]["quantity"]
+                ? budgetyeartotals[bdgtyear]["quantity"]
+                : 0}{" "}
+              mt
+            </p>
+            <p className="bdgttyearname">Quantity</p>
+            <div className="bdgtlyearfigs">
+              <p>{bdgtyear - 1} Sales:</p>
+            </div>
+            <div className="bdgtlyearfigs">
+              <p>{bdgtyear - 1} Budget:</p>
+              <p>
+                {budgetyeartotals &&
+                budgetyeartotals[bdgtyear - 1] &&
+                budgetyeartotals[bdgtyear - 1]["quantity"]
+                  ? budgetyeartotals[bdgtyear - 1]["quantity"]
+                  : 0}{" "}
+                mt
+              </p>
+            </div>
+          </li>
+          <li>
+            <p className="bdgttyearfig">
+              {budgetyeartotals &&
+              budgetyeartotals[bdgtyear] &&
+              budgetyeartotals[bdgtyear]["revenue"]
+                ? budgetyeartotals[bdgtyear]["revenue"]
+                : 0}
+            </p>
+            <p className="bdgttyearname">Revenue</p>
+          </li>
+          <li>
+            <p className="bdgttyearfig">
+              {budgetyeartotals &&
+              budgetyeartotals[bdgtyear] &&
+              budgetyeartotals[bdgtyear]["totalprofit"]
+                ? budgetyeartotals[bdgtyear]["totalprofit"]
+                : 0}
+            </p>
+            <p className="bdgttyearname">Profit</p>
+          </li>
+        </ul>
+      </div>
+
       <div className="budgetfilterbuttons">
         <div className="pgroupfbtns">
           <p>Product Groups:</p>
@@ -580,7 +667,7 @@ const Budget2023 = () => {
                   </button>
                 );
               })
-            : "Loading"}
+            : "Please add a product."}
         </div>
         <div className="pnamefbtns">
           <p>Product Name:</p>
@@ -1160,10 +1247,16 @@ const Budget2023 = () => {
                         <td className="lyearcountrycolttl">Total</td>
                         <td className="lyeardatattl">{lyearqtytotal}</td>
                         <td className="lyeardatattl">
-                          {"$ " + (lyearpricetotal / lyearqtytotal).toFixed(0)}
+                          {lyearqtytotal === 0
+                            ? 0
+                            : "$ " +
+                              (lyearpricetotal / lyearqtytotal).toFixed(0)}
                         </td>
                         <td className="lyeardatattl">
-                          {"$ " + (lyearprofittotal / lyearqtytotal).toFixed(0)}
+                          {lyearqtytotal === 0
+                            ? 0
+                            : "$ " +
+                              (lyearprofittotal / lyearqtytotal).toFixed(0)}
                         </td>
                       </tr>
                     </tbody>

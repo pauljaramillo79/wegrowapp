@@ -2204,7 +2204,7 @@ router.post("/yearbudgetdata", (req, res) => {
   let year = req.body.year;
   let lastyear = year - 1;
   db.query(
-    `SELECT YEAR(date) AS year, abbreviation, prodCatName, sum(quantity) AS quantity FROM budgets INNER JOIN prodCatNames ON budgets.prodCatNameID=prodCatNames.prodCatNameID INNER JOIN prodNames ON budgets.prodNameID=prodNames.prodnameID WHERE YEAR(date)=${year} OR YEAR(date)=${lastyear} GROUP BY prodCatName, abbreviation, YEAR(date) `,
+    `SELECT YEAR(date) AS year, abbreviation, prodCatName, sum(quantity) AS quantity, sum(quantity*price) AS revenue, SUM(quantity*profit) AS totalprofit FROM budgets INNER JOIN prodCatNames ON budgets.prodCatNameID=prodCatNames.prodCatNameID INNER JOIN prodNames ON budgets.prodNameID=prodNames.prodnameID WHERE YEAR(date)=${year} OR YEAR(date)=${lastyear} GROUP BY prodCatName, abbreviation, YEAR(date) `,
     (err, results) => {
       if (err) {
         console.log(err);

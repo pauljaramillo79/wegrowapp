@@ -32,8 +32,8 @@
 }
 .addprodgroup {
   position: relative;
-  padding-bottom: 0.5rem;
-  border-bottom: dashed 1px gray;
+  /* padding-bottom: rem; */
+  /* border-bottom: dashed 1px gray; */
 }
 .addprodbutton,
 .cancelprodbutton {
@@ -422,4 +422,39 @@
 }
 .lyeartable {
   margin-bottom: 1rem;
+}
+.bdgttotals {
+  border-bottom: 1px solid gray;
+}
+.bdgttotalsul {
+  display: flex;
+  justify-content: space-between;
+  width: 70%;
+  margin-bottom: 1rem;
+  font-family: "Helvetica Neue", sans-serif;
+}
+.bdgttyearfig {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+.bdgttyearname {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+.bdgtlyearfigs {
+  font-size: 0.85rem;
+  display: flex;
+  justify-content: space-between;
+  width: 140px;
+}
+.bdgttitle {
+  margin-right: 1rem;
+}
+.bdgttitles {
+  display: flex;
+  align-items: center;
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+  border-bottom: solid 2px gray;
 }
