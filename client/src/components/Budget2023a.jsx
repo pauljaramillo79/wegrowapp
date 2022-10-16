@@ -382,27 +382,31 @@ const Budget2023 = () => {
 
   const [bdgtlyearsales, setBdgtlyearsales] = useState({});
 
-  const formatbdgyeardata = (arr) => {
-    let prodlev = {};
-    let reglev = {};
-    let ctylev = {};
-    arr.forEach((el2) => {
-      arr.forEach((el1) => {
-        arr.forEach((el) => {
-          ctylev[el["country"]] = {
-            quantity: Number(el["quantity"]),
-            avgprice: Number(el["avgprice"]),
-            avgprofit: Number(el["avgprofit"]),
+  const formatsaleslastyeardata = (arr) => {
+    let ctylevel = {};
+    let reglevel = {};
+    let prodlevel = {};
+    let prodgrouped = Object.entries(arr.groupBy("abbreviation"));
+    prodgrouped.forEach((prodel) => {
+      let prodind = prodel[0];
+      let regrouped = Object.entries(prodel[1].groupBy("region"));
+      regrouped.forEach((regel) => {
+        let regind = regel[0];
+        regel[1].forEach((ctyel) => {
+          // console.log(prodind, regind, ctyel["country"], ctyel["quantity"]);
+          ctylevel[ctyel["country"]] = {
+            quantity: Number(ctyel["quantity"]),
+            avgprice: Number(ctyel["avgprice"]),
+            avgprofit: Number(ctyel["avgprofit"]),
           };
         });
-        reglev[el1["region"]] = ctylev;
-        ctylev = {};
+        reglevel[regind] = ctylevel;
+        ctylevel = {};
       });
-      prodlev[el2["abbreviation"]] = reglev;
-      reglev = {};
+      prodlevel[prodind] = reglevel;
+      reglevel = {};
     });
-    console.log(prodlev);
-    return prodlev;
+    return prodlevel;
   };
 
   useEffect(() => {
@@ -423,7 +427,7 @@ const Budget2023 = () => {
         prodcat: activePCatName,
       }).then((response) => {
         // setBdgtlyearsales(response.data);
-        setBdgtlyearsales(formatbdgyeardata(response.data));
+        setBdgtlyearsales(formatsaleslastyeardata(response.data));
       });
     }
   }, [activePCatName, reloadbdgdata]);
