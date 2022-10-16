@@ -396,6 +396,7 @@ const Budget2023 = () => {
   const [bdgtlyearsales, setBdgtlyearsales] = useState({});
 
   const formatsaleslastyeardata = (arr) => {
+    console.log(arr);
     let ctylevel = {};
     let reglevel = {};
     let prodlevel = {};
@@ -693,7 +694,7 @@ const Budget2023 = () => {
                   );
                 }
               })
-            : "Loading"}
+            : "Please add a product."}
         </div>
       </div>
       <div className="budgetprepdata">
