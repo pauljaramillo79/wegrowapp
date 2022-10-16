@@ -140,6 +140,7 @@ const Budget2023 = () => {
       // console.log(response.data);
       setYearbudgetdata(response.data);
       setBudgetyeartotals(getbudgetyeartotals(response.data));
+      console.log(response.data);
     });
   }, [reloadyearbdgdata]);
 
@@ -1270,8 +1271,8 @@ const Budget2023 = () => {
           {yearbudgetdata
             ? yearbudgetdata.map((ybd) => (
                 <li>
-                  <p>{ybd.prodCatName}</p>
-                  <p>{ybd.quantity}</p>
+                  <p>{ybd.year === bdgtyear ? ybd.prodCatName : ""}</p>
+                  <p>{ybd.year === bdgtyear ? ybd.quantity : ""}</p>
                 </li>
               ))
             : ""}
