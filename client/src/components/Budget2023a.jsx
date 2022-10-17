@@ -1066,21 +1066,14 @@ const Budget2023 = () => {
                                 let regprice =
                                   priceqty === 0
                                     ? 0
-                                    : Number(
-                                        (
-                                          priceqty /
-                                          (q1reg + q2reg + q3reg + q4reg)
-                                        ).toFixed(0)
-                                      );
+                                    : priceqty /
+                                      (q1reg + q2reg + q3reg + q4reg);
+
                                 let regprofit =
                                   profitqty === 0
                                     ? 0
-                                    : Number(
-                                        (
-                                          profitqty /
-                                          (q1reg + q2reg + q3reg + q4reg)
-                                        ).toFixed(0)
-                                      );
+                                    : profitqty /
+                                      (q1reg + q2reg + q3reg + q4reg);
 
                                 return [
                                   <tr className="bdgtregionrow">
