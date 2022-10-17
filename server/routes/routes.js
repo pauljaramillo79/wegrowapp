@@ -2086,6 +2086,21 @@ router.post("/budgetfilterbtns", (req, res) => {
   );
 });
 
+router.post("/budgetgroupbtns", (req, res) => {
+  let year = req.body.year;
+  db.query(
+    `SELECT DISTINCT productGroups.productGroup, sum(quantity) AS quantity, sum(quantity*profit) AS profit FROM budgets LEFT JOIN ((prodNames INNER JOIN productGroups ON prodNames.prodGroupID=productGroups.prodGroupID) INNER JOIN prodCatNames ON prodNames.prodCatNameID=prodCatNames.prodCatNameID) ON prodNames.prodNameID=budgets.prodNameID WHERE YEAR(date)=${year} GROUP BY productGroups.productGroup ORDER BY profit DESC`,
+    (err, results) => {
+      if (err) {
+        console.log(err);
+      }
+      if (results.length > 0) {
+        res.status(200).send(results);
+      }
+    }
+  );
+});
+
 router.post("/getbudgetdata", (req, res) => {
   let pcat = req.body.prodcat;
   let year = req.body.year;

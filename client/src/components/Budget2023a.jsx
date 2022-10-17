@@ -102,7 +102,7 @@ const Budget2023 = () => {
     Axios.post("/budgetfilterbtns", { year: bdgtyear }).then((resp) => {
       setBudgetbtns(resp.data);
       // console.log(resp.data);
-      setProdgroupsbtn([...new Set(resp.data.map((x) => x.productGroup))]);
+      // setProdgroupsbtn([...new Set(resp.data.map((x) => x.productGroup))]);
     });
   }, [updatebuttons]);
 
@@ -161,7 +161,13 @@ const Budget2023 = () => {
       setBudgetyeartotals(getbudgetyeartotals(response.data));
       // console.log(response.data);
     });
+    Axios.post("/budgetgroupbtns", { year: bdgtyear }).then((response) => {
+      setProdgroupsbtn(response.data);
+    });
   }, [reloadyearbdgdata]);
+  // useEffect(() => {
+
+  // }, [reloadyearbdgdata]);
 
   const [bdgtresponsemsg, setBdgtresponsemsg] = useState();
 
@@ -849,14 +855,31 @@ const Budget2023 = () => {
                 return (
                   <button
                     key={i}
-                    onClick={(e) => handleProdGroupClick(e, i, item)}
+                    onClick={(e) =>
+                      handleProdGroupClick(e, i, item.productGroup)
+                    }
                     className={
                       i === clickedProdGroup
                         ? "budgetfilterbutton budgetfilterbuttonactive"
                         : "budgetfilterbutton"
                     }
                   >
-                    {item}
+                    {
+                      <div>
+                        <p className="bdgtbtntitle">{item.productGroup}</p>
+                        <p>
+                          {item.quantity
+                            .toFixed(0)
+                            .replace(/\B(?=(\d{3})+(?!\d))/g, ",") + " mt"}
+                        </p>
+                        <p>
+                          {"$ " +
+                            item.profit
+                              .toFixed(0)
+                              .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                        </p>
+                      </div>
+                    }
                   </button>
                 );
               })
