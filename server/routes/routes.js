@@ -2023,7 +2023,7 @@ router.post("/addprodbudget", async (req, res) => {
                 yearshort + q.toString() + padprod + padcountry
               );
               db.query(
-                `INSERT IGNORE INTO budgets (budgetentryID, date, prodNameID, quantity, customerID, countryID, prodCatNameID) VALUES (${entryid},'${year}-${q}-01', ?, 0, 9999, ?, ${prodcatname})`,
+                `INSERT IGNORE INTO budgets (budgetentryID, date, prodNameID, quantity, customerID, countryID, prodCatNameID, price, profit) VALUES (${entryid},'${year}-${q}-01', ?, 0, 9999, ?, ${prodcatname}, 0,0)`,
                 [prod, country],
                 (err1, res1) => {
                   if (err1) {
@@ -2047,7 +2047,7 @@ router.post("/addprodbudget", async (req, res) => {
               yearshort + q.toString() + padprod + padcountry
             );
             db.query(
-              `INSERT IGNORE INTO budgets (budgetentryID, date, prodNameID, quantity, customerID, countryID, prodCatNameID) VALUES (${entryid},'${year}-${q}-01', ?, 0, 9999, ?, ${prodcatname})`,
+              `INSERT IGNORE INTO budgets (budgetentryID, date, prodNameID, quantity, customerID, countryID, prodCatNameID, price, profit) VALUES (${entryid},'${year}-${q}-01', ?, 0, 9999, ?, ${prodcatname},0,0)`,
               [prod, country],
               (err1, res1) => {
                 if (err1) {
@@ -2090,7 +2090,7 @@ router.post("/getbudgetdata", (req, res) => {
   let pcat = req.body.prodcat;
   let year = req.body.year;
   db.query(
-    `SELECT budgets.*, abbreviation, country, region FROM budgets INNER JOIN prodNames ON budgets.prodNameID = prodNames.prodNameID INNER JOIN countryList ON budgets.countryID=countryList.countryID WHERE budgets.prodCatNameID=${pcat} AND YEAR(date)=${year} ORDER BY abbreviation, region, country ASC, date ASC`,
+    `SELECT budgets.*, abbreviation, country, region, price, profit FROM budgets INNER JOIN prodNames ON budgets.prodNameID = prodNames.prodNameID INNER JOIN countryList ON budgets.countryID=countryList.countryID WHERE budgets.prodCatNameID=${pcat} AND YEAR(date)=${year} ORDER BY abbreviation, region, country ASC, date ASC`,
     (err, results) => {
       if (err) {
         console.log(err);
@@ -2118,6 +2118,42 @@ router.post("/savebdgtqty", (req, res) => {
       }
     }
   );
+});
+
+router.post("/savebdgteconfig", (req, res) => {
+  let year = req.body.year;
+  yearshort = year - 2000;
+  let item = req.body.item;
+  let value = req.body.value;
+  let prod = req.body.prod;
+  let country = req.body.cty;
+  let quarter = [1, 4, 7, 10];
+  let okind = "";
+  quarter.forEach((q) => {
+    let padprod = pad(prod, 3);
+    let padcountry = pad(country, 3);
+    let entryid = Number(yearshort + q.toString() + padprod + padcountry);
+    // let sql = `UPDATE budgets SET ${item}=${value} WHERE budgetentryID='${entryid}'`;
+    // console.log(sql);
+    db.query(
+      `UPDATE budgets SET ${item}=${value} WHERE budgetentryID='${entryid}'`,
+      (err, results) => {
+        if (err) {
+          console.log(err);
+        } else {
+          // okind = "OK";
+          console.log("OK");
+        }
+      }
+    );
+    // if (okind === "OK") {
+
+    // }
+  });
+  res.json({
+    success: true,
+    msg: "New Quantity Saved",
+  });
 });
 
 router.post("/bdgtloadregcty", (req, res) => {

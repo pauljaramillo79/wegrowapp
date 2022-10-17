@@ -108,14 +108,17 @@ const Budget2023 = () => {
 
   const [numRows, setNumRows] = useState();
   const [numCols, setNumCols] = useState(4);
+  const [numColsEcon, setNumColsEcon] = useState(2);
 
   // const [numRows, numCols] = [19, 4]; // No magic numbers
   const [activeIndex, setActiveIndex] = useState(-1); // Track which cell to highlight
+  const [activeEconIndex, setActiveEconIndex] = useState(-1);
   const [isNavigating, setIsNavigating] = useState(false); // Track navigation
   const [isEditing, setIsEditing] = useState(false); // Track editing
   const [values, setValues] = useState([]); // Track input values
   const boardRef = useRef(); // For setting/ unsetting navigation
   const inputRefs = useRef([]); // For setting / unsetting input focus
+  const inputEconRefs = useRef([]);
 
   const handleChange1 = (e, prod, reg, cty, qtr) => {
     setFormatedData({
@@ -133,6 +136,22 @@ const Budget2023 = () => {
     });
   };
 
+  const handleEconChange = (e, prod, reg, cty, item) => {
+    setBdgtecondata({
+      ...bdgtecondata,
+      [prod]: {
+        ...bdgtecondata[prod],
+        [reg]: {
+          ...bdgtecondata[prod][reg],
+          [cty]: {
+            ...bdgtecondata[prod][reg][cty],
+            [item]: Number(e.target.value),
+          },
+        },
+      },
+    });
+  };
+
   const [reloadyearbdgdata, setReloadyearbdgdata] = useState(false);
 
   useEffect(() => {
@@ -140,7 +159,7 @@ const Budget2023 = () => {
       // console.log(response.data);
       setYearbudgetdata(response.data);
       setBudgetyeartotals(getbudgetyeartotals(response.data));
-      console.log(response.data);
+      // console.log(response.data);
     });
   }, [reloadyearbdgdata]);
 
@@ -177,6 +196,42 @@ const Budget2023 = () => {
     }
   };
 
+  const saveNewEconValue = (e, i, prod, reg, cty, item) => {
+    let val = Number(e.target.value);
+    if (val !== Number(Obdgtecondata[prod][reg][cty][item])) {
+      if (val !== Number(Ibdgtecondata[prod][reg][cty][item])) {
+        Axios.post("/savebdgteconfig", {
+          year: bdgtyear,
+          item: item,
+          value: val,
+          prod: prodkeys[prod],
+          cty: countrykeys[cty],
+        }).then((response) => {
+          setBdgtresponsemsg(response.data.msg);
+          setIBdgtecondata(bdgtecondata);
+          setReloadyearbdgdata(!reloadyearbdgdata);
+        });
+      }
+    }
+    if (
+      val === Number(Obdgtecondata[prod][reg][cty][item]) &&
+      Number(Ibdgtecondata[prod][reg][cty][item]) !==
+        Number(Obdgtecondata[prod][reg][cty][item])
+    ) {
+      Axios.post("/savebdgteconfig", {
+        year: bdgtyear,
+        item: item,
+        value: val,
+        prod: prodkeys[prod],
+        cty: countrykeys[cty],
+      }).then((response) => {
+        setBdgtresponsemsg(response.data.msg);
+        setIBdgtecondata(bdgtecondata);
+        setReloadyearbdgdata(!reloadyearbdgdata);
+      });
+    }
+  };
+
   // Handle mouse down inside or outside the board
   const handleMouseDown = useCallback(
     (e) => {
@@ -192,29 +247,59 @@ const Budget2023 = () => {
     [boardRef, setIsNavigating]
   );
 
+  const [editingQty, setEditingQty] = useState(false);
+  const [editingEcon, setEditingEcon] = useState(false);
+
   const handleKeyDown = useCallback((e) => {
-    const { key } = e;
-    switch (key) {
-      case "ArrowUp":
-        if (activeIndex >= numCols) {
-          setActiveIndex(activeIndex - numCols);
-        }
-        break;
-      case "ArrowDown":
-        if (activeIndex < numCols * numRows - numCols) {
-          setActiveIndex(activeIndex + numCols);
-        }
-        break;
-      case "ArrowRight":
-        if (activeIndex < numRows * numCols - 1) {
-          setActiveIndex(activeIndex + 1);
-        }
-        break;
-      case "ArrowLeft":
-        if (activeIndex > 0) {
-          setActiveIndex(activeIndex - 1);
-        }
-        break;
+    if (editingQty) {
+      const { key } = e;
+      switch (key) {
+        case "ArrowUp":
+          if (activeIndex >= numCols) {
+            setActiveIndex(activeIndex - numCols);
+          }
+          break;
+        case "ArrowDown":
+          if (activeIndex < numCols * numRows - numCols) {
+            setActiveIndex(activeIndex + numCols);
+          }
+          break;
+        case "ArrowRight":
+          if (activeIndex < numRows * numCols - 1) {
+            setActiveIndex(activeIndex + 1);
+          }
+          break;
+        case "ArrowLeft":
+          if (activeIndex > 0) {
+            setActiveIndex(activeIndex - 1);
+          }
+          break;
+      }
+    }
+    if (editingEcon) {
+      const { key } = e;
+      switch (key) {
+        case "ArrowUp":
+          if (activeEconIndex >= numColsEcon) {
+            setActiveEconIndex(activeEconIndex - numColsEcon);
+          }
+          break;
+        case "ArrowDown":
+          if (activeEconIndex < numColsEcon * numRows - numColsEcon) {
+            setActiveEconIndex(activeEconIndex + numColsEcon);
+          }
+          break;
+        case "ArrowRight":
+          if (activeEconIndex < numRows * numColsEcon - 1) {
+            setActiveEconIndex(activeEconIndex + 1);
+          }
+          break;
+        case "ArrowLeft":
+          if (activeEconIndex > 0) {
+            setActiveEconIndex(activeEconIndex - 1);
+          }
+          break;
+      }
     }
   });
 
@@ -244,6 +329,21 @@ const Budget2023 = () => {
   }, [activeIndex, isEditing, inputRefs, numRows, numCols]);
 
   useEffect(onIndexChange, [activeIndex, onIndexChange]);
+
+  const onEconIndexChange = useCallback(() => {
+    if (activeEconIndex >= 0 && activeEconIndex < numRows * numColsEcon) {
+      const inputEconRef = inputEconRefs.current[activeEconIndex];
+      if (inputEconRef) {
+        if (isEditing) {
+          inputEconRef.focus();
+        } else {
+          inputEconRef.blur();
+        }
+      }
+    }
+  }, [activeEconIndex, isEditing, inputEconRefs, numRows, numColsEcon]);
+
+  useEffect(onEconIndexChange, [activeEconIndex, onEconIndexChange]);
 
   const [clickedProdGroup, setClickedProdGroup] = useState();
 
@@ -396,7 +496,7 @@ const Budget2023 = () => {
   const [bdgtlyearsales, setBdgtlyearsales] = useState({});
 
   const formatsaleslastyeardata = (arr) => {
-    console.log(arr);
+    // console.log(arr);
     let ctylevel = {};
     let reglevel = {};
     let prodlevel = {};
@@ -423,6 +523,53 @@ const Budget2023 = () => {
     return prodlevel;
   };
 
+  const [bdgtecondata, setBdgtecondata] = useState({});
+  const [Obdgtecondata, setOBdgtecondata] = useState({});
+  const [Ibdgtecondata, setIBdgtecondata] = useState({});
+
+  const formatecondata = (arr) => {
+    let ctylevel = {};
+    let reglevel = {};
+    let prodlevel = {};
+    let quantity = 0;
+    let price = 0;
+    let profit = 0;
+    let prodgrouped = Object.entries(arr.groupBy("abbreviation"));
+    prodgrouped.forEach((prodel) => {
+      let prodind = prodel[0];
+      let regrouped = Object.entries(prodel[1].groupBy("region"));
+      regrouped.forEach((regel) => {
+        let regind = regel[0];
+
+        let ctygrouped = Object.entries(regel[1].groupBy("country"));
+        ctygrouped.forEach((ctyel) => {
+          // console.log(ctyel);
+          let ctyind = ctyel[0];
+          ctyel[1].forEach((qel) => {
+            quantity = quantity + qel["quantity"];
+            price = price + qel["quantity"] * qel["price"];
+            profit = profit + qel["quantity"] * qel["profit"];
+          });
+          ctylevel[ctyind] = {
+            price: quantity === 0 || price === 0 ? 0 : price / quantity,
+            profit: quantity === 0 || profit === 0 ? 0 : profit / quantity,
+            quantity: quantity,
+          };
+
+          quantity = 0;
+          price = 0;
+          profit = 0;
+          //   console.log(ctyind);
+        });
+        reglevel[regind] = ctylevel;
+        ctylevel = {};
+      });
+      prodlevel[prodind] = reglevel;
+      reglevel = {};
+    });
+    return prodlevel;
+  };
+
   useEffect(() => {
     if (activePCatName && activePCatName !== "") {
       Axios.post("/getbudgetdata", {
@@ -435,6 +582,9 @@ const Budget2023 = () => {
         setOFormatedData(formatData(response.data));
         setIFormatedData(formatData(response.data));
         getkeys(response.data);
+        setBdgtecondata(formatecondata(response.data));
+        setOBdgtecondata(formatecondata(response.data));
+        setIBdgtecondata(formatecondata(response.data));
       });
       Axios.post("/budgetlyearsales", {
         year: bdgtyear,
@@ -454,6 +604,7 @@ const Budget2023 = () => {
   };
 
   let ind = 0;
+  let indecon = 0;
   var totalcountry = 0;
   let countryind = 0;
 
@@ -608,6 +759,8 @@ const Budget2023 = () => {
               budgetyeartotals[bdgtyear] &&
               budgetyeartotals[bdgtyear]["quantity"]
                 ? budgetyeartotals[bdgtyear]["quantity"]
+                    .toFixed(0)
+                    .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                 : 0}{" "}
               mt
             </p>
@@ -622,6 +775,8 @@ const Budget2023 = () => {
                 budgetyeartotals[bdgtyear - 1] &&
                 budgetyeartotals[bdgtyear - 1]["quantity"]
                   ? budgetyeartotals[bdgtyear - 1]["quantity"]
+                      .toFixed(0)
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                   : 0}{" "}
                 mt
               </p>
@@ -632,7 +787,10 @@ const Budget2023 = () => {
               {budgetyeartotals &&
               budgetyeartotals[bdgtyear] &&
               budgetyeartotals[bdgtyear]["revenue"]
-                ? budgetyeartotals[bdgtyear]["revenue"]
+                ? "$" +
+                  budgetyeartotals[bdgtyear]["revenue"]
+                    .toFixed(0)
+                    .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                 : 0}
             </p>
             <p className="bdgttyearname">Revenue</p>
@@ -642,10 +800,43 @@ const Budget2023 = () => {
               {budgetyeartotals &&
               budgetyeartotals[bdgtyear] &&
               budgetyeartotals[bdgtyear]["totalprofit"]
-                ? budgetyeartotals[bdgtyear]["totalprofit"]
+                ? "$" +
+                  budgetyeartotals[bdgtyear]["totalprofit"]
+                    .toFixed(0)
+                    .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                 : 0}
             </p>
             <p className="bdgttyearname">Profit</p>
+          </li>
+          <li>
+            <p className="bdgttyearfig">
+              {budgetyeartotals &&
+              budgetyeartotals[bdgtyear] &&
+              budgetyeartotals[bdgtyear]["totalprofit"]
+                ? "$" +
+                  (
+                    budgetyeartotals[bdgtyear]["totalprofit"] /
+                    budgetyeartotals[bdgtyear]["quantity"]
+                  )
+                    .toFixed(0)
+                    .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                : 0}
+            </p>
+            <p className="bdgttyearname">Avg Profit</p>
+          </li>
+          <li>
+            <p className="bdgttyearfig">
+              {budgetyeartotals &&
+              budgetyeartotals[bdgtyear] &&
+              budgetyeartotals[bdgtyear]["totalprofit"]
+                ? (
+                    (budgetyeartotals[bdgtyear]["totalprofit"] /
+                      budgetyeartotals[bdgtyear]["revenue"]) *
+                    100
+                  ).toFixed(1) + "%"
+                : 0}
+            </p>
+            <p className="bdgttyearname">Margin</p>
           </li>
         </ul>
       </div>
@@ -802,6 +993,11 @@ const Budget2023 = () => {
                               <td className="bdgtdatacol">Q3</td>
                               <td className="bdgtdatacol">Q4</td>
                               <td className="bdgtdatacol">Total</td>
+                              <td className="bdgtcolseparation"></td>
+                              <td className="bdgtdatacol">Price</td>
+                              <td className="bdgtdatacol">Profit</td>
+                              <td className="bdgtdatacol">Ttl Profit</td>
+                              <td className="bdgtdatacol">% Mgn</td>
                             </tr>
                           </thead>
                           <tbody>
@@ -952,9 +1148,16 @@ const Budget2023 = () => {
                                     <td className="bdgtregioncolttl">
                                       {q1reg + q2reg + q3reg + q4reg}
                                     </td>
+                                    <td className="bdgtcolseparation"></td>
+                                    <td className="bdgtregioncolttl"></td>
+                                    <td className="bdgtregioncolttl"></td>
+                                    <td className="bdgtregioncolttl"></td>
+                                    <td className="bdgtregioncolttl"></td>
                                   </tr>,
                                   Object.keys(formatedData[prod][reg]).map(
                                     (cty) => {
+                                      let indexecon = indecon;
+                                      indecon = indecon + 2;
                                       //   q1reg = 0;
                                       return [
                                         <tr>
@@ -997,6 +1200,8 @@ const Budget2023 = () => {
                                                     onFocus={(e) => {
                                                       setActiveIndex(index);
                                                       e.target.select();
+                                                      setEditingQty(true);
+                                                      setEditingEcon(false);
                                                     }}
                                                     ref={(el) =>
                                                       (inputRefs.current[
@@ -1029,6 +1234,163 @@ const Budget2023 = () => {
                                               ] +
                                               formatedData[prod][reg][cty]["3"]}
                                           </td>
+                                          <td className="bdgtcolseparation"></td>
+                                          <td className="bdgtctyeconomics">
+                                            <input
+                                              className="cell-input"
+                                              value={
+                                                bdgtecondata &&
+                                                bdgtecondata[prod] &&
+                                                bdgtecondata[prod][reg] &&
+                                                bdgtecondata[prod][reg][cty] &&
+                                                bdgtecondata[prod][reg][cty][
+                                                  "price"
+                                                ] !== null
+                                                  ? bdgtecondata[prod][reg][
+                                                      cty
+                                                    ]["price"]
+                                                  : "na"
+                                              }
+                                              onChange={(e) => {
+                                                handleEconChange(
+                                                  e,
+                                                  prod,
+                                                  reg,
+                                                  cty,
+                                                  "price"
+                                                );
+                                              }}
+                                              onFocus={(e) => {
+                                                setActiveEconIndex(indexecon);
+                                                e.target.select();
+                                                setEditingQty(false);
+                                                setEditingEcon(true);
+                                                setActiveIndex(-1);
+                                              }}
+                                              ref={(el) =>
+                                                (inputEconRefs.current[
+                                                  indexecon
+                                                ] = el)
+                                              }
+                                              onBlur={(e) => {
+                                                saveNewEconValue(
+                                                  e,
+                                                  indexecon,
+                                                  prod,
+                                                  reg,
+                                                  cty,
+                                                  "price"
+                                                );
+                                                setShowmsg(!showmsg);
+                                              }}
+                                            />
+                                          </td>
+                                          <td className="bdgtctyeconomics">
+                                            <input
+                                              className="cell-input"
+                                              value={
+                                                bdgtecondata &&
+                                                bdgtecondata[prod] &&
+                                                bdgtecondata[prod][reg] &&
+                                                bdgtecondata[prod][reg][cty] &&
+                                                bdgtecondata[prod][reg][cty][
+                                                  "profit"
+                                                ] !== null
+                                                  ? bdgtecondata[prod][reg][
+                                                      cty
+                                                    ]["profit"]
+                                                  : "na"
+                                              }
+                                              onChange={(e) => {
+                                                handleEconChange(
+                                                  e,
+                                                  prod,
+                                                  reg,
+                                                  cty,
+                                                  "profit"
+                                                );
+                                              }}
+                                              onFocus={(e) => {
+                                                setActiveEconIndex(
+                                                  indexecon + 1
+                                                );
+                                                e.target.select();
+                                                setEditingQty(false);
+                                                setEditingEcon(true);
+                                                setActiveIndex(-1);
+                                              }}
+                                              ref={(el) =>
+                                                (inputEconRefs.current[
+                                                  indexecon + 1
+                                                ] = el)
+                                              }
+                                              onBlur={(e) => {
+                                                saveNewEconValue(
+                                                  e,
+                                                  indexecon,
+                                                  prod,
+                                                  reg,
+                                                  cty,
+                                                  "profit"
+                                                );
+                                                setShowmsg(!showmsg);
+                                              }}
+                                            />
+                                          </td>
+                                          <td className="bdgtctyeconomics">
+                                            {bdgtecondata &&
+                                            formatedData &&
+                                            bdgtecondata[prod] &&
+                                            formatedData[prod] &&
+                                            bdgtecondata[prod][reg] &&
+                                            formatedData[prod][reg] &&
+                                            bdgtecondata[prod][reg][cty] &&
+                                            formatedData[prod][reg][cty] &&
+                                            bdgtecondata[prod][reg][cty][
+                                              "price"
+                                            ] !== null
+                                              ? (
+                                                  bdgtecondata[prod][reg][cty][
+                                                    "price"
+                                                  ] *
+                                                  (formatedData[prod][reg][
+                                                    cty
+                                                  ][0] +
+                                                    formatedData[prod][reg][
+                                                      cty
+                                                    ][1] +
+                                                    formatedData[prod][reg][
+                                                      cty
+                                                    ][2] +
+                                                    formatedData[prod][reg][
+                                                      cty
+                                                    ][3])
+                                                ).toFixed(0)
+                                              : 0}
+                                          </td>
+                                          <td className="bdgtctyeconomics">
+                                            {bdgtecondata &&
+                                            bdgtecondata[prod] &&
+                                            bdgtecondata[prod][reg] &&
+                                            bdgtecondata[prod][reg][cty] &&
+                                            bdgtecondata[prod][reg][cty][
+                                              "profit"
+                                            ] !== null &&
+                                            bdgtecondata[prod][reg][cty][
+                                              "price"
+                                            ] !== 0
+                                              ? (
+                                                  (bdgtecondata[prod][reg][cty][
+                                                    "profit"
+                                                  ] /
+                                                    bdgtecondata[prod][reg][
+                                                      cty
+                                                    ]["price"]) *
+                                                  100
+                                                ).toFixed(1) + "%"
+                                              : "0%"}
+                                          </td>
+
                                           <FontAwesomeIcon
                                             className="bdgtctydelete"
                                             icon={faMinusCircle}
@@ -1083,6 +1445,11 @@ const Budget2023 = () => {
                                   q3prodtotal +
                                   q4prodtotal}
                               </td>
+                              <td class="bdgtcolseparation"></td>
+                              <td className="bdgttotalqty"></td>
+                              <td className="bdgttotalqty"></td>
+                              <td className="bdgttotalqty"></td>
+                              <td className="bdgttotalqty"></td>
                             </tr>
                           </tbody>
                         </table>

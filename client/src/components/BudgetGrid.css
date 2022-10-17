@@ -214,6 +214,10 @@
   display: flex;
   flex-direction: column;
 }
+.bdgtdatacol {
+  text-align: right;
+  padding-right: 0.5rem;
+}
 .bdgtpnametable .bdgtdatacol input {
   width: 60px;
   text-align: right;
@@ -457,4 +461,20 @@
   padding-bottom: 1rem;
   margin-bottom: 1rem;
   border-bottom: solid 2px gray;
+}
+.bdgtpnametable .bdgtcolseparation {
+  width: 15px;
+  border: none;
+  background-color: white;
+}
+.bdgtctyeconomics {
+  width: 60px;
+  text-align: right;
+  padding-right: 0.5rem;
+}
+.bdgtpnametable .bdgtctyeconomics input {
+  width: 60px;
+  text-align: right;
+  padding-right: 0;
+  /* padding-right: 0.5rem; */
 }
