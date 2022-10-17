@@ -1347,11 +1347,11 @@ const Budget2023 = () => {
                                             bdgtecondata[prod][reg][cty] &&
                                             formatedData[prod][reg][cty] &&
                                             bdgtecondata[prod][reg][cty][
-                                              "price"
+                                              "profit"
                                             ] !== null
                                               ? (
                                                   bdgtecondata[prod][reg][cty][
-                                                    "price"
+                                                    "profit"
                                                   ] *
                                                   (formatedData[prod][reg][
                                                     cty
