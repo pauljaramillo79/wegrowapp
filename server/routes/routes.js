@@ -2142,7 +2142,7 @@ router.post("/savebdgteconfig", (req, res) => {
           console.log(err);
         } else {
           // okind = "OK";
-          console.log("OK");
+          // console.log("OK");
         }
       }
     );

@@ -1007,6 +1007,8 @@ const Budget2023 = () => {
                                 let q2reg = 0;
                                 let q3reg = 0;
                                 let q4reg = 0;
+                                let priceqty = 0;
+                                let profitqty = 0;
 
                                 Object.keys(formatedData[prod][reg]).forEach(
                                   (ctry) => {
@@ -1022,12 +1024,63 @@ const Budget2023 = () => {
                                     q4reg =
                                       q4reg +
                                       formatedData[prod][reg][ctry]["3"];
+                                    if (
+                                      bdgtecondata &&
+                                      bdgtecondata[prod] &&
+                                      bdgtecondata[prod][reg] &&
+                                      bdgtecondata[prod][reg][ctry] &&
+                                      bdgtecondata[prod][reg][ctry]["price"]
+                                    ) {
+                                      priceqty =
+                                        priceqty +
+                                        bdgtecondata[prod][reg][ctry]["price"] *
+                                          (formatedData[prod][reg][ctry]["0"] +
+                                            formatedData[prod][reg][ctry]["1"] +
+                                            formatedData[prod][reg][ctry]["2"] +
+                                            formatedData[prod][reg][ctry]["3"]);
+                                    }
+                                    if (
+                                      bdgtecondata &&
+                                      bdgtecondata[prod] &&
+                                      bdgtecondata[prod][reg] &&
+                                      bdgtecondata[prod][reg][ctry] &&
+                                      bdgtecondata[prod][reg][ctry]["profit"]
+                                    ) {
+                                      profitqty =
+                                        profitqty +
+                                        bdgtecondata[prod][reg][ctry][
+                                          "profit"
+                                        ] *
+                                          (formatedData[prod][reg][ctry]["0"] +
+                                            formatedData[prod][reg][ctry]["1"] +
+                                            formatedData[prod][reg][ctry]["2"] +
+                                            formatedData[prod][reg][ctry]["3"]);
+                                    }
                                   }
                                 );
                                 q1prodtotal = q1prodtotal + q1reg;
                                 q2prodtotal = q2prodtotal + q2reg;
                                 q3prodtotal = q3prodtotal + q3reg;
                                 q4prodtotal = q4prodtotal + q4reg;
+
+                                let regprice =
+                                  priceqty === 0
+                                    ? 0
+                                    : Number(
+                                        (
+                                          priceqty /
+                                          (q1reg + q2reg + q3reg + q4reg)
+                                        ).toFixed(0)
+                                      );
+                                let regprofit =
+                                  profitqty === 0
+                                    ? 0
+                                    : Number(
+                                        (
+                                          profitqty /
+                                          (q1reg + q2reg + q3reg + q4reg)
+                                        ).toFixed(0)
+                                      );
 
                                 return [
                                   <tr className="bdgtregionrow">
@@ -1149,10 +1202,50 @@ const Budget2023 = () => {
                                       {q1reg + q2reg + q3reg + q4reg}
                                     </td>
                                     <td className="bdgtcolseparation"></td>
-                                    <td className="bdgtregioncolttl"></td>
-                                    <td className="bdgtregioncolttl"></td>
-                                    <td className="bdgtregioncolttl"></td>
-                                    <td className="bdgtregioncolttl"></td>
+                                    <td className="bdgtregioncolttl">
+                                      {/* {priceqty === 0
+                                        ? 0
+                                        : (
+                                            priceqty /
+                                            (q1reg + q2reg + q3reg + q4reg)
+                                          ).toFixed(0)} */}
+                                      {"$" +
+                                        regprice
+                                          .toFixed(0)
+                                          .replace(
+                                            /\B(?=(\d{3})+(?!\d))/g,
+                                            ","
+                                          )}
+                                    </td>
+                                    <td className="bdgtregioncolttl">
+                                      {"$" +
+                                        regprofit
+                                          .toFixed(0)
+                                          .replace(
+                                            /\B(?=(\d{3})+(?!\d))/g,
+                                            ","
+                                          )}
+                                    </td>
+                                    <td className="bdgtregioncolttl">
+                                      {"$" +
+                                        (
+                                          regprofit *
+                                          (q1reg + q2reg + q3reg + q4reg)
+                                        )
+                                          .toFixed(0)
+                                          .replace(
+                                            /\B(?=(\d{3})+(?!\d))/g,
+                                            ","
+                                          )}
+                                    </td>
+                                    <td className="bdgtregioncolttl">
+                                      {regprofit === 0 || regprice === 0
+                                        ? 0 + "%"
+                                        : (
+                                            (regprofit / regprice) *
+                                            100
+                                          ).toFixed(1) + "%"}
+                                    </td>
                                   </tr>,
                                   Object.keys(formatedData[prod][reg]).map(
                                     (cty) => {
