@@ -696,6 +696,11 @@ const Budget2023 = () => {
   const [summarygroupby1, setSummarygroupby1] = useState("region");
   const [summarygroupby2, setSummarygroupby2] = useState("country");
 
+  let q1total = 0;
+  let q2total = 0;
+  let q3total = 0;
+  let q4total = 0;
+
   return (
     <div>
       <div className="bdgttitles">
@@ -2022,6 +2027,10 @@ const Budget2023 = () => {
                         if (regel["quarter"] === 4) {
                           q4 = q4 + regel["quantity"];
                         }
+                        // let q1total = 0;
+                        // q2total = 0;
+                        // q3total = 0;
+                        // q4total = 0;
                       });
                       return [
                         <Accordion className="bdgtacc" allowZeroExpanded={true}>
@@ -2056,15 +2065,19 @@ const Budget2023 = () => {
                                   cty[1].forEach((ctyel) => {
                                     if (ctyel["quarter"] === 1) {
                                       q21 = q21 + ctyel["quantity"];
+                                      q1total = q1total + ctyel["quantity"];
                                     }
                                     if (ctyel["quarter"] === 2) {
                                       q22 = q22 + ctyel["quantity"];
+                                      q2total = q2total + ctyel["quantity"];
                                     }
                                     if (ctyel["quarter"] === 3) {
                                       q23 = q23 + ctyel["quantity"];
+                                      q3total = q3total + ctyel["quantity"];
                                     }
                                     if (ctyel["quarter"] === 4) {
                                       q24 = q24 + ctyel["quantity"];
+                                      q4total = q4total + ctyel["quantity"];
                                     }
                                   });
 
@@ -2089,6 +2102,16 @@ const Budget2023 = () => {
                     }
                   )
                 : ""}
+              <li className="stblrow stblfooter">
+                <p className="stblcollarge">TOTAL</p>
+                <p className="stblfig">{q1total}</p>
+                <p className="stblfig">{q2total}</p>
+                <p className="stblfig">{q3total}</p>
+                <p className="stblfig">{q4total}</p>
+                <p className="stblfig">
+                  {q1total + q2total + q3total + q4total}
+                </p>
+              </li>
             </div>
           </ul>
         </div>

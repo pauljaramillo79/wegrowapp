@@ -584,3 +584,8 @@
   border-top: 1px gray dashed;
   margin-left: 15px;
 }
+.stblfooter {
+  margin-bottom: 0.5rem;
+  border-top: 1px solid gray;
+  justify-content: right;
+}
