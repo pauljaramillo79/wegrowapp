@@ -98,13 +98,6 @@ const Budget2023 = () => {
     setShowprodnamefilter(false);
   };
 
-  useEffect(() => {
-    Axios.post("/budgetfilterbtns", { year: bdgtyear }).then((resp) => {
-      setBudgetbtns(resp.data);
-      console.log(resp.data);
-    });
-  }, [updatebuttons]);
-
   const [numRows, setNumRows] = useState();
   const [numCols, setNumCols] = useState(4);
   const [numColsEcon, setNumColsEcon] = useState(2);
@@ -164,6 +157,13 @@ const Budget2023 = () => {
       setProdgroupsbtn(response.data);
     });
   }, [reloadyearbdgdata]);
+
+  useEffect(() => {
+    Axios.post("/budgetfilterbtns", { year: bdgtyear }).then((resp) => {
+      setBudgetbtns(resp.data);
+      console.log(resp.data);
+    });
+  }, [updatebuttons, reloadyearbdgdata]);
   // useEffect(() => {
 
   // }, [reloadyearbdgdata]);
@@ -934,6 +934,8 @@ const Budget2023 = () => {
                   let q2prodtotal = 0;
                   let q3prodtotal = 0;
                   let q4prodtotal = 0;
+                  let pricetotal = 0;
+                  let profittotal = 0;
                   return [
                     <div className="bdgtpnametable">
                       <div className="bdgtpnametabletitle">
@@ -1111,7 +1113,8 @@ const Budget2023 = () => {
                                     ? 0
                                     : profitqty /
                                       (q1reg + q2reg + q3reg + q4reg);
-
+                                pricetotal = pricetotal + priceqty;
+                                profittotal = profittotal + profitqty;
                                 return [
                                   <tr className="bdgtregionrow">
                                     <td className="bdgtregioncol">
@@ -1569,10 +1572,59 @@ const Budget2023 = () => {
                                   q4prodtotal}
                               </td>
                               <td class="bdgtcolseparation"></td>
-                              <td className="bdgttotalqty"></td>
-                              <td className="bdgttotalqty"></td>
-                              <td className="bdgttotalqty"></td>
-                              <td className="bdgttotalqty"></td>
+                              <td className="bdgttotalqty">
+                                {pricetotal === 0 ||
+                                q1prodtotal +
+                                  q2prodtotal +
+                                  q3prodtotal +
+                                  q4prodtotal ===
+                                  0
+                                  ? 0
+                                  : "$" +
+                                    (
+                                      pricetotal /
+                                      (q1prodtotal +
+                                        q2prodtotal +
+                                        q3prodtotal +
+                                        q4prodtotal)
+                                    )
+                                      .toFixed(0)
+                                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                              </td>
+                              <td className="bdgttotalqty">
+                                {profittotal === 0 ||
+                                q1prodtotal +
+                                  q2prodtotal +
+                                  q3prodtotal +
+                                  q4prodtotal ===
+                                  0
+                                  ? 0
+                                  : "$" +
+                                    (
+                                      profittotal /
+                                      (q1prodtotal +
+                                        q2prodtotal +
+                                        q3prodtotal +
+                                        q4prodtotal)
+                                    )
+                                      .toFixed(0)
+                                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                              </td>
+                              <td className="bdgttotalqty">
+                                {profittotal === 0
+                                  ? 0
+                                  : "$" +
+                                    profittotal
+                                      .toFixed(0)
+                                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                              </td>
+                              <td className="bdgttotalqty">
+                                {profittotal === 0 || pricetotal == 0
+                                  ? 0
+                                  : ((profittotal / pricetotal) * 100).toFixed(
+                                      1
+                                    ) + "%"}
+                              </td>
                             </tr>
                           </tbody>
                         </table>
