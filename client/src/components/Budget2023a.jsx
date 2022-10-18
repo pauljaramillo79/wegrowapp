@@ -13,7 +13,7 @@ const Budget2023 = () => {
     setBdgtresponsemsg("");
   };
 
-  const [bdgtyear, setBdgtyear] = useState(2022);
+  const [bdgtyear, setBdgtyear] = useState(2023);
 
   useEffect(() => {
     const elem = refresmsg.current;
@@ -157,6 +157,10 @@ const Budget2023 = () => {
     Axios.post("/budgetgroupbtns", { year: bdgtyear }).then((response) => {
       setProdgroupsbtn(response.data);
     });
+    Axios.post("/budgetfilterbtns", { year: bdgtyear }).then((resp) => {
+      setBudgetbtns(resp.data);
+      // console.log(resp.data);
+    });
   }, [reloadyearbdgdata]);
 
   useEffect(() => {
@@ -164,7 +168,7 @@ const Budget2023 = () => {
       setBudgetbtns(resp.data);
       // console.log(resp.data);
     });
-  }, [updatebuttons, reloadyearbdgdata]);
+  }, [updatebuttons]);
   // useEffect(() => {
 
   // }, [reloadyearbdgdata]);
