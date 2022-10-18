@@ -4,6 +4,13 @@ import { gsap } from "gsap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlusCircle } from "@fortawesome/free-solid-svg-icons";
 import { faMinusCircle } from "@fortawesome/free-solid-svg-icons";
+import {
+  Accordion,
+  AccordionItem,
+  AccordionItemHeading,
+  AccordionItemButton,
+  AccordionItemPanel,
+} from "react-accessible-accordion";
 
 const Budget2023 = () => {
   const refresmsg = useRef(null);
@@ -150,7 +157,7 @@ const Budget2023 = () => {
 
   useEffect(() => {
     Axios.post("/yearbudgetdata", { year: bdgtyear }).then((response) => {
-      console.log(response.data);
+      // console.log(response.data);
       setYearbudgetdata(response.data);
       setBudgetyeartotals(getbudgetyeartotals(response.data));
     });
@@ -671,9 +678,23 @@ const Budget2023 = () => {
       yearrevenue = 0;
       yearprofit = 0;
     });
-    console.log(output);
+    // console.log(output);
     return output;
   };
+
+  const [bdgtregiondta, setBdgtregiondata] = useState();
+
+  useEffect(() => {
+    Axios.post("/bdgtregiondata", { year: bdgtyear }).then((response) => {
+      setBdgtregiondata(response.data);
+      Object.entries(response.data.groupBy("region")).map((item) =>
+        console.log(item)
+      );
+    });
+  }, []);
+
+  const [summarygroupby1, setSummarygroupby1] = useState("region");
+  const [summarygroupby2, setSummarygroupby2] = useState("country");
 
   return (
     <div>
@@ -1012,7 +1033,7 @@ const Budget2023 = () => {
                   return [
                     <div className="bdgtpnametable">
                       <div className="bdgtpnametabletitle">
-                        <h3>{prod}</h3>
+                        <h3>2023 {prod} Budget</h3>
                         <FontAwesomeIcon
                           icon={faPlusCircle}
                           onClick={(e) => {
@@ -1882,7 +1903,7 @@ const Budget2023 = () => {
               })
             : ""}
         </div>
-        <div className="budgetbyprod">
+        {/* <div className="budgetbyprod">
           <h4>{bdgtyear} Budget Summary</h4>
           {yearbudgetdata
             ? yearbudgetdata.map((ybd) => (
@@ -1892,6 +1913,184 @@ const Budget2023 = () => {
                 </li>
               ))
             : ""}
+        </div> */}
+        <div className="budgetbyprod">
+          <h4>Budget Summary Figures 2023</h4>
+          <div className="bdgtsummarybuttons1">
+            <p>Level 1:</p>
+            <button
+              onClick={(e) => {
+                setSummarygroupby1("region");
+              }}
+            >
+              Region
+            </button>
+            <button
+              onClick={(e) => {
+                setSummarygroupby1("productGroup");
+              }}
+            >
+              Group
+            </button>
+            <button
+              onClick={(e) => {
+                setSummarygroupby1("prodCatName");
+              }}
+            >
+              Category
+            </button>
+            <button
+              onClick={(e) => {
+                setSummarygroupby1("abbreviation");
+              }}
+            >
+              Name
+            </button>
+            <button
+              onClick={(e) => {
+                setSummarygroupby1("country");
+              }}
+            >
+              Country
+            </button>
+          </div>
+          <div className="bdgtsummarybuttons2">
+            <p>Level 2:</p>
+            <button
+              onClick={(e) => {
+                setSummarygroupby2("region");
+              }}
+            >
+              Region
+            </button>
+            <button
+              onClick={(e) => {
+                setSummarygroupby2("productGroup");
+              }}
+            >
+              Group
+            </button>
+            <button
+              onClick={(e) => {
+                setSummarygroupby2("prodCatName");
+              }}
+            >
+              Category
+            </button>
+            <button
+              onClick={(e) => {
+                setSummarygroupby2("abbreviation");
+              }}
+            >
+              Name
+            </button>
+            <button
+              onClick={(e) => {
+                setSummarygroupby2("country");
+              }}
+            >
+              Country
+            </button>
+          </div>
+          <ul className="bdgtsummarytable">
+            <li className="stblrow stblheader">
+              <p className="stblcollarge">Country</p>
+              <p className="stblfig">Q1</p>
+              <p className="stblfig">Q2</p>
+              <p className="stblfig">Q3</p>
+              <p className="stblfig">Q4</p>
+              <p className="stblfig">Total</p>
+            </li>
+            <div className="bdgtsummarydata">
+              {bdgtregiondta
+                ? Object.entries(bdgtregiondta.groupBy(summarygroupby1)).map(
+                    (reg, key) => {
+                      let q1 = 0;
+                      let q2 = 0;
+                      let q3 = 0;
+                      let q4 = 0;
+                      reg[1].forEach((regel) => {
+                        if (regel["quarter"] === 1) {
+                          q1 = q1 + regel["quantity"];
+                        }
+                        if (regel["quarter"] === 2) {
+                          q2 = q2 + regel["quantity"];
+                        }
+                        if (regel["quarter"] === 3) {
+                          q3 = q3 + regel["quantity"];
+                        }
+                        if (regel["quarter"] === 4) {
+                          q4 = q4 + regel["quantity"];
+                        }
+                      });
+                      return [
+                        <Accordion className="bdgtacc" allowZeroExpanded={true}>
+                          <AccordionItem style={{ border: "none" }}>
+                            <AccordionItemHeading>
+                              <AccordionItemButton className="bsummaccordion_button">
+                                <li className="stblrow">
+                                  <p className="stblcollarge">
+                                    {reg[0] === "Latin America"
+                                      ? "L. America"
+                                      : reg[0] === "Dominican Republic"
+                                      ? "Dom Rep"
+                                      : reg[0]}
+                                  </p>
+                                  <p className="stblfig">{q1}</p>
+                                  <p className="stblfig">{q2}</p>
+                                  <p className="stblfig">{q3}</p>
+                                  <p className="stblfig">{q4}</p>
+                                  <p className="stblfig">{q1 + q2 + q3 + q4}</p>
+                                </li>
+                              </AccordionItemButton>
+                            </AccordionItemHeading>
+                            {
+                              <AccordionItemPanel className="bdgtaccpanel">
+                                {Object.entries(
+                                  reg[1].groupBy(summarygroupby2)
+                                ).map((cty) => {
+                                  let q21 = 0;
+                                  let q22 = 0;
+                                  let q23 = 0;
+                                  let q24 = 0;
+                                  cty[1].forEach((ctyel) => {
+                                    if (ctyel["quarter"] === 1) {
+                                      q21 = q21 + ctyel["quantity"];
+                                    }
+                                    if (ctyel["quarter"] === 2) {
+                                      q22 = q22 + ctyel["quantity"];
+                                    }
+                                    if (ctyel["quarter"] === 3) {
+                                      q23 = q23 + ctyel["quantity"];
+                                    }
+                                    if (ctyel["quarter"] === 4) {
+                                      q24 = q24 + ctyel["quantity"];
+                                    }
+                                  });
+
+                                  return (
+                                    <li className="stblrow">
+                                      <p className="stblcollarge">{cty[0]}</p>
+                                      <p className="stblfig">{q21}</p>
+                                      <p className="stblfig">{q22}</p>
+                                      <p className="stblfig">{q23}</p>
+                                      <p className="stblfig">{q24}</p>
+                                      <p className="stblfig">
+                                        {q21 + q22 + q23 + q24}
+                                      </p>
+                                    </li>
+                                  );
+                                })}
+                              </AccordionItemPanel>
+                            }
+                          </AccordionItem>
+                        </Accordion>,
+                      ];
+                    }
+                  )
+                : ""}
+            </div>
+          </ul>
         </div>
       </div>
       {/* <div className="board" ref={boardRef}>

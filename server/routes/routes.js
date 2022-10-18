@@ -2118,6 +2118,21 @@ router.post("/getbudgetdata", (req, res) => {
   );
 });
 
+router.post("/bdgtregiondata", (req, res) => {
+  let year = req.body.year;
+  db.query(
+    `SELECT QUARTER(date) as quarter, countryList.country, region, quantity, profit*quantity AS profit, abbreviation, productGroup, prodCatName FROM budgets LEFT JOIN ((prodNames INNER JOIN productGroups ON prodNames.prodGroupID=productGroups.prodGroupID) INNER JOIN prodCatNames ON prodNames.prodCatNameID=prodCatNames.prodCatNameID) ON prodNames.prodNameID=budgets.prodNameID INNER JOIN countryList ON countryList.countryID = budgets.countryID WHERE YEAR(date)=${year}`,
+    (err, results) => {
+      if (err) {
+        console.log(err);
+      }
+      if (results.length > 0) {
+        res.status(200).send(results);
+      }
+    }
+  );
+});
+
 router.post("/savebdgtqty", (req, res) => {
   let newqty = req.body.newqty;
   let entryID = req.body.entryID;

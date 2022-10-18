@@ -352,9 +352,12 @@
   overflow-y: scroll;
 }
 .budgetbyprod {
-  width: 300px;
-  background-color: rgb(233, 233, 233);
+  width: 600px;
+  /* background-color: rgb(247, 247, 247); */
+  border-left: 1px dashed rgb(68, 65, 162);
   padding: 1rem;
+  padding-left: 2rem;
+
   /* height: 600px; */
   display: flex;
   flex-direction: column;
@@ -487,4 +490,97 @@
   font-family: "Roboto", sans-serif;
   font-size: 0.9rem;
   font-weight: 600;
+}
+.bdgtsummarybuttons1,
+.bdgtsummarybuttons2 {
+  display: flex;
+  padding: 0.5rem 0;
+  border-bottom: 1px gray dashed;
+}
+.bdgtsummarybuttons1 button {
+  width: 90px;
+  margin-left: 0.5rem;
+  border-radius: 0.75rem;
+  padding: 0.25rem 1rem;
+  background-color: white;
+  border: solid 1px rgb(68, 65, 162);
+}
+.bdgtsummarybuttons2 button {
+  width: 90px;
+  margin-left: 0.5rem;
+  border-radius: 0.75rem;
+  padding: 0.25rem 1rem;
+  background-color: white;
+  border: solid 1px rgb(160, 182, 103);
+}
+.bdgtsummarytable {
+  margin-top: 1rem;
+}
+.bdgtsummarydata {
+  height: 50vh;
+  overflow-y: scroll;
+  margin-right: 0;
+  /* position: relative; */
+}
+.stblrow {
+  display: flex;
+  width: 100%;
+  /* padding-left: 1rem; */
+  font-family: "Helvetica Neue", sans-serif;
+  font-size: 0.9rem;
+}
+.stblrow p {
+  display: flex;
+  flex-basis: 16%;
+}
+.stblrow .stblcollarge {
+  display: flex;
+  flex-basis: 25%;
+}
+.bsummaccordion_button {
+  color: #444;
+  cursor: pointer;
+  padding: 2px 0;
+  /* width: 500px; */
+  text-align: left;
+  border: none;
+  display: flex;
+  font-family: "Roboto", sans-serif;
+  font-size: 0.9rem;
+  /* position: sticky;
+  top: 0; */
+}
+.bsummaccordion_button:before {
+  display: inline-block;
+  content: "";
+  height: 5px;
+  width: 5px;
+  margin-right: 12px;
+  margin-top: 5px;
+  border-bottom: 2px solid currentColor;
+  border-right: 2px solid currentColor;
+  transform: rotate(-45deg);
+}
+.bsummaccordion_button[aria-expanded="true"]::before,
+.bsummaccordion_button[aria-selected="true"]::before {
+  transform: rotate(45deg);
+}
+.bsummaccordion_button:hover {
+  background-color: rgb(245, 245, 245);
+}
+.bdgtacc {
+  border: none;
+}
+.stblheader {
+  margin-bottom: 0.5rem;
+  border-bottom: 1px solid gray;
+}
+.stblfig {
+  text-align: right;
+  justify-content: right;
+}
+.bdgtaccpanel {
+  padding: 0.5rem 0;
+  border-top: 1px gray dashed;
+  margin-left: 15px;
 }
