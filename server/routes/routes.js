@@ -2074,7 +2074,8 @@ router.post("/addprodbudget", async (req, res) => {
 router.post("/budgetfilterbtns", (req, res) => {
   let year = req.body.year;
   db.query(
-    `SELECT DISTINCT prodCatName, productGroups.productGroup, budgets.prodCatNameID FROM budgets LEFT JOIN ((prodNames INNER JOIN productGroups ON prodNames.prodGroupID=productGroups.prodGroupID) INNER JOIN prodCatNames ON prodNames.prodCatNameID=prodCatNames.prodCatNameID) ON prodNames.prodNameID=budgets.prodNameID WHERE YEAR(date)=${year}`,
+    // `SELECT DISTINCT prodCatName, productGroups.productGroup, budgets.prodCatNameID FROM budgets LEFT JOIN ((prodNames INNER JOIN productGroups ON prodNames.prodGroupID=productGroups.prodGroupID) INNER JOIN prodCatNames ON prodNames.prodCatNameID=prodCatNames.prodCatNameID) ON prodNames.prodNameID=budgets.prodNameID WHERE YEAR(date)=${year}`,
+    `SELECT DISTINCT prodCatName, productGroups.productGroup, budgets.prodCatNameID, sum(quantity) AS quantity, sum(quantity*profit) AS profit FROM budgets LEFT JOIN ((prodNames INNER JOIN productGroups ON prodNames.prodGroupID=productGroups.prodGroupID) INNER JOIN prodCatNames ON prodNames.prodCatNameID=prodCatNames.prodCatNameID) ON prodNames.prodNameID=budgets.prodNameID WHERE YEAR(date)=${year} GROUP BY prodCatName, productGroups.productGroup, budgets.prodCatNameID`,
     (err, results) => {
       if (err) {
         console.log(err);

@@ -101,8 +101,7 @@ const Budget2023 = () => {
   useEffect(() => {
     Axios.post("/budgetfilterbtns", { year: bdgtyear }).then((resp) => {
       setBudgetbtns(resp.data);
-      // console.log(resp.data);
-      // setProdgroupsbtn([...new Set(resp.data.map((x) => x.productGroup))]);
+      console.log(resp.data);
     });
   }, [updatebuttons]);
 
@@ -903,7 +902,22 @@ const Budget2023 = () => {
                           : "pnamebutton"
                       }
                     >
-                      {item.prodCatName}
+                      {
+                        <div>
+                          <p className="bdgtbtntitle">{item.prodCatName}</p>
+                          <p>
+                            {item.quantity
+                              .toFixed(0)
+                              .replace(/\B(?=(\d{3})+(?!\d))/g, ",") + " mt"}
+                          </p>
+                          <p>
+                            {"$ " +
+                              item.profit
+                                .toFixed(0)
+                                .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                          </p>
+                        </div>
+                      }
                     </button>
                   );
                 }

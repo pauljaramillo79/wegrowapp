@@ -155,8 +155,8 @@
 }
 .pnamebutton {
   margin: 0.2rem 0;
-  padding: 0.25rem 1rem;
-  border-radius: 0.75rem;
+  padding: 0.5rem 1rem;
+  border-radius: 1rem;
   border: rgb(160, 182, 103) solid 1px;
   color: rgb(68, 65, 162);
   background-color: white;
@@ -481,5 +481,10 @@
 .pgroupfbtns .bdgtbtntitle {
   font-family: "Roboto", sans-serif;
   font-size: 1rem;
+  font-weight: 600;
+}
+.pnamefbtns .bdgtbtntitle {
+  font-family: "Roboto", sans-serif;
+  font-size: 0.9rem;
   font-weight: 600;
 }
