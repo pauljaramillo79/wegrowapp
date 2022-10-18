@@ -776,7 +776,7 @@ const Budget2023 = () => {
             </p>
             <p className="bdgttyearname">Quantity</p>
             <div className="bdgtlyearfigs">
-              <p>{bdgtyear - 1} Sales:</p>
+              <p>{bdgtyear - 1} Actual:</p>
             </div>
             <div className="bdgtlyearfigs">
               <p>{bdgtyear - 1} Budget:</p>
@@ -804,6 +804,22 @@ const Budget2023 = () => {
                 : 0}
             </p>
             <p className="bdgttyearname">Revenue</p>
+            <div className="bdgtlyearfigs">
+              <p>{bdgtyear - 1} Actual:</p>
+            </div>
+            <div className="bdgtlyearfigs">
+              <p>{bdgtyear - 1} Budget:</p>
+              <p>
+                {budgetyeartotals &&
+                budgetyeartotals[bdgtyear - 1] &&
+                budgetyeartotals[bdgtyear - 1]["revenue"]
+                  ? "$" +
+                    budgetyeartotals[bdgtyear - 1]["revenue"]
+                      .toFixed(0)
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                  : "$" + 0}
+              </p>
+            </div>
           </li>
           <li>
             <p className="bdgttyearfig">
@@ -817,6 +833,22 @@ const Budget2023 = () => {
                 : 0}
             </p>
             <p className="bdgttyearname">Profit</p>
+            <div className="bdgtlyearfigs">
+              <p>{bdgtyear - 1} Actual:</p>
+            </div>
+            <div className="bdgtlyearfigs">
+              <p>{bdgtyear - 1} Budget:</p>
+              <p>
+                {budgetyeartotals &&
+                budgetyeartotals[bdgtyear - 1] &&
+                budgetyeartotals[bdgtyear - 1]["totalprofit"]
+                  ? "$" +
+                    budgetyeartotals[bdgtyear - 1]["totalprofit"]
+                      .toFixed(0)
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                  : "$" + 0}
+              </p>
+            </div>
           </li>
           <li>
             <p className="bdgttyearfig">
@@ -833,6 +865,25 @@ const Budget2023 = () => {
                 : 0}
             </p>
             <p className="bdgttyearname">Avg Profit</p>
+            <div className="bdgtlyearfigs">
+              <p>{bdgtyear - 1} Actual:</p>
+            </div>
+            <div className="bdgtlyearfigs">
+              <p>{bdgtyear - 1} Budget:</p>
+              <p>
+                {budgetyeartotals &&
+                budgetyeartotals[bdgtyear - 1] &&
+                budgetyeartotals[bdgtyear - 1]["totalprofit"]
+                  ? "$" +
+                    (
+                      budgetyeartotals[bdgtyear - 1]["totalprofit"] /
+                      budgetyeartotals[bdgtyear]["quantity"]
+                    )
+                      .toFixed(0)
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                  : "$" + 0}
+              </p>
+            </div>
           </li>
           <li>
             <p className="bdgttyearfig">
@@ -847,6 +898,22 @@ const Budget2023 = () => {
                 : 0}
             </p>
             <p className="bdgttyearname">Margin</p>
+            <div className="bdgtlyearfigs">
+              <p>{bdgtyear - 1} Actual:</p>
+            </div>
+            <div className="bdgtlyearfigs">
+              <p>{bdgtyear - 1} Budget:</p>
+              <p>
+                {budgetyeartotals &&
+                budgetyeartotals[bdgtyear - 1] &&
+                budgetyeartotals[bdgtyear - 1]["totalprofit"]
+                  ? (
+                      budgetyeartotals[bdgtyear - 1]["totalprofit"] /
+                      budgetyeartotals[bdgtyear]["revenue"]
+                    ).toFixed(1) + "%"
+                  : "0.0%"}
+              </p>
+            </div>
           </li>
         </ul>
       </div>
