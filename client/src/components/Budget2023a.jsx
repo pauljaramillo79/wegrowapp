@@ -13,7 +13,7 @@ const Budget2023 = () => {
     setBdgtresponsemsg("");
   };
 
-  const [bdgtyear, setBdgtyear] = useState(2023);
+  const [bdgtyear, setBdgtyear] = useState(2022);
 
   useEffect(() => {
     const elem = refresmsg.current;
@@ -146,12 +146,13 @@ const Budget2023 = () => {
 
   const [reloadyearbdgdata, setReloadyearbdgdata] = useState(false);
 
+  const [budgetyeartotals, setBudgetyeartotals] = useState({});
+
   useEffect(() => {
     Axios.post("/yearbudgetdata", { year: bdgtyear }).then((response) => {
-      // console.log(response.data);
+      console.log(response.data);
       setYearbudgetdata(response.data);
       setBudgetyeartotals(getbudgetyeartotals(response.data));
-      // console.log(response.data);
     });
     Axios.post("/budgetgroupbtns", { year: bdgtyear }).then((response) => {
       setProdgroupsbtn(response.data);
@@ -161,7 +162,7 @@ const Budget2023 = () => {
   useEffect(() => {
     Axios.post("/budgetfilterbtns", { year: bdgtyear }).then((resp) => {
       setBudgetbtns(resp.data);
-      console.log(resp.data);
+      // console.log(resp.data);
     });
   }, [updatebuttons, reloadyearbdgdata]);
   // useEffect(() => {
@@ -643,7 +644,6 @@ const Budget2023 = () => {
   }, []);
 
   const [yearbudgetdata, setYearbudgetdata] = useState();
-  const [budgetyeartotals, setBudgetyeartotals] = useState({});
 
   const getbudgetyeartotals = (arr) => {
     let yearqty = 0;
@@ -667,6 +667,7 @@ const Budget2023 = () => {
       yearrevenue = 0;
       yearprofit = 0;
     });
+    console.log(output);
     return output;
   };
 
