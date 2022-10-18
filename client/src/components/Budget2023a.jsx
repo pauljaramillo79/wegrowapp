@@ -908,8 +908,9 @@ const Budget2023 = () => {
                 budgetyeartotals[bdgtyear - 1] &&
                 budgetyeartotals[bdgtyear - 1]["totalprofit"]
                   ? (
-                      budgetyeartotals[bdgtyear - 1]["totalprofit"] /
-                      budgetyeartotals[bdgtyear]["revenue"]
+                      (budgetyeartotals[bdgtyear - 1]["totalprofit"] /
+                        budgetyeartotals[bdgtyear]["revenue"]) *
+                      100
                     ).toFixed(1) + "%"
                   : "0.0%"}
               </p>
