@@ -706,7 +706,7 @@ const Budget2023 = () => {
     <div>
       <div className="bdgttitles">
         <h2 className="bdgttitle">{bdgtyear} Budget</h2>
-        <ExportToCSV csvData={bdgtregiondta} fileName={"budget2023"} />
+
         <div className="addprodgroup">
           <button
             className="addprodbutton"
@@ -788,6 +788,7 @@ const Budget2023 = () => {
             ""
           )}
         </div>
+        <ExportToCSV csvData={bdgtregiondta} fileName={"budget2023"} />
       </div>
       <div className="bdgttotals">
         <ul className="bdgttotalsul">

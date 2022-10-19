@@ -32,6 +32,7 @@
 }
 .addprodgroup {
   position: relative;
+  margin-right: 1rem;
   /* padding-bottom: rem; */
   /* border-bottom: dashed 1px gray; */
 }
@@ -588,4 +589,7 @@
   margin-bottom: 0.5rem;
   border-top: 1px solid gray;
   justify-content: right;
+}
+.bdgtexport:hover {
+  cursor: pointer;
 }

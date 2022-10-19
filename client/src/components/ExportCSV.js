@@ -1,6 +1,8 @@
 import React from "react";
 import * as FileSaver from "file-saver";
 import * as XLSX from "xlsx";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faAlignRight, faDownload } from "@fortawesome/free-solid-svg-icons";
 
 const ExportCSV = ({ csvData, fileName }) => {
   const fileType =
@@ -15,7 +17,10 @@ const ExportCSV = ({ csvData, fileName }) => {
     FileSaver.saveAs(data, fileName + fileExtension);
   };
   return (
-    <button onClick={(e) => exportToCSV(csvData, fileName)}>Export</button>
+    <div className="bdgtexport" onClick={(e) => exportToCSV(csvData, fileName)}>
+      <FontAwesomeIcon style={{ marginRight: "0.5rem" }} icon={faDownload} />
+      Export
+    </div>
   );
 };
 
