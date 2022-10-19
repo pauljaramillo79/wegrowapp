@@ -177,9 +177,9 @@ const Budget2023 = () => {
     });
     Axios.post("/bdgtregiondata", { year: bdgtyear }).then((response) => {
       setBdgtregiondata(response.data);
-      Object.entries(response.data.groupBy("region")).map((item) =>
-        console.log(item)
-      );
+      // Object.entries(response.data.groupBy("region")).map((item) =>
+      //   console.log(item)
+      // );
     });
   }, [reloadyearbdgdata]);
 
@@ -711,9 +711,11 @@ const Budget2023 = () => {
   const [summarygroupby2, setSummarygroupby2] = useState("country");
   const [summarygroupby3, setSummarygroupby3] = useState("quantity");
 
+  const [lysalestotals, setLysalestotals] = useState();
+
   useEffect(() => {
     Axios.post("/bdgtlyearsalestotals", { year: bdgtyear }).then((response) => {
-      console.log(response);
+      setLysalestotals(response.data);
     });
   }, []);
 
@@ -826,6 +828,13 @@ const Budget2023 = () => {
             <p className="bdgttyearname">Quantity</p>
             <div className="bdgtlyearfigs">
               <p>{bdgtyear - 1} Actual:</p>
+              <p>
+                {lysalestotals
+                  ? lysalestotals[0]["quantity"]
+                      .toFixed(0)
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                  : ""}
+              </p>
             </div>
             <div className="bdgtlyearfigs">
               <p>{bdgtyear - 1} Budget:</p>
@@ -855,6 +864,14 @@ const Budget2023 = () => {
             <p className="bdgttyearname">Revenue</p>
             <div className="bdgtlyearfigs">
               <p>{bdgtyear - 1} Actual:</p>
+              <p>
+                {lysalestotals
+                  ? "$" +
+                    lysalestotals[0]["revenue"]
+                      .toFixed(0)
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                  : ""}
+              </p>
             </div>
             <div className="bdgtlyearfigs">
               <p>{bdgtyear - 1} Budget:</p>
@@ -884,6 +901,14 @@ const Budget2023 = () => {
             <p className="bdgttyearname">Profit</p>
             <div className="bdgtlyearfigs">
               <p>{bdgtyear - 1} Actual:</p>
+              <p>
+                {lysalestotals
+                  ? "$" +
+                    lysalestotals[0]["profit"]
+                      .toFixed(0)
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                  : ""}
+              </p>
             </div>
             <div className="bdgtlyearfigs">
               <p>{bdgtyear - 1} Budget:</p>
@@ -916,6 +941,14 @@ const Budget2023 = () => {
             <p className="bdgttyearname">Avg Profit</p>
             <div className="bdgtlyearfigs">
               <p>{bdgtyear - 1} Actual:</p>
+              <p>
+                {lysalestotals
+                  ? "$" +
+                    (lysalestotals[0]["profit"] / lysalestotals[0]["quantity"])
+                      .toFixed(0)
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                  : ""}
+              </p>
             </div>
             <div className="bdgtlyearfigs">
               <p>{bdgtyear - 1} Budget:</p>
@@ -949,6 +982,17 @@ const Budget2023 = () => {
             <p className="bdgttyearname">Margin</p>
             <div className="bdgtlyearfigs">
               <p>{bdgtyear - 1} Actual:</p>
+              <p>
+                {lysalestotals
+                  ? (
+                      (lysalestotals[0]["profit"] /
+                        lysalestotals[0]["revenue"]) *
+                      100
+                    )
+                      .toFixed(1)
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "%"
+                  : ""}
+              </p>
             </div>
             <div className="bdgtlyearfigs">
               <p>{bdgtyear - 1} Budget:</p>
