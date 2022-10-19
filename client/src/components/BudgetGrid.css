@@ -365,7 +365,7 @@
 }
 .budgetbyprod li {
   display: flex;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
 }
 .lyearfigures {
   margin-top: 1rem;
@@ -578,7 +578,7 @@
   display: flex;
   /* flex-basis: 16%;
  */
-  width: 66px;
+  width: 69px;
 }
 .stblrow .stblcollarge {
   display: flex;

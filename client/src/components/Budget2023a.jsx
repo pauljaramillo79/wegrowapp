@@ -156,6 +156,12 @@ const Budget2023 = () => {
 
   const [budgetyeartotals, setBudgetyeartotals] = useState({});
 
+  const [bdgtregiondta, setBdgtregiondata] = useState();
+
+  // useEffect(() => {
+
+  // }, []);
+
   useEffect(() => {
     Axios.post("/yearbudgetdata", { year: bdgtyear }).then((response) => {
       // console.log(response.data);
@@ -168,6 +174,12 @@ const Budget2023 = () => {
     Axios.post("/budgetfilterbtns", { year: bdgtyear }).then((resp) => {
       setBudgetbtns(resp.data);
       // console.log(resp.data);
+    });
+    Axios.post("/bdgtregiondata", { year: bdgtyear }).then((response) => {
+      setBdgtregiondata(response.data);
+      Object.entries(response.data.groupBy("region")).map((item) =>
+        console.log(item)
+      );
     });
   }, [reloadyearbdgdata]);
 
@@ -693,17 +705,6 @@ const Budget2023 = () => {
     // console.log(output);
     return output;
   };
-
-  const [bdgtregiondta, setBdgtregiondata] = useState();
-
-  useEffect(() => {
-    Axios.post("/bdgtregiondata", { year: bdgtyear }).then((response) => {
-      setBdgtregiondata(response.data);
-      Object.entries(response.data.groupBy("region")).map((item) =>
-        console.log(item)
-      );
-    });
-  }, []);
 
   const [summarygroupby1, setSummarygroupby1] = useState("region");
   const [summarygroupby2, setSummarygroupby2] = useState("country");
