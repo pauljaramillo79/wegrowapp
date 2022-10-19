@@ -353,7 +353,7 @@
   overflow-y: scroll;
 }
 .budgetbyprod {
-  width: 543px;
+  width: 580px;
   /* background-color: rgb(247, 247, 247); */
   border-left: 1px dashed rgb(68, 65, 162);
   padding: 1rem;
@@ -502,7 +502,7 @@
   display: flex;
   /* padding: 0.5rem 0; */
   border-bottom: 1px gray dashed;
-  width: 510px;
+  width: 550px;
   align-items: center;
 }
 .bdgtsummarybuttons {
@@ -519,7 +519,7 @@
 .bdgtsummarybuttons1 button,
 .bdgtsummarybuttons2 button,
 .bdgtsummarybuttons button {
-  width: 91px;
+  width: 98px;
   /* margin-left: 0.5rem; */
   /* border-radius: 0.75rem; */
   padding: 0.25rem 0rem;
@@ -580,7 +580,7 @@
 }
 .bdgtsummarytable {
   margin-top: 1rem;
-  width: 510px;
+  width: 550px;
 }
 .bdgtsummarydata {
   height: 50vh;
@@ -599,7 +599,7 @@
   display: flex;
   /* flex-basis: 16%;
  */
-  width: 81px;
+  width: 88px;
 }
 .stblrow .stblcollarge {
   display: flex;
