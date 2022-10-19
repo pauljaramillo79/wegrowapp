@@ -2287,7 +2287,7 @@ router.post("/bdgtlyearsalestotals", (req, res) => {
   let year = req.body.year;
   let lastyear = year - 1;
   db.query(
-    "SELECT quantity, priceAfterInterest*quantity AS revenue, tradingProfit*quantity as profit FROM quotationsheet WHERE YEAR(`from`)=? AND saleComplete=-1",
+    "SELECT SUM(quantity), SUM(priceAfterInterest*quantity) AS revenue, SUM(tradingProfit*quantity) as profit FROM quotationsheet WHERE YEAR(`from`)=? AND saleComplete=-1",
     [lastyear],
     (err, results) => {
       if (err) {
