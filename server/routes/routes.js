@@ -2283,6 +2283,23 @@ router.post("/yearbudgetdata", (req, res) => {
   );
 });
 
+router.post("/bdgtlyearsalestotals", (req, res) => {
+  let year = req.body.year;
+  let lastyear = year - 1;
+  db.query(
+    "SELECT quantity, priceAfterInterest*quantity AS revenue, tradingProfit*quantity as profit FROM quotationsheet WHERE YEAR(`from`)=? AND saleComplete=-1",
+    [lastyear],
+    (err, results) => {
+      if (err) {
+        console.log(err);
+      }
+      if (results.length > 0) {
+        res.status(200).send(results);
+      }
+    }
+  );
+});
+
 router.post("/budgetlyearsales", (req, res) => {
   let year = req.body.year;
   let lastyear = year - 1;

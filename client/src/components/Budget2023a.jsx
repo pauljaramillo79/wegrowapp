@@ -711,6 +711,12 @@ const Budget2023 = () => {
   const [summarygroupby2, setSummarygroupby2] = useState("country");
   const [summarygroupby3, setSummarygroupby3] = useState("quantity");
 
+  useEffect(() => {
+    Axios.post("/bdgtlyearsalestotals", { year: bdgtyear }).then((response) => {
+      console.log(response);
+    });
+  }, []);
+
   let q1total = 0;
   let q2total = 0;
   let q3total = 0;
