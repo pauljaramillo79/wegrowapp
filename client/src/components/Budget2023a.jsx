@@ -833,7 +833,8 @@ const Budget2023 = () => {
                   ? lysalestotals[0]["quantity"]
                       .toFixed(0)
                       .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                  : ""}
+                  : ""}{" "}
+                mt
               </p>
             </div>
             <div className="bdgtlyearfigs">
