@@ -11,6 +11,7 @@ import {
   AccordionItemButton,
   AccordionItemPanel,
 } from "react-accessible-accordion";
+import ExportToCSV from "./ExportCSV";
 
 const Budget2023 = () => {
   const refresmsg = useRef(null);
@@ -705,6 +706,7 @@ const Budget2023 = () => {
     <div>
       <div className="bdgttitles">
         <h2 className="bdgttitle">{bdgtyear} Budget</h2>
+        <ExportToCSV csvData={bdgtregiondta} fileName={"budget2023"} />
         <div className="addprodgroup">
           <button
             className="addprodbutton"
