@@ -373,6 +373,17 @@ const Budget2023 = () => {
     setSelectedPG(item);
   };
 
+  const [clickedlevel1, setClickedlevel1] = useState(1);
+  const [clickedlevel2, setClickedlevel2] = useState(5);
+
+  // const handleClicklevel1 = (e, i) => {
+  //   setClickedlevel1(i);
+  // };
+
+  // const handleClicklevel2 = (e, i) => {
+  //   setClickedlevel2(i);
+  // };
+
   const [clickedProdCat, setClickedProdCat] = useState();
   const [selectedPN, setSelectedPN] = useState();
 
@@ -1929,35 +1940,45 @@ const Budget2023 = () => {
             <button
               onClick={(e) => {
                 setSummarygroupby1("region");
+                setClickedlevel1(1);
               }}
+              className={1 === clickedlevel1 ? "bdgtlvl1active" : ""}
             >
               Region
             </button>
             <button
               onClick={(e) => {
                 setSummarygroupby1("productGroup");
+                setClickedlevel1(2);
               }}
+              className={2 === clickedlevel1 ? "bdgtlvl1active" : ""}
             >
               Group
             </button>
             <button
               onClick={(e) => {
                 setSummarygroupby1("prodCatName");
+                setClickedlevel1(3);
               }}
+              className={3 === clickedlevel1 ? "bdgtlvl1active" : ""}
             >
               Category
             </button>
             <button
               onClick={(e) => {
                 setSummarygroupby1("abbreviation");
+                setClickedlevel1(4);
               }}
+              className={4 === clickedlevel1 ? "bdgtlvl1active" : ""}
             >
               Name
             </button>
             <button
               onClick={(e) => {
                 setSummarygroupby1("country");
+                setClickedlevel1(5);
               }}
+              className={5 === clickedlevel1 ? "bdgtlvl1active" : ""}
             >
               Country
             </button>
@@ -1967,35 +1988,45 @@ const Budget2023 = () => {
             <button
               onClick={(e) => {
                 setSummarygroupby2("region");
+                setClickedlevel2(1);
               }}
+              className={1 === clickedlevel2 ? "bdgtlvl2active" : ""}
             >
               Region
             </button>
             <button
               onClick={(e) => {
                 setSummarygroupby2("productGroup");
+                setClickedlevel2(2);
               }}
+              className={2 === clickedlevel2 ? "bdgtlvl2active" : ""}
             >
               Group
             </button>
             <button
               onClick={(e) => {
                 setSummarygroupby2("prodCatName");
+                setClickedlevel2(3);
               }}
+              className={3 === clickedlevel2 ? "bdgtlvl2active" : ""}
             >
               Category
             </button>
             <button
               onClick={(e) => {
                 setSummarygroupby2("abbreviation");
+                setClickedlevel2(4);
               }}
+              className={4 === clickedlevel2 ? "bdgtlvl2active" : ""}
             >
               Name
             </button>
             <button
               onClick={(e) => {
                 setSummarygroupby2("country");
+                setClickedlevel2(5);
               }}
+              className={5 === clickedlevel2 ? "bdgtlvl2active" : ""}
             >
               Country
             </button>
