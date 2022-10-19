@@ -353,7 +353,7 @@
   overflow-y: scroll;
 }
 .budgetbyprod {
-  width: 480px;
+  width: 543px;
   /* background-color: rgb(247, 247, 247); */
   border-left: 1px dashed rgb(68, 65, 162);
   padding: 1rem;
@@ -497,41 +497,49 @@
   margin-bottom: 0.5rem;
 }
 .bdgtsummarybuttons1,
-.bdgtsummarybuttons2 {
+.bdgtsummarybuttons2,
+.bdgtsummarybuttons {
   display: flex;
   /* padding: 0.5rem 0; */
   border-bottom: 1px gray dashed;
-  width: 450px;
+  width: 510px;
+  align-items: center;
+}
+.bdgtsummarybuttons {
+  margin-top: 1rem;
+  border: none;
 }
 .bdgtsummarybuttons1 p,
-.bdgtsummarybuttons2 p {
+.bdgtsummarybuttons2 p,
+.bdgtsummarybuttons p {
   margin-right: 0.5rem;
   font-size: 0.8rem;
   font-weight: 600;
 }
-.bdgtsummarybuttons1 button {
-  width: 79px;
+.bdgtsummarybuttons1 button,
+.bdgtsummarybuttons2 button,
+.bdgtsummarybuttons button {
+  width: 91px;
   /* margin-left: 0.5rem; */
   /* border-radius: 0.75rem; */
   padding: 0.25rem 0rem;
   background-color: white;
   border: none;
-  border-left: solid 1px rgb(68, 65, 162);
-  border-right: solid 1px rgb(68, 65, 162);
   font-size: 0.8rem;
   font-family: "Helvetica Neue", sans-serif;
 }
+.bdgtsummarybuttons1 button,
+.bdgtsummarybuttons button {
+  border-left: solid 1px rgb(68, 65, 162);
+  border-right: solid 1px rgb(68, 65, 162);
+}
+.bdgtsummarybuttons button {
+  padding: 0.25rem 0.5rem;
+  width: 100px;
+}
 .bdgtsummarybuttons2 button {
-  width: 79px;
-  /* margin-left: 0.5rem; */
-  /* border-radius: 0.75rem; */
-  padding: 0.25rem 0rem;
-  background-color: white;
-  border: none;
   border-left: solid 1px rgb(160, 182, 103);
   border-right: solid 1px rgb(160, 182, 103);
-  font-size: 0.8rem;
-  font-family: "Helvetica Neue", sans-serif;
 }
 .bdgtsummarybuttons1 .bdgtlvl1active {
   background-color: rgb(68, 65, 162);
@@ -539,6 +547,10 @@
 }
 .bdgtsummarybuttons2 .bdgtlvl2active {
   background-color: rgb(160, 182, 103);
+  color: white;
+}
+.bdgtsummarybuttons .bdgtlvl3active {
+  background-color: black;
   color: white;
 }
 .bdgtsummarybuttons1 button:hover {
@@ -549,6 +561,11 @@
   cursor: pointer;
   background-color: rgb(203, 215, 171);
 }
+.bdgtsummarybuttons button:hover {
+  cursor: pointer;
+  background-color: rgb(220, 220, 220);
+  color: black;
+}
 .bdgtsummarybuttons1 button:active {
   background-color: rgb(68, 65, 162);
   color: white;
@@ -557,9 +574,13 @@
   background-color: rgb(160, 182, 103);
   color: white;
 }
+.bdgtsummarybuttons button:active {
+  background-color: black;
+  color: white;
+}
 .bdgtsummarytable {
   margin-top: 1rem;
-  width: 450px;
+  width: 510px;
 }
 .bdgtsummarydata {
   height: 50vh;
@@ -578,7 +599,7 @@
   display: flex;
   /* flex-basis: 16%;
  */
-  width: 69px;
+  width: 81px;
 }
 .stblrow .stblcollarge {
   display: flex;
@@ -646,4 +667,7 @@
 .stblfooter .stblcollarge,
 .stblheader .stblcollarge {
   width: 96px;
+}
+.stbltotal {
+  font-weight: 600;
 }

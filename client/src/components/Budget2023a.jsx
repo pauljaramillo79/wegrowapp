@@ -387,6 +387,7 @@ const Budget2023 = () => {
 
   const [clickedlevel1, setClickedlevel1] = useState(1);
   const [clickedlevel2, setClickedlevel2] = useState(5);
+  const [clickedlevel3, setClickedlevel3] = useState(1);
 
   // const handleClicklevel1 = (e, i) => {
   //   setClickedlevel1(i);
@@ -708,6 +709,7 @@ const Budget2023 = () => {
 
   const [summarygroupby1, setSummarygroupby1] = useState("region");
   const [summarygroupby2, setSummarygroupby2] = useState("country");
+  const [summarygroupby3, setSummarygroupby3] = useState("quantity");
 
   let q1total = 0;
   let q2total = 0;
@@ -1936,6 +1938,7 @@ const Budget2023 = () => {
         </div> */}
         <div className="budgetbyprod">
           <h4>Budget Summary Figures 2023</h4>
+
           <div className="bdgtsummarybuttons1">
             <p>Level 1:</p>
             <button
@@ -2032,6 +2035,27 @@ const Budget2023 = () => {
               Country
             </button>
           </div>
+          <div className="bdgtsummarybuttons">
+            <p>Show:</p>
+            <button
+              onClick={(e) => {
+                setSummarygroupby3("quantity");
+                setClickedlevel3(1);
+              }}
+              className={1 === clickedlevel3 ? "bdgtlvl3active" : ""}
+            >
+              Quantity (mt)
+            </button>
+            <button
+              onClick={(e) => {
+                setSummarygroupby3("profit");
+                setClickedlevel3(2);
+              }}
+              className={2 === clickedlevel3 ? "bdgtlvl3active" : ""}
+            >
+              Profit ($)
+            </button>
+          </div>
           <ul className="bdgtsummarytable">
             <li className="stblrow stblheader">
               <p className="stblcollarge">Country</p>
@@ -2051,16 +2075,16 @@ const Budget2023 = () => {
                       let q4 = 0;
                       reg[1].forEach((regel) => {
                         if (regel["quarter"] === 1) {
-                          q1 = q1 + regel["quantity"];
+                          q1 = q1 + regel[summarygroupby3];
                         }
                         if (regel["quarter"] === 2) {
-                          q2 = q2 + regel["quantity"];
+                          q2 = q2 + regel[summarygroupby3];
                         }
                         if (regel["quarter"] === 3) {
-                          q3 = q3 + regel["quantity"];
+                          q3 = q3 + regel[summarygroupby3];
                         }
                         if (regel["quarter"] === 4) {
-                          q4 = q4 + regel["quantity"];
+                          q4 = q4 + regel[summarygroupby3];
                         }
                         // let q1total = 0;
                         // q2total = 0;
@@ -2080,11 +2104,71 @@ const Budget2023 = () => {
                                       ? "Dom Rep"
                                       : reg[0]}
                                   </p>
-                                  <p className="stblfig">{q1}</p>
-                                  <p className="stblfig">{q2}</p>
-                                  <p className="stblfig">{q3}</p>
-                                  <p className="stblfig">{q4}</p>
-                                  <p className="stblfig">{q1 + q2 + q3 + q4}</p>
+                                  <p className="stblfig">
+                                    {summarygroupby3 === "quantity"
+                                      ? q1
+                                          .toFixed(0)
+                                          .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                      : "$" +
+                                        q1
+                                          .toFixed(0)
+                                          .replace(
+                                            /\B(?=(\d{3})+(?!\d))/g,
+                                            ","
+                                          )}
+                                  </p>
+                                  <p className="stblfig">
+                                    {summarygroupby3 === "quantity"
+                                      ? q2
+                                          .toFixed(0)
+                                          .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                      : "$ " +
+                                        q2
+                                          .toFixed(0)
+                                          .replace(
+                                            /\B(?=(\d{3})+(?!\d))/g,
+                                            ","
+                                          )}
+                                  </p>
+                                  <p className="stblfig">
+                                    {summarygroupby3 === "quantity"
+                                      ? q3
+                                          .toFixed(0)
+                                          .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                      : "$ " +
+                                        q3
+                                          .toFixed(0)
+                                          .replace(
+                                            /\B(?=(\d{3})+(?!\d))/g,
+                                            ","
+                                          )}
+                                  </p>
+                                  <p className="stblfig">
+                                    {summarygroupby3 === "quantity"
+                                      ? q4
+                                          .toFixed(0)
+                                          .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                      : "$ " +
+                                        q4
+                                          .toFixed(0)
+                                          .replace(
+                                            /\B(?=(\d{3})+(?!\d))/g,
+                                            ","
+                                          )}
+                                  </p>
+                                  <p className="stblfig stbltotal">
+                                    {summarygroupby3 === "quantity"
+                                      ? (q1 + q2 + q3 + q4)
+                                          .toFixed(0)
+                                          .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                      : "$ " +
+                                        (q1 + q2 + q3 + q4)
+                                          .toFixed(0)
+                                          .replace(
+                                            /\B(?=(\d{3})+(?!\d))/g,
+                                            ","
+                                          )}
+                                  </p>
                                 </li>
                               </AccordionItemButton>
                             </AccordionItemHeading>
@@ -2099,32 +2183,111 @@ const Budget2023 = () => {
                                   let q24 = 0;
                                   cty[1].forEach((ctyel) => {
                                     if (ctyel["quarter"] === 1) {
-                                      q21 = q21 + ctyel["quantity"];
-                                      q1total = q1total + ctyel["quantity"];
+                                      q21 = q21 + ctyel[summarygroupby3];
+                                      q1total =
+                                        q1total + ctyel[summarygroupby3];
                                     }
                                     if (ctyel["quarter"] === 2) {
-                                      q22 = q22 + ctyel["quantity"];
-                                      q2total = q2total + ctyel["quantity"];
+                                      q22 = q22 + ctyel[summarygroupby3];
+                                      q2total =
+                                        q2total + ctyel[summarygroupby3];
                                     }
                                     if (ctyel["quarter"] === 3) {
-                                      q23 = q23 + ctyel["quantity"];
-                                      q3total = q3total + ctyel["quantity"];
+                                      q23 = q23 + ctyel[summarygroupby3];
+                                      q3total =
+                                        q3total + ctyel[summarygroupby3];
                                     }
                                     if (ctyel["quarter"] === 4) {
-                                      q24 = q24 + ctyel["quantity"];
-                                      q4total = q4total + ctyel["quantity"];
+                                      q24 = q24 + ctyel[summarygroupby3];
+                                      q4total =
+                                        q4total + ctyel[summarygroupby3];
                                     }
                                   });
 
                                   return (
                                     <li className="stblrow">
                                       <p className="stblcollarge">{cty[0]}</p>
-                                      <p className="stblfig">{q21}</p>
-                                      <p className="stblfig">{q22}</p>
-                                      <p className="stblfig">{q23}</p>
-                                      <p className="stblfig">{q24}</p>
                                       <p className="stblfig">
-                                        {q21 + q22 + q23 + q24}
+                                        {" "}
+                                        {summarygroupby3 === "quantity"
+                                          ? q21
+                                              .toFixed(0)
+                                              .replace(
+                                                /\B(?=(\d{3})+(?!\d))/g,
+                                                ","
+                                              )
+                                          : "$ " +
+                                            q21
+                                              .toFixed(0)
+                                              .replace(
+                                                /\B(?=(\d{3})+(?!\d))/g,
+                                                ","
+                                              )}
+                                      </p>
+                                      <p className="stblfig">
+                                        {" "}
+                                        {summarygroupby3 === "quantity"
+                                          ? q22
+                                              .toFixed(0)
+                                              .replace(
+                                                /\B(?=(\d{3})+(?!\d))/g,
+                                                ","
+                                              )
+                                          : "$ " +
+                                            q22
+                                              .toFixed(0)
+                                              .replace(
+                                                /\B(?=(\d{3})+(?!\d))/g,
+                                                ","
+                                              )}
+                                      </p>
+                                      <p className="stblfig">
+                                        {summarygroupby3 === "quantity"
+                                          ? q23
+                                              .toFixed(0)
+                                              .replace(
+                                                /\B(?=(\d{3})+(?!\d))/g,
+                                                ","
+                                              )
+                                          : "$ " +
+                                            q23
+                                              .toFixed(0)
+                                              .replace(
+                                                /\B(?=(\d{3})+(?!\d))/g,
+                                                ","
+                                              )}
+                                      </p>
+                                      <p className="stblfig">
+                                        {summarygroupby3 === "quantity"
+                                          ? q24
+                                              .toFixed(0)
+                                              .replace(
+                                                /\B(?=(\d{3})+(?!\d))/g,
+                                                ","
+                                              )
+                                          : "$ " +
+                                            q24
+                                              .toFixed(0)
+                                              .replace(
+                                                /\B(?=(\d{3})+(?!\d))/g,
+                                                ","
+                                              )}
+                                      </p>
+                                      <p className="stblfig stbltotal">
+                                        {summarygroupby3 === "quantity"
+                                          ? (q21 + q22 + q23 + q24)
+                                              .toFixed(0)
+                                              .replace(
+                                                /\B(?=(\d{3})+(?!\d))/g,
+                                                ","
+                                              )
+                                          : "$ " +
+                                            (q21 + q22 + q23 + q24)
+                                              .toFixed(0)
+                                              .replace(
+                                                /\B(?=(\d{3})+(?!\d))/g,
+                                                ","
+                                              )}
                                       </p>
                                     </li>
                                   );
@@ -2138,13 +2301,40 @@ const Budget2023 = () => {
                   )
                 : ""}
               <li className="stblrow stblfooter">
-                <p className="stblcollarge">TOTAL</p>
-                <p className="stblfig">{q1total}</p>
-                <p className="stblfig">{q2total}</p>
-                <p className="stblfig">{q3total}</p>
-                <p className="stblfig">{q4total}</p>
-                <p className="stblfig">
-                  {q1total + q2total + q3total + q4total}
+                <p className="stblcollarge  stbltotal">TOTAL</p>
+                <p className="stblfig stbltotal">
+                  {summarygroupby3 === "quantity"
+                    ? q1total.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                    : "$ " +
+                      q1total.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                </p>
+                <p className="stblfig stbltotal">
+                  {summarygroupby3 === "quantity"
+                    ? q2total.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                    : "$ " +
+                      q2total.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                </p>
+                <p className="stblfig stbltotal">
+                  {summarygroupby3 === "quantity"
+                    ? q3total.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                    : "$ " +
+                      q3total.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                </p>
+                <p className="stblfig stbltotal">
+                  {summarygroupby3 === "quantity"
+                    ? q4total.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                    : "$ " +
+                      q4total.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                </p>
+                <p className="stblfig stbltotal">
+                  {summarygroupby3 === "quantity"
+                    ? (q1total + q2total + q3total + q4total)
+                        .toFixed(0)
+                        .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                    : "$ " +
+                      (q1total + q2total + q3total + q4total)
+                        .toFixed(0)
+                        .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                 </p>
               </li>
             </div>
