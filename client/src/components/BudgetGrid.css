@@ -347,14 +347,16 @@
   font-size: 0.7rem;
 }
 .budgetprepdata {
+  height: 60vh;
   display: flex;
   justify-content: space-between;
-  height: 60vh;
   /* overflow-y: scroll; */
 }
 .bdgtleftbottompanel {
   height: 60vh;
   overflow-y: scroll;
+  display: flex;
+  justify-content: space-between;
 }
 .budgetbyprod {
   width: 580px;
