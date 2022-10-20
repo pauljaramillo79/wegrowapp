@@ -1093,888 +1093,934 @@ const Budget2023 = () => {
         </div>
       </div>
       <div className="budgetprepdata">
-        <div className="budgettablesandresponse">
-          <div className="budgettables" ref={boardRef}>
-            {formatedData
-              ? Object.keys(formatedData).map((prod, key) => {
-                  let q1prodtotal = 0;
-                  let q2prodtotal = 0;
-                  let q3prodtotal = 0;
-                  let q4prodtotal = 0;
-                  let pricetotal = 0;
-                  let profittotal = 0;
-                  return [
-                    <div className="bdgtpnametable">
-                      <div className="bdgtpnametabletitle">
-                        <h3>2023 {prod} Budget</h3>
-                        <FontAwesomeIcon
-                          icon={faPlusCircle}
-                          onClick={(e) => {
-                            setShowprodctyadd({
-                              ...showprodctyadd,
-                              [prod]: !showprodctyadd[prod],
-                            });
-                          }}
-                        />
-                        <div
-                          className={
-                            showprodctyadd && showprodctyadd[prod]
-                              ? "bdgtselectallcty showbdgtpane"
-                              : "bdgtselectallcty hidebdgtpane"
-                          }
-                        >
-                          <h4>Select countries to add.</h4>
-                          <div className="bdgtselectctycty">
-                            {fullcountrylist
-                              ? fullcountrylist.map((ctyel) => {
-                                  return (
-                                    <div className="addctyrow">
-                                      <input
-                                        type="checkbox"
-                                        name={ctyel.countryID}
-                                        onClick={(e) => {
-                                          if (
-                                            e.target.checked &&
-                                            prodcountriestoadd
-                                          ) {
-                                            setProdcountriestoadd({
-                                              ...prodcountriestoadd,
-                                              [prod]: {
-                                                ...prodcountriestoadd[prod],
-                                                [ctyel.countryID]:
-                                                  ctyel.country,
-                                              },
-                                            });
-                                          } else {
-                                            setProdcountriestoadd((current) => {
-                                              const copy = {
-                                                ...current,
-                                              };
-                                              delete copy[prod][
-                                                ctyel.countryID
-                                              ];
-                                              return copy;
-                                            });
-                                          }
-                                        }}
-                                      />
-                                      <label for={ctyel.countyID}>
-                                        {ctyel.country}
-                                      </label>
-                                    </div>
-                                  );
-                                })
-                              : ""}
-                          </div>
-                          <div className="addprodcanceladd">
-                            <button
-                              className="cancelprodbutton"
-                              onClick={(e) => {
-                                setShowprodctyadd({
-                                  ...showprodctyadd,
-                                  [prod]: false,
-                                });
-                              }}
-                            >
-                              Cancel
-                            </button>
-                            <button
-                              className="addprodbutton"
-                              onClick={(e) => {
-                                addbdgtcountry(prod);
-                              }}
-                            >
-                              Confirm
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="board">
-                        <table>
-                          <thead>
-                            <tr>
-                              <td className="countrycol">Country</td>
-                              <td className="bdgtdatacol">Q1</td>
-                              <td className="bdgtdatacol">Q2</td>
-                              <td className="bdgtdatacol">Q3</td>
-                              <td className="bdgtdatacol">Q4</td>
-                              <td className="bdgtdatacol">Total</td>
-                              <td className="bdgtcolseparation"></td>
-                              <td className="bdgtdatacol">Price</td>
-                              <td className="bdgtdatacol">Profit</td>
-                              <td className="bdgtdatacol">Ttl Profit</td>
-                              <td className="bdgtdatacol">% Mgn</td>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {Object.keys(formatedData[prod]).map(
-                              (reg, key1) => {
-                                let q1reg = 0;
-                                let q2reg = 0;
-                                let q3reg = 0;
-                                let q4reg = 0;
-                                let priceqty = 0;
-                                let profitqty = 0;
-
-                                Object.keys(formatedData[prod][reg]).forEach(
-                                  (ctry) => {
-                                    q1reg =
-                                      q1reg +
-                                      formatedData[prod][reg][ctry]["0"];
-                                    q2reg =
-                                      q2reg +
-                                      formatedData[prod][reg][ctry]["1"];
-                                    q3reg =
-                                      q3reg +
-                                      formatedData[prod][reg][ctry]["2"];
-                                    q4reg =
-                                      q4reg +
-                                      formatedData[prod][reg][ctry]["3"];
-                                    if (
-                                      bdgtecondata &&
-                                      bdgtecondata[prod] &&
-                                      bdgtecondata[prod][reg] &&
-                                      bdgtecondata[prod][reg][ctry] &&
-                                      bdgtecondata[prod][reg][ctry]["price"]
-                                    ) {
-                                      priceqty =
-                                        priceqty +
-                                        bdgtecondata[prod][reg][ctry]["price"] *
-                                          (formatedData[prod][reg][ctry]["0"] +
-                                            formatedData[prod][reg][ctry]["1"] +
-                                            formatedData[prod][reg][ctry]["2"] +
-                                            formatedData[prod][reg][ctry]["3"]);
-                                    }
-                                    if (
-                                      bdgtecondata &&
-                                      bdgtecondata[prod] &&
-                                      bdgtecondata[prod][reg] &&
-                                      bdgtecondata[prod][reg][ctry] &&
-                                      bdgtecondata[prod][reg][ctry]["profit"]
-                                    ) {
-                                      profitqty =
-                                        profitqty +
-                                        bdgtecondata[prod][reg][ctry][
-                                          "profit"
-                                        ] *
-                                          (formatedData[prod][reg][ctry]["0"] +
-                                            formatedData[prod][reg][ctry]["1"] +
-                                            formatedData[prod][reg][ctry]["2"] +
-                                            formatedData[prod][reg][ctry]["3"]);
-                                    }
-                                  }
-                                );
-                                q1prodtotal = q1prodtotal + q1reg;
-                                q2prodtotal = q2prodtotal + q2reg;
-                                q3prodtotal = q3prodtotal + q3reg;
-                                q4prodtotal = q4prodtotal + q4reg;
-
-                                let regprice =
-                                  priceqty === 0
-                                    ? 0
-                                    : priceqty /
-                                      (q1reg + q2reg + q3reg + q4reg);
-
-                                let regprofit =
-                                  profitqty === 0
-                                    ? 0
-                                    : profitqty /
-                                      (q1reg + q2reg + q3reg + q4reg);
-                                pricetotal = pricetotal + priceqty;
-                                profittotal = profittotal + profitqty;
-                                return [
-                                  <tr className="bdgtregionrow">
-                                    <td className="bdgtregioncol">
-                                      <FontAwesomeIcon
-                                        className="bdgtctyrowadd"
-                                        icon={faPlusCircle}
-                                        onClick={(e) => {
-                                          setShowaddcty({
-                                            ...showaddcty,
-                                            [prod]: {
-                                              ...showaddcty[prod],
-                                              [reg]: !showaddcty[prod][reg],
-                                            },
-                                          });
-                                          loadregcountries(reg);
-                                        }}
-                                      />
-                                      {reg === "Latin America"
-                                        ? "L. America"
-                                        : reg}
-                                      <div
-                                        className={
-                                          showaddcty && showaddcty[prod]
-                                            ? showaddcty[prod][reg]
-                                              ? "bdgtselectcty showbdgtpane"
-                                              : "bdgtselectcty hidebdgtpane"
-                                            : ""
-                                        }
-                                      >
-                                        <h4>
-                                          Select countries to add in {reg}
-                                        </h4>
-                                        <div className="bdgtselectctycty">
-                                          {loadregcties && loadregcties[reg]
-                                            ? loadregcties[reg][0].map((el) => (
-                                                <div className="addctyrow">
-                                                  <input
-                                                    type="checkbox"
-                                                    name={el.countryID}
-                                                    value={prod}
-                                                    onClick={(e) => {
-                                                      if (
-                                                        e.target.checked &&
-                                                        prodcountriestoadd
-                                                      ) {
-                                                        setProdcountriestoadd({
-                                                          ...prodcountriestoadd,
-                                                          [prod]: {
-                                                            ...prodcountriestoadd[
-                                                              prod
-                                                            ],
-                                                            [el.countryID]:
-                                                              el.country,
-                                                          },
-                                                        });
-                                                      } else {
-                                                        setProdcountriestoadd(
-                                                          (current) => {
-                                                            const copy = {
-                                                              ...current,
-                                                            };
-                                                            delete copy[prod][
-                                                              el.countryID
-                                                            ];
-                                                            return copy;
-                                                          }
-                                                        );
-                                                      }
-                                                    }}
-                                                  />
-                                                  <label for={el.countryID}>
-                                                    {el.country}
-                                                  </label>
-                                                </div>
-                                              ))
-                                            : ""}
-                                        </div>
-                                        <div className="addprodcanceladd">
-                                          <button
-                                            className="cancelprodbutton"
-                                            onClick={(e) => {
-                                              setShowaddcty({
-                                                ...showaddcty,
+        <div className="bdgtleftbottompanel">
+          <div className="budgettablesandresponse">
+            <div className="budgettables" ref={boardRef}>
+              {formatedData
+                ? Object.keys(formatedData).map((prod, key) => {
+                    let q1prodtotal = 0;
+                    let q2prodtotal = 0;
+                    let q3prodtotal = 0;
+                    let q4prodtotal = 0;
+                    let pricetotal = 0;
+                    let profittotal = 0;
+                    return [
+                      <div className="bdgtpnametable">
+                        <div className="bdgtpnametabletitle">
+                          <h3>2023 {prod} Budget</h3>
+                          <FontAwesomeIcon
+                            icon={faPlusCircle}
+                            onClick={(e) => {
+                              setShowprodctyadd({
+                                ...showprodctyadd,
+                                [prod]: !showprodctyadd[prod],
+                              });
+                            }}
+                          />
+                          <div
+                            className={
+                              showprodctyadd && showprodctyadd[prod]
+                                ? "bdgtselectallcty showbdgtpane"
+                                : "bdgtselectallcty hidebdgtpane"
+                            }
+                          >
+                            <h4>Select countries to add.</h4>
+                            <div className="bdgtselectctycty">
+                              {fullcountrylist
+                                ? fullcountrylist.map((ctyel) => {
+                                    return (
+                                      <div className="addctyrow">
+                                        <input
+                                          type="checkbox"
+                                          name={ctyel.countryID}
+                                          onClick={(e) => {
+                                            if (
+                                              e.target.checked &&
+                                              prodcountriestoadd
+                                            ) {
+                                              setProdcountriestoadd({
+                                                ...prodcountriestoadd,
                                                 [prod]: {
-                                                  ...showaddcty[prod],
-                                                  [reg]: !showaddcty[prod][reg],
+                                                  ...prodcountriestoadd[prod],
+                                                  [ctyel.countryID]:
+                                                    ctyel.country,
                                                 },
                                               });
-                                            }}
-                                          >
-                                            Cancel
-                                          </button>
-                                          <button
-                                            className="addprodbutton"
-                                            onClick={(e) => {
-                                              addbdgtcountry(prod);
-                                            }}
-                                          >
-                                            Confirm
-                                          </button>
-                                        </div>
+                                            } else {
+                                              setProdcountriestoadd(
+                                                (current) => {
+                                                  const copy = {
+                                                    ...current,
+                                                  };
+                                                  delete copy[prod][
+                                                    ctyel.countryID
+                                                  ];
+                                                  return copy;
+                                                }
+                                              );
+                                            }
+                                          }}
+                                        />
+                                        <label for={ctyel.countyID}>
+                                          {ctyel.country}
+                                        </label>
                                       </div>
-                                    </td>
+                                    );
+                                  })
+                                : ""}
+                            </div>
+                            <div className="addprodcanceladd">
+                              <button
+                                className="cancelprodbutton"
+                                onClick={(e) => {
+                                  setShowprodctyadd({
+                                    ...showprodctyadd,
+                                    [prod]: false,
+                                  });
+                                }}
+                              >
+                                Cancel
+                              </button>
+                              <button
+                                className="addprodbutton"
+                                onClick={(e) => {
+                                  addbdgtcountry(prod);
+                                }}
+                              >
+                                Confirm
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="board">
+                          <table>
+                            <thead>
+                              <tr>
+                                <td className="countrycol">Country</td>
+                                <td className="bdgtdatacol">Q1</td>
+                                <td className="bdgtdatacol">Q2</td>
+                                <td className="bdgtdatacol">Q3</td>
+                                <td className="bdgtdatacol">Q4</td>
+                                <td className="bdgtdatacol">Total</td>
+                                <td className="bdgtcolseparation"></td>
+                                <td className="bdgtdatacol">Price</td>
+                                <td className="bdgtdatacol">Profit</td>
+                                <td className="bdgtdatacol">Ttl Profit</td>
+                                <td className="bdgtdatacol">% Mgn</td>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {Object.keys(formatedData[prod]).map(
+                                (reg, key1) => {
+                                  let q1reg = 0;
+                                  let q2reg = 0;
+                                  let q3reg = 0;
+                                  let q4reg = 0;
+                                  let priceqty = 0;
+                                  let profitqty = 0;
 
-                                    <td className="bdgtregioncolttl">
-                                      {q1reg}
-                                    </td>
-                                    <td className="bdgtregioncolttl">
-                                      {q2reg}
-                                    </td>
-                                    <td className="bdgtregioncolttl">
-                                      {q3reg}
-                                    </td>
-                                    <td className="bdgtregioncolttl">
-                                      {q4reg}
-                                    </td>
-                                    <td className="bdgtregioncolttl">
-                                      {q1reg + q2reg + q3reg + q4reg}
-                                    </td>
-                                    <td className="bdgtcolseparation"></td>
-                                    <td className="bdgtregioncolttl">
-                                      {/* {priceqty === 0
+                                  Object.keys(formatedData[prod][reg]).forEach(
+                                    (ctry) => {
+                                      q1reg =
+                                        q1reg +
+                                        formatedData[prod][reg][ctry]["0"];
+                                      q2reg =
+                                        q2reg +
+                                        formatedData[prod][reg][ctry]["1"];
+                                      q3reg =
+                                        q3reg +
+                                        formatedData[prod][reg][ctry]["2"];
+                                      q4reg =
+                                        q4reg +
+                                        formatedData[prod][reg][ctry]["3"];
+                                      if (
+                                        bdgtecondata &&
+                                        bdgtecondata[prod] &&
+                                        bdgtecondata[prod][reg] &&
+                                        bdgtecondata[prod][reg][ctry] &&
+                                        bdgtecondata[prod][reg][ctry]["price"]
+                                      ) {
+                                        priceqty =
+                                          priceqty +
+                                          bdgtecondata[prod][reg][ctry][
+                                            "price"
+                                          ] *
+                                            (formatedData[prod][reg][ctry][
+                                              "0"
+                                            ] +
+                                              formatedData[prod][reg][ctry][
+                                                "1"
+                                              ] +
+                                              formatedData[prod][reg][ctry][
+                                                "2"
+                                              ] +
+                                              formatedData[prod][reg][ctry][
+                                                "3"
+                                              ]);
+                                      }
+                                      if (
+                                        bdgtecondata &&
+                                        bdgtecondata[prod] &&
+                                        bdgtecondata[prod][reg] &&
+                                        bdgtecondata[prod][reg][ctry] &&
+                                        bdgtecondata[prod][reg][ctry]["profit"]
+                                      ) {
+                                        profitqty =
+                                          profitqty +
+                                          bdgtecondata[prod][reg][ctry][
+                                            "profit"
+                                          ] *
+                                            (formatedData[prod][reg][ctry][
+                                              "0"
+                                            ] +
+                                              formatedData[prod][reg][ctry][
+                                                "1"
+                                              ] +
+                                              formatedData[prod][reg][ctry][
+                                                "2"
+                                              ] +
+                                              formatedData[prod][reg][ctry][
+                                                "3"
+                                              ]);
+                                      }
+                                    }
+                                  );
+                                  q1prodtotal = q1prodtotal + q1reg;
+                                  q2prodtotal = q2prodtotal + q2reg;
+                                  q3prodtotal = q3prodtotal + q3reg;
+                                  q4prodtotal = q4prodtotal + q4reg;
+
+                                  let regprice =
+                                    priceqty === 0
+                                      ? 0
+                                      : priceqty /
+                                        (q1reg + q2reg + q3reg + q4reg);
+
+                                  let regprofit =
+                                    profitqty === 0
+                                      ? 0
+                                      : profitqty /
+                                        (q1reg + q2reg + q3reg + q4reg);
+                                  pricetotal = pricetotal + priceqty;
+                                  profittotal = profittotal + profitqty;
+                                  return [
+                                    <tr className="bdgtregionrow">
+                                      <td className="bdgtregioncol">
+                                        <FontAwesomeIcon
+                                          className="bdgtctyrowadd"
+                                          icon={faPlusCircle}
+                                          onClick={(e) => {
+                                            setShowaddcty({
+                                              ...showaddcty,
+                                              [prod]: {
+                                                ...showaddcty[prod],
+                                                [reg]: !showaddcty[prod][reg],
+                                              },
+                                            });
+                                            loadregcountries(reg);
+                                          }}
+                                        />
+                                        {reg === "Latin America"
+                                          ? "L. America"
+                                          : reg}
+                                        <div
+                                          className={
+                                            showaddcty && showaddcty[prod]
+                                              ? showaddcty[prod][reg]
+                                                ? "bdgtselectcty showbdgtpane"
+                                                : "bdgtselectcty hidebdgtpane"
+                                              : ""
+                                          }
+                                        >
+                                          <h4>
+                                            Select countries to add in {reg}
+                                          </h4>
+                                          <div className="bdgtselectctycty">
+                                            {loadregcties && loadregcties[reg]
+                                              ? loadregcties[reg][0].map(
+                                                  (el) => (
+                                                    <div className="addctyrow">
+                                                      <input
+                                                        type="checkbox"
+                                                        name={el.countryID}
+                                                        value={prod}
+                                                        onClick={(e) => {
+                                                          if (
+                                                            e.target.checked &&
+                                                            prodcountriestoadd
+                                                          ) {
+                                                            setProdcountriestoadd(
+                                                              {
+                                                                ...prodcountriestoadd,
+                                                                [prod]: {
+                                                                  ...prodcountriestoadd[
+                                                                    prod
+                                                                  ],
+                                                                  [el.countryID]:
+                                                                    el.country,
+                                                                },
+                                                              }
+                                                            );
+                                                          } else {
+                                                            setProdcountriestoadd(
+                                                              (current) => {
+                                                                const copy = {
+                                                                  ...current,
+                                                                };
+                                                                delete copy[
+                                                                  prod
+                                                                ][el.countryID];
+                                                                return copy;
+                                                              }
+                                                            );
+                                                          }
+                                                        }}
+                                                      />
+                                                      <label for={el.countryID}>
+                                                        {el.country}
+                                                      </label>
+                                                    </div>
+                                                  )
+                                                )
+                                              : ""}
+                                          </div>
+                                          <div className="addprodcanceladd">
+                                            <button
+                                              className="cancelprodbutton"
+                                              onClick={(e) => {
+                                                setShowaddcty({
+                                                  ...showaddcty,
+                                                  [prod]: {
+                                                    ...showaddcty[prod],
+                                                    [reg]: !showaddcty[prod][
+                                                      reg
+                                                    ],
+                                                  },
+                                                });
+                                              }}
+                                            >
+                                              Cancel
+                                            </button>
+                                            <button
+                                              className="addprodbutton"
+                                              onClick={(e) => {
+                                                addbdgtcountry(prod);
+                                              }}
+                                            >
+                                              Confirm
+                                            </button>
+                                          </div>
+                                        </div>
+                                      </td>
+
+                                      <td className="bdgtregioncolttl">
+                                        {q1reg}
+                                      </td>
+                                      <td className="bdgtregioncolttl">
+                                        {q2reg}
+                                      </td>
+                                      <td className="bdgtregioncolttl">
+                                        {q3reg}
+                                      </td>
+                                      <td className="bdgtregioncolttl">
+                                        {q4reg}
+                                      </td>
+                                      <td className="bdgtregioncolttl">
+                                        {q1reg + q2reg + q3reg + q4reg}
+                                      </td>
+                                      <td className="bdgtcolseparation"></td>
+                                      <td className="bdgtregioncolttl">
+                                        {/* {priceqty === 0
                                         ? 0
                                         : (
                                             priceqty /
                                             (q1reg + q2reg + q3reg + q4reg)
                                           ).toFixed(0)} */}
-                                      {"$" +
-                                        regprice
-                                          .toFixed(0)
-                                          .replace(
-                                            /\B(?=(\d{3})+(?!\d))/g,
-                                            ","
-                                          )}
-                                    </td>
-                                    <td className="bdgtregioncolttl">
-                                      {"$" +
-                                        regprofit
-                                          .toFixed(0)
-                                          .replace(
-                                            /\B(?=(\d{3})+(?!\d))/g,
-                                            ","
-                                          )}
-                                    </td>
-                                    <td className="bdgtregioncolttl">
-                                      {"$" +
-                                        (
-                                          regprofit *
-                                          (q1reg + q2reg + q3reg + q4reg)
-                                        )
-                                          .toFixed(0)
-                                          .replace(
-                                            /\B(?=(\d{3})+(?!\d))/g,
-                                            ","
-                                          )}
-                                    </td>
-                                    <td className="bdgtregioncolttl">
-                                      {regprofit === 0 || regprice === 0
-                                        ? 0 + "%"
-                                        : (
-                                            (regprofit / regprice) *
-                                            100
-                                          ).toFixed(1) + "%"}
-                                    </td>
-                                  </tr>,
-                                  Object.keys(formatedData[prod][reg]).map(
-                                    (cty) => {
-                                      let indexecon = indecon;
-                                      indecon = indecon + 2;
-                                      //   q1reg = 0;
-                                      return [
-                                        <tr>
-                                          <td className="countrycol">
-                                            {cty === "Dominican Republic"
-                                              ? "Dom Rep"
-                                              : cty}
-                                          </td>
-                                          {Object.keys(
-                                            formatedData[prod][reg][cty]
-                                          ).map((q) => {
-                                            let index = ind;
-                                            // console.log(index);
-                                            ind = ind + 1;
-                                            return [
-                                              <td className="bdgtdatacol">
-                                                <div
-                                                  className={`tile ${
-                                                    activeIndex === index
-                                                      ? "active"
-                                                      : ""
-                                                  }`}
-                                                >
-                                                  <input
-                                                    value={
-                                                      formatedData[prod][reg][
+                                        {"$" +
+                                          regprice
+                                            .toFixed(0)
+                                            .replace(
+                                              /\B(?=(\d{3})+(?!\d))/g,
+                                              ","
+                                            )}
+                                      </td>
+                                      <td className="bdgtregioncolttl">
+                                        {"$" +
+                                          regprofit
+                                            .toFixed(0)
+                                            .replace(
+                                              /\B(?=(\d{3})+(?!\d))/g,
+                                              ","
+                                            )}
+                                      </td>
+                                      <td className="bdgtregioncolttl">
+                                        {"$" +
+                                          (
+                                            regprofit *
+                                            (q1reg + q2reg + q3reg + q4reg)
+                                          )
+                                            .toFixed(0)
+                                            .replace(
+                                              /\B(?=(\d{3})+(?!\d))/g,
+                                              ","
+                                            )}
+                                      </td>
+                                      <td className="bdgtregioncolttl">
+                                        {regprofit === 0 || regprice === 0
+                                          ? 0 + "%"
+                                          : (
+                                              (regprofit / regprice) *
+                                              100
+                                            ).toFixed(1) + "%"}
+                                      </td>
+                                    </tr>,
+                                    Object.keys(formatedData[prod][reg]).map(
+                                      (cty) => {
+                                        let indexecon = indecon;
+                                        indecon = indecon + 2;
+                                        //   q1reg = 0;
+                                        return [
+                                          <tr>
+                                            <td className="countrycol">
+                                              {cty === "Dominican Republic"
+                                                ? "Dom Rep"
+                                                : cty}
+                                            </td>
+                                            {Object.keys(
+                                              formatedData[prod][reg][cty]
+                                            ).map((q) => {
+                                              let index = ind;
+                                              // console.log(index);
+                                              ind = ind + 1;
+                                              return [
+                                                <td className="bdgtdatacol">
+                                                  <div
+                                                    className={`tile ${
+                                                      activeIndex === index
+                                                        ? "active"
+                                                        : ""
+                                                    }`}
+                                                  >
+                                                    <input
+                                                      value={
+                                                        formatedData[prod][reg][
+                                                          cty
+                                                        ][q]
+                                                      }
+                                                      onChange={(e) => {
+                                                        handleChange1(
+                                                          e,
+                                                          prod,
+                                                          reg,
+                                                          cty,
+                                                          q
+                                                        );
+                                                      }}
+                                                      className="cell-input"
+                                                      onFocus={(e) => {
+                                                        setActiveIndex(index);
+                                                        e.target.select();
+                                                        setEditingQty(true);
+                                                        setEditingEcon(false);
+                                                      }}
+                                                      ref={(el) =>
+                                                        (inputRefs.current[
+                                                          index
+                                                        ] = el)
+                                                      }
+                                                      onBlur={(e) => {
+                                                        saveNewValue(
+                                                          e,
+                                                          index,
+                                                          prod,
+                                                          reg,
+                                                          cty,
+                                                          q
+                                                        );
+                                                        setShowmsg(!showmsg);
+                                                      }}
+                                                    />
+                                                  </div>
+                                                </td>,
+                                              ];
+                                            })}
+                                            <td className="bdgtcountrytotals">
+                                              {formatedData[prod][reg][cty][
+                                                "0"
+                                              ] +
+                                                formatedData[prod][reg][cty][
+                                                  "1"
+                                                ] +
+                                                formatedData[prod][reg][cty][
+                                                  "2"
+                                                ] +
+                                                formatedData[prod][reg][cty][
+                                                  "3"
+                                                ]}
+                                            </td>
+                                            <td className="bdgtcolseparation"></td>
+                                            <td className="bdgtctyeconomics">
+                                              <input
+                                                className="cell-input"
+                                                value={
+                                                  bdgtecondata &&
+                                                  bdgtecondata[prod] &&
+                                                  bdgtecondata[prod][reg] &&
+                                                  bdgtecondata[prod][reg][
+                                                    cty
+                                                  ] &&
+                                                  bdgtecondata[prod][reg][cty][
+                                                    "price"
+                                                  ] !== null
+                                                    ? bdgtecondata[prod][reg][
                                                         cty
-                                                      ][q]
-                                                    }
-                                                    onChange={(e) => {
-                                                      handleChange1(
-                                                        e,
-                                                        prod,
-                                                        reg,
-                                                        cty,
-                                                        q
-                                                      );
-                                                    }}
-                                                    className="cell-input"
-                                                    onFocus={(e) => {
-                                                      setActiveIndex(index);
-                                                      e.target.select();
-                                                      setEditingQty(true);
-                                                      setEditingEcon(false);
-                                                    }}
-                                                    ref={(el) =>
-                                                      (inputRefs.current[
-                                                        index
-                                                      ] = el)
-                                                    }
-                                                    onBlur={(e) => {
-                                                      saveNewValue(
-                                                        e,
-                                                        index,
-                                                        prod,
-                                                        reg,
-                                                        cty,
-                                                        q
-                                                      );
-                                                      setShowmsg(!showmsg);
-                                                    }}
-                                                  />
-                                                </div>
-                                              </td>,
-                                            ];
-                                          })}
-                                          <td className="bdgtcountrytotals">
-                                            {formatedData[prod][reg][cty]["0"] +
-                                              formatedData[prod][reg][cty][
-                                                "1"
-                                              ] +
-                                              formatedData[prod][reg][cty][
-                                                "2"
-                                              ] +
-                                              formatedData[prod][reg][cty]["3"]}
-                                          </td>
-                                          <td className="bdgtcolseparation"></td>
-                                          <td className="bdgtctyeconomics">
-                                            <input
-                                              className="cell-input"
-                                              value={
-                                                bdgtecondata &&
-                                                bdgtecondata[prod] &&
-                                                bdgtecondata[prod][reg] &&
-                                                bdgtecondata[prod][reg][cty] &&
-                                                bdgtecondata[prod][reg][cty][
-                                                  "price"
-                                                ] !== null
-                                                  ? bdgtecondata[prod][reg][
-                                                      cty
-                                                    ]["price"]
-                                                  : "na"
-                                              }
-                                              onChange={(e) => {
-                                                handleEconChange(
-                                                  e,
-                                                  prod,
-                                                  reg,
-                                                  cty,
-                                                  "price"
-                                                );
-                                              }}
-                                              onFocus={(e) => {
-                                                setActiveEconIndex(indexecon);
-                                                e.target.select();
-                                                setEditingQty(false);
-                                                setEditingEcon(true);
-                                                setActiveIndex(-1);
-                                              }}
-                                              ref={(el) =>
-                                                (inputEconRefs.current[
-                                                  indexecon
-                                                ] = el)
-                                              }
-                                              onBlur={(e) => {
-                                                saveNewEconValue(
-                                                  e,
-                                                  indexecon,
-                                                  prod,
-                                                  reg,
-                                                  cty,
-                                                  "price"
-                                                );
-                                                setShowmsg(!showmsg);
-                                              }}
-                                            />
-                                          </td>
-                                          <td className="bdgtctyeconomics">
-                                            <input
-                                              className="cell-input"
-                                              value={
-                                                bdgtecondata &&
-                                                bdgtecondata[prod] &&
-                                                bdgtecondata[prod][reg] &&
-                                                bdgtecondata[prod][reg][cty] &&
-                                                bdgtecondata[prod][reg][cty][
-                                                  "profit"
-                                                ] !== null
-                                                  ? bdgtecondata[prod][reg][
-                                                      cty
-                                                    ]["profit"]
-                                                  : "na"
-                                              }
-                                              onChange={(e) => {
-                                                handleEconChange(
-                                                  e,
-                                                  prod,
-                                                  reg,
-                                                  cty,
-                                                  "profit"
-                                                );
-                                              }}
-                                              onFocus={(e) => {
-                                                setActiveEconIndex(
-                                                  indexecon + 1
-                                                );
-                                                e.target.select();
-                                                setEditingQty(false);
-                                                setEditingEcon(true);
-                                                setActiveIndex(-1);
-                                              }}
-                                              ref={(el) =>
-                                                (inputEconRefs.current[
-                                                  indexecon + 1
-                                                ] = el)
-                                              }
-                                              onBlur={(e) => {
-                                                saveNewEconValue(
-                                                  e,
-                                                  indexecon,
-                                                  prod,
-                                                  reg,
-                                                  cty,
-                                                  "profit"
-                                                );
-                                                setShowmsg(!showmsg);
-                                              }}
-                                            />
-                                          </td>
-                                          <td className="bdgtctyeconomics">
-                                            {bdgtecondata &&
-                                            formatedData &&
-                                            bdgtecondata[prod] &&
-                                            formatedData[prod] &&
-                                            bdgtecondata[prod][reg] &&
-                                            formatedData[prod][reg] &&
-                                            bdgtecondata[prod][reg][cty] &&
-                                            formatedData[prod][reg][cty] &&
-                                            bdgtecondata[prod][reg][cty][
-                                              "profit"
-                                            ] !== null
-                                              ? (
+                                                      ]["price"]
+                                                    : "na"
+                                                }
+                                                onChange={(e) => {
+                                                  handleEconChange(
+                                                    e,
+                                                    prod,
+                                                    reg,
+                                                    cty,
+                                                    "price"
+                                                  );
+                                                }}
+                                                onFocus={(e) => {
+                                                  setActiveEconIndex(indexecon);
+                                                  e.target.select();
+                                                  setEditingQty(false);
+                                                  setEditingEcon(true);
+                                                  setActiveIndex(-1);
+                                                }}
+                                                ref={(el) =>
+                                                  (inputEconRefs.current[
+                                                    indexecon
+                                                  ] = el)
+                                                }
+                                                onBlur={(e) => {
+                                                  saveNewEconValue(
+                                                    e,
+                                                    indexecon,
+                                                    prod,
+                                                    reg,
+                                                    cty,
+                                                    "price"
+                                                  );
+                                                  setShowmsg(!showmsg);
+                                                }}
+                                              />
+                                            </td>
+                                            <td className="bdgtctyeconomics">
+                                              <input
+                                                className="cell-input"
+                                                value={
+                                                  bdgtecondata &&
+                                                  bdgtecondata[prod] &&
+                                                  bdgtecondata[prod][reg] &&
+                                                  bdgtecondata[prod][reg][
+                                                    cty
+                                                  ] &&
                                                   bdgtecondata[prod][reg][cty][
                                                     "profit"
-                                                  ] *
-                                                  (formatedData[prod][reg][
-                                                    cty
-                                                  ][0] +
-                                                    formatedData[prod][reg][
-                                                      cty
-                                                    ][1] +
-                                                    formatedData[prod][reg][
-                                                      cty
-                                                    ][2] +
-                                                    formatedData[prod][reg][
-                                                      cty
-                                                    ][3])
-                                                ).toFixed(0)
-                                              : 0}
-                                          </td>
-                                          <td className="bdgtctyeconomics">
-                                            {bdgtecondata &&
-                                            bdgtecondata[prod] &&
-                                            bdgtecondata[prod][reg] &&
-                                            bdgtecondata[prod][reg][cty] &&
-                                            bdgtecondata[prod][reg][cty][
-                                              "profit"
-                                            ] !== null &&
-                                            bdgtecondata[prod][reg][cty][
-                                              "price"
-                                            ] !== 0
-                                              ? (
-                                                  (bdgtecondata[prod][reg][cty][
+                                                  ] !== null
+                                                    ? bdgtecondata[prod][reg][
+                                                        cty
+                                                      ]["profit"]
+                                                    : "na"
+                                                }
+                                                onChange={(e) => {
+                                                  handleEconChange(
+                                                    e,
+                                                    prod,
+                                                    reg,
+                                                    cty,
                                                     "profit"
-                                                  ] /
+                                                  );
+                                                }}
+                                                onFocus={(e) => {
+                                                  setActiveEconIndex(
+                                                    indexecon + 1
+                                                  );
+                                                  e.target.select();
+                                                  setEditingQty(false);
+                                                  setEditingEcon(true);
+                                                  setActiveIndex(-1);
+                                                }}
+                                                ref={(el) =>
+                                                  (inputEconRefs.current[
+                                                    indexecon + 1
+                                                  ] = el)
+                                                }
+                                                onBlur={(e) => {
+                                                  saveNewEconValue(
+                                                    e,
+                                                    indexecon,
+                                                    prod,
+                                                    reg,
+                                                    cty,
+                                                    "profit"
+                                                  );
+                                                  setShowmsg(!showmsg);
+                                                }}
+                                              />
+                                            </td>
+                                            <td className="bdgtctyeconomics">
+                                              {bdgtecondata &&
+                                              formatedData &&
+                                              bdgtecondata[prod] &&
+                                              formatedData[prod] &&
+                                              bdgtecondata[prod][reg] &&
+                                              formatedData[prod][reg] &&
+                                              bdgtecondata[prod][reg][cty] &&
+                                              formatedData[prod][reg][cty] &&
+                                              bdgtecondata[prod][reg][cty][
+                                                "profit"
+                                              ] !== null
+                                                ? (
                                                     bdgtecondata[prod][reg][
                                                       cty
-                                                    ]["price"]) *
-                                                  100
-                                                ).toFixed(1) + "%"
-                                              : "0%"}
-                                          </td>
+                                                    ]["profit"] *
+                                                    (formatedData[prod][reg][
+                                                      cty
+                                                    ][0] +
+                                                      formatedData[prod][reg][
+                                                        cty
+                                                      ][1] +
+                                                      formatedData[prod][reg][
+                                                        cty
+                                                      ][2] +
+                                                      formatedData[prod][reg][
+                                                        cty
+                                                      ][3])
+                                                  ).toFixed(0)
+                                                : 0}
+                                            </td>
+                                            <td className="bdgtctyeconomics">
+                                              {bdgtecondata &&
+                                              bdgtecondata[prod] &&
+                                              bdgtecondata[prod][reg] &&
+                                              bdgtecondata[prod][reg][cty] &&
+                                              bdgtecondata[prod][reg][cty][
+                                                "profit"
+                                              ] !== null &&
+                                              bdgtecondata[prod][reg][cty][
+                                                "price"
+                                              ] !== 0
+                                                ? (
+                                                    (bdgtecondata[prod][reg][
+                                                      cty
+                                                    ]["profit"] /
+                                                      bdgtecondata[prod][reg][
+                                                        cty
+                                                      ]["price"]) *
+                                                    100
+                                                  ).toFixed(1) + "%"
+                                                : "0%"}
+                                            </td>
 
-                                          <FontAwesomeIcon
-                                            className="bdgtctydelete"
-                                            icon={faMinusCircle}
-                                            onClick={(e) => {
-                                              setShowdelctybtns({
-                                                ...showdelctybtns,
-                                                [prod]: {
-                                                  ...showdelctybtns[prod],
-                                                  [reg]: {
-                                                    ...showdelctybtns[prod][
-                                                      reg
-                                                    ],
-                                                    [cty]: !showdelctybtns[
-                                                      prod
-                                                    ][reg][cty],
+                                            <FontAwesomeIcon
+                                              className="bdgtctydelete"
+                                              icon={faMinusCircle}
+                                              onClick={(e) => {
+                                                setShowdelctybtns({
+                                                  ...showdelctybtns,
+                                                  [prod]: {
+                                                    ...showdelctybtns[prod],
+                                                    [reg]: {
+                                                      ...showdelctybtns[prod][
+                                                        reg
+                                                      ],
+                                                      [cty]: !showdelctybtns[
+                                                        prod
+                                                      ][reg][cty],
+                                                    },
                                                   },
-                                                },
-                                              });
-                                            }}
-                                          />
-                                          <button
-                                            className={
-                                              showdelctybtns &&
-                                              showdelctybtns[prod] &&
-                                              showdelctybtns[prod][reg][cty] ===
-                                                true
-                                                ? "bdgtctydeletebtn showbdgtpane"
-                                                : "bdgtctydeletebtn hidebdgtpane"
-                                            }
-                                            onClick={(e) => {
-                                              deletectyrow(prod, cty);
-                                            }}
-                                          >
-                                            Delete
-                                          </button>
-                                        </tr>,
-                                      ];
-                                    }
-                                  ),
-                                ];
+                                                });
+                                              }}
+                                            />
+                                            <button
+                                              className={
+                                                showdelctybtns &&
+                                                showdelctybtns[prod] &&
+                                                showdelctybtns[prod][reg][
+                                                  cty
+                                                ] === true
+                                                  ? "bdgtctydeletebtn showbdgtpane"
+                                                  : "bdgtctydeletebtn hidebdgtpane"
+                                              }
+                                              onClick={(e) => {
+                                                deletectyrow(prod, cty);
+                                              }}
+                                            >
+                                              Delete
+                                            </button>
+                                          </tr>,
+                                        ];
+                                      }
+                                    ),
+                                  ];
+                                }
+                              )}
+                              <tr>
+                                <td className="bdgttotal">Total</td>
+                                <td className="bdgttotalqty">{q1prodtotal}</td>
+                                <td className="bdgttotalqty">{q2prodtotal}</td>
+                                <td className="bdgttotalqty">{q3prodtotal}</td>
+                                <td className="bdgttotalqty">{q4prodtotal}</td>
+                                <td className="bdgttotalqty">
+                                  {q1prodtotal +
+                                    q2prodtotal +
+                                    q3prodtotal +
+                                    q4prodtotal}
+                                </td>
+                                <td class="bdgtcolseparation"></td>
+                                <td className="bdgttotalqty">
+                                  {pricetotal === 0 ||
+                                  q1prodtotal +
+                                    q2prodtotal +
+                                    q3prodtotal +
+                                    q4prodtotal ===
+                                    0
+                                    ? 0
+                                    : "$" +
+                                      (
+                                        pricetotal /
+                                        (q1prodtotal +
+                                          q2prodtotal +
+                                          q3prodtotal +
+                                          q4prodtotal)
+                                      )
+                                        .toFixed(0)
+                                        .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                                </td>
+                                <td className="bdgttotalqty">
+                                  {profittotal === 0 ||
+                                  q1prodtotal +
+                                    q2prodtotal +
+                                    q3prodtotal +
+                                    q4prodtotal ===
+                                    0
+                                    ? 0
+                                    : "$" +
+                                      (
+                                        profittotal /
+                                        (q1prodtotal +
+                                          q2prodtotal +
+                                          q3prodtotal +
+                                          q4prodtotal)
+                                      )
+                                        .toFixed(0)
+                                        .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                                </td>
+                                <td className="bdgttotalqty">
+                                  {profittotal === 0
+                                    ? 0
+                                    : "$" +
+                                      profittotal
+                                        .toFixed(0)
+                                        .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                                </td>
+                                <td className="bdgttotalqty">
+                                  {profittotal === 0 || pricetotal == 0
+                                    ? 0
+                                    : (
+                                        (profittotal / pricetotal) *
+                                        100
+                                      ).toFixed(1) + "%"}
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>,
+                    ];
+                  })
+                : ""}
+            </div>
+            <span className="bdgtresponsemsg" ref={refresmsg}>
+              {bdgtresponsemsg}
+            </span>
+          </div>
+          <div className="lyearfigures">
+            {formatedData && bdgtlyearsales
+              ? Object.keys(formatedData).map((prod) => {
+                  let lyearqtytotal = 0;
+                  let lyearpricetotal = 0;
+                  let lyearprofittotal = 0;
+                  return [
+                    <h3>
+                      {bdgtyear - 1} {prod} Sales Figures
+                    </h3>,
+                    <table className="lyeartable">
+                      <thead className="lyearhead">
+                        <tr>
+                          <td className="lyearcountrycol">Country</td>
+                          <td className="lyeardatah">Qty</td>
+                          <td className="lyeardatah">Price</td>
+                          <td className="lyeardatah">Profit</td>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {Object.keys(formatedData[prod]).map((reg) => {
+                          let lyearregqty = 0;
+                          let lyearregprice = 0;
+                          let lyearregprofit = 0;
+                          Object.keys(formatedData[prod][reg]).forEach(
+                            (ctry) => {
+                              if (
+                                bdgtlyearsales &&
+                                bdgtlyearsales[prod] &&
+                                bdgtlyearsales[prod][reg] &&
+                                bdgtlyearsales[prod][reg][ctry] &&
+                                bdgtlyearsales[prod][reg][ctry]["quantity"] &&
+                                bdgtlyearsales[prod][reg][ctry]["avgprice"] &&
+                                bdgtlyearsales[prod][reg][ctry]["avgprofit"]
+                              ) {
+                                lyearregqty =
+                                  lyearregqty +
+                                  bdgtlyearsales[prod][reg][ctry]["quantity"];
+                                lyearregprice =
+                                  lyearregprice +
+                                  bdgtlyearsales[prod][reg][ctry]["quantity"] *
+                                    bdgtlyearsales[prod][reg][ctry]["avgprice"];
+                                lyearregprofit =
+                                  lyearregprofit +
+                                  bdgtlyearsales[prod][reg][ctry]["quantity"] *
+                                    bdgtlyearsales[prod][reg][ctry][
+                                      "avgprofit"
+                                    ];
                               }
-                            )}
+                            }
+                          );
+                          return [
                             <tr>
-                              <td className="bdgttotal">Total</td>
-                              <td className="bdgttotalqty">{q1prodtotal}</td>
-                              <td className="bdgttotalqty">{q2prodtotal}</td>
-                              <td className="bdgttotalqty">{q3prodtotal}</td>
-                              <td className="bdgttotalqty">{q4prodtotal}</td>
-                              <td className="bdgttotalqty">
-                                {q1prodtotal +
-                                  q2prodtotal +
-                                  q3prodtotal +
-                                  q4prodtotal}
+                              <td className="lyearregrow lyearcountrycol">
+                                {reg === "Latin America" ? "L. America" : reg}
                               </td>
-                              <td class="bdgtcolseparation"></td>
-                              <td className="bdgttotalqty">
-                                {pricetotal === 0 ||
-                                q1prodtotal +
-                                  q2prodtotal +
-                                  q3prodtotal +
-                                  q4prodtotal ===
-                                  0
+                              <td className="lyearregrowdata">{lyearregqty}</td>
+                              <td className="lyearregrowdata">
+                                {lyearregqty === 0
                                   ? 0
-                                  : "$" +
-                                    (
-                                      pricetotal /
-                                      (q1prodtotal +
-                                        q2prodtotal +
-                                        q3prodtotal +
-                                        q4prodtotal)
-                                    )
-                                      .toFixed(0)
-                                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                                  : "$ " +
+                                    (lyearregprice / lyearregqty).toFixed(0)}
                               </td>
-                              <td className="bdgttotalqty">
-                                {profittotal === 0 ||
-                                q1prodtotal +
-                                  q2prodtotal +
-                                  q3prodtotal +
-                                  q4prodtotal ===
-                                  0
+                              <td className="lyearregrowdata">
+                                {lyearregqty === 0
                                   ? 0
-                                  : "$" +
-                                    (
-                                      profittotal /
-                                      (q1prodtotal +
-                                        q2prodtotal +
-                                        q3prodtotal +
-                                        q4prodtotal)
-                                    )
-                                      .toFixed(0)
-                                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                                  : "$ " +
+                                    (lyearregprofit / lyearregqty).toFixed(0)}
                               </td>
-                              <td className="bdgttotalqty">
-                                {profittotal === 0
-                                  ? 0
-                                  : "$" +
-                                    profittotal
-                                      .toFixed(0)
-                                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-                              </td>
-                              <td className="bdgttotalqty">
-                                {profittotal === 0 || pricetotal == 0
-                                  ? 0
-                                  : ((profittotal / pricetotal) * 100).toFixed(
-                                      1
-                                    ) + "%"}
-                              </td>
-                            </tr>
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>,
+                              {/* <td colSpan={3}></td> */}
+                            </tr>,
+                            Object.keys(formatedData[prod][reg]).map((cty) => {
+                              if (
+                                bdgtlyearsales &&
+                                bdgtlyearsales[prod] &&
+                                bdgtlyearsales[prod][reg] &&
+                                bdgtlyearsales[prod][reg][cty] &&
+                                bdgtlyearsales[prod][reg][cty]["quantity"]
+                              ) {
+                                lyearqtytotal =
+                                  lyearqtytotal +
+                                  bdgtlyearsales[prod][reg][cty]["quantity"];
+                              }
+                              if (
+                                bdgtlyearsales &&
+                                bdgtlyearsales[prod] &&
+                                bdgtlyearsales[prod][reg] &&
+                                bdgtlyearsales[prod][reg][cty] &&
+                                bdgtlyearsales[prod][reg][cty]["quantity"] &&
+                                bdgtlyearsales[prod][reg][cty]["avgprice"]
+                              ) {
+                                lyearpricetotal =
+                                  lyearpricetotal +
+                                  bdgtlyearsales[prod][reg][cty]["avgprice"] *
+                                    bdgtlyearsales[prod][reg][cty]["quantity"];
+                              }
+                              if (
+                                bdgtlyearsales &&
+                                bdgtlyearsales[prod] &&
+                                bdgtlyearsales[prod][reg] &&
+                                bdgtlyearsales[prod][reg][cty] &&
+                                bdgtlyearsales[prod][reg][cty]["quantity"] &&
+                                bdgtlyearsales[prod][reg][cty]["avgprofit"]
+                              ) {
+                                lyearprofittotal =
+                                  lyearprofittotal +
+                                  bdgtlyearsales[prod][reg][cty]["avgprofit"] *
+                                    bdgtlyearsales[prod][reg][cty]["quantity"];
+                              }
+
+                              return [
+                                <tr>
+                                  <td className="lyearcountrycol">
+                                    {cty === "Dominican Republic"
+                                      ? "Dom Rep"
+                                      : cty}
+                                  </td>
+                                  <td className="lyeardata">
+                                    {bdgtlyearsales &&
+                                    bdgtlyearsales[prod] &&
+                                    bdgtlyearsales[prod][reg] &&
+                                    bdgtlyearsales[prod][reg][cty] &&
+                                    bdgtlyearsales[prod][reg][cty]["quantity"]
+                                      ? bdgtlyearsales[prod][reg][cty][
+                                          "quantity"
+                                        ]
+                                      : 0}
+                                  </td>
+                                  <td className="lyeardata">
+                                    {bdgtlyearsales &&
+                                    bdgtlyearsales[prod] &&
+                                    bdgtlyearsales[prod][reg] &&
+                                    bdgtlyearsales[prod][reg][cty] &&
+                                    bdgtlyearsales[prod][reg][cty]["avgprice"]
+                                      ? "$ " +
+                                        bdgtlyearsales[prod][reg][cty][
+                                          "avgprice"
+                                        ]
+                                      : 0}
+                                  </td>
+                                  <td className="lyeardata">
+                                    {bdgtlyearsales &&
+                                    bdgtlyearsales[prod] &&
+                                    bdgtlyearsales[prod][reg] &&
+                                    bdgtlyearsales[prod][reg][cty] &&
+                                    bdgtlyearsales[prod][reg][cty]["avgprofit"]
+                                      ? "$ " +
+                                        bdgtlyearsales[prod][reg][cty][
+                                          "avgprofit"
+                                        ]
+                                      : 0}
+                                  </td>
+                                </tr>,
+                              ];
+                            }),
+                          ];
+                        })}
+                        <tr>
+                          <td className="lyearcountrycolttl">Total</td>
+                          <td className="lyeardatattl">{lyearqtytotal}</td>
+                          <td className="lyeardatattl">
+                            {lyearqtytotal === 0
+                              ? 0
+                              : "$ " +
+                                (lyearpricetotal / lyearqtytotal).toFixed(0)}
+                          </td>
+                          <td className="lyeardatattl">
+                            {lyearqtytotal === 0
+                              ? 0
+                              : "$ " +
+                                (lyearprofittotal / lyearqtytotal).toFixed(0)}
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>,
                   ];
                 })
               : ""}
           </div>
-          <span className="bdgtresponsemsg" ref={refresmsg}>
-            {bdgtresponsemsg}
-          </span>
-        </div>
-        <div className="lyearfigures">
-          {formatedData && bdgtlyearsales
-            ? Object.keys(formatedData).map((prod) => {
-                let lyearqtytotal = 0;
-                let lyearpricetotal = 0;
-                let lyearprofittotal = 0;
-                return [
-                  <h3>
-                    {bdgtyear - 1} {prod} Sales Figures
-                  </h3>,
-                  <table className="lyeartable">
-                    <thead className="lyearhead">
-                      <tr>
-                        <td className="lyearcountrycol">Country</td>
-                        <td className="lyeardatah">Qty</td>
-                        <td className="lyeardatah">Price</td>
-                        <td className="lyeardatah">Profit</td>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {Object.keys(formatedData[prod]).map((reg) => {
-                        let lyearregqty = 0;
-                        let lyearregprice = 0;
-                        let lyearregprofit = 0;
-                        Object.keys(formatedData[prod][reg]).forEach((ctry) => {
-                          if (
-                            bdgtlyearsales &&
-                            bdgtlyearsales[prod] &&
-                            bdgtlyearsales[prod][reg] &&
-                            bdgtlyearsales[prod][reg][ctry] &&
-                            bdgtlyearsales[prod][reg][ctry]["quantity"] &&
-                            bdgtlyearsales[prod][reg][ctry]["avgprice"] &&
-                            bdgtlyearsales[prod][reg][ctry]["avgprofit"]
-                          ) {
-                            lyearregqty =
-                              lyearregqty +
-                              bdgtlyearsales[prod][reg][ctry]["quantity"];
-                            lyearregprice =
-                              lyearregprice +
-                              bdgtlyearsales[prod][reg][ctry]["quantity"] *
-                                bdgtlyearsales[prod][reg][ctry]["avgprice"];
-                            lyearregprofit =
-                              lyearregprofit +
-                              bdgtlyearsales[prod][reg][ctry]["quantity"] *
-                                bdgtlyearsales[prod][reg][ctry]["avgprofit"];
-                          }
-                        });
-                        return [
-                          <tr>
-                            <td className="lyearregrow lyearcountrycol">
-                              {reg === "Latin America" ? "L. America" : reg}
-                            </td>
-                            <td className="lyearregrowdata">{lyearregqty}</td>
-                            <td className="lyearregrowdata">
-                              {lyearregqty === 0
-                                ? 0
-                                : "$ " +
-                                  (lyearregprice / lyearregqty).toFixed(0)}
-                            </td>
-                            <td className="lyearregrowdata">
-                              {lyearregqty === 0
-                                ? 0
-                                : "$ " +
-                                  (lyearregprofit / lyearregqty).toFixed(0)}
-                            </td>
-                            {/* <td colSpan={3}></td> */}
-                          </tr>,
-                          Object.keys(formatedData[prod][reg]).map((cty) => {
-                            if (
-                              bdgtlyearsales &&
-                              bdgtlyearsales[prod] &&
-                              bdgtlyearsales[prod][reg] &&
-                              bdgtlyearsales[prod][reg][cty] &&
-                              bdgtlyearsales[prod][reg][cty]["quantity"]
-                            ) {
-                              lyearqtytotal =
-                                lyearqtytotal +
-                                bdgtlyearsales[prod][reg][cty]["quantity"];
-                            }
-                            if (
-                              bdgtlyearsales &&
-                              bdgtlyearsales[prod] &&
-                              bdgtlyearsales[prod][reg] &&
-                              bdgtlyearsales[prod][reg][cty] &&
-                              bdgtlyearsales[prod][reg][cty]["quantity"] &&
-                              bdgtlyearsales[prod][reg][cty]["avgprice"]
-                            ) {
-                              lyearpricetotal =
-                                lyearpricetotal +
-                                bdgtlyearsales[prod][reg][cty]["avgprice"] *
-                                  bdgtlyearsales[prod][reg][cty]["quantity"];
-                            }
-                            if (
-                              bdgtlyearsales &&
-                              bdgtlyearsales[prod] &&
-                              bdgtlyearsales[prod][reg] &&
-                              bdgtlyearsales[prod][reg][cty] &&
-                              bdgtlyearsales[prod][reg][cty]["quantity"] &&
-                              bdgtlyearsales[prod][reg][cty]["avgprofit"]
-                            ) {
-                              lyearprofittotal =
-                                lyearprofittotal +
-                                bdgtlyearsales[prod][reg][cty]["avgprofit"] *
-                                  bdgtlyearsales[prod][reg][cty]["quantity"];
-                            }
-
-                            return [
-                              <tr>
-                                <td className="lyearcountrycol">
-                                  {cty === "Dominican Republic"
-                                    ? "Dom Rep"
-                                    : cty}
-                                </td>
-                                <td className="lyeardata">
-                                  {bdgtlyearsales &&
-                                  bdgtlyearsales[prod] &&
-                                  bdgtlyearsales[prod][reg] &&
-                                  bdgtlyearsales[prod][reg][cty] &&
-                                  bdgtlyearsales[prod][reg][cty]["quantity"]
-                                    ? bdgtlyearsales[prod][reg][cty]["quantity"]
-                                    : 0}
-                                </td>
-                                <td className="lyeardata">
-                                  {bdgtlyearsales &&
-                                  bdgtlyearsales[prod] &&
-                                  bdgtlyearsales[prod][reg] &&
-                                  bdgtlyearsales[prod][reg][cty] &&
-                                  bdgtlyearsales[prod][reg][cty]["avgprice"]
-                                    ? "$ " +
-                                      bdgtlyearsales[prod][reg][cty]["avgprice"]
-                                    : 0}
-                                </td>
-                                <td className="lyeardata">
-                                  {bdgtlyearsales &&
-                                  bdgtlyearsales[prod] &&
-                                  bdgtlyearsales[prod][reg] &&
-                                  bdgtlyearsales[prod][reg][cty] &&
-                                  bdgtlyearsales[prod][reg][cty]["avgprofit"]
-                                    ? "$ " +
-                                      bdgtlyearsales[prod][reg][cty][
-                                        "avgprofit"
-                                      ]
-                                    : 0}
-                                </td>
-                              </tr>,
-                            ];
-                          }),
-                        ];
-                      })}
-                      <tr>
-                        <td className="lyearcountrycolttl">Total</td>
-                        <td className="lyeardatattl">{lyearqtytotal}</td>
-                        <td className="lyeardatattl">
-                          {lyearqtytotal === 0
-                            ? 0
-                            : "$ " +
-                              (lyearpricetotal / lyearqtytotal).toFixed(0)}
-                        </td>
-                        <td className="lyeardatattl">
-                          {lyearqtytotal === 0
-                            ? 0
-                            : "$ " +
-                              (lyearprofittotal / lyearqtytotal).toFixed(0)}
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>,
-                ];
-              })
-            : ""}
         </div>
         {/* <div className="budgetbyprod">
           <h4>{bdgtyear} Budget Summary</h4>

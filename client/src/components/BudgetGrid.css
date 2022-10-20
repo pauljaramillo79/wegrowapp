@@ -350,6 +350,10 @@
   display: flex;
   justify-content: space-between;
   height: 60vh;
+  /* overflow-y: scroll; */
+}
+.bdgtleftbottompanel {
+  height: 60vh;
   overflow-y: scroll;
 }
 .budgetbyprod {
