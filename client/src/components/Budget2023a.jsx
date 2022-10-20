@@ -723,6 +723,14 @@ const Budget2023 = () => {
   let q2total = 0;
   let q3total = 0;
   let q4total = 0;
+  let p1total = 0;
+  let p2total = 0;
+  let p3total = 0;
+  let p4total = 0;
+  let r1total = 0;
+  let r2total = 0;
+  let r3total = 0;
+  let r4total = 0;
 
   return (
     <div>
@@ -2152,6 +2160,24 @@ const Budget2023 = () => {
             >
               Profit ($)
             </button>
+            <button
+              onClick={(e) => {
+                setSummarygroupby3("avgprofit");
+                setClickedlevel3(3);
+              }}
+              className={3 === clickedlevel3 ? "bdgtlvl3active" : ""}
+            >
+              Avg. Profit ($)
+            </button>
+            <button
+              onClick={(e) => {
+                setSummarygroupby3("margin");
+                setClickedlevel3(4);
+              }}
+              className={4 === clickedlevel3 ? "bdgtlvl3active" : ""}
+            >
+              Margin (%)
+            </button>
           </div>
           <ul className="bdgtsummarytable">
             <li className="stblrow stblheader">
@@ -2170,18 +2196,47 @@ const Budget2023 = () => {
                       let q2 = 0;
                       let q3 = 0;
                       let q4 = 0;
+                      let p1 = 0;
+                      let p2 = 0;
+                      let p3 = 0;
+                      let p4 = 0;
+                      let r1 = 0;
+                      let r2 = 0;
+                      let r3 = 0;
+                      let r4 = 0;
+
                       reg[1].forEach((regel) => {
+                        // if (regel["quarter"] === 1) {
+                        //   q1 = q1 + regel[summarygroupby3];
+                        // }
+                        // if (regel["quarter"] === 2) {
+                        //   q2 = q2 + regel[summarygroupby3];
+                        // }
+                        // if (regel["quarter"] === 3) {
+                        //   q3 = q3 + regel[summarygroupby3];
+                        // }
+                        // if (regel["quarter"] === 4) {
+                        //   q4 = q4 + regel[summarygroupby3];
+                        // }
                         if (regel["quarter"] === 1) {
-                          q1 = q1 + regel[summarygroupby3];
+                          q1 = q1 + regel["quantity"];
+                          p1 = p1 + regel["profit"];
+                          r1 = r1 + regel["revenue"];
                         }
                         if (regel["quarter"] === 2) {
-                          q2 = q2 + regel[summarygroupby3];
+                          q2 = q2 + regel["quantity"];
+                          p2 = p2 + regel["profit"];
+                          r2 = r2 + regel["revenue"];
                         }
                         if (regel["quarter"] === 3) {
-                          q3 = q3 + regel[summarygroupby3];
+                          q3 = q3 + regel["quantity"];
+                          p3 = p3 + regel["profit"];
+                          r3 = r3 + regel["revenue"];
                         }
                         if (regel["quarter"] === 4) {
-                          q4 = q4 + regel[summarygroupby3];
+                          q4 = q4 + regel["quantity"];
+                          p4 = p4 + regel["profit"];
+                          r4 = r4 + regel["revenue"];
                         }
                         // let q1total = 0;
                         // q2total = 0;
@@ -2206,65 +2261,147 @@ const Budget2023 = () => {
                                       ? q1
                                           .toFixed(0)
                                           .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                                      : "$" +
-                                        q1
+                                      : summarygroupby3 === "profit"
+                                      ? "$" +
+                                        p1
                                           .toFixed(0)
+                                          .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                      : p1 !== 0 &&
+                                        q1 !== 0 &&
+                                        summarygroupby3 === "avgprofit"
+                                      ? "$" +
+                                        (p1 / q1)
+                                          .toFixed(0)
+                                          .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                      : p1 !== 0 &&
+                                        q1 !== 0 &&
+                                        summarygroupby3 === "margin"
+                                      ? ((p1 / r1) * 100)
+                                          .toFixed(1)
                                           .replace(
                                             /\B(?=(\d{3})+(?!\d))/g,
                                             ","
-                                          )}
+                                          ) + "%"
+                                      : "-"}
                                   </p>
                                   <p className="stblfig">
                                     {summarygroupby3 === "quantity"
                                       ? q2
                                           .toFixed(0)
                                           .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                                      : "$ " +
-                                        q2
+                                      : summarygroupby3 === "profit"
+                                      ? "$ " +
+                                        p2
                                           .toFixed(0)
+                                          .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                      : p2 !== 0 &&
+                                        q2 !== 0 &&
+                                        summarygroupby3 === "avgprofit"
+                                      ? "$" +
+                                        (p2 / q2)
+                                          .toFixed(0)
+                                          .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                      : p2 !== 0 &&
+                                        q2 !== 0 &&
+                                        summarygroupby3 === "margin"
+                                      ? ((p2 / r2) * 100)
+                                          .toFixed(1)
                                           .replace(
                                             /\B(?=(\d{3})+(?!\d))/g,
                                             ","
-                                          )}
+                                          ) + "%"
+                                      : "-"}
                                   </p>
                                   <p className="stblfig">
                                     {summarygroupby3 === "quantity"
                                       ? q3
                                           .toFixed(0)
                                           .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                                      : "$ " +
-                                        q3
+                                      : summarygroupby3 === "profit"
+                                      ? "$ " +
+                                        p3
                                           .toFixed(0)
+                                          .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                      : p3 !== 0 &&
+                                        q3 !== 0 &&
+                                        summarygroupby3 === "avgprofit"
+                                      ? "$" +
+                                        (p3 / q3)
+                                          .toFixed(0)
+                                          .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                      : p3 !== 0 &&
+                                        q3 !== 0 &&
+                                        summarygroupby3 === "margin"
+                                      ? ((p3 / r3) * 100)
+                                          .toFixed(1)
                                           .replace(
                                             /\B(?=(\d{3})+(?!\d))/g,
                                             ","
-                                          )}
+                                          ) + "%"
+                                      : "-"}
                                   </p>
                                   <p className="stblfig">
                                     {summarygroupby3 === "quantity"
                                       ? q4
                                           .toFixed(0)
                                           .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                                      : "$ " +
-                                        q4
+                                      : summarygroupby3 === "profit"
+                                      ? "$ " +
+                                        p4
                                           .toFixed(0)
+                                          .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                      : p4 !== 0 &&
+                                        q4 !== 0 &&
+                                        summarygroupby3 === "avgprofit"
+                                      ? "$" +
+                                        (p4 / q4)
+                                          .toFixed(0)
+                                          .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                      : p4 !== 0 &&
+                                        q4 !== 0 &&
+                                        summarygroupby3 === "margin"
+                                      ? ((p4 / r4) * 100)
+                                          .toFixed(1)
                                           .replace(
                                             /\B(?=(\d{3})+(?!\d))/g,
                                             ","
-                                          )}
+                                          ) + "%"
+                                      : "-"}
                                   </p>
                                   <p className="stblfig stbltotal">
                                     {summarygroupby3 === "quantity"
                                       ? (q1 + q2 + q3 + q4)
                                           .toFixed(0)
                                           .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                                      : "$ " +
-                                        (q1 + q2 + q3 + q4)
+                                      : summarygroupby3 === "profit"
+                                      ? "$ " +
+                                        (p1 + p2 + p3 + p4)
                                           .toFixed(0)
+                                          .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                      : p1 + p2 + p3 + p4 !== 0 &&
+                                        q1 + q2 + q3 + q4 !== 0 &&
+                                        summarygroupby3 === "avgprofit"
+                                      ? "$" +
+                                        (
+                                          (p1 + p2 + p3 + p4) /
+                                          (q1 + q2 + q3 + q4)
+                                        )
+                                          .toFixed(0)
+                                          .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                      : p1 + p2 + p3 + p4 !== 0 &&
+                                        r1 + r2 + r3 + r4 !== 0 &&
+                                        summarygroupby3 === "margin"
+                                      ? (
+                                          ((p1 + p2 + p3 + p4) /
+                                            (r1 + r2 + r3 + r4)) *
+                                          100
+                                        )
+                                          .toFixed(1)
                                           .replace(
                                             /\B(?=(\d{3})+(?!\d))/g,
                                             ","
-                                          )}
+                                          ) + "%"
+                                      : "-"}
                                   </p>
                                 </li>
                               </AccordionItemButton>
@@ -2278,26 +2415,70 @@ const Budget2023 = () => {
                                   let q22 = 0;
                                   let q23 = 0;
                                   let q24 = 0;
+                                  let p21 = 0;
+                                  let p22 = 0;
+                                  let p23 = 0;
+                                  let p24 = 0;
+                                  let r21 = 0;
+                                  let r22 = 0;
+                                  let r23 = 0;
+                                  let r24 = 0;
                                   cty[1].forEach((ctyel) => {
+                                    // if (ctyel["quarter"] === 1) {
+                                    //   q21 = q21 + ctyel[summarygroupby3];
+                                    //   q1total =
+                                    //     q1total + ctyel[summarygroupby3];
+                                    // }
+                                    // if (ctyel["quarter"] === 2) {
+                                    //   q22 = q22 + ctyel[summarygroupby3];
+                                    //   q2total =
+                                    //     q2total + ctyel[summarygroupby3];
+                                    // }
+                                    // if (ctyel["quarter"] === 3) {
+                                    //   q23 = q23 + ctyel[summarygroupby3];
+                                    //   q3total =
+                                    //     q3total + ctyel[summarygroupby3];
+                                    // }
+                                    // if (ctyel["quarter"] === 4) {
+                                    //   q24 = q24 + ctyel[summarygroupby3];
+                                    //   q4total =
+                                    //     q4total + ctyel[summarygroupby3];
+                                    // }
+
                                     if (ctyel["quarter"] === 1) {
-                                      q21 = q21 + ctyel[summarygroupby3];
-                                      q1total =
-                                        q1total + ctyel[summarygroupby3];
+                                      q21 = q21 + ctyel["quantity"];
+                                      p21 = p21 + ctyel["profit"];
+                                      r21 = r21 + ctyel["revenue"];
+                                      q1total = q1total + ctyel["quantity"];
+                                      p1total = p1total + ctyel["profit"];
+                                      r1total = r1total + ctyel["revenue"];
                                     }
                                     if (ctyel["quarter"] === 2) {
-                                      q22 = q22 + ctyel[summarygroupby3];
-                                      q2total =
-                                        q2total + ctyel[summarygroupby3];
+                                      q22 = q22 + ctyel["quantity"];
+                                      p22 = p22 + ctyel["profit"];
+                                      r22 = r22 + ctyel["revenue"];
+
+                                      q2total = q2total + ctyel["quantity"];
+                                      p2total = p2total + ctyel["profit"];
+                                      r2total = r2total + ctyel["revenue"];
                                     }
                                     if (ctyel["quarter"] === 3) {
-                                      q23 = q23 + ctyel[summarygroupby3];
-                                      q3total =
-                                        q3total + ctyel[summarygroupby3];
+                                      q23 = q23 + ctyel["quantity"];
+                                      p23 = p23 + ctyel["profit"];
+                                      r23 = r23 + ctyel["revenue"];
+
+                                      q3total = q3total + ctyel["quantity"];
+                                      p3total = p3total + ctyel["profit"];
+                                      r3total = r3total + ctyel["revenue"];
                                     }
                                     if (ctyel["quarter"] === 4) {
-                                      q24 = q24 + ctyel[summarygroupby3];
-                                      q4total =
-                                        q4total + ctyel[summarygroupby3];
+                                      q24 = q24 + ctyel["quantity"];
+                                      p24 = p24 + ctyel["profit"];
+                                      r24 = r24 + ctyel["revenue"];
+
+                                      q4total = q4total + ctyel["quantity"];
+                                      p4total = p4total + ctyel["profit"];
+                                      r4total = r4total + ctyel["revenue"];
                                     }
                                   });
 
@@ -2305,7 +2486,6 @@ const Budget2023 = () => {
                                     <li className="stblrow">
                                       <p className="stblcollarge">{cty[0]}</p>
                                       <p className="stblfig">
-                                        {" "}
                                         {summarygroupby3 === "quantity"
                                           ? q21
                                               .toFixed(0)
@@ -2313,16 +2493,36 @@ const Budget2023 = () => {
                                                 /\B(?=(\d{3})+(?!\d))/g,
                                                 ","
                                               )
-                                          : "$ " +
-                                            q21
+                                          : summarygroupby3 === "profit"
+                                          ? "$ " +
+                                            p21
                                               .toFixed(0)
                                               .replace(
                                                 /\B(?=(\d{3})+(?!\d))/g,
                                                 ","
-                                              )}
+                                              )
+                                          : p21 !== 0 &&
+                                            q21 !== 0 &&
+                                            summarygroupby3 === "avgprofit"
+                                          ? "$ " +
+                                            (p21 / q21)
+                                              .toFixed(0)
+                                              .replace(
+                                                /\B(?=(\d{3})+(?!\d))/g,
+                                                ","
+                                              )
+                                          : p21 !== 0 &&
+                                            r21 !== 0 &&
+                                            summarygroupby3 === "margin"
+                                          ? ((p21 / r21) * 100)
+                                              .toFixed(1)
+                                              .replace(
+                                                /\B(?=(\d{3})+(?!\d))/g,
+                                                ","
+                                              ) + "%"
+                                          : "-"}
                                       </p>
                                       <p className="stblfig">
-                                        {" "}
                                         {summarygroupby3 === "quantity"
                                           ? q22
                                               .toFixed(0)
@@ -2330,13 +2530,34 @@ const Budget2023 = () => {
                                                 /\B(?=(\d{3})+(?!\d))/g,
                                                 ","
                                               )
-                                          : "$ " +
+                                          : summarygroupby3 === "profit"
+                                          ? "$ " +
                                             q22
                                               .toFixed(0)
                                               .replace(
                                                 /\B(?=(\d{3})+(?!\d))/g,
                                                 ","
-                                              )}
+                                              )
+                                          : p22 !== 0 &&
+                                            q22 !== 0 &&
+                                            summarygroupby3 === "avgprofit"
+                                          ? "$ " +
+                                            (p22 / q22)
+                                              .toFixed(0)
+                                              .replace(
+                                                /\B(?=(\d{3})+(?!\d))/g,
+                                                ","
+                                              )
+                                          : p22 !== 0 &&
+                                            r22 !== 0 &&
+                                            summarygroupby3 === "margin"
+                                          ? ((p22 / r22) * 100)
+                                              .toFixed(1)
+                                              .replace(
+                                                /\B(?=(\d{3})+(?!\d))/g,
+                                                ","
+                                              ) + "%"
+                                          : "-"}
                                       </p>
                                       <p className="stblfig">
                                         {summarygroupby3 === "quantity"
@@ -2346,13 +2567,34 @@ const Budget2023 = () => {
                                                 /\B(?=(\d{3})+(?!\d))/g,
                                                 ","
                                               )
-                                          : "$ " +
+                                          : summarygroupby3 === "profit"
+                                          ? "$ " +
                                             q23
                                               .toFixed(0)
                                               .replace(
                                                 /\B(?=(\d{3})+(?!\d))/g,
                                                 ","
-                                              )}
+                                              )
+                                          : p23 !== 0 &&
+                                            q23 !== 0 &&
+                                            summarygroupby3 === "avgprofit"
+                                          ? "$ " +
+                                            (p23 / q23)
+                                              .toFixed(0)
+                                              .replace(
+                                                /\B(?=(\d{3})+(?!\d))/g,
+                                                ","
+                                              )
+                                          : p23 !== 0 &&
+                                            r23 !== 0 &&
+                                            summarygroupby3 === "margin"
+                                          ? ((p23 / r23) * 100)
+                                              .toFixed(1)
+                                              .replace(
+                                                /\B(?=(\d{3})+(?!\d))/g,
+                                                ","
+                                              ) + "%"
+                                          : "-"}
                                       </p>
                                       <p className="stblfig">
                                         {summarygroupby3 === "quantity"
@@ -2362,13 +2604,34 @@ const Budget2023 = () => {
                                                 /\B(?=(\d{3})+(?!\d))/g,
                                                 ","
                                               )
-                                          : "$ " +
+                                          : summarygroupby3 === "profit"
+                                          ? "$ " +
                                             q24
                                               .toFixed(0)
                                               .replace(
                                                 /\B(?=(\d{3})+(?!\d))/g,
                                                 ","
-                                              )}
+                                              )
+                                          : p24 !== 0 &&
+                                            q24 !== 0 &&
+                                            summarygroupby3 === "avgprofit"
+                                          ? "$ " +
+                                            (p24 / q24)
+                                              .toFixed(0)
+                                              .replace(
+                                                /\B(?=(\d{3})+(?!\d))/g,
+                                                ","
+                                              )
+                                          : p24 !== 0 &&
+                                            r24 !== 0 &&
+                                            summarygroupby3 === "margin"
+                                          ? ((p24 / r24) * 100)
+                                              .toFixed(1)
+                                              .replace(
+                                                /\B(?=(\d{3})+(?!\d))/g,
+                                                ","
+                                              ) + "%"
+                                          : "-"}
                                       </p>
                                       <p className="stblfig stbltotal">
                                         {summarygroupby3 === "quantity"
@@ -2378,13 +2641,41 @@ const Budget2023 = () => {
                                                 /\B(?=(\d{3})+(?!\d))/g,
                                                 ","
                                               )
-                                          : "$ " +
-                                            (q21 + q22 + q23 + q24)
+                                          : summarygroupby3 === "profit"
+                                          ? "$ " +
+                                            (p21 + p22 + p23 + p24)
                                               .toFixed(0)
                                               .replace(
                                                 /\B(?=(\d{3})+(?!\d))/g,
                                                 ","
-                                              )}
+                                              )
+                                          : p21 + p22 + p23 + p24 !== 0 &&
+                                            q21 + q22 + q23 + q24 !== 0 &&
+                                            summarygroupby3 === "avgprofit"
+                                          ? "$ " +
+                                            (
+                                              (p21 + p22 + p23 + p24) /
+                                              (q21 + q22 + q23 + q24)
+                                            )
+                                              .toFixed(0)
+                                              .replace(
+                                                /\B(?=(\d{3})+(?!\d))/g,
+                                                ","
+                                              )
+                                          : p21 + p22 + p23 + p24 !== 0 &&
+                                            r21 + r22 + r23 + r24 !== 0 &&
+                                            summarygroupby3 === "margin"
+                                          ? (
+                                              ((p21 + p22 + p23 + p24) /
+                                                (r21 + r22 + r23 + r24)) *
+                                              100
+                                            )
+                                              .toFixed(1)
+                                              .replace(
+                                                /\B(?=(\d{3})+(?!\d))/g,
+                                                ","
+                                              ) + "%"
+                                          : "-"}
                                       </p>
                                     </li>
                                   );
@@ -2402,36 +2693,118 @@ const Budget2023 = () => {
                 <p className="stblfig stbltotal">
                   {summarygroupby3 === "quantity"
                     ? q1total.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                    : "$ " +
-                      q1total.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                    : summarygroupby3 === "profit"
+                    ? "$ " +
+                      p1total.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                    : q1total !== 0 &&
+                      p1total !== 0 &&
+                      summarygroupby3 === "avgprofit"
+                    ? "$" +
+                      (p1total / q1total)
+                        .toFixed(0)
+                        .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                    : q1total !== 0 &&
+                      r1total !== 0 &&
+                      summarygroupby3 === "margin"
+                    ? ((p1total / r1total) * 100)
+                        .toFixed(1)
+                        .replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "%"
+                    : "-"}
                 </p>
                 <p className="stblfig stbltotal">
                   {summarygroupby3 === "quantity"
                     ? q2total.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                    : "$ " +
-                      q2total.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                    : summarygroupby3 === "profit"
+                    ? "$ " +
+                      p2total.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                    : q2total !== 0 &&
+                      p2total !== 0 &&
+                      summarygroupby3 === "avgprofit"
+                    ? "$" +
+                      (p2total / q2total)
+                        .toFixed(0)
+                        .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                    : r2total !== 0 &&
+                      p2total !== 0 &&
+                      summarygroupby3 === "margin"
+                    ? ((p2total / r2total) * 100)
+                        .toFixed(1)
+                        .replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "%"
+                    : "-"}
                 </p>
                 <p className="stblfig stbltotal">
                   {summarygroupby3 === "quantity"
                     ? q3total.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                    : "$ " +
-                      q3total.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                    : summarygroupby3 === "profit"
+                    ? "$ " +
+                      p3total.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                    : q3total !== 0 &&
+                      p3total !== 0 &&
+                      summarygroupby3 === "avgprofit"
+                    ? "$" +
+                      (p3total / q3total)
+                        .toFixed(0)
+                        .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                    : r3total !== 0 &&
+                      p3total !== 0 &&
+                      summarygroupby3 === "margin"
+                    ? ((p3total / r3total) * 100)
+                        .toFixed(1)
+                        .replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "%"
+                    : "-"}
                 </p>
                 <p className="stblfig stbltotal">
                   {summarygroupby3 === "quantity"
                     ? q4total.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                    : "$ " +
-                      q4total.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                    : summarygroupby3 === "profit"
+                    ? "$ " +
+                      p4total.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                    : q4total !== 0 &&
+                      p4total !== 0 &&
+                      summarygroupby3 === "avgprofit"
+                    ? "$" +
+                      (p4total / q4total)
+                        .toFixed(0)
+                        .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                    : r4total !== 0 &&
+                      p4total !== 0 &&
+                      summarygroupby3 === "margin"
+                    ? ((p4total / r4total) * 100)
+                        .toFixed(1)
+                        .replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "%"
+                    : "-"}
                 </p>
                 <p className="stblfig stbltotal">
                   {summarygroupby3 === "quantity"
                     ? (q1total + q2total + q3total + q4total)
                         .toFixed(0)
                         .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                    : "$ " +
+                    : summarygroupby3 === "profit"
+                    ? "$ " +
                       (q1total + q2total + q3total + q4total)
                         .toFixed(0)
-                        .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                        .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                    : q1total + q2total + q3total + q4total !== 0 &&
+                      p1total + p2total + p3total + p4total !== 0 &&
+                      summarygroupby3 === "avgprofit"
+                    ? "$" +
+                      (
+                        (p1total + p2total + p3total + p4total) /
+                        (q1total + q2total + q3total + q4total)
+                      )
+                        .toFixed(0)
+                        .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                    : r1total + r2total + r3total + r4total !== 0 &&
+                      p1total + p2total + p3total + p4total !== 0 &&
+                      summarygroupby3 === "margin"
+                    ? (
+                        ((p1total + p2total + p3total + p4total) /
+                          (r1total + r2total + r3total + r4total)) *
+                        100
+                      )
+                        .toFixed(1)
+                        .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                    : "-"}
                 </p>
               </li>
             </div>
