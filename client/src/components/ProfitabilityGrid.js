@@ -11,6 +11,7 @@ import moment from "moment";
 import { ProfitabilityContext } from "../contexts/ProfitabilityProvider";
 import PrBarChartQty from "./PrBarChartQty";
 import PrBarChartProf from "./PrBarChartProf";
+import ExportToCSV from "./ExportCSV";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -213,7 +214,9 @@ const ProfitabilityGrid = () => {
   // );
   const [reportstartdate, setReportstartdate] = useState(startofcurrentmonth);
   const [reportenddate, setReportenddate] = useState(
-    moment().add(1, "years").format("YYYY-MM-DD")
+    moment()
+      .add(1, "years")
+      .format("YYYY-MM-DD")
   );
   const [showcustomedates, setShowcustomdates] = useState(false);
   const [refreshreport, setRefreshreport] = useState(false);
@@ -227,19 +230,31 @@ const ProfitabilityGrid = () => {
     }
     if (id === 1) {
       setShowcustomdates(false);
-      setReportstartdate(moment().subtract(3, "months").format("YYYY-MM-DD"));
+      setReportstartdate(
+        moment()
+          .subtract(3, "months")
+          .format("YYYY-MM-DD")
+      );
       setRefreshreport(!refreshreport);
     }
     if (id === 2) {
       setShowcustomdates(false);
       setReportstartdate(
-        moment().year(currentyear).month(0).date(1).format("YYYY-MM-DD")
+        moment()
+          .year(currentyear)
+          .month(0)
+          .date(1)
+          .format("YYYY-MM-DD")
       );
       setRefreshreport(!refreshreport);
     }
     if (id === 3) {
       setShowcustomdates(false);
-      setReportstartdate(moment().subtract(12, "months").format("YYYY-MM-DD"));
+      setReportstartdate(
+        moment()
+          .subtract(12, "months")
+          .format("YYYY-MM-DD")
+      );
       setRefreshreport(!refreshreport);
     }
     if (id === 4) {
@@ -303,6 +318,12 @@ const ProfitabilityGrid = () => {
         <div id="profitability" key="h">
           <div className="profreporttitle">
             <h3>Profitability Report</h3>
+            <ExportToCSV
+              csvData={prdata}
+              fileName={
+                "profitability - " + reportstartdate + " to " + reportenddate
+              }
+            />
             <button
               onClick={(e) => {
                 setPrshowdetail(!prshowdetail);

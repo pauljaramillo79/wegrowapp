@@ -9,6 +9,7 @@ import { faSort } from "@fortawesome/free-solid-svg-icons";
 import { faSortDown } from "@fortawesome/free-solid-svg-icons";
 import { faSortUp } from "@fortawesome/free-solid-svg-icons";
 import { ProfitabilityContext } from "../contexts/ProfitabilityProvider";
+import ExportToCSV from "./ExportCSV";
 
 const ProfitabilityReport = ({
   reportstartdate,
@@ -54,8 +55,8 @@ const ProfitabilityReport = ({
   const [showprodfiltmenu, setShowprodfiltmenu] = useState(false);
   const [showpgroupfiltmenu, setShowpgroupfiltmenu] = useState(false);
 
-  Array.prototype.groupBy = function (key) {
-    return this.reduce(function (groups, item) {
+  Array.prototype.groupBy = function(key) {
+    return this.reduce(function(groups, item) {
       const val = item[key];
       groups[val] = groups[val] || [];
       groups[val].push(item);
