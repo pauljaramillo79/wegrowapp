@@ -9,7 +9,6 @@ import { faSort } from "@fortawesome/free-solid-svg-icons";
 import { faSortDown } from "@fortawesome/free-solid-svg-icons";
 import { faSortUp } from "@fortawesome/free-solid-svg-icons";
 import { ProfitabilityContext } from "../contexts/ProfitabilityProvider";
-import ExportToCSV from "./ExportCSV";
 
 const ProfitabilityReport = ({
   reportstartdate,

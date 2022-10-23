@@ -732,6 +732,27 @@ const Budget2023 = () => {
   let r3total = 0;
   let r4total = 0;
 
+  const sumvalues = (data, sstr) => {
+    let total = 0;
+    for (var x of data) {
+      total += x[sstr];
+    }
+    return total;
+  };
+  const calcavg = (data, numer, denom) => {
+    let numertotal = 0;
+    let denomtotal = 0;
+    for (var x of data) {
+      numertotal += x[numer];
+      denomtotal += x[denom];
+    }
+    if (numertotal !== 0 && denomtotal !== 0) {
+      // console.log(numertotal / denomtotal);
+      return numertotal / denomtotal;
+    } else {
+      return 0;
+    }
+  };
   return (
     <div>
       <div className="bdgttitles">
@@ -2190,8 +2211,32 @@ const Budget2023 = () => {
             </li>
             <div className="bdgtsummarydata">
               {bdgtregiondta
-                ? Object.entries(bdgtregiondta.groupBy(summarygroupby1)).map(
-                    (reg, key) => {
+                ? Object.entries(bdgtregiondta.groupBy(summarygroupby1))
+                    .sort(([, a], [, b]) => {
+                      if (
+                        summarygroupby3 === "quantity" ||
+                        summarygroupby3 === "profit"
+                      ) {
+                        return (
+                          sumvalues(b, summarygroupby3) -
+                          sumvalues(a, summarygroupby3)
+                        );
+                      }
+                      if (summarygroupby3 === "avgprofit") {
+                        return (
+                          calcavg(b, "profit", "quantity") -
+                          calcavg(a, "profit", "quantity")
+                        );
+                      }
+                      if (summarygroupby3 === "margin") {
+                        // console.log(calcavg(b, "revenue", "quantity"));
+                        return (
+                          calcavg(b, "profit", "revenue") -
+                          calcavg(a, "profit", "revenue")
+                        );
+                      }
+                    })
+                    .map((reg, key) => {
                       let q1 = 0;
                       let q2 = 0;
                       let q3 = 0;
@@ -2408,285 +2453,313 @@ const Budget2023 = () => {
                             </AccordionItemHeading>
                             {
                               <AccordionItemPanel className="bdgtaccpanel">
-                                {Object.entries(
-                                  reg[1].groupBy(summarygroupby2)
-                                ).map((cty) => {
-                                  let q21 = 0;
-                                  let q22 = 0;
-                                  let q23 = 0;
-                                  let q24 = 0;
-                                  let p21 = 0;
-                                  let p22 = 0;
-                                  let p23 = 0;
-                                  let p24 = 0;
-                                  let r21 = 0;
-                                  let r22 = 0;
-                                  let r23 = 0;
-                                  let r24 = 0;
-                                  cty[1].forEach((ctyel) => {
-                                    // if (ctyel["quarter"] === 1) {
-                                    //   q21 = q21 + ctyel[summarygroupby3];
-                                    //   q1total =
-                                    //     q1total + ctyel[summarygroupby3];
-                                    // }
-                                    // if (ctyel["quarter"] === 2) {
-                                    //   q22 = q22 + ctyel[summarygroupby3];
-                                    //   q2total =
-                                    //     q2total + ctyel[summarygroupby3];
-                                    // }
-                                    // if (ctyel["quarter"] === 3) {
-                                    //   q23 = q23 + ctyel[summarygroupby3];
-                                    //   q3total =
-                                    //     q3total + ctyel[summarygroupby3];
-                                    // }
-                                    // if (ctyel["quarter"] === 4) {
-                                    //   q24 = q24 + ctyel[summarygroupby3];
-                                    //   q4total =
-                                    //     q4total + ctyel[summarygroupby3];
-                                    // }
-
-                                    if (ctyel["quarter"] === 1) {
-                                      q21 = q21 + ctyel["quantity"];
-                                      p21 = p21 + ctyel["profit"];
-                                      r21 = r21 + ctyel["revenue"];
-                                      q1total = q1total + ctyel["quantity"];
-                                      p1total = p1total + ctyel["profit"];
-                                      r1total = r1total + ctyel["revenue"];
+                                {Object.entries(reg[1].groupBy(summarygroupby2))
+                                  .sort(([, a], [, b]) => {
+                                    if (
+                                      summarygroupby3 === "quantity" ||
+                                      summarygroupby3 === "profit"
+                                    ) {
+                                      return (
+                                        sumvalues(b, summarygroupby3) -
+                                        sumvalues(a, summarygroupby3)
+                                      );
                                     }
-                                    if (ctyel["quarter"] === 2) {
-                                      q22 = q22 + ctyel["quantity"];
-                                      p22 = p22 + ctyel["profit"];
-                                      r22 = r22 + ctyel["revenue"];
-
-                                      q2total = q2total + ctyel["quantity"];
-                                      p2total = p2total + ctyel["profit"];
-                                      r2total = r2total + ctyel["revenue"];
+                                    if (summarygroupby3 === "avgprofit") {
+                                      return (
+                                        calcavg(b, "profit", "quantity") -
+                                        calcavg(a, "profit", "quantity")
+                                      );
                                     }
-                                    if (ctyel["quarter"] === 3) {
-                                      q23 = q23 + ctyel["quantity"];
-                                      p23 = p23 + ctyel["profit"];
-                                      r23 = r23 + ctyel["revenue"];
-
-                                      q3total = q3total + ctyel["quantity"];
-                                      p3total = p3total + ctyel["profit"];
-                                      r3total = r3total + ctyel["revenue"];
+                                    if (summarygroupby3 === "margin") {
+                                      // console.log(calcavg(b, "revenue", "quantity"));
+                                      return (
+                                        calcavg(b, "profit", "revenue") -
+                                        calcavg(a, "profit", "revenue")
+                                      );
                                     }
-                                    if (ctyel["quarter"] === 4) {
-                                      q24 = q24 + ctyel["quantity"];
-                                      p24 = p24 + ctyel["profit"];
-                                      r24 = r24 + ctyel["revenue"];
+                                  })
+                                  .map((cty) => {
+                                    let q21 = 0;
+                                    let q22 = 0;
+                                    let q23 = 0;
+                                    let q24 = 0;
+                                    let p21 = 0;
+                                    let p22 = 0;
+                                    let p23 = 0;
+                                    let p24 = 0;
+                                    let r21 = 0;
+                                    let r22 = 0;
+                                    let r23 = 0;
+                                    let r24 = 0;
+                                    cty[1].forEach((ctyel) => {
+                                      // if (ctyel["quarter"] === 1) {
+                                      //   q21 = q21 + ctyel[summarygroupby3];
+                                      //   q1total =
+                                      //     q1total + ctyel[summarygroupby3];
+                                      // }
+                                      // if (ctyel["quarter"] === 2) {
+                                      //   q22 = q22 + ctyel[summarygroupby3];
+                                      //   q2total =
+                                      //     q2total + ctyel[summarygroupby3];
+                                      // }
+                                      // if (ctyel["quarter"] === 3) {
+                                      //   q23 = q23 + ctyel[summarygroupby3];
+                                      //   q3total =
+                                      //     q3total + ctyel[summarygroupby3];
+                                      // }
+                                      // if (ctyel["quarter"] === 4) {
+                                      //   q24 = q24 + ctyel[summarygroupby3];
+                                      //   q4total =
+                                      //     q4total + ctyel[summarygroupby3];
+                                      // }
 
-                                      q4total = q4total + ctyel["quantity"];
-                                      p4total = p4total + ctyel["profit"];
-                                      r4total = r4total + ctyel["revenue"];
-                                    }
-                                  });
+                                      if (ctyel["quarter"] === 1) {
+                                        q21 = q21 + ctyel["quantity"];
+                                        p21 = p21 + ctyel["profit"];
+                                        r21 = r21 + ctyel["revenue"];
+                                        q1total = q1total + ctyel["quantity"];
+                                        p1total = p1total + ctyel["profit"];
+                                        r1total = r1total + ctyel["revenue"];
+                                      }
+                                      if (ctyel["quarter"] === 2) {
+                                        q22 = q22 + ctyel["quantity"];
+                                        p22 = p22 + ctyel["profit"];
+                                        r22 = r22 + ctyel["revenue"];
 
-                                  return (
-                                    <li className="stblrow">
-                                      <p className="stblcollarge">{cty[0]}</p>
-                                      <p className="stblfig">
-                                        {summarygroupby3 === "quantity"
-                                          ? q21
-                                              .toFixed(0)
-                                              .replace(
-                                                /\B(?=(\d{3})+(?!\d))/g,
-                                                ","
+                                        q2total = q2total + ctyel["quantity"];
+                                        p2total = p2total + ctyel["profit"];
+                                        r2total = r2total + ctyel["revenue"];
+                                      }
+                                      if (ctyel["quarter"] === 3) {
+                                        q23 = q23 + ctyel["quantity"];
+                                        p23 = p23 + ctyel["profit"];
+                                        r23 = r23 + ctyel["revenue"];
+
+                                        q3total = q3total + ctyel["quantity"];
+                                        p3total = p3total + ctyel["profit"];
+                                        r3total = r3total + ctyel["revenue"];
+                                      }
+                                      if (ctyel["quarter"] === 4) {
+                                        q24 = q24 + ctyel["quantity"];
+                                        p24 = p24 + ctyel["profit"];
+                                        r24 = r24 + ctyel["revenue"];
+
+                                        q4total = q4total + ctyel["quantity"];
+                                        p4total = p4total + ctyel["profit"];
+                                        r4total = r4total + ctyel["revenue"];
+                                      }
+                                    });
+
+                                    return (
+                                      <li className="stblrow">
+                                        <p className="stblcollarge">
+                                          {cty[0] === "Dominican Republic"
+                                            ? "Dom Rep"
+                                            : cty[0] === "Latin America"
+                                            ? "L. America"
+                                            : cty[0]}
+                                        </p>
+                                        <p className="stblfig">
+                                          {summarygroupby3 === "quantity"
+                                            ? q21
+                                                .toFixed(0)
+                                                .replace(
+                                                  /\B(?=(\d{3})+(?!\d))/g,
+                                                  ","
+                                                )
+                                            : summarygroupby3 === "profit"
+                                            ? "$ " +
+                                              p21
+                                                .toFixed(0)
+                                                .replace(
+                                                  /\B(?=(\d{3})+(?!\d))/g,
+                                                  ","
+                                                )
+                                            : p21 !== 0 &&
+                                              q21 !== 0 &&
+                                              summarygroupby3 === "avgprofit"
+                                            ? "$ " +
+                                              (p21 / q21)
+                                                .toFixed(0)
+                                                .replace(
+                                                  /\B(?=(\d{3})+(?!\d))/g,
+                                                  ","
+                                                )
+                                            : p21 !== 0 &&
+                                              r21 !== 0 &&
+                                              summarygroupby3 === "margin"
+                                            ? ((p21 / r21) * 100)
+                                                .toFixed(1)
+                                                .replace(
+                                                  /\B(?=(\d{3})+(?!\d))/g,
+                                                  ","
+                                                ) + "%"
+                                            : "-"}
+                                        </p>
+                                        <p className="stblfig">
+                                          {summarygroupby3 === "quantity"
+                                            ? q22
+                                                .toFixed(0)
+                                                .replace(
+                                                  /\B(?=(\d{3})+(?!\d))/g,
+                                                  ","
+                                                )
+                                            : summarygroupby3 === "profit"
+                                            ? "$ " +
+                                              q22
+                                                .toFixed(0)
+                                                .replace(
+                                                  /\B(?=(\d{3})+(?!\d))/g,
+                                                  ","
+                                                )
+                                            : p22 !== 0 &&
+                                              q22 !== 0 &&
+                                              summarygroupby3 === "avgprofit"
+                                            ? "$ " +
+                                              (p22 / q22)
+                                                .toFixed(0)
+                                                .replace(
+                                                  /\B(?=(\d{3})+(?!\d))/g,
+                                                  ","
+                                                )
+                                            : p22 !== 0 &&
+                                              r22 !== 0 &&
+                                              summarygroupby3 === "margin"
+                                            ? ((p22 / r22) * 100)
+                                                .toFixed(1)
+                                                .replace(
+                                                  /\B(?=(\d{3})+(?!\d))/g,
+                                                  ","
+                                                ) + "%"
+                                            : "-"}
+                                        </p>
+                                        <p className="stblfig">
+                                          {summarygroupby3 === "quantity"
+                                            ? q23
+                                                .toFixed(0)
+                                                .replace(
+                                                  /\B(?=(\d{3})+(?!\d))/g,
+                                                  ","
+                                                )
+                                            : summarygroupby3 === "profit"
+                                            ? "$ " +
+                                              q23
+                                                .toFixed(0)
+                                                .replace(
+                                                  /\B(?=(\d{3})+(?!\d))/g,
+                                                  ","
+                                                )
+                                            : p23 !== 0 &&
+                                              q23 !== 0 &&
+                                              summarygroupby3 === "avgprofit"
+                                            ? "$ " +
+                                              (p23 / q23)
+                                                .toFixed(0)
+                                                .replace(
+                                                  /\B(?=(\d{3})+(?!\d))/g,
+                                                  ","
+                                                )
+                                            : p23 !== 0 &&
+                                              r23 !== 0 &&
+                                              summarygroupby3 === "margin"
+                                            ? ((p23 / r23) * 100)
+                                                .toFixed(1)
+                                                .replace(
+                                                  /\B(?=(\d{3})+(?!\d))/g,
+                                                  ","
+                                                ) + "%"
+                                            : "-"}
+                                        </p>
+                                        <p className="stblfig">
+                                          {summarygroupby3 === "quantity"
+                                            ? q24
+                                                .toFixed(0)
+                                                .replace(
+                                                  /\B(?=(\d{3})+(?!\d))/g,
+                                                  ","
+                                                )
+                                            : summarygroupby3 === "profit"
+                                            ? "$ " +
+                                              q24
+                                                .toFixed(0)
+                                                .replace(
+                                                  /\B(?=(\d{3})+(?!\d))/g,
+                                                  ","
+                                                )
+                                            : p24 !== 0 &&
+                                              q24 !== 0 &&
+                                              summarygroupby3 === "avgprofit"
+                                            ? "$ " +
+                                              (p24 / q24)
+                                                .toFixed(0)
+                                                .replace(
+                                                  /\B(?=(\d{3})+(?!\d))/g,
+                                                  ","
+                                                )
+                                            : p24 !== 0 &&
+                                              r24 !== 0 &&
+                                              summarygroupby3 === "margin"
+                                            ? ((p24 / r24) * 100)
+                                                .toFixed(1)
+                                                .replace(
+                                                  /\B(?=(\d{3})+(?!\d))/g,
+                                                  ","
+                                                ) + "%"
+                                            : "-"}
+                                        </p>
+                                        <p className="stblfig stbltotal">
+                                          {summarygroupby3 === "quantity"
+                                            ? (q21 + q22 + q23 + q24)
+                                                .toFixed(0)
+                                                .replace(
+                                                  /\B(?=(\d{3})+(?!\d))/g,
+                                                  ","
+                                                )
+                                            : summarygroupby3 === "profit"
+                                            ? "$ " +
+                                              (p21 + p22 + p23 + p24)
+                                                .toFixed(0)
+                                                .replace(
+                                                  /\B(?=(\d{3})+(?!\d))/g,
+                                                  ","
+                                                )
+                                            : p21 + p22 + p23 + p24 !== 0 &&
+                                              q21 + q22 + q23 + q24 !== 0 &&
+                                              summarygroupby3 === "avgprofit"
+                                            ? "$ " +
+                                              (
+                                                (p21 + p22 + p23 + p24) /
+                                                (q21 + q22 + q23 + q24)
                                               )
-                                          : summarygroupby3 === "profit"
-                                          ? "$ " +
-                                            p21
-                                              .toFixed(0)
-                                              .replace(
-                                                /\B(?=(\d{3})+(?!\d))/g,
-                                                ","
+                                                .toFixed(0)
+                                                .replace(
+                                                  /\B(?=(\d{3})+(?!\d))/g,
+                                                  ","
+                                                )
+                                            : p21 + p22 + p23 + p24 !== 0 &&
+                                              r21 + r22 + r23 + r24 !== 0 &&
+                                              summarygroupby3 === "margin"
+                                            ? (
+                                                ((p21 + p22 + p23 + p24) /
+                                                  (r21 + r22 + r23 + r24)) *
+                                                100
                                               )
-                                          : p21 !== 0 &&
-                                            q21 !== 0 &&
-                                            summarygroupby3 === "avgprofit"
-                                          ? "$ " +
-                                            (p21 / q21)
-                                              .toFixed(0)
-                                              .replace(
-                                                /\B(?=(\d{3})+(?!\d))/g,
-                                                ","
-                                              )
-                                          : p21 !== 0 &&
-                                            r21 !== 0 &&
-                                            summarygroupby3 === "margin"
-                                          ? ((p21 / r21) * 100)
-                                              .toFixed(1)
-                                              .replace(
-                                                /\B(?=(\d{3})+(?!\d))/g,
-                                                ","
-                                              ) + "%"
-                                          : "-"}
-                                      </p>
-                                      <p className="stblfig">
-                                        {summarygroupby3 === "quantity"
-                                          ? q22
-                                              .toFixed(0)
-                                              .replace(
-                                                /\B(?=(\d{3})+(?!\d))/g,
-                                                ","
-                                              )
-                                          : summarygroupby3 === "profit"
-                                          ? "$ " +
-                                            q22
-                                              .toFixed(0)
-                                              .replace(
-                                                /\B(?=(\d{3})+(?!\d))/g,
-                                                ","
-                                              )
-                                          : p22 !== 0 &&
-                                            q22 !== 0 &&
-                                            summarygroupby3 === "avgprofit"
-                                          ? "$ " +
-                                            (p22 / q22)
-                                              .toFixed(0)
-                                              .replace(
-                                                /\B(?=(\d{3})+(?!\d))/g,
-                                                ","
-                                              )
-                                          : p22 !== 0 &&
-                                            r22 !== 0 &&
-                                            summarygroupby3 === "margin"
-                                          ? ((p22 / r22) * 100)
-                                              .toFixed(1)
-                                              .replace(
-                                                /\B(?=(\d{3})+(?!\d))/g,
-                                                ","
-                                              ) + "%"
-                                          : "-"}
-                                      </p>
-                                      <p className="stblfig">
-                                        {summarygroupby3 === "quantity"
-                                          ? q23
-                                              .toFixed(0)
-                                              .replace(
-                                                /\B(?=(\d{3})+(?!\d))/g,
-                                                ","
-                                              )
-                                          : summarygroupby3 === "profit"
-                                          ? "$ " +
-                                            q23
-                                              .toFixed(0)
-                                              .replace(
-                                                /\B(?=(\d{3})+(?!\d))/g,
-                                                ","
-                                              )
-                                          : p23 !== 0 &&
-                                            q23 !== 0 &&
-                                            summarygroupby3 === "avgprofit"
-                                          ? "$ " +
-                                            (p23 / q23)
-                                              .toFixed(0)
-                                              .replace(
-                                                /\B(?=(\d{3})+(?!\d))/g,
-                                                ","
-                                              )
-                                          : p23 !== 0 &&
-                                            r23 !== 0 &&
-                                            summarygroupby3 === "margin"
-                                          ? ((p23 / r23) * 100)
-                                              .toFixed(1)
-                                              .replace(
-                                                /\B(?=(\d{3})+(?!\d))/g,
-                                                ","
-                                              ) + "%"
-                                          : "-"}
-                                      </p>
-                                      <p className="stblfig">
-                                        {summarygroupby3 === "quantity"
-                                          ? q24
-                                              .toFixed(0)
-                                              .replace(
-                                                /\B(?=(\d{3})+(?!\d))/g,
-                                                ","
-                                              )
-                                          : summarygroupby3 === "profit"
-                                          ? "$ " +
-                                            q24
-                                              .toFixed(0)
-                                              .replace(
-                                                /\B(?=(\d{3})+(?!\d))/g,
-                                                ","
-                                              )
-                                          : p24 !== 0 &&
-                                            q24 !== 0 &&
-                                            summarygroupby3 === "avgprofit"
-                                          ? "$ " +
-                                            (p24 / q24)
-                                              .toFixed(0)
-                                              .replace(
-                                                /\B(?=(\d{3})+(?!\d))/g,
-                                                ","
-                                              )
-                                          : p24 !== 0 &&
-                                            r24 !== 0 &&
-                                            summarygroupby3 === "margin"
-                                          ? ((p24 / r24) * 100)
-                                              .toFixed(1)
-                                              .replace(
-                                                /\B(?=(\d{3})+(?!\d))/g,
-                                                ","
-                                              ) + "%"
-                                          : "-"}
-                                      </p>
-                                      <p className="stblfig stbltotal">
-                                        {summarygroupby3 === "quantity"
-                                          ? (q21 + q22 + q23 + q24)
-                                              .toFixed(0)
-                                              .replace(
-                                                /\B(?=(\d{3})+(?!\d))/g,
-                                                ","
-                                              )
-                                          : summarygroupby3 === "profit"
-                                          ? "$ " +
-                                            (p21 + p22 + p23 + p24)
-                                              .toFixed(0)
-                                              .replace(
-                                                /\B(?=(\d{3})+(?!\d))/g,
-                                                ","
-                                              )
-                                          : p21 + p22 + p23 + p24 !== 0 &&
-                                            q21 + q22 + q23 + q24 !== 0 &&
-                                            summarygroupby3 === "avgprofit"
-                                          ? "$ " +
-                                            (
-                                              (p21 + p22 + p23 + p24) /
-                                              (q21 + q22 + q23 + q24)
-                                            )
-                                              .toFixed(0)
-                                              .replace(
-                                                /\B(?=(\d{3})+(?!\d))/g,
-                                                ","
-                                              )
-                                          : p21 + p22 + p23 + p24 !== 0 &&
-                                            r21 + r22 + r23 + r24 !== 0 &&
-                                            summarygroupby3 === "margin"
-                                          ? (
-                                              ((p21 + p22 + p23 + p24) /
-                                                (r21 + r22 + r23 + r24)) *
-                                              100
-                                            )
-                                              .toFixed(1)
-                                              .replace(
-                                                /\B(?=(\d{3})+(?!\d))/g,
-                                                ","
-                                              ) + "%"
-                                          : "-"}
-                                      </p>
-                                    </li>
-                                  );
-                                })}
+                                                .toFixed(1)
+                                                .replace(
+                                                  /\B(?=(\d{3})+(?!\d))/g,
+                                                  ","
+                                                ) + "%"
+                                            : "-"}
+                                        </p>
+                                      </li>
+                                    );
+                                  })}
                               </AccordionItemPanel>
                             }
                           </AccordionItem>
                         </Accordion>,
                       ];
-                    }
-                  )
+                    })
                 : ""}
               <li className="stblrow stblfooter">
                 <p className="stblcollarge  stbltotal">TOTAL</p>
