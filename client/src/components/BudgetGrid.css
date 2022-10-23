@@ -20,6 +20,8 @@
   display: flex;
   flex-basis: 100%;
   display: inline-block;
+  max-height: 100vh;
+  overflow-y: clip;
   /* width: 150%; */
   position: relative;
   left: 130px;
@@ -347,7 +349,7 @@
   font-size: 0.7rem;
 }
 .budgetprepdata {
-  height: 60vh;
+  height: 54vh;
   display: flex;
   justify-content: space-between;
   /* overflow-y: scroll; */
