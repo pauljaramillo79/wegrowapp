@@ -382,6 +382,7 @@
 .lyearfigures h3 {
   font-family: "Roboto", sans-serif;
   font-size: 0.936rem;
+  position: relative;
 }
 .lyearfigures table {
   border-collapse: collapse;
