@@ -681,3 +681,47 @@
 .stbltotal {
   font-weight: 600;
 }
+.budgetselectfilebutton {
+  border: none;
+  /* border-radius: 0.75rem; */
+  padding: 0.25rem 1rem;
+  margin-left: 25rem;
+  background-color: black;
+  color: white;
+  margin-right: 1rem;
+  font-size: 0.8rem;
+}
+.budgetselectfilebutton:hover {
+  cursor: pointer;
+  background-color: rgb(107, 107, 107);
+}
+.bdgtloadfileinput {
+  min-width: 400px;
+}
+.bdgtloadbtn {
+  border: none;
+  border-radius: 0.75rem;
+  padding: 0.25rem 1rem;
+  margin-left: 1rem;
+  background-color: rgb(161, 161, 161);
+  color: white;
+  z-index: 5;
+}
+.bdgtloadbtn:hover {
+  cursor: pointer;
+  background-color: rgb(97, 97, 97);
+}
+input[type="file"] {
+  display: none;
+}
+.showloadbutton {
+  display: inline;
+}
+.hideloadbutton {
+  display: none;
+}
+.loadmsg {
+  display: inline;
+  margin-left: 1rem;
+  color: rgb(24, 139, 24);
+}

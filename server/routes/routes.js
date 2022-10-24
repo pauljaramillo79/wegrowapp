@@ -2121,7 +2121,7 @@ router.post("/getbudgetdata", (req, res) => {
 router.post("/bdgtregiondata", (req, res) => {
   let year = req.body.year;
   db.query(
-    `SELECT QUARTER(date) as quarter, countryList.country, region, quantity, profit*quantity AS profit, abbreviation, productGroup, prodCatName, budgets.price*budgets.quantity AS revenue FROM budgets LEFT JOIN ((prodNames INNER JOIN productGroups ON prodNames.prodGroupID=productGroups.prodGroupID) INNER JOIN prodCatNames ON prodNames.prodCatNameID=prodCatNames.prodCatNameID) ON prodNames.prodNameID=budgets.prodNameID INNER JOIN countryList ON countryList.countryID = budgets.countryID WHERE YEAR(date)=${year}`,
+    `SELECT QUARTER(date) as quarter, countryList.country, region, quantity, profit*quantity AS profit, abbreviation, productGroup, prodCatName, budgets.price*budgets.quantity AS revenue, budgetentryID, budgets.prodNameID, budgets.customerID, budgets.countryID, budgets.prodCatNameID, budgets.profit AS unitprofit, budgets.date, budgets.price FROM budgets LEFT JOIN ((prodNames INNER JOIN productGroups ON prodNames.prodGroupID=productGroups.prodGroupID) INNER JOIN prodCatNames ON prodNames.prodCatNameID=prodCatNames.prodCatNameID) ON prodNames.prodNameID=budgets.prodNameID INNER JOIN countryList ON countryList.countryID = budgets.countryID WHERE YEAR(date)=${year}`,
     (err, results) => {
       if (err) {
         console.log(err);
@@ -2316,6 +2316,70 @@ router.post("/budgetlyearsales", (req, res) => {
       }
     }
   );
+});
+
+router.post("/loadbudgetfile", (req, res) => {
+  let data = req.body.data;
+  let values = "";
+
+  data.forEach((i, ind1) => {
+    let val = "(";
+    Object.keys(i).forEach((x, ind) => {
+      if (
+        x === "budgetentryID" ||
+        x === "date" ||
+        x === "prodNameID" ||
+        x === "customerID" ||
+        x === "countryID" ||
+        x === "prodCatNameID" ||
+        x === "price" ||
+        x === "quantity" ||
+        x === "unitprofit"
+      ) {
+        if (ind + 1 === Object.keys(i).length) {
+          val += i[x] + ")";
+        } else {
+          if (x === "date") {
+            val +=
+              "'" +
+              i[x].toString().slice(0, i[x].toString().indexOf("T")) +
+              "',";
+          } else {
+            val += i[x] + ", ";
+          }
+        }
+      }
+    });
+    if (ind1 + 1 === data.length) {
+      values += val;
+    } else {
+      values += val + ", ";
+    }
+    val = "";
+  });
+
+  // console.log(values);
+  // quantity, budgetentryID, prodNameID, customerID, countryID, prodCatNameID, profit, date
+
+  db.query("TRUNCATE TABLE budgets", (err, results) => {
+    if (err) {
+      console.log(err);
+    } else {
+      db.query(
+        `INSERT INTO budgets (quantity, budgetentryID, prodNameID, customerID, countryID, prodCatNameID, profit, date, price) VALUES ${values}`,
+        (err, results) => {
+          if (err) {
+            console.log(err);
+          } else {
+            res.json({
+              success: true,
+              msg: "File Uploaded",
+            });
+          }
+        }
+      );
+    }
+  });
 });
 
 module.exports = router;

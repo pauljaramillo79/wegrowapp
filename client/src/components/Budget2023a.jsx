@@ -12,6 +12,7 @@ import {
   AccordionItemPanel,
 } from "react-accessible-accordion";
 import ExportToCSV from "./ExportCSV";
+import * as XLSX from "xlsx";
 
 const Budget2023 = () => {
   const refresmsg = useRef(null);
@@ -36,6 +37,22 @@ const Budget2023 = () => {
       }
     );
   }, [showmsg]);
+
+  const refloadmsg = useRef(null);
+
+  useEffect(() => {
+    const elem = refloadmsg.current;
+    gsap.fromTo(
+      elem,
+      { opacity: 1 },
+      {
+        opacity: 0,
+        duration: 15,
+        ease: "power1.inOut",
+        // onComplete: onComplete,
+      }
+    );
+  }, [loadmsgrefresh]);
 
   const [prodList, setProdList] = useState();
   const searchProdRef = useRef(null);
@@ -753,6 +770,39 @@ const Budget2023 = () => {
       return 0;
     }
   };
+
+  const [datatoload, setDatatoload] = useState();
+  const [filename, setFilename] = useState();
+  const [loadmsg, setLoadmsg] = useState();
+  const [loadmsgrefresh, setLoadmsgrefresh] = useState(false);
+  // const [dataloaded, setDataloaded]=useState(false)
+
+  const readUploadFile = (e) => {
+    e.preventDefault();
+    setFilename(e.target.files[0]["name"]);
+    if (e.target.files) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const data = e.target.result;
+        const workbook = XLSX.read(data, { type: "array" });
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+        const json = XLSX.utils.sheet_to_json(worksheet);
+        setDatatoload(json);
+      };
+      reader.readAsArrayBuffer(e.target.files[0]);
+    }
+  };
+
+  const loaddata = () => {
+    Axios.post("/loadbudgetfile", { data: datatoload }).then((response) => {
+      console.log(response);
+      setFilename("");
+      setLoadmsg(response.data.msg);
+      setLoadmsgrefresh(!loadmsgrefresh);
+    });
+  };
+
   return (
     <div>
       <div className="bdgttitles">
@@ -840,6 +890,34 @@ const Budget2023 = () => {
           )}
         </div>
         <ExportToCSV csvData={bdgtregiondta} fileName={"budget2023"} />
+        <form>
+          <label htmlFor="upload" className="budgetselectfilebutton">
+            Select File to Load:
+          </label>
+          <input
+            type="file"
+            name="upload"
+            id="upload"
+            onChange={readUploadFile}
+          />
+          <input className="bdgtloadfileinput" value={filename} />
+          <button
+            className={
+              filename
+                ? "bdgtloadbtn showloadbutton"
+                : "bdgtloadbtn hideloadbutton"
+            }
+            onClick={(e) => {
+              e.preventDefault();
+              loaddata();
+            }}
+          >
+            Load File
+          </button>
+          <span ref={refloadmsg} className="loadmsg">
+            {loadmsg}
+          </span>
+        </form>
       </div>
       <div className="bdgttotals">
         <ul className="bdgttotalsul">
