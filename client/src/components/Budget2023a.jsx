@@ -2606,7 +2606,7 @@ const Budget2023 = () => {
                                                 )
                                             : summarygroupby3 === "profit"
                                             ? "$ " +
-                                              q22
+                                              p22
                                                 .toFixed(0)
                                                 .replace(
                                                   /\B(?=(\d{3})+(?!\d))/g,
@@ -2643,7 +2643,7 @@ const Budget2023 = () => {
                                                 )
                                             : summarygroupby3 === "profit"
                                             ? "$ " +
-                                              q23
+                                              p23
                                                 .toFixed(0)
                                                 .replace(
                                                   /\B(?=(\d{3})+(?!\d))/g,
@@ -2680,7 +2680,7 @@ const Budget2023 = () => {
                                                 )
                                             : summarygroupby3 === "profit"
                                             ? "$ " +
-                                              q24
+                                              p24
                                                 .toFixed(0)
                                                 .replace(
                                                   /\B(?=(\d{3})+(?!\d))/g,
