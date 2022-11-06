@@ -933,7 +933,7 @@ const Budget2023 = () => {
               mt
             </p>
             <p className="bdgttyearname">Quantity</p>
-            <div className="bdgtlyearfigs">
+            {/* <div className="bdgtlyearfigs">
               <p>{bdgtyear - 1} Actual:</p>
               <p>
                 {lysalestotals
@@ -943,7 +943,7 @@ const Budget2023 = () => {
                   : ""}{" "}
                 mt
               </p>
-            </div>
+            </div> */}
             <div className="bdgtlyearfigs">
               <p>{bdgtyear - 1} Budget:</p>
               <p>
@@ -956,6 +956,10 @@ const Budget2023 = () => {
                   : 0}{" "}
                 mt
               </p>
+            </div>
+            <div className="bdgtlyearfigs">
+              <p>{bdgtyear - 2} Budget:</p>
+              <p>155,247mt</p>
             </div>
           </li>
           <li>
@@ -970,7 +974,7 @@ const Budget2023 = () => {
                 : 0}
             </p>
             <p className="bdgttyearname">Revenue</p>
-            <div className="bdgtlyearfigs">
+            {/* <div className="bdgtlyearfigs">
               <p>{bdgtyear - 1} Actual:</p>
               <p>
                 {lysalestotals
@@ -980,7 +984,7 @@ const Budget2023 = () => {
                       .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                   : ""}
               </p>
-            </div>
+            </div> */}
             <div className="bdgtlyearfigs">
               <p>{bdgtyear - 1} Budget:</p>
               <p>
@@ -993,6 +997,10 @@ const Budget2023 = () => {
                       .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                   : "$" + 0}
               </p>
+            </div>
+            <div className="bdgtlyearfigs">
+              <p>{bdgtyear - 2} Revenue:</p>
+              <p>na</p>
             </div>
           </li>
           <li>
@@ -1007,7 +1015,7 @@ const Budget2023 = () => {
                 : 0}
             </p>
             <p className="bdgttyearname">Profit</p>
-            <div className="bdgtlyearfigs">
+            {/* <div className="bdgtlyearfigs">
               <p>{bdgtyear - 1} Actual:</p>
               <p>
                 {lysalestotals
@@ -1017,7 +1025,7 @@ const Budget2023 = () => {
                       .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                   : ""}
               </p>
-            </div>
+            </div> */}
             <div className="bdgtlyearfigs">
               <p>{bdgtyear - 1} Budget:</p>
               <p>
@@ -1030,6 +1038,10 @@ const Budget2023 = () => {
                       .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                   : "$" + 0}
               </p>
+            </div>
+            <div className="bdgtlyearfigs">
+              <p>{bdgtyear - 2} Budget:</p>
+              <p>$4,246,803</p>
             </div>
           </li>
           <li>
@@ -1047,7 +1059,7 @@ const Budget2023 = () => {
                 : 0}
             </p>
             <p className="bdgttyearname">Avg Profit</p>
-            <div className="bdgtlyearfigs">
+            {/* <div className="bdgtlyearfigs">
               <p>{bdgtyear - 1} Actual:</p>
               <p>
                 {lysalestotals
@@ -1057,7 +1069,7 @@ const Budget2023 = () => {
                       .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                   : ""}
               </p>
-            </div>
+            </div> */}
             <div className="bdgtlyearfigs">
               <p>{bdgtyear - 1} Budget:</p>
               <p>
@@ -1074,6 +1086,10 @@ const Budget2023 = () => {
                   : "$" + 0}
               </p>
             </div>
+            <div className="bdgtlyearfigs">
+              <p>{bdgtyear - 2} Budget:</p>
+              <p>$27</p>
+            </div>
           </li>
           <li>
             <p className="bdgttyearfig">
@@ -1088,7 +1104,7 @@ const Budget2023 = () => {
                 : 0}
             </p>
             <p className="bdgttyearname">Margin</p>
-            <div className="bdgtlyearfigs">
+            {/* <div className="bdgtlyearfigs">
               <p>{bdgtyear - 1} Actual:</p>
               <p>
                 {lysalestotals
@@ -1101,7 +1117,7 @@ const Budget2023 = () => {
                       .replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "%"
                   : ""}
               </p>
-            </div>
+            </div> */}
             <div className="bdgtlyearfigs">
               <p>{bdgtyear - 1} Budget:</p>
               <p>
@@ -1115,6 +1131,10 @@ const Budget2023 = () => {
                     ).toFixed(1) + "%"
                   : "0.0%"}
               </p>
+            </div>
+            <div className="bdgtlyearfigs">
+              <p>{bdgtyear - 2} Budget:</p>
+              <p>na</p>
             </div>
           </li>
         </ul>
@@ -2932,7 +2952,7 @@ const Budget2023 = () => {
                         .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                     : summarygroupby3 === "profit"
                     ? "$ " +
-                      (q1total + q2total + q3total + q4total)
+                      (p1total + p2total + p3total + p4total)
                         .toFixed(0)
                         .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                     : q1total + q2total + q3total + q4total !== 0 &&
@@ -2954,7 +2974,7 @@ const Budget2023 = () => {
                         100
                       )
                         .toFixed(1)
-                        .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                        .replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "%"
                     : "-"}
                 </p>
               </li>
