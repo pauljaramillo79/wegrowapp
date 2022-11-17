@@ -999,7 +999,7 @@ const Budget2023 = () => {
               </p>
             </div>
             <div className="bdgtlyearfigs">
-              <p>{bdgtyear - 2} Budget:</p>
+              <p>{bdgtyear - 2} Revenue:</p>
               <p>$98,083,156</p>
             </div>
           </li>
@@ -1133,7 +1133,7 @@ const Budget2023 = () => {
               </p>
             </div>
             <div className="bdgtlyearfigs">
-              <p>{bdgtyear - 2} Budget:</p>
+              <p>{bdgtyear - 2} Margin:</p>
               <p>4.1%</p>
             </div>
           </li>
