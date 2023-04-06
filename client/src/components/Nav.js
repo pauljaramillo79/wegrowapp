@@ -22,7 +22,10 @@ const Nav = () => {
         )}
         {role === 1 || role === 2 || role === 3 ? (
           <li>
-            <NavLink activeClassName="navbaractive" to="/analysis">
+            <NavLink
+              activeClassName="navbaractive"
+              to="/analysis/actualvsbudget"
+            >
               Analysis
             </NavLink>
           </li>

@@ -41,7 +41,7 @@ const AnalysisLastYSales = ({ userID }) => {
   var group = "";
   return (
     <div className="lysaleslist">
-      <ul>
+      <ul className="lysalesdata">
         <li className="lysalesline lysalesheader">
           <p className="lysalescolumn">QSDate</p>
           <p className="lysalescolumn">QSID</p>

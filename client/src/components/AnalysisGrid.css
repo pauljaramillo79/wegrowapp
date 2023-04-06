@@ -1,3 +1,33 @@
+.analysiscontainer {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+}
+.analysisnav {
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  flex-basis: 19%;
+  width: 230px;
+  background-color: rgb(65, 64, 73);
+  /* background-color: black; */
+  color: white;
+  padding: 8rem 2rem;
+  height: 100vh;
+}
+.analysisnav a {
+  font-size: 0.9rem;
+  color: white;
+}
+.analysisgridcontainer {
+  /* margin-left: 10%; */
+  display: flex;
+  flex-basis: 90%;
+  display: inline-block;
+  width: 100%;
+  position: relative;
+  left: 230px;
+}
 .lysaleslist {
   overflow: auto;
   height: 90%;
@@ -18,9 +48,7 @@
   flex-direction: row;
   width: 100%;
 }
-.lysalesline:hover {
-  background-color: #ddeaf9;
-}
+
 .lysalescolumn {
   display: flex;
   flex-basis: 20%;
@@ -38,6 +66,7 @@
   border-bottom: 1px solid rgb(68, 65, 162);
   margin-bottom: 0.5rem;
   background-color: white;
+  /* color: red; */
 }
 .lysalesmonth {
   margin-bottom: 0.5rem;
@@ -45,4 +74,13 @@
   padding-top: 0.5rem;
   /* margin-top: 0.5rem; */
   top: 19px;
+}
+.lysalesdata li:nth-child(even) {
+  background-color: rgb(245, 245, 245);
+}
+.lysalesline:hover {
+  background-color: #ddeaf9;
+}
+.lysalesdata li:nth-child(even):hover {
+  background-color: #ddeaf9;
 }
