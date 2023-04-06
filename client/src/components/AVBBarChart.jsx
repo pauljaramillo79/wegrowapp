@@ -74,7 +74,14 @@ const AVBBarChart = () => {
     });
   }, []);
 
-  const options = { indexAxis: "y", responsive: true };
+  const options = {
+    indexAxis: "y",
+    responsive: true,
+    aspectRatio: 0.9 / 1.5,
+    layout: {
+      padding: 0,
+    },
+  };
   const data = {
     labels: labels1,
     datasets: [
