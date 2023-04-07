@@ -3,7 +3,6 @@ import "../../node_modules/react-grid-layout/css/styles.css";
 import "../../node_modules/react-resizable/css/styles.css";
 import { Responsive, WidthProvider } from "react-grid-layout";
 import AVBBarChart from "./AVBBarChart";
-import AVBBarChartContainer from "./AVBBarChartContainer";
 import moment from "moment";
 import Axios from "axios";
 
