@@ -21,21 +21,26 @@ ChartJS.register(
   Legend
 );
 
-const AVBBarChart = () => {
-  let currentyear = moment().format("YYYY");
+const AVBBarChart = ({ groupcriteria, loadeddata }) => {
+  // let currentyear = moment().format("YYYY");
 
-  const [loadeddata, setLoadedData] = useState();
+  // const [loadeddata, setLoadedData] = useState();
 
-  const [groupcriteria1, setGroupcriteria1] = useState("country");
+  // const [groupcriteria1, setGroupcriteria1] = useState("country");
+
   const [labels1, setLabels1] = useState();
   const [budgetdata, setBudgetdata] = useState();
   const [salesdata, setSalesdata] = useState();
 
-  const groupBy = (arg1, loadeddata) => {
-    if (loadeddata) {
-      console.log(loadeddata);
+  useEffect(() => {
+    groupBy(groupcriteria, loadeddata);
+  }, [loadeddata, groupcriteria]);
+
+  const groupBy = (arg1, data) => {
+    if (data) {
+      console.log(data);
       let finalResult = [];
-      loadeddata.forEach((item) => {
+      data.forEach((item) => {
         let group = item[arg1];
         let index = finalResult.findIndex((it) => it[arg1] === group);
 
@@ -67,12 +72,12 @@ const AVBBarChart = () => {
     }
   };
 
-  useEffect(() => {
-    Axios.post("/loadcurrentbudget", { currentyear }).then((response) => {
-      setLoadedData(response.data);
-      groupBy(groupcriteria1, response.data);
-    });
-  }, []);
+  // useEffect(() => {
+  //   Axios.post("/loadcurrentbudget", { currentyear }).then((response) => {
+  //     setLoadedData(response.data);
+  //     groupBy(groupcriteria1, response.data);
+  //   });
+  // }, []);
 
   const options = {
     indexAxis: "y",

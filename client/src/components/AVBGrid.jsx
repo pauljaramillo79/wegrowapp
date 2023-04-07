@@ -3,6 +3,9 @@ import "../../node_modules/react-grid-layout/css/styles.css";
 import "../../node_modules/react-resizable/css/styles.css";
 import { Responsive, WidthProvider } from "react-grid-layout";
 import AVBBarChart from "./AVBBarChart";
+import AVBBarChartContainer from "./AVBBarChartContainer";
+import moment from "moment";
+import Axios from "axios";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -49,6 +52,18 @@ const AVBGrid = () => {
   };
   const originalLayout = getFromLS("layouts") || initlayout;
   const [layouts, setLayouts] = useState(originalLayout);
+
+  let currentyear = moment().format("YYYY");
+  const [loadeddata, setLoadedData] = useState();
+  const [groupcriteria1, setGroupcriteria1] = useState("country");
+  const [groupcriteria2, setGroupcriteria2] = useState("country");
+
+  useEffect(() => {
+    Axios.post("/loadcurrentbudget", { currentyear }).then((response) => {
+      setLoadedData(response.data);
+    });
+  }, []);
+
   return (
     <div>
       <ResponsiveGridLayout
@@ -64,10 +79,20 @@ const AVBGrid = () => {
         draggableCancel=".canceldrag"
       >
         <div id="avbbarchart" key="h">
-          <AVBBarChart />
+          <select
+            onChange={(e) => {
+              setGroupcriteria1(e.target.value);
+            }}
+            name="groupcriteria"
+            id="groupcriteria"
+          >
+            <option value="country">Country</option>
+            <option value="prodCatName">ProdCatName</option>
+          </select>
+          <AVBBarChart groupcriteria={groupcriteria1} loadeddata={loadeddata} />
         </div>
         <div id="avbbarchart2" key="j">
-          <AVBBarChart />
+          <AVBBarChart groupcriteria={groupcriteria2} loadeddata={loadeddata} />
         </div>
       </ResponsiveGridLayout>
     </div>
