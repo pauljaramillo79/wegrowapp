@@ -57,10 +57,12 @@ const AVBGrid = () => {
   const [groupcriteria1, setGroupcriteria1] = useState("region");
   const [showcriteria1, setShowcriteria1] = useState("budget");
   const [filter11, setFilter11] = useState("");
+  const [filter21, setFilter21] = useState("");
 
   const [groupcriteria2, setGroupcriteria2] = useState("region");
   const [show2criteria1, setShow2criteria1] = useState("sold");
   const [filter12, setFilter12] = useState("");
+  const [filter22, setFilter22] = useState("");
 
   useEffect(() => {
     Axios.post("/loadcurrentbudget", { currentyear }).then((response) => {
@@ -107,7 +109,9 @@ const AVBGrid = () => {
             loadeddata={loadeddata}
             setGroupcriteria={setGroupcriteria1}
             filter1={filter11}
+            filter2={filter21}
             setFilter1={setFilter11}
+            setFilter2={setFilter21}
           />
         </div>
         <div id="avbbarchart2" key="j">
@@ -116,7 +120,9 @@ const AVBGrid = () => {
             loadeddata={loadeddata}
             setGroupcriteria={setGroupcriteria2}
             filter1={filter12}
+            filter2={filter22}
             setFilter1={setFilter12}
+            setFilter2={setFilter22}
           />
         </div>
       </ResponsiveGridLayout>

@@ -28,6 +28,8 @@ const AVBBarChart = ({
   setGroupcriteria,
   filter1,
   setFilter1,
+  filter2,
+  setFilter2,
 }) => {
   // let currentyear = moment().format("YYYY");
 
@@ -44,13 +46,18 @@ const AVBBarChart = ({
 
   useEffect(() => {
     groupBy(groupcriteria, loadeddata, showcriteria1, show2criteria1);
-  }, [loadeddata, groupcriteria, filter1]);
+  }, [loadeddata, groupcriteria, filter1, filter2]);
 
   const groupBy = (arg1, data, showcriteria, showcriteria2) => {
     if (data) {
       let datafiltered = [];
       if (filter1 !== "") {
         datafiltered = data.filter((item) => item["region"] === filter1);
+        if (filter2 !== "") {
+          datafiltered = datafiltered.filter(
+            (item) => item["country"] === filter2
+          );
+        }
       } else {
         datafiltered = data;
       }
@@ -121,6 +128,10 @@ const AVBBarChart = ({
       if (groupcriteria === "region") {
         setGroupcriteria("country");
         setFilter1(e.chart["tooltip"]["title"][0]);
+      }
+      if (groupcriteria === "country") {
+        setGroupcriteria("prodCatName");
+        setFilter2(e.chart["tooltip"]["title"][0]);
       }
     },
   };
