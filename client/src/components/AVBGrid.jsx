@@ -54,8 +54,13 @@ const AVBGrid = () => {
 
   let currentyear = moment().format("YYYY");
   const [loadeddata, setLoadedData] = useState();
-  const [groupcriteria1, setGroupcriteria1] = useState("country");
-  const [groupcriteria2, setGroupcriteria2] = useState("country");
+  const [groupcriteria1, setGroupcriteria1] = useState("region");
+  const [showcriteria1, setShowcriteria1] = useState("budget");
+  const [filter11, setFilter11] = useState("");
+
+  const [groupcriteria2, setGroupcriteria2] = useState("region");
+  const [show2criteria1, setShow2criteria1] = useState("sold");
+  const [filter12, setFilter12] = useState("");
 
   useEffect(() => {
     Axios.post("/loadcurrentbudget", { currentyear }).then((response) => {
@@ -78,6 +83,14 @@ const AVBGrid = () => {
         draggableCancel=".canceldrag"
       >
         <div id="avbbarchart" key="h">
+          <div
+            onClick={(e) => {
+              setGroupcriteria1("region");
+              setFilter11("");
+            }}
+          >
+            {filter11 !== "" ? "Regions" : ""}
+          </div>
           <select
             onChange={(e) => {
               setGroupcriteria1(e.target.value);
@@ -87,11 +100,24 @@ const AVBGrid = () => {
           >
             <option value="country">Country</option>
             <option value="prodCatName">ProdCatName</option>
+            <option value="region">Region</option>
           </select>
-          <AVBBarChart groupcriteria={groupcriteria1} loadeddata={loadeddata} />
+          <AVBBarChart
+            groupcriteria={groupcriteria1}
+            loadeddata={loadeddata}
+            setGroupcriteria={setGroupcriteria1}
+            filter1={filter11}
+            setFilter1={setFilter11}
+          />
         </div>
         <div id="avbbarchart2" key="j">
-          <AVBBarChart groupcriteria={groupcriteria2} loadeddata={loadeddata} />
+          <AVBBarChart
+            groupcriteria={groupcriteria2}
+            loadeddata={loadeddata}
+            setGroupcriteria={setGroupcriteria2}
+            filter1={filter12}
+            setFilter1={setFilter12}
+          />
         </div>
       </ResponsiveGridLayout>
     </div>

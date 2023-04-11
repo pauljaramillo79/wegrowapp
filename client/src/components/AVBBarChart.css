@@ -1,0 +1,36 @@
+.AVBTable {
+  margin-top: 1.5rem;
+  margin-left: 1rem;
+  width: 100%;
+  /* margin: 0 auto; */
+}
+.AVBTableHeaders {
+  display: flex;
+  flex-direction: row;
+  width: 75%;
+  margin: 0 auto;
+  font-family: "Roboto", sans-serif;
+  font-size: 0.85rem;
+  font-weight: 800;
+  border-bottom: 1px solid gray;
+}
+.AVBTableHeaders li {
+  display: flex;
+  flex-basis: 30%;
+}
+.AVBTableRow {
+  display: flex;
+  flex-direction: row;
+  width: 75%;
+  margin: 0 auto;
+  font-family: "Roboto", sans-serif;
+  font-size: 0.85rem;
+}
+.AVBTableRow li {
+  display: flex;
+  flex-basis: 30%;
+}
+.AVBTableRow .AVBTableFig,
+.AVBTableHeaders .AVBTableFig {
+  justify-content: flex-end;
+}

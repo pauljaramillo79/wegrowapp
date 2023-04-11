@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import moment from "moment";
 import Axios from "axios";
+import "./AVBBarChart.css";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -21,7 +22,13 @@ ChartJS.register(
   Legend
 );
 
-const AVBBarChart = ({ groupcriteria, loadeddata }) => {
+const AVBBarChart = ({
+  groupcriteria,
+  loadeddata,
+  setGroupcriteria,
+  filter1,
+  setFilter1,
+}) => {
   // let currentyear = moment().format("YYYY");
 
   // const [loadeddata, setLoadedData] = useState();
@@ -32,38 +39,60 @@ const AVBBarChart = ({ groupcriteria, loadeddata }) => {
   const [budgetdata, setBudgetdata] = useState();
   const [salesdata, setSalesdata] = useState();
 
-  useEffect(() => {
-    groupBy(groupcriteria, loadeddata);
-  }, [loadeddata, groupcriteria]);
+  const [showcriteria1, setShowcriteria1] = useState("budget");
+  const [show2criteria1, setShow2criteria1] = useState("sold");
 
-  const groupBy = (arg1, data) => {
+  useEffect(() => {
+    groupBy(groupcriteria, loadeddata, showcriteria1, show2criteria1);
+  }, [loadeddata, groupcriteria, filter1]);
+
+  const groupBy = (arg1, data, showcriteria, showcriteria2) => {
     if (data) {
+      let datafiltered = [];
+      if (filter1 !== "") {
+        datafiltered = data.filter((item) => item["region"] === filter1);
+      } else {
+        datafiltered = data;
+      }
+
       console.log(data);
       let finalResult = [];
-      data.forEach((item) => {
-        let group = item[arg1];
-        let index = finalResult.findIndex((it) => it[arg1] === group);
+      datafiltered.forEach((item) => {
+        let group = "";
+        let index = 0;
+        // console.log(item[arg1]);
+        if (item[arg1] === "Dominican Republic") {
+          group = "Dom Rep";
+          index = finalResult.findIndex((it) => it[arg1] === "Dom Rep");
+        } else {
+          group = item[arg1];
+          index = finalResult.findIndex((it) => it[arg1] === group);
+        }
 
         if (index === -1) {
           finalResult.push({
             [arg1]: group,
-            budget: item.budget,
-            sold: item.sold,
+            [showcriteria]: Number(item[showcriteria]),
+            [showcriteria2]: Number(item[showcriteria2]),
           });
         } else {
-          finalResult[index].budget += item.budget;
-          finalResult[index].sold += item.sold;
+          finalResult[index][showcriteria] += Number(item[showcriteria]);
+          finalResult[index][showcriteria2] += Number(item[showcriteria2]);
         }
       });
       // console.log(finalResult);
       let sortedfinal = finalResult.sort((el1, el2) =>
-        el1.budget < el2.budget ? 1 : el1.budget > el2.budget ? -1 : 0
+        el1[showcriteria] < el2[showcriteria]
+          ? 1
+          : el1[showcriteria] > el2[showcriteria]
+          ? -1
+          : 0
       );
       let filteredfinal = sortedfinal.filter(
-        (el) => el.budget > 0 || el.sold > 0
+        (el) => el[showcriteria] > 0 || el[showcriteria2] > 0
       );
-      let budgetdata = filteredfinal.map((el) => el.budget);
-      let salesdata = filteredfinal.map((el) => el.sold);
+      let budgetdata = filteredfinal.map((el) => el[showcriteria]);
+      let salesdata = filteredfinal.map((el) => el[showcriteria2]);
       let labels = filteredfinal.map((el) => el[arg1]);
       // console.log(labels);
       setLabels1(labels);
@@ -82,9 +111,17 @@ const AVBBarChart = ({ groupcriteria, loadeddata }) => {
   const options = {
     indexAxis: "y",
     responsive: true,
-    aspectRatio: 0.9 / 1.5,
+    // aspectRatio: 0.9 / 1.5,
+    aspectRatio: 1.8 / 1.5,
     layout: {
       padding: 0,
+    },
+    onClick: (e) => {
+      console.log(e.chart["tooltip"]["title"]);
+      if (groupcriteria === "region") {
+        setGroupcriteria("country");
+        setFilter1(e.chart["tooltip"]["title"][0]);
+      }
     },
   };
   const data = {
@@ -99,7 +136,43 @@ const AVBBarChart = ({ groupcriteria, loadeddata }) => {
     ],
   };
 
-  return <Bar options={options} data={data} />;
+  return (
+    <>
+      <Bar options={options} data={data} />
+      <div className="AVBTable">
+        <ul className="AVBTableHeaders">
+          <li>{groupcriteria.toUpperCase()}</li>
+          <li className="AVBTableFig">Budget</li>
+          <li className="AVBTableFig">Sales YTD</li>
+        </ul>
+        {labels1
+          ? labels1.map((item, i) => {
+              return [
+                <ul className="AVBTableRow">
+                  <li>{item}</li>
+                  <li className="AVBTableFig">
+                    {showcriteria1 === "budgetprofit" ? "$ " : ""}
+                    {budgetdata[i]
+                      .toFixed(0)
+                      .toString()
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                    {showcriteria1 === "budget" ? " mt" : ""}
+                  </li>
+                  <li className="AVBTableFig">
+                    {showcriteria1 === "budgetprofit" ? "$ " : ""}
+                    {salesdata[i]
+                      .toFixed(0)
+                      .toString()
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                    {showcriteria1 === "budget" ? " mt" : ""}
+                  </li>
+                </ul>,
+              ];
+            })
+          : ""}
+      </div>
+    </>
+  );
 };
 
 export default AVBBarChart;
