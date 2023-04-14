@@ -103,6 +103,7 @@ const AVBGrid = () => {
             <option value="country">Country</option>
             <option value="prodCatName">ProdCatName</option>
             <option value="region">Region</option>
+            <option value="productGroup">ProductGroup</option>
           </select>
           <AVBBarChart
             groupcriteria={groupcriteria1}
