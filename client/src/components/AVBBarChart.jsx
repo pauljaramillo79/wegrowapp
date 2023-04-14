@@ -74,6 +74,17 @@ const AVBBarChart = ({
     sho2criteria1
   ) => {
     if (loadeddata) {
+      let datafiltered = [];
+      if (filter1 !== "") {
+        datafiltered = loadeddata.filter((item) => item["region"] === filter1);
+        if (filter2 !== "") {
+          datafiltered = datafiltered.filter(
+            (item) => item["country"] === filter2
+          );
+        }
+      } else {
+        datafiltered = loadeddata;
+      }
       // let labels = [];
       // let q1data = [];
       // let q2data = [];
@@ -81,7 +92,7 @@ const AVBBarChart = ({
       // let q4data = [];
       let quartergroupdata = [];
       let finaldata = [];
-      let groupeddata = loadeddata.groupBy(groupcriteria);
+      let groupeddata = datafiltered.groupBy(groupcriteria);
       for (const [key1, val1] of Object.entries(groupeddata)) {
         quartergroupdata = { group: key1 };
         // labels.push(key1);
