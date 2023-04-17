@@ -1,13 +1,14 @@
 .AVBTable {
   margin-top: 1.5rem;
   margin-left: 1rem;
-  width: 100%;
+  width: 95%;
+  overflow-x: scroll;
   /* margin: 0 auto; */
 }
 .AVBTableHeaders {
   display: flex;
   flex-direction: row;
-  width: 75%;
+  width: 100%;
   margin: 0 auto;
   font-family: "Roboto", sans-serif;
   font-size: 0.85rem;
@@ -16,21 +17,26 @@
 }
 .AVBTableHeaders li {
   display: flex;
-  flex-basis: 30%;
+  flex-basis: 10%;
+  /* min-width: 50px; */
 }
 .AVBTableRow {
   display: flex;
   flex-direction: row;
-  width: 75%;
+  width: 100%;
   margin: 0 auto;
   font-family: "Roboto", sans-serif;
   font-size: 0.85rem;
 }
 .AVBTableRow li {
   display: flex;
-  flex-basis: 30%;
+  flex-basis: 10%;
 }
 .AVBTableRow .AVBTableFig,
 .AVBTableHeaders .AVBTableFig {
   justify-content: flex-end;
+}
+.AVBTableRow .AVBFirstCol,
+.AVBTableHeaders .AVBFirstCol {
+  min-width: 90px;
 }
