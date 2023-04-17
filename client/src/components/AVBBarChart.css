@@ -11,7 +11,7 @@
   width: 100%;
   margin: 0 auto;
   font-family: "Roboto", sans-serif;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-weight: 800;
   border-bottom: 1px solid gray;
 }
@@ -26,7 +26,7 @@
   width: 100%;
   margin: 0 auto;
   font-family: "Roboto", sans-serif;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
 }
 .AVBTableRow li {
   display: flex;
@@ -39,4 +39,15 @@
 .AVBTableRow .AVBFirstCol,
 .AVBTableHeaders .AVBFirstCol {
   min-width: 90px;
+}
+.AVBCharts {
+  display: flex;
+  flex-direction: row;
+}
+.AVBChart {
+  display: flex;
+  width: 49%;
+}
+.AVBGroupEnd {
+  margin-right: 5rem;
 }

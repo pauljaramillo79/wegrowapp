@@ -49,10 +49,18 @@ const AVBBarChart = ({
   const [q2salesdata, setq2salesdata] = useState();
   const [q3salesdata, setq3salesdata] = useState();
   const [q4salesdata, setq4salesdata] = useState();
+  const [q1budgetprofit, setq1budgetprofit] = useState();
+  const [q2budgetprofit, setq2budgetprofit] = useState();
+  const [q3budgetprofit, setq3budgetprofit] = useState();
+  const [q4budgetprofit, setq4budgetprofit] = useState();
+  const [q1salesprofit, setq1salesprofit] = useState();
+  const [q2salesprofit, setq2salesprofit] = useState();
+  const [q3salesprofit, setq3salesprofit] = useState();
+  const [q4salesprofit, setq4salesprofit] = useState();
   const [filteredfinal, setFilteredfinal] = useState();
 
-  // const [currentquarter, setCurrentquarter] = useState(moment().quarter());
-  const [currentquarter, setCurrentquarter] = useState(4);
+  const [currentquarter, setCurrentquarter] = useState(moment().quarter());
+  // const [currentquarter, setCurrentquarter] = useState(4);
 
   const [showcriteria1, setShowcriteria1] = useState("budget");
   const [show2criteria1, setShow2criteria1] = useState("sold");
@@ -78,6 +86,7 @@ const AVBBarChart = ({
     sho2criteria1
   ) => {
     if (loadeddata) {
+      // console.log(loadeddata);
       let datafiltered = [];
       if (filter1 !== "") {
         datafiltered = loadeddata.filter((item) => item["region"] === filter1);
@@ -113,11 +122,22 @@ const AVBBarChart = ({
         let qs3 = 0;
         let qs4 = 0;
         // let totals = 0;
+        let qbp1 = 0;
+        let qbp2 = 0;
+        let qbp3 = 0;
+        let qbp4 = 0;
+        // let totalb = 0;
+        let qsp1 = 0;
+        let qsp2 = 0;
+        let qsp3 = 0;
+        let qsp4 = 0;
         for (const [key2, val2] of Object.entries(qgroupeddata)) {
           if (Number(key2) === 1) {
             val2.forEach((item) => {
               qb1 += item["budget"];
               qs1 += item["sold"];
+              qbp1 += item["budgetprofit"];
+              qsp1 += item["soldprofit"];
             });
             // quarter = key2;
           }
@@ -125,18 +145,24 @@ const AVBBarChart = ({
             val2.forEach((item) => {
               qb2 += item["budget"];
               qs2 += item["sold"];
+              qbp2 += item["budgetprofit"];
+              qsp2 += item["soldprofit"];
             }); // quarter = key2;
           }
           if (Number(key2) === 3) {
             val2.forEach((item) => {
               qb3 += item["budget"];
               qs3 += item["sold"];
+              qbp3 += item["budgetprofit"];
+              qsp3 += item["soldprofit"];
             });
           }
           if (Number(key2) === 4) {
             val2.forEach((item) => {
               qb4 += item["budget"];
               qs4 += item["sold"];
+              qbp4 += item["budgetprofit"];
+              qsp4 += item["soldprofit"];
             });
           }
         }
@@ -151,17 +177,23 @@ const AVBBarChart = ({
           qs2: qs2,
           qs3: qs3,
           qs4: qs4,
-          totals: qb1 + qb2 + qb3 + qb4,
+          totals: qs1 + qs2 + qs3 + qs4,
+          qbp1: qbp1,
+          qbp2: qbp2,
+          qbp3: qbp3,
+          qbp4: qbp4,
+          totalbprofit: qbp1 + qbp2 + qbp3 + qbp4,
+          qsp1: qsp1,
+          qsp2: qsp2,
+          qsp3: qsp3,
+          qsp4: qsp4,
+          totalsprofit: qsp1 + qsp2 + qsp3 + qsp4,
         };
-        // console.log(quartergroupdata);
-        // q1data.push(q1);
-        // q2data.push(q2);
-        // q3data.push(q3);
-        // q4data.push(q4);
+
         finaldata.push(quartergroupdata);
       }
       let sortedfinal = finaldata.sort((el1, el2) =>
-        el1["totalb"] < el2["totalb"]
+        el1["totalbp"] < el2["totalb"]
           ? 1
           : el1["totalb"] > el2["totalb"]
           ? -1
@@ -180,6 +212,14 @@ const AVBBarChart = ({
       let q2sdata = filteredfinal.map((el) => el["qs2"]);
       let q3sdata = filteredfinal.map((el) => el["qs3"]);
       let q4sdata = filteredfinal.map((el) => el["qs4"]);
+      let q1bprofit = filteredfinal.map((el) => el["qbp1"]);
+      let q2bprofit = filteredfinal.map((el) => el["qbp2"]);
+      let q3bprofit = filteredfinal.map((el) => el["qbp3"]);
+      let q4bprofit = filteredfinal.map((el) => el["qbp4"]);
+      let q1sprofit = filteredfinal.map((el) => el["qsp1"]);
+      let q2sprofit = filteredfinal.map((el) => el["qsp2"]);
+      let q3sprofit = filteredfinal.map((el) => el["qsp3"]);
+      let q4sprofit = filteredfinal.map((el) => el["qsp4"]);
 
       setLabels1(labels);
       setq1budgetdata(q1bdata);
@@ -190,6 +230,14 @@ const AVBBarChart = ({
       setq2salesdata(q2sdata);
       setq3salesdata(q3sdata);
       setq4salesdata(q4sdata);
+      setq1budgetprofit(q1bprofit);
+      setq2budgetprofit(q2bprofit);
+      setq3budgetprofit(q3bprofit);
+      setq4budgetprofit(q4bprofit);
+      setq1salesprofit(q1sprofit);
+      setq2salesprofit(q2sprofit);
+      setq3salesprofit(q3sprofit);
+      setq4salesprofit(q4sprofit);
       setFilteredfinal(filteredfinal);
 
       // console.log(labels, q1data, q2data, q3data, q4data);
@@ -265,10 +313,60 @@ const AVBBarChart = ({
   const options = {
     indexAxis: "y",
     responsive: true,
+    plugins: {
+      legend: {
+        display: false,
+      },
+    },
     // aspectRatio: 0.9 / 1.5,
-    aspectRatio: 1.8 / 1.5,
+    aspectRatio: 2 / 1.5,
     layout: {
       padding: 0,
+    },
+    onClick: (e) => {
+      // console.log(e.chart["tooltip"]["title"]);
+      if (groupcriteria === "region") {
+        setGroupcriteria("country");
+        setFilter1(e.chart["tooltip"]["title"][0]);
+      }
+      if (groupcriteria === "productGroup") {
+        setGroupcriteria("prodCatName");
+        setFilter1(e.chart["tooltip"]["title"][0]);
+      }
+      if (groupcriteria === "country") {
+        setGroupcriteria("prodCatName");
+        setFilter2(e.chart["tooltip"]["title"][0]);
+      }
+    },
+  };
+  const options2 = {
+    indexAxis: "y",
+    responsive: true,
+    plugins: {
+      legend: {
+        display: false,
+      },
+    },
+    // aspectRatio: 0.9 / 1.5,
+    aspectRatio: 2 / 1.5,
+    layout: {
+      padding: 0,
+    },
+    scales: {
+      x: {
+        ticks: {
+          // Include a dollar sign in the ticks
+          callback: function(value, index, ticks) {
+            return (
+              "$" +
+              value
+                .toFixed(0)
+                .toString()
+                .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+            );
+          },
+        },
+      },
     },
     onClick: (e) => {
       // console.log(e.chart["tooltip"]["title"]);
@@ -345,21 +443,109 @@ const AVBBarChart = ({
       // },
     ],
   };
+  const data2 = {
+    labels: labels1,
+    datasets: [
+      {
+        label: "Budget Q1",
+        data: q1budgetprofit,
+        backgroundColor: "rgba(68, 65, 162,1)",
+        stack: "Stack 0",
+      },
+      {
+        label: "Budget Q2",
+        data: q2budgetprofit,
+        backgroundColor: "rgba(68, 65, 162,0.7)",
+        stack: "Stack 0",
+      },
+      {
+        label: "Budget Q3",
+        data: q3budgetprofit,
+        backgroundColor: "rgba(68, 65, 162,0.4)",
+        stack: "Stack 0",
+      },
+      {
+        label: "Budget Q4",
+        data: q4budgetprofit,
+        backgroundColor: "rgba(68, 65, 162,0.25)",
+        stack: "Stack 0",
+      },
+      {
+        label: "Sales Q1",
+        data: q1salesprofit,
+        backgroundColor: "rgba(160, 182, 103,1)",
+        stack: "Stack 1",
+      },
+      {
+        label: "Sales Q2",
+        data: q2salesprofit,
+        backgroundColor: "rgba(160, 182, 103,0.7)",
+        stack: "Stack 1",
+      },
+      {
+        label: "Sales Q3",
+        data: q3salesprofit,
+        backgroundColor: "rgba(160, 182, 103,0.4)",
+        stack: "Stack 1",
+      },
+      {
+        label: "Sales Q4",
+        data: q4salesprofit,
+        backgroundColor: "rgba(160, 182, 103,0.25)",
+        stack: "Stack 1",
+      },
+      // {
+      //   // label: "YTD",
+      //   // data: salesdata,
+      //   // backgroundColor: "blue",
+      //   // stack: "Stack 0",
+      // },
+    ],
+  };
 
   return (
     <>
-      <Bar options={options} data={data} />
+      <div className="AVBCharts">
+        <div className="AVBChart">
+          <Bar options={options} data={data} />
+        </div>
+        <div className="AVBChart">
+          <Bar options={options2} data={data2} />
+        </div>
+      </div>
       <div className="AVBTable">
         <ul className="AVBTableHeaders">
+          <li className="AVBFirstCol"></li>
+          <li className="AVBTableFig">Q1</li>
+          <li className="AVBTableFig"></li>
+          <li className="AVBTableFig AVBGroupEnd"></li>
+          <li className="AVBTableFig">Q2</li>
+          <li className="AVBTableFig"></li>
+          <li className="AVBTableFig AVBGroupEnd"></li>
+          <li className="AVBTableFig">Q3</li>
+          <li className="AVBTableFig"></li>
+          <li className="AVBTableFig AVBGroupEnd"></li>
+          <li className="AVBTableFig">Q4</li>
+          <li className="AVBTableFig"></li>
+          <li className="AVBTableFig AVBGroupEnd"></li>
+          <li className="AVBTableFig">Totals</li>
+          <li className="AVBTableFig"></li>
+          <li className="AVBTableFig"></li>
+        </ul>
+        <ul className="AVBTableHeaders">
           <li className="AVBFirstCol">{groupcriteria.toUpperCase()}</li>
-          <li className="AVBTableFig">Q1 B</li>
-          <li className="AVBTableFig">Q1 S</li>
-          <li className="AVBTableFig">Q2 B</li>
-          <li className="AVBTableFig">Q2 S</li>
-          <li className="AVBTableFig">Q3 B</li>
-          <li className="AVBTableFig">Q3 S</li>
-          <li className="AVBTableFig">Q4 B</li>
-          <li className="AVBTableFig">Q4 S</li>
+          <li className="AVBTableFig">B</li>
+          <li className="AVBTableFig">S</li>
+          <li className="AVBTableFig AVBGroupEnd">VAR</li>
+          <li className="AVBTableFig">B</li>
+          <li className="AVBTableFig">S</li>
+          <li className="AVBTableFig AVBGroupEnd">VAR</li>
+          <li className="AVBTableFig">B</li>
+          <li className="AVBTableFig">S</li>
+          <li className="AVBTableFig AVBGroupEnd">VAR</li>
+          <li className="AVBTableFig">B</li>
+          <li className="AVBTableFig">S</li>
+          <li className="AVBTableFig AVBGroupEnd">VAR</li>
           <li className="AVBTableFig">Total B</li>{" "}
           {currentquarter === 4 ? "" : <li className="AVBTableFig">YTD B</li>}
           <li className="AVBTableFig">YTD S</li>
@@ -411,6 +597,11 @@ const AVBBarChart = ({
                       .toString()
                       .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                   </li>
+                  <li className="AVBTableFig AVBGroupEnd">
+                    {item.qb1 > 0
+                      ? ((item.qs1 / item.qb1) * 100).toFixed() + "%"
+                      : "NB"}
+                  </li>
                   <li className="AVBTableFig">
                     {item.qb2
                       .toFixed(0)
@@ -422,6 +613,11 @@ const AVBBarChart = ({
                       .toFixed(0)
                       .toString()
                       .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                  </li>
+                  <li className="AVBTableFig AVBGroupEnd">
+                    {item.qb2 > 0
+                      ? ((item.qs2 / item.qb2) * 100).toFixed() + "%"
+                      : "NB"}
                   </li>
                   <li className="AVBTableFig">
                     {item.qb3
@@ -435,6 +631,11 @@ const AVBBarChart = ({
                       .toString()
                       .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                   </li>
+                  <li className="AVBTableFig AVBGroupEnd">
+                    {item.qb3 > 0
+                      ? ((item.qs3 / item.qb3) * 100).toFixed() + "%"
+                      : "NB"}
+                  </li>
                   <li className="AVBTableFig">
                     {item.qb4
                       .toFixed(0)
@@ -446,6 +647,11 @@ const AVBBarChart = ({
                       .toFixed(0)
                       .toString()
                       .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                  </li>
+                  <li className="AVBTableFig AVBGroupEnd">
+                    {item.qb4 > 0
+                      ? ((item.qs4 / item.qb4) * 100).toFixed() + "%"
+                      : "NB"}
                   </li>
                   <li className="AVBTableFig">
                     {item.totalb
@@ -481,6 +687,199 @@ const AVBBarChart = ({
                       .toFixed(0)
                       .toString()
                       .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                  </li>
+                </ul>,
+              ];
+            })
+          : ""}{" "}
+      </div>
+      <div className="AVBTable">
+        <ul className="AVBTableHeaders">
+          <li className="AVBFirstCol"></li>
+          <li className="AVBTableFig">Q1</li>
+          <li className="AVBTableFig"></li>
+          <li className="AVBTableFig AVBGroupEnd"></li>
+          <li className="AVBTableFig">Q2</li>
+          <li className="AVBTableFig"></li>
+          <li className="AVBTableFig AVBGroupEnd"></li>
+          <li className="AVBTableFig">Q3</li>
+          <li className="AVBTableFig"></li>
+          <li className="AVBTableFig AVBGroupEnd"></li>
+          <li className="AVBTableFig">Q4</li>
+          <li className="AVBTableFig"></li>
+          <li className="AVBTableFig AVBGroupEnd"></li>
+          <li className="AVBTableFig">Totals</li>
+          <li className="AVBTableFig"></li>
+          <li className="AVBTableFig"></li>
+        </ul>
+        <ul className="AVBTableHeaders">
+          <li className="AVBFirstCol">{groupcriteria.toUpperCase()}</li>
+          <li className="AVBTableFig">B</li>
+          <li className="AVBTableFig">S</li>
+          <li className="AVBTableFig AVBGroupEnd">VAR</li>
+          <li className="AVBTableFig">B</li>
+          <li className="AVBTableFig">S</li>
+          <li className="AVBTableFig AVBGroupEnd">VAR</li>
+          <li className="AVBTableFig">B</li>
+          <li className="AVBTableFig">S</li>
+          <li className="AVBTableFig AVBGroupEnd">VAR</li>
+          <li className="AVBTableFig">B</li>
+          <li className="AVBTableFig">S</li>
+          <li className="AVBTableFig AVBGroupEnd">VAR</li>
+          <li className="AVBTableFig">Total B</li>{" "}
+          {currentquarter === 4 ? "" : <li className="AVBTableFig">YTD B</li>}
+          <li className="AVBTableFig">YTD S</li>
+          {/* {currentquarter === 2
+            ? [
+                <li className="AVBTableFig">YTD B</li>,
+                <li className="AVBTableFig">YTD S</li>,
+              ]
+            : currentquarter > 2
+            ? [
+                <li className="AVBTableFig">Q2 B</li>,
+                <li className="AVBTableFig">Q2 S</li>,
+              ]
+            : ""}
+          {currentquarter === 3
+            ? [
+                <li className="AVBTableFig">YTD B</li>,
+                <li className="AVBTableFig">YTD S</li>,
+              ]
+            : currentquarter > 2
+            ? [
+                <li className="AVBTableFig">Q3 B</li>,
+                <li className="AVBTableFig">Q3 S</li>,
+              ]
+            : ""}
+          <li className="AVBTableFig">Total B</li>
+          {currentquarter === 4 ? <li className="AVBTableFig">YTD S</li> : ""} */}
+        </ul>
+        {filteredfinal
+          ? filteredfinal.map((item) => {
+              return [
+                <ul className="AVBTableRow">
+                  <li className="AVBFirstCol">
+                    {item.group === "Dominican Republic"
+                      ? "DomRep"
+                      : // : item.group === "Costa Rica"
+                        // ? "C Rica"
+                        item.group}
+                  </li>
+                  <li className="AVBTableFig">
+                    {"$" +
+                      item.qbp1
+                        .toFixed(0)
+                        .toString()
+                        .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                  </li>
+                  <li className="AVBTableFig">
+                    {"$" +
+                      item.qsp1
+                        .toFixed(0)
+                        .toString()
+                        .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                  </li>
+                  <li className="AVBTableFig AVBGroupEnd">
+                    {item.qbp1 > 0
+                      ? ((item.qsp1 / item.qbp1) * 100).toFixed() + "%"
+                      : "NB"}
+                  </li>
+                  <li className="AVBTableFig">
+                    {"$" +
+                      item.qbp2
+                        .toFixed(0)
+                        .toString()
+                        .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                  </li>
+                  <li className="AVBTableFig">
+                    {"$" +
+                      item.qsp2
+                        .toFixed(0)
+                        .toString()
+                        .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                  </li>
+                  <li className="AVBTableFig AVBGroupEnd">
+                    {item.qbp2 > 0
+                      ? ((item.qsp2 / item.qbp2) * 100).toFixed() + "%"
+                      : "NB"}
+                  </li>
+                  <li className="AVBTableFig">
+                    {"$" +
+                      item.qbp3
+                        .toFixed(0)
+                        .toString()
+                        .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                  </li>
+                  <li className="AVBTableFig">
+                    {"$" +
+                      item.qsp3
+                        .toFixed(0)
+                        .toString()
+                        .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                  </li>
+                  <li className="AVBTableFig AVBGroupEnd">
+                    {item.qbp3 > 0
+                      ? ((item.qsp3 / item.qbp3) * 100).toFixed() + "%"
+                      : "NB"}
+                  </li>
+                  <li className="AVBTableFig">
+                    {"$" +
+                      item.qbp4
+                        .toFixed(0)
+                        .toString()
+                        .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                  </li>
+                  <li className="AVBTableFig">
+                    {"$" +
+                      item.qsp4
+                        .toFixed(0)
+                        .toString()
+                        .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                  </li>
+                  <li className="AVBTableFig AVBGroupEnd">
+                    {item.qbp4 > 0
+                      ? ((item.qsp4 / item.qbp4) * 100).toFixed() + "%"
+                      : "NB"}
+                  </li>
+                  <li className="AVBTableFig">
+                    {"$" +
+                      item.totalbprofit
+                        .toFixed(0)
+                        .toString()
+                        .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                  </li>
+                  {currentquarter === 4 ? (
+                    ""
+                  ) : (
+                    <li className="AVBTableFig">
+                      {currentquarter === 1
+                        ? "$" +
+                          item.qbp1
+                            .toFixed(0)
+                            .toString()
+                            .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                        : currentquarter === 2
+                        ? "$" +
+                          (item.qbp1 + item.qbp2)
+                            .toFixed(0)
+                            .toString()
+                            .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                        : currentquarter === 3
+                        ? "$" +
+                          (item.qbp1 + item.qbp2 + item.qbp3)
+                            .toFixed(0)
+                            .toString()
+                            .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                        : ""}
+                    </li>
+                  )}
+
+                  <li className="AVBTableFig">
+                    {"$" +
+                      item.totalsprofit
+                        .toFixed(0)
+                        .toString()
+                        .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                   </li>
                 </ul>,
               ];

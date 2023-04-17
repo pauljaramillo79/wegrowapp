@@ -115,7 +115,7 @@ const AVBGrid = () => {
             setFilter2={setFilter21}
           />
         </div>
-        <div id="avbbarchart2" key="j">
+        {/* <div id="avbbarchart2" key="j">
           <AVBBarChart
             groupcriteria={groupcriteria2}
             loadeddata={loadeddata}
@@ -125,7 +125,7 @@ const AVBGrid = () => {
             setFilter1={setFilter12}
             setFilter2={setFilter22}
           />
-        </div>
+        </div> */}
       </ResponsiveGridLayout>
     </div>
   );
