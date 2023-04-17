@@ -399,30 +399,89 @@ const AVBBarChart = ({
                         // ? "C Rica"
                         item.group}
                   </li>
-                  <li className="AVBTableFig">{item.qb1}</li>
-                  <li className="AVBTableFig">{item.qs1}</li>
-                  <li className="AVBTableFig">{item.qb2}</li>
-                  <li className="AVBTableFig">{item.qs2}</li>
-                  <li className="AVBTableFig">{item.qb3}</li>
-                  <li className="AVBTableFig">{item.qs3}</li>
-                  <li className="AVBTableFig">{item.qb4}</li>
-                  <li className="AVBTableFig">{item.qs4}</li>
-                  <li className="AVBTableFig">{item.totalb}</li>
+                  <li className="AVBTableFig">
+                    {item.qb1
+                      .toFixed(0)
+                      .toString()
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                  </li>
+                  <li className="AVBTableFig">
+                    {item.qs1
+                      .toFixed(0)
+                      .toString()
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                  </li>
+                  <li className="AVBTableFig">
+                    {item.qb2
+                      .toFixed(0)
+                      .toString()
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                  </li>
+                  <li className="AVBTableFig">
+                    {item.qs2
+                      .toFixed(0)
+                      .toString()
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                  </li>
+                  <li className="AVBTableFig">
+                    {item.qb3
+                      .toFixed(0)
+                      .toString()
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                  </li>
+                  <li className="AVBTableFig">
+                    {item.qs3
+                      .toFixed(0)
+                      .toString()
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                  </li>
+                  <li className="AVBTableFig">
+                    {item.qb4
+                      .toFixed(0)
+                      .toString()
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                  </li>
+                  <li className="AVBTableFig">
+                    {item.qs4
+                      .toFixed(0)
+                      .toString()
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                  </li>
+                  <li className="AVBTableFig">
+                    {item.totalb
+                      .toFixed(0)
+                      .toString()
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                  </li>
                   {currentquarter === 4 ? (
                     ""
                   ) : (
                     <li className="AVBTableFig">
                       {currentquarter === 1
                         ? item.qb1
+                            .toFixed(0)
+                            .toString()
+                            .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                         : currentquarter === 2
-                        ? item.qb1 + item.qb2
+                        ? (item.qb1 + item.qb2)
+                            .toFixed(0)
+                            .toString()
+                            .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                         : currentquarter === 3
-                        ? item.qb1 + item.qb2 + item.qb3
+                        ? (item.qb1 + item.qb2 + item.qb3)
+                            .toFixed(0)
+                            .toString()
+                            .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                         : ""}
                     </li>
                   )}
 
-                  <li className="AVBTableFig">{item.totals}</li>
+                  <li className="AVBTableFig">
+                    {item.totals
+                      .toFixed(0)
+                      .toString()
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                  </li>
                 </ul>,
               ];
             })
