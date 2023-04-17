@@ -49,6 +49,10 @@ const AVBBarChart = ({
   const [q2salesdata, setq2salesdata] = useState();
   const [q3salesdata, setq3salesdata] = useState();
   const [q4salesdata, setq4salesdata] = useState();
+  const [filteredfinal, setFilteredfinal] = useState();
+
+  // const [currentquarter, setCurrentquarter] = useState(moment().quarter());
+  const [currentquarter, setCurrentquarter] = useState(4);
 
   const [showcriteria1, setShowcriteria1] = useState("budget");
   const [show2criteria1, setShow2criteria1] = useState("sold");
@@ -186,69 +190,70 @@ const AVBBarChart = ({
       setq2salesdata(q2sdata);
       setq3salesdata(q3sdata);
       setq4salesdata(q4sdata);
+      setFilteredfinal(filteredfinal);
 
       // console.log(labels, q1data, q2data, q3data, q4data);
     }
   };
 
-  const groupBy2 = (arg1, data, showcriteria, showcriteria2) => {
-    if (data) {
-      let datafiltered = [];
-      if (filter1 !== "") {
-        datafiltered = data.filter((item) => item["region"] === filter1);
-        if (filter2 !== "") {
-          datafiltered = datafiltered.filter(
-            (item) => item["country"] === filter2
-          );
-        }
-      } else {
-        datafiltered = data;
-      }
+  // const groupBy2 = (arg1, data, showcriteria, showcriteria2) => {
+  //   if (data) {
+  //     let datafiltered = [];
+  //     if (filter1 !== "") {
+  //       datafiltered = data.filter((item) => item["region"] === filter1);
+  //       if (filter2 !== "") {
+  //         datafiltered = datafiltered.filter(
+  //           (item) => item["country"] === filter2
+  //         );
+  //       }
+  //     } else {
+  //       datafiltered = data;
+  //     }
 
-      let finalResult = [];
+  //     let finalResult = [];
 
-      console.log(datafiltered.groupBy("qq"));
+  //     console.log(datafiltered.groupBy("qq"));
 
-      datafiltered.forEach((item) => {
-        let group = "";
-        let index = 0;
-        if (item[arg1] === "Dominican Republic") {
-          group = "Dom Rep";
-          index = finalResult.findIndex((it) => it[arg1] === "Dom Rep");
-        } else {
-          group = item[arg1];
-          index = finalResult.findIndex((it) => it[arg1] === group);
-        }
-        if (index === -1) {
-          finalResult.push({
-            [arg1]: group,
-            [showcriteria]: Number(item[showcriteria]),
-            [showcriteria2]: Number(item[showcriteria2]),
-          });
-        } else {
-          finalResult[index][showcriteria] += Number(item[showcriteria]);
-          finalResult[index][showcriteria2] += Number(item[showcriteria2]);
-        }
-      });
-      let sortedfinal = finalResult.sort((el1, el2) =>
-        el1[showcriteria] < el2[showcriteria]
-          ? 1
-          : el1[showcriteria] > el2[showcriteria]
-          ? -1
-          : 0
-      );
-      let filteredfinal = sortedfinal.filter(
-        (el) => el[showcriteria] > 0 || el[showcriteria2] > 0
-      );
-      let budgetdata = filteredfinal.map((el) => el[showcriteria]);
-      let salesdata = filteredfinal.map((el) => el[showcriteria2]);
-      let labels = filteredfinal.map((el) => el[arg1]);
-      // console.log(labels);
-      setLabels1(labels);
-      setBudgetdata(budgetdata);
-      setSalesdata(salesdata);
-    }
-  };
+  //     datafiltered.forEach((item) => {
+  //       let group = "";
+  //       let index = 0;
+  //       if (item[arg1] === "Dominican Republic") {
+  //         group = "Dom Rep";
+  //         index = finalResult.findIndex((it) => it[arg1] === "Dom Rep");
+  //       } else {
+  //         group = item[arg1];
+  //         index = finalResult.findIndex((it) => it[arg1] === group);
+  //       }
+  //       if (index === -1) {
+  //         finalResult.push({
+  //           [arg1]: group,
+  //           [showcriteria]: Number(item[showcriteria]),
+  //           [showcriteria2]: Number(item[showcriteria2]),
+  //         });
+  //       } else {
+  //         finalResult[index][showcriteria] += Number(item[showcriteria]);
+  //         finalResult[index][showcriteria2] += Number(item[showcriteria2]);
+  //       }
+  //     });
+  //     let sortedfinal = finalResult.sort((el1, el2) =>
+  //       el1[showcriteria] < el2[showcriteria]
+  //         ? 1
+  //         : el1[showcriteria] > el2[showcriteria]
+  //         ? -1
+  //         : 0
+  //     );
+  //     let filteredfinal = sortedfinal.filter(
+  //       (el) => el[showcriteria] > 0 || el[showcriteria2] > 0
+  //     );
+  //     let budgetdata = filteredfinal.map((el) => el[showcriteria]);
+  //     let salesdata = filteredfinal.map((el) => el[showcriteria2]);
+  //     let labels = filteredfinal.map((el) => el[arg1]);
+  //     // console.log(labels);
+  //     setLabels1(labels);
+  //     setBudgetdata(budgetdata);
+  //     setSalesdata(salesdata);
+  //   }
+  // };
 
   // useEffect(() => {
   //   Axios.post("/loadcurrentbudget", { currentyear }).then((response) => {
@@ -266,7 +271,7 @@ const AVBBarChart = ({
       padding: 0,
     },
     onClick: (e) => {
-      console.log(e.chart["tooltip"]["title"]);
+      // console.log(e.chart["tooltip"]["title"]);
       if (groupcriteria === "region") {
         setGroupcriteria("country");
         setFilter1(e.chart["tooltip"]["title"][0]);
@@ -344,6 +349,85 @@ const AVBBarChart = ({
   return (
     <>
       <Bar options={options} data={data} />
+      <div className="AVBTable">
+        <ul className="AVBTableHeaders">
+          <li className="AVBFirstCol">{groupcriteria.toUpperCase()}</li>
+          <li className="AVBTableFig">Q1 B</li>
+          <li className="AVBTableFig">Q1 S</li>
+          <li className="AVBTableFig">Q2 B</li>
+          <li className="AVBTableFig">Q2 S</li>
+          <li className="AVBTableFig">Q3 B</li>
+          <li className="AVBTableFig">Q3 S</li>
+          <li className="AVBTableFig">Q4 B</li>
+          <li className="AVBTableFig">Q4 S</li>
+          <li className="AVBTableFig">Total B</li>{" "}
+          {currentquarter === 4 ? "" : <li className="AVBTableFig">YTD B</li>}
+          <li className="AVBTableFig">YTD S</li>
+          {/* {currentquarter === 2
+            ? [
+                <li className="AVBTableFig">YTD B</li>,
+                <li className="AVBTableFig">YTD S</li>,
+              ]
+            : currentquarter > 2
+            ? [
+                <li className="AVBTableFig">Q2 B</li>,
+                <li className="AVBTableFig">Q2 S</li>,
+              ]
+            : ""}
+          {currentquarter === 3
+            ? [
+                <li className="AVBTableFig">YTD B</li>,
+                <li className="AVBTableFig">YTD S</li>,
+              ]
+            : currentquarter > 2
+            ? [
+                <li className="AVBTableFig">Q3 B</li>,
+                <li className="AVBTableFig">Q3 S</li>,
+              ]
+            : ""}
+          <li className="AVBTableFig">Total B</li>
+          {currentquarter === 4 ? <li className="AVBTableFig">YTD S</li> : ""} */}
+        </ul>
+        {filteredfinal
+          ? filteredfinal.map((item) => {
+              return [
+                <ul className="AVBTableRow">
+                  <li className="AVBFirstCol">
+                    {item.group === "Dominican Republic"
+                      ? "DomRep"
+                      : // : item.group === "Costa Rica"
+                        // ? "C Rica"
+                        item.group}
+                  </li>
+                  <li className="AVBTableFig">{item.qb1}</li>
+                  <li className="AVBTableFig">{item.qs1}</li>
+                  <li className="AVBTableFig">{item.qb2}</li>
+                  <li className="AVBTableFig">{item.qs2}</li>
+                  <li className="AVBTableFig">{item.qb3}</li>
+                  <li className="AVBTableFig">{item.qs3}</li>
+                  <li className="AVBTableFig">{item.qb4}</li>
+                  <li className="AVBTableFig">{item.qs4}</li>
+                  <li className="AVBTableFig">{item.totalb}</li>
+                  {currentquarter === 4 ? (
+                    ""
+                  ) : (
+                    <li className="AVBTableFig">
+                      {currentquarter === 1
+                        ? item.qb1
+                        : currentquarter === 2
+                        ? item.qb1 + item.qb2
+                        : currentquarter === 3
+                        ? item.qb1 + item.qb2 + item.qb3
+                        : ""}
+                    </li>
+                  )}
+
+                  <li className="AVBTableFig">{item.totals}</li>
+                </ul>,
+              ];
+            })
+          : ""}{" "}
+      </div>
       {/* <div className="AVBTable">
         <ul className="AVBTableHeaders">
           <li>{groupcriteria.toUpperCase()}</li>
