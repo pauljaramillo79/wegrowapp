@@ -714,9 +714,13 @@ const AVBBarChart = ({
         </ul>
         <ul className="AVBTableHeaders">
           <li className="AVBFirstCol">
-            {groupcriteria2 === ""
-              ? groupcriteria.toUpperCase()
-              : groupcriteria2.toUpperCase()}
+            {groupcriteria4 !== ""
+              ? groupcriteria4.toUpperCase()
+              : groupcriteria3 !== ""
+              ? groupcriteria3.toUpperCase()
+              : groupcriteria2 !== ""
+              ? groupcriteria2.toUpperCase()
+              : groupcriteria.toUpperCase()}
           </li>
           <li className="AVBTableFig">B</li>
           <li className="AVBTableFig">S</li>
