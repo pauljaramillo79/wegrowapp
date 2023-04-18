@@ -55,11 +55,15 @@ const AVBGrid = () => {
   let currentyear = moment().format("YYYY");
   const [loadeddata, setLoadedData] = useState();
   const [groupcriteria1, setGroupcriteria1] = useState("region");
+  const [groupcriteria2, setGroupcriteria2] = useState("");
+  const [groupcriteria3, setGroupcriteria3] = useState("");
+  const [groupcriteria4, setGroupcriteria4] = useState("");
   const [showcriteria1, setShowcriteria1] = useState("budget");
   const [filter11, setFilter11] = useState("");
   const [filter21, setFilter21] = useState("");
+  const [filter31, setFilter31] = useState("");
 
-  const [groupcriteria2, setGroupcriteria2] = useState("region");
+  // const [groupcriteria2, setGroupcriteria2] = useState("region");
   const [show2criteria1, setShow2criteria1] = useState("sold");
   const [filter12, setFilter12] = useState("");
   const [filter22, setFilter22] = useState("");
@@ -85,15 +89,15 @@ const AVBGrid = () => {
         draggableCancel=".canceldrag"
       >
         <div id="avbbarchart" key="h">
-          <div
+          {/* <div
             onClick={(e) => {
               setGroupcriteria1("region");
               setFilter11("");
             }}
           >
             {filter11 !== "" ? "Regions" : ""}
-          </div>
-          <select
+          </div> */}
+          {/* <select
             onChange={(e) => {
               setGroupcriteria1(e.target.value);
             }}
@@ -104,15 +108,23 @@ const AVBGrid = () => {
             <option value="prodCatName">ProdCatName</option>
             <option value="region">Region</option>
             <option value="productGroup">ProductGroup</option>
-          </select>
+          </select> */}
           <AVBBarChart
             groupcriteria={groupcriteria1}
+            groupcriteria2={groupcriteria2}
+            groupcriteria3={groupcriteria3}
+            groupcriteria4={groupcriteria4}
             loadeddata={loadeddata}
             setGroupcriteria={setGroupcriteria1}
+            setGroupcriteria2={setGroupcriteria2}
+            setGroupcriteria3={setGroupcriteria3}
+            setGroupcriteria4={setGroupcriteria4}
             filter1={filter11}
             filter2={filter21}
+            filter3={filter31}
             setFilter1={setFilter11}
             setFilter2={setFilter21}
+            setFilter3={setFilter31}
           />
         </div>
         {/* <div id="avbbarchart2" key="j">

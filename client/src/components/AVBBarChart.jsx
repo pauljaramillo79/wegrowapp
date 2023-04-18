@@ -10,6 +10,7 @@ import {
   Title,
   Tooltip,
   Legend,
+  Interaction,
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
 
@@ -24,12 +25,20 @@ ChartJS.register(
 
 const AVBBarChart = ({
   groupcriteria,
+  groupcriteria2,
+  groupcriteria3,
+  groupcriteria4,
   loadeddata,
   setGroupcriteria,
+  setGroupcriteria2,
+  setGroupcriteria3,
+  setGroupcriteria4,
   filter1,
   setFilter1,
   filter2,
   setFilter2,
+  filter3,
+  setFilter3,
 }) => {
   // let currentyear = moment().format("YYYY");
 
@@ -65,10 +74,46 @@ const AVBBarChart = ({
   const [showcriteria1, setShowcriteria1] = useState("budget");
   const [show2criteria1, setShow2criteria1] = useState("sold");
 
+  let initgroupbuttons = [
+    "Region",
+    "Country",
+    "Product Group",
+    "Product Category",
+    "Product",
+  ];
+
+  const [groupbuttons, setGroupbuttons] = useState(initgroupbuttons);
+
+  let initgroupings = [
+    "region",
+    "country",
+    "productGroup",
+    "productCategory",
+    "product",
+  ];
+
+  const [groupings, setGroupings] = useState(initgroupings);
+
   useEffect(() => {
     // groupBy2(groupcriteria, loadeddata, showcriteria1, show2criteria1);
-    groupBy3(groupcriteria, loadeddata, showcriteria1, show2criteria1);
-  }, [loadeddata, groupcriteria, filter1, filter2]);
+    groupBy3(
+      groupcriteria,
+      loadeddata,
+      groupcriteria2,
+      groupcriteria3
+      // showcriteria1,
+      // show2criteria1
+    );
+  }, [
+    loadeddata,
+    groupcriteria,
+    filter1,
+    filter2,
+    filter3,
+    groupcriteria2,
+    groupcriteria3,
+    groupcriteria4,
+  ]);
 
   Array.prototype.groupBy = function(key) {
     return this.reduce(function(groups, item) {
@@ -82,18 +127,27 @@ const AVBBarChart = ({
   const groupBy3 = (
     groupcriteria,
     loadeddata,
-    showcriteria1,
-    sho2criteria1
+    groupcriteria2,
+    groupcriteria3
+    // showcriteria1,
+    // sho2criteria1
   ) => {
     if (loadeddata) {
-      // console.log(loadeddata);
+      console.log(loadeddata);
       let datafiltered = [];
       if (filter1 !== "") {
-        datafiltered = loadeddata.filter((item) => item["region"] === filter1);
+        datafiltered = loadeddata.filter(
+          (item) => item[groupcriteria] === filter1
+        );
         if (filter2 !== "") {
           datafiltered = datafiltered.filter(
-            (item) => item["country"] === filter2
+            (item) => item[groupcriteria2] === filter2
           );
+          if (filter3 !== "") {
+            datafiltered = datafiltered.filter(
+              (item) => item[groupcriteria3] === filter3
+            );
+          }
         }
       } else {
         datafiltered = loadeddata;
@@ -105,7 +159,23 @@ const AVBBarChart = ({
       // let q4data = [];
       let quartergroupdata = [];
       let finaldata = [];
-      let groupeddata = datafiltered.groupBy(groupcriteria);
+      let groupeddata = [];
+      // if (groupcriteria2 !== "") {
+      //   groupeddata = datafiltered.groupBy(groupcriteria2);
+      // } else {
+      groupeddata = datafiltered.groupBy(groupcriteria);
+      if (groupcriteria2 !== "" && groupcriteria3 === "") {
+        // console.log(groupcriteria2);
+        groupeddata = datafiltered.groupBy(groupcriteria2);
+      }
+      if (groupcriteria3 !== "") {
+        // console.log(groupcriteria2);
+        groupeddata = datafiltered.groupBy(groupcriteria3);
+      }
+      if (filter3 !== "") {
+        groupeddata = datafiltered.groupBy(groupcriteria4);
+      }
+      // }
       for (const [key1, val1] of Object.entries(groupeddata)) {
         quartergroupdata = { group: key1 };
         // labels.push(key1);
@@ -324,19 +394,43 @@ const AVBBarChart = ({
       padding: 0,
     },
     onClick: (e) => {
-      // console.log(e.chart["tooltip"]["title"]);
-      if (groupcriteria === "region") {
-        setGroupcriteria("country");
+      if (groupcriteria2 === "") {
         setFilter1(e.chart["tooltip"]["title"][0]);
+        groupbuttons.splice(clickedgroup, 1);
+        groupings.splice(clickedgroup, 1);
+        setGroupcriteria2(groupings[0]);
+        setClickedgroup(0);
       }
-      if (groupcriteria === "productGroup") {
-        setGroupcriteria("prodCatName");
-        setFilter1(e.chart["tooltip"]["title"][0]);
-      }
-      if (groupcriteria === "country") {
-        setGroupcriteria("prodCatName");
+      if (groupcriteria3 === "" && groupcriteria2 !== "") {
+        // console.log(groupcriteria3);
+
         setFilter2(e.chart["tooltip"]["title"][0]);
+        groupbuttons.splice(clickedgroup, 1);
+        groupings.splice(clickedgroup, 1);
+        setGroupcriteria3(groupings[0]);
+        setClickedgroup(0);
       }
+      if (groupcriteria3 !== "" && groupcriteria2 !== "") {
+        setFilter3(e.chart["tooltip"]["title"][0]);
+        groupbuttons.splice(clickedgroup, 1);
+        groupings.splice(clickedgroup, 1);
+        setGroupcriteria4(groupings[0]);
+        setClickedgroup(0);
+      }
+
+      // console.log(e.chart["tooltip"]["title"]);
+      // if (groupcriteria === "region") {
+      //   setGroupcriteria("country");
+      //   setFilter1(e.chart["tooltip"]["title"][0]);
+      // }
+      // if (groupcriteria === "productGroup") {
+      //   setGroupcriteria("prodCatName");
+      //   setFilter1(e.chart["tooltip"]["title"][0]);
+      // }
+      // if (groupcriteria === "country") {
+      //   setGroupcriteria("prodCatName");
+      //   setFilter2(e.chart["tooltip"]["title"][0]);
+      // }
     },
   };
   const options2 = {
@@ -369,19 +463,42 @@ const AVBBarChart = ({
       },
     },
     onClick: (e) => {
-      // console.log(e.chart["tooltip"]["title"]);
-      if (groupcriteria === "region") {
-        setGroupcriteria("country");
+      if (groupcriteria2 === "") {
         setFilter1(e.chart["tooltip"]["title"][0]);
+        groupbuttons.splice(clickedgroup, 1);
+        groupings.splice(clickedgroup, 1);
+        setGroupcriteria2(groupings[0]);
+        setClickedgroup(0);
       }
-      if (groupcriteria === "productGroup") {
-        setGroupcriteria("prodCatName");
-        setFilter1(e.chart["tooltip"]["title"][0]);
-      }
-      if (groupcriteria === "country") {
-        setGroupcriteria("prodCatName");
+      if (groupcriteria3 === "" && groupcriteria2 !== "") {
+        // console.log(groupcriteria3);
+
         setFilter2(e.chart["tooltip"]["title"][0]);
+        groupbuttons.splice(clickedgroup, 1);
+        groupings.splice(clickedgroup, 1);
+        setGroupcriteria3(groupings[0]);
+        setClickedgroup(0);
       }
+      if (groupcriteria3 !== "" && groupcriteria2 !== "") {
+        setFilter3(e.chart["tooltip"]["title"][0]);
+        groupbuttons.splice(clickedgroup, 1);
+        groupings.splice(clickedgroup, 1);
+        setGroupcriteria4(groupings[0]);
+        setClickedgroup(0);
+      }
+      // console.log(e.chart["tooltip"]["title"]);
+      // if (groupcriteria === "region") {
+      //   setGroupcriteria("country");
+      //   setFilter1(e.chart["tooltip"]["title"][0]);
+      // }
+      // if (groupcriteria === "productGroup") {
+      //   setGroupcriteria("prodCatName");
+      //   setFilter1(e.chart["tooltip"]["title"][0]);
+      // }
+      // if (groupcriteria === "country") {
+      //   setGroupcriteria("prodCatName");
+      //   setFilter2(e.chart["tooltip"]["title"][0]);
+      // }
     },
   };
   const data = {
@@ -503,8 +620,71 @@ const AVBBarChart = ({
     ],
   };
 
+  const [clickedgroup, setClickedgroup] = useState(0);
+
+  const handleAVBReset = () => {
+    setFilter1("");
+    setFilter2("");
+    setFilter3("");
+    setGroupcriteria2("");
+    setGroupcriteria3("");
+    setGroupcriteria4("");
+    setGroupcriteria("region");
+    setGroupbuttons(initgroupbuttons);
+    setGroupings(initgroupings);
+  };
+
   return (
     <>
+      <div className="AVBTitleArea">
+        <div className="AVBTitle">
+          <h2>
+            {groupcriteria ? groupcriteria.toUpperCase() : ""}
+            {filter1 ? " : " + filter1 : ""}
+            {groupcriteria2 ? ", " + groupcriteria2.toUpperCase() : ""}
+            {filter2 ? " : " + filter2 : ""}
+            {groupcriteria3 ? ", " + groupcriteria3.toUpperCase() : ""}
+            {filter3 ? " : " + filter3 : ""}
+          </h2>
+        </div>
+        <div className="groupbuttons">
+          <p>{filter1 !== "" ? "Level 2:" : "Level 1:"}</p>
+          {groupbuttons
+            ? groupbuttons.map((grp, i) => {
+                return (
+                  <button
+                    key={i}
+                    value={
+                      grp === "Product Group"
+                        ? "productGroup"
+                        : grp === "Product Category"
+                        ? "productCategory"
+                        : grp.toLowerCase()
+                    }
+                    onClick={(e) => {
+                      setClickedgroup(i);
+                      if (filter1 === "") {
+                        setGroupcriteria(e.target.value);
+                      } else if (filter2 === "") {
+                        setGroupcriteria2(e.target.value);
+                      } else if (filter3 === "") {
+                        setGroupcriteria3(e.target.value);
+                      } else {
+                        setGroupcriteria4(e.target.value);
+                      }
+                    }}
+                    className={i === clickedgroup ? "activegroupbutton" : ""}
+                  >
+                    {grp}
+                  </button>
+                );
+              })
+            : ""}
+          <button className="AVBReset" onClick={(e) => handleAVBReset()}>
+            Reset
+          </button>
+        </div>
+      </div>
       <div className="AVBCharts">
         <div className="AVBChart">
           <Bar options={options} data={data} />
@@ -533,7 +713,11 @@ const AVBBarChart = ({
           <li className="AVBTableFig"></li>
         </ul>
         <ul className="AVBTableHeaders">
-          <li className="AVBFirstCol">{groupcriteria.toUpperCase()}</li>
+          <li className="AVBFirstCol">
+            {groupcriteria2 === ""
+              ? groupcriteria.toUpperCase()
+              : groupcriteria2.toUpperCase()}
+          </li>
           <li className="AVBTableFig">B</li>
           <li className="AVBTableFig">S</li>
           <li className="AVBTableFig AVBGroupEnd">VAR</li>
@@ -713,7 +897,12 @@ const AVBBarChart = ({
           <li className="AVBTableFig"></li>
         </ul>
         <ul className="AVBTableHeaders">
-          <li className="AVBFirstCol">{groupcriteria.toUpperCase()}</li>
+          <li className="AVBFirstCol">
+            {" "}
+            {groupcriteria2 === ""
+              ? groupcriteria.toUpperCase()
+              : groupcriteria2.toUpperCase()}
+          </li>
           <li className="AVBTableFig">B</li>
           <li className="AVBTableFig">S</li>
           <li className="AVBTableFig AVBGroupEnd">VAR</li>
