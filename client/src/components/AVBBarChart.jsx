@@ -270,7 +270,7 @@ const AVBBarChart = ({
           : 0
       );
       let filteredfinal = sortedfinal.filter(
-        (el) => el["totalb"] > 0 || el["totalb"] > 0
+        (el) => el["totalb"] > 0 || el["totals"] > 0
       );
       // console.log(sortedfinal);
       let labels = filteredfinal.map((el) => el["group"]);
