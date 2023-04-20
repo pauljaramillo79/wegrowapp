@@ -11,24 +11,24 @@ const ResponsiveGridLayout = WidthProvider(Responsive);
 const AVBGrid = () => {
   const initlayout = {
     lg: [
-      { i: "h", x: 0, y: 0, w: 10, h: 8 },
-      { i: "j", x: 10, y: 8, w: 10, h: 8 },
+      { i: "h", x: 0, y: 0, w: 34, h: 28 },
+      { i: "j", x: 34, y: 28, w: 34, h: 28 },
     ],
     md: [
-      { i: "h", x: 0, y: 0, w: 10, h: 8 },
-      { i: "j", x: 10, y: 8, w: 10, h: 8 },
+      { i: "h", x: 0, y: 0, w: 34, h: 28 },
+      { i: "j", x: 34, y: 28, w: 34, h: 28 },
     ],
     sm: [
-      { i: "h", x: 0, y: 0, w: 10, h: 8 },
-      { i: "j", x: 10, y: 8, w: 10, h: 8 },
+      { i: "h", x: 0, y: 0, w: 34, h: 28 },
+      { i: "j", x: 34, y: 28, w: 34, h: 28 },
     ],
     xs: [
-      { i: "h", x: 0, y: 0, w: 10, h: 8 },
-      { i: "j", x: 10, y: 8, w: 10, h: 8 },
+      { i: "h", x: 0, y: 0, w: 34, h: 28 },
+      { i: "j", x: 34, y: 28, w: 34, h: 28 },
     ],
     xxs: [
-      { i: "h", x: 0, y: 0, w: 10, h: 8 },
-      { i: "j", x: 10, y: 8, w: 10, h: 8 },
+      { i: "h", x: 0, y: 0, w: 34, h: 28 },
+      { i: "j", x: 34, y: 28, w: 34, h: 28 },
     ],
   };
   const getFromLS = (key) => {
