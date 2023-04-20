@@ -69,7 +69,7 @@ const AVBBarChart = ({
   const [filteredfinal, setFilteredfinal] = useState();
 
   const [currentquarter, setCurrentquarter] = useState(moment().quarter());
-  // const [currentquarter, setCurrentquarter] = useState(4);
+  // const [currentquarter, setCurrentquarter] = useState(2);
 
   const [showcriteria1, setShowcriteria1] = useState("budget");
   const [show2criteria1, setShow2criteria1] = useState("sold");
@@ -660,6 +660,17 @@ const AVBBarChart = ({
     }
   };
 
+  let qb1total = 0;
+  let qb2total = 0;
+  let qb3total = 0;
+  let qb4total = 0;
+  let qs1total = 0;
+  let qs2total = 0;
+  let qs3total = 0;
+  let qs4total = 0;
+  let totaltotalb = 0;
+  let totaltotals = 0;
+
   return (
     <>
       <div className="AVBTitleArea">
@@ -748,6 +759,7 @@ const AVBBarChart = ({
           <li className="AVBTableFig">Totals</li>
           <li className="AVBTableFig"></li>
           <li className="AVBTableFig"></li>
+          <li className="AVBTableFig"></li>
         </ul>
         <ul className="AVBTableHeaders">
           <li className="AVBFirstCol">
@@ -774,6 +786,7 @@ const AVBBarChart = ({
           <li className="AVBTableFig">Total B</li>{" "}
           {currentquarter === 4 ? "" : <li className="AVBTableFig">YTD B</li>}
           <li className="AVBTableFig">YTD S</li>
+          <li className="AVBTableFig">YTD VAR</li>
           {/* {currentquarter === 2
             ? [
                 <li className="AVBTableFig">YTD B</li>,
@@ -801,6 +814,16 @@ const AVBBarChart = ({
         </ul>
         {filteredfinal
           ? filteredfinal.map((item) => {
+              qb1total += item.qb1;
+              qb2total += item.qb2;
+              qb3total += item.qb3;
+              qb4total += item.qb4;
+              qs1total += item.qs1;
+              qs2total += item.qs2;
+              qs3total += item.qs3;
+              qs4total += item.qs4;
+              totaltotalb += item.totalb;
+              totaltotals += item.totals;
               return [
                 <ul className="AVBTableRow">
                   <li className="AVBFirstCol">
@@ -913,10 +936,176 @@ const AVBBarChart = ({
                       .toString()
                       .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                   </li>
+                  {currentquarter === 4 ? (
+                    item.totalb > 0 ? (
+                      <li className="AVBTableFig">
+                        {((item.totals / item.totalb) * 100)
+                          .toFixed(0)
+                          .toString()
+                          .replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "%"}
+                      </li>
+                    ) : (
+                      <li className="AVBTableFig"> "NB"</li>
+                    )
+                  ) : (
+                    <li className="AVBTableFig">
+                      {currentquarter === 1
+                        ? item.qb1 > 0
+                          ? ((item.qs1 / item.qb1) * 100).toFixed(0) + "%"
+                          : "NB"
+                        : currentquarter === 2
+                        ? item.qb2 + item.qb1 > 0
+                          ? (
+                              ((item.qs1 + item.qs2) / (item.qb1 + item.qb2)) *
+                              100
+                            ).toFixed(0) + "%"
+                          : "NB"
+                        : currentquarter === 3
+                        ? item.qb2 + item.qb1 + item.qb3 > 0
+                          ? (
+                              ((item.qs1 + item.qs2 + item.qs3) /
+                                (item.qb1 + item.qb2 + item.qb3)) *
+                              100
+                            ).toFixed(0) + "%"
+                          : "NB"
+                        : ""}
+                    </li>
+                  )}
                 </ul>,
               ];
             })
           : ""}{" "}
+        <ul className="AVBTableTotals">
+          <li className="AVBFirstCol">TOTAL</li>
+          <li className="AVBTableFig">
+            {qb1total
+              .toFixed(0)
+              .toString()
+              .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+          </li>
+          <li className="AVBTableFig">
+            {qs1total
+              .toFixed(0)
+              .toString()
+              .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+          </li>
+          <li className="AVBTableFig AVBGroupEnd">
+            {qb1total > 0
+              ? ((qs1total / qb1total) * 100).toFixed() + "%"
+              : "NB"}
+          </li>
+          <li className="AVBTableFig">
+            {qb2total
+              .toFixed(0)
+              .toString()
+              .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+          </li>
+          <li className="AVBTableFig">
+            {qs2total
+              .toFixed(0)
+              .toString()
+              .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+          </li>
+          <li className="AVBTableFig AVBGroupEnd">
+            {qb2total > 0
+              ? ((qs2total / qb2total) * 100).toFixed() + "%"
+              : "NB"}
+          </li>
+          <li className="AVBTableFig">
+            {qb3total
+              .toFixed(0)
+              .toString()
+              .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+          </li>
+          <li className="AVBTableFig">
+            {qs3total
+              .toFixed(0)
+              .toString()
+              .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+          </li>
+          <li className=" AVBTableFig AVBGroupEnd">
+            {qb3total > 0
+              ? ((qs3total / qb3total) * 100).toFixed() + "%"
+              : "NB"}
+          </li>
+          <li className="AVBTableFig">
+            {qb4total
+              .toFixed(0)
+              .toString()
+              .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+          </li>
+          <li className="AVBTableFig">
+            {qs4total
+              .toFixed(0)
+              .toString()
+              .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+          </li>
+          <li className="AVBTableFig AVBGroupEnd">
+            {qb4total > 0
+              ? ((qs4total / qb4total) * 100).toFixed() + "%"
+              : "NB"}
+          </li>
+          <li className="AVBTableFig">
+            {totaltotalb
+              .toFixed(0)
+              .toString()
+              .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+          </li>
+          {currentquarter === 4 ? (
+            ""
+          ) : (
+            <li className="AVBTableFig">
+              {currentquarter === 1
+                ? qb1total
+                    .toFixed(0)
+                    .toString()
+                    .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                : currentquarter === 2
+                ? (qb1total + qb2total)
+                    .toFixed(0)
+                    .toString()
+                    .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                : currentquarter === 3
+                ? (qb1total + qb2total + qb3total)
+                    .toFixed(0)
+                    .toString()
+                    .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                : ""}
+            </li>
+          )}
+          <li className="AVBTableFig">
+            {totaltotals
+              .toFixed(0)
+              .toString()
+              .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+          </li>
+          <li className="AVBTableFig">
+            {currentquarter === 1
+              ? qb1total > 0
+                ? ((qs1total / qb1total) * 100).toFixed(0) + "%"
+                : "NB"
+              : currentquarter === 2
+              ? qb1total + qb2total > 0
+                ? (
+                    ((qs1total + qs2total) / (qb1total + qb2total)) *
+                    100
+                  ).toFixed(0) + "%"
+                : "NB"
+              : currentquarter === 3
+              ? qb1total + qb2total + qb3total > 0
+                ? (
+                    ((qs1total + qs2total + qs3total) /
+                      (qb1total + qb2total + qb3total)) *
+                    100
+                  ).toFixed(0) + "%"
+                : "NB"
+              : currentquarter === 4
+              ? totaltotalb > 0
+                ? ((totaltotals / totaltotalb) * 100).toFixed(0) + "%"
+                : "NB"
+              : ""}
+          </li>
+        </ul>
       </div>
       <div className="AVBTable">
         <ul className="AVBTableHeaders">

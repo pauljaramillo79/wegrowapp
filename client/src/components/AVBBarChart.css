@@ -32,12 +32,18 @@
   display: flex;
   flex-basis: 10%;
 }
+.AVBTableTotals li {
+  display: flex;
+  flex-basis: 10%;
+}
 .AVBTableRow .AVBTableFig,
-.AVBTableHeaders .AVBTableFig {
+.AVBTableHeaders .AVBTableFig,
+.AVBTableTotals .AVBTableFig {
   justify-content: flex-end;
 }
 .AVBTableRow .AVBFirstCol,
-.AVBTableHeaders .AVBFirstCol {
+.AVBTableHeaders .AVBFirstCol,
+.AVBTableTotals .AVBFirstCol {
   min-width: 90px;
 }
 .AVBCharts {
@@ -110,4 +116,14 @@
   background-color: rgb(160, 182, 103);
   border: none;
   color: white;
+}
+.AVBTableTotals {
+  display: flex;
+  flex-direction: row;
+  font-family: "Roboto", sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+.AVBTableTotals .AVBFirstCol {
+  min-width: 90px;
 }
