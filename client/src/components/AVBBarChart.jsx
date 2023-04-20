@@ -133,7 +133,7 @@ const AVBBarChart = ({
     // sho2criteria1
   ) => {
     if (loadeddata) {
-      console.log(loadeddata);
+      // console.log(loadeddata);
       let datafiltered = [];
       if (filter1 !== "") {
         datafiltered = loadeddata.filter(
@@ -410,7 +410,8 @@ const AVBBarChart = ({
         setGroupcriteria3(groupings[0]);
         setClickedgroup(0);
       }
-      if (groupcriteria3 !== "" && groupcriteria2 !== "") {
+      // if (groupcriteria3 !== "" && groupcriteria2 !== "") {
+      if (groupcriteria4 === "" && groupcriteria3 !== "") {
         setFilter3(e.chart["tooltip"]["title"][0]);
         groupbuttons.splice(clickedgroup, 1);
         groupings.splice(clickedgroup, 1);
@@ -634,6 +635,31 @@ const AVBBarChart = ({
     setGroupings(initgroupings);
   };
 
+  const handleAVBBack = () => {
+    if (filter3 !== "") {
+      setFilter3("");
+      let index = initgroupings.indexOf(groupcriteria3);
+      groupbuttons.push(initgroupbuttons[index]);
+      groupings.push(initgroupings[index]);
+      setClickedgroup(groupbuttons.indexOf(initgroupbuttons[index]));
+      setGroupcriteria4("");
+    } else if (filter2 !== "") {
+      setFilter2("");
+      let index = initgroupings.indexOf(groupcriteria2);
+      groupbuttons.push(initgroupbuttons[index]);
+      groupings.push(initgroupings[index]);
+      setClickedgroup(groupbuttons.indexOf(initgroupbuttons[index]));
+      setGroupcriteria3("");
+    } else if (filter1 !== "") {
+      setFilter1("");
+      let index = initgroupings.indexOf(groupcriteria);
+      groupbuttons.push(initgroupbuttons[index]);
+      groupings.push(initgroupings[index]);
+      setClickedgroup(groupbuttons.indexOf(initgroupbuttons[index]));
+      setGroupcriteria2("");
+    }
+  };
+
   return (
     <>
       <div className="AVBTitleArea">
@@ -648,7 +674,18 @@ const AVBBarChart = ({
           </h2>
         </div>
         <div className="groupbuttons">
-          <p>{filter1 !== "" ? "Level 2:" : "Level 1:"}</p>
+          <button className="AVBBackbutton" onClick={(e) => handleAVBBack()}>
+            {"<< Back"}
+          </button>
+          <p>
+            {filter3 !== ""
+              ? "Level 4:"
+              : filter2 !== ""
+              ? "Level 3:"
+              : filter1 !== ""
+              ? "Level 2:"
+              : "Level 1:"}
+          </p>
           {groupbuttons
             ? groupbuttons.map((grp, i) => {
                 return (

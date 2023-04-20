@@ -95,3 +95,19 @@
   background-color: rgb(216, 55, 74);
   color: white;
 }
+.groupbuttons .AVBBackbutton {
+  background-color: rgb(160, 182, 103);
+  border: none;
+  color: white;
+  margin-right: 2rem;
+}
+.groupbuttons .AVBBackbutton:hover {
+  background-color: rgb(205, 217, 174);
+  border: none;
+  color: white;
+}
+.groupbuttons .AVBBackbutton:active {
+  background-color: rgb(160, 182, 103);
+  border: none;
+  color: white;
+}
