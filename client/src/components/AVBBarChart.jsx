@@ -671,6 +671,17 @@ const AVBBarChart = ({
   let totaltotalb = 0;
   let totaltotals = 0;
 
+  let qb1totalp = 0;
+  let qb2totalp = 0;
+  let qb3totalp = 0;
+  let qb4totalp = 0;
+  let qs1totalp = 0;
+  let qs2totalp = 0;
+  let qs3totalp = 0;
+  let qs4totalp = 0;
+  let totaltotalbp = 0;
+  let totaltotalsp = 0;
+
   return (
     <>
       <div className="AVBTitleArea">
@@ -1125,13 +1136,18 @@ const AVBBarChart = ({
           <li className="AVBTableFig">Totals</li>
           <li className="AVBTableFig"></li>
           <li className="AVBTableFig"></li>
+          <li className="AVBTableFig"></li>
         </ul>
         <ul className="AVBTableHeaders">
           <li className="AVBFirstCol">
             {" "}
-            {groupcriteria2 === ""
-              ? groupcriteria.toUpperCase()
-              : groupcriteria2.toUpperCase()}
+            {groupcriteria4 !== ""
+              ? groupcriteria4.toUpperCase()
+              : groupcriteria3 !== ""
+              ? groupcriteria3.toUpperCase()
+              : groupcriteria2 !== ""
+              ? groupcriteria2.toUpperCase()
+              : groupcriteria.toUpperCase()}
           </li>
           <li className="AVBTableFig">B</li>
           <li className="AVBTableFig">S</li>
@@ -1147,7 +1163,8 @@ const AVBBarChart = ({
           <li className="AVBTableFig AVBGroupEnd">VAR</li>
           <li className="AVBTableFig">Total B</li>{" "}
           {currentquarter === 4 ? "" : <li className="AVBTableFig">YTD B</li>}
-          <li className="AVBTableFig">YTD S</li>
+          <li className="AVBTableFig">YTD S</li>{" "}
+          <li className="AVBTableFig">YTD VAR</li>
           {/* {currentquarter === 2
             ? [
                 <li className="AVBTableFig">YTD B</li>,
@@ -1175,6 +1192,16 @@ const AVBBarChart = ({
         </ul>
         {filteredfinal
           ? filteredfinal.map((item) => {
+              qb1totalp += item.qbp1;
+              qb2totalp += item.qbp2;
+              qb3totalp += item.qbp3;
+              qb4totalp += item.qbp4;
+              qs1totalp += item.qsp1;
+              qs2totalp += item.qsp2;
+              qs3totalp += item.qsp3;
+              qs4totalp += item.qsp4;
+              totaltotalbp += item.totalbprofit;
+              totaltotalsp += item.totalsprofit;
               return [
                 <ul className="AVBTableRow">
                   <li className="AVBFirstCol">
@@ -1300,10 +1327,190 @@ const AVBBarChart = ({
                         .toString()
                         .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                   </li>
+                  {currentquarter === 4 ? (
+                    item.totalbprofit > 0 ? (
+                      <li className="AVBTableFig">
+                        {((item.totalsprofit / item.totalbprofit) * 100)
+                          .toFixed(0)
+                          .toString()
+                          .replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "%"}
+                      </li>
+                    ) : (
+                      <li className="AVBTableFig"> "NB"</li>
+                    )
+                  ) : (
+                    <li className="AVBTableFig">
+                      {currentquarter === 1
+                        ? item.qbp1 > 0
+                          ? ((item.qsp1 / item.qbp1) * 100).toFixed(0) + "%"
+                          : "NB"
+                        : currentquarter === 2
+                        ? item.qbp2 + item.qbp1 > 0
+                          ? (
+                              ((item.qsp1 + item.qsp2) /
+                                (item.qbp1 + item.qbp2)) *
+                              100
+                            ).toFixed(0) + "%"
+                          : "NB"
+                        : currentquarter === 3
+                        ? item.qbp2 + item.qbp1 + item.qbp3 > 0
+                          ? (
+                              ((item.qsp1 + item.qsp2 + item.qsp3) /
+                                (item.qbp1 + item.qbp2 + item.qbp3)) *
+                              100
+                            ).toFixed(0) + "%"
+                          : "NB"
+                        : ""}
+                    </li>
+                  )}
                 </ul>,
               ];
             })
           : ""}{" "}
+        <ul className="AVBTableTotals">
+          <li className="AVBFirstCol">TOTAL</li>
+          <li className="AVBTableFig">
+            {"$" +
+              qb1totalp
+                .toFixed(0)
+                .toString()
+                .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+          </li>
+          <li className="AVBTableFig">
+            {"$" +
+              qs1totalp
+                .toFixed(0)
+                .toString()
+                .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+          </li>
+          <li className="AVBTableFig AVBGroupEnd">
+            {qb1totalp > 0
+              ? ((qs1totalp / qb1totalp) * 100).toFixed() + "%"
+              : "NB"}
+          </li>
+          <li className="AVBTableFig">
+            {"$" +
+              qb2totalp
+                .toFixed(0)
+                .toString()
+                .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+          </li>
+          <li className="AVBTableFig">
+            {"$" +
+              qs2totalp
+                .toFixed(0)
+                .toString()
+                .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+          </li>
+          <li className="AVBTableFig AVBGroupEnd">
+            {qb2totalp > 0
+              ? ((qs2totalp / qb2totalp) * 100).toFixed() + "%"
+              : "NB"}
+          </li>
+          <li className="AVBTableFig">
+            {"$" +
+              qb3totalp
+                .toFixed(0)
+                .toString()
+                .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+          </li>
+          <li className="AVBTableFig">
+            {"$" +
+              qs3totalp
+                .toFixed(0)
+                .toString()
+                .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+          </li>
+          <li className=" AVBTableFig AVBGroupEnd">
+            {qb3totalp > 0
+              ? ((qs3totalp / qb3totalp) * 100).toFixed() + "%"
+              : "NB"}
+          </li>
+          <li className="AVBTableFig">
+            {"$" +
+              qb4totalp
+                .toFixed(0)
+                .toString()
+                .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+          </li>
+          <li className="AVBTableFig">
+            {"$" +
+              qs4totalp
+                .toFixed(0)
+                .toString()
+                .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+          </li>
+          <li className="AVBTableFig AVBGroupEnd">
+            {qb4totalp > 0
+              ? ((qs4totalp / qb4totalp) * 100).toFixed() + "%"
+              : "NB"}
+          </li>
+          <li className="AVBTableFig">
+            {"$" +
+              totaltotalbp
+                .toFixed(0)
+                .toString()
+                .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+          </li>
+          {currentquarter === 4 ? (
+            ""
+          ) : (
+            <li className="AVBTableFig">
+              {currentquarter === 1
+                ? "$" +
+                  qb1totalp
+                    .toFixed(0)
+                    .toString()
+                    .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                : currentquarter === 2
+                ? "$" +
+                  (qb1totalp + qb2totalp)
+                    .toFixed(0)
+                    .toString()
+                    .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                : currentquarter === 3
+                ? "$" +
+                  (qb1totalp + qb2totalp + qb3totalp)
+                    .toFixed(0)
+                    .toString()
+                    .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                : ""}
+            </li>
+          )}
+          <li className="AVBTableFig">
+            {"$" +
+              totaltotalsp
+                .toFixed(0)
+                .toString()
+                .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+          </li>
+          <li className="AVBTableFig">
+            {currentquarter === 1
+              ? qb1totalp > 0
+                ? ((qs1totalp / qb1totalp) * 100).toFixed(0) + "%"
+                : "NB"
+              : currentquarter === 2
+              ? qb1totalp + qb2totalp > 0
+                ? (
+                    ((qs1totalp + qs2totalp) / (qb1totalp + qb2totalp)) *
+                    100
+                  ).toFixed(0) + "%"
+                : "NB"
+              : currentquarter === 3
+              ? qb1totalp + qb2totalp + qb3totalp > 0
+                ? (
+                    ((qs1totalp + qs2totalp + qs3totalp) /
+                      (qb1totalp + qb2totalp + qb3totalp)) *
+                    100
+                  ).toFixed(0) + "%"
+                : "NB"
+              : currentquarter === 4
+              ? totaltotalbp > 0
+                ? ((totaltotalsp / totaltotalbp) * 100).toFixed(0) + "%"
+                : "NB"
+              : ""}
+          </li>
+        </ul>
       </div>
       {/* <div className="AVBTable">
         <ul className="AVBTableHeaders">
