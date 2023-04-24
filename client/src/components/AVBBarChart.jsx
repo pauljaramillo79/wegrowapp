@@ -630,9 +630,11 @@ const AVBBarChart = ({
     setGroupcriteria2("");
     setGroupcriteria3("");
     setGroupcriteria4("");
+
     setGroupcriteria("region");
     setGroupbuttons(initgroupbuttons);
     setGroupings(initgroupings);
+    setClickedgroup(0);
   };
 
   const handleAVBBack = () => {
