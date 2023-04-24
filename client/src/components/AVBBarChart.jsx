@@ -754,7 +754,7 @@ const AVBBarChart = ({
       </div>
       <div className="AVBTable">
         <ul className="AVBTableHeaders">
-          <li className="AVBFirstCol"></li>
+          <li className="AVBFirstCol">(in mt)</li>
           <li className="AVBTableFig">Q1</li>
           <li className="AVBTableFig"></li>
           <li className="AVBTableFig AVBGroupEnd"></li>
@@ -1120,7 +1120,7 @@ const AVBBarChart = ({
       </div>
       <div className="AVBTable">
         <ul className="AVBTableHeaders">
-          <li className="AVBFirstCol"></li>
+          <li className="AVBFirstCol">(in '000 $)</li>
           <li className="AVBTableFig">Q1</li>
           <li className="AVBTableFig"></li>
           <li className="AVBTableFig AVBGroupEnd"></li>
@@ -1213,14 +1213,14 @@ const AVBBarChart = ({
                   </li>
                   <li className="AVBTableFig">
                     {"$" +
-                      item.qbp1
+                      (item.qbp1 / 1000)
                         .toFixed(0)
                         .toString()
                         .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                   </li>
                   <li className="AVBTableFig">
                     {"$" +
-                      item.qsp1
+                      (item.qsp1 / 1000)
                         .toFixed(0)
                         .toString()
                         .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
@@ -1232,14 +1232,14 @@ const AVBBarChart = ({
                   </li>
                   <li className="AVBTableFig">
                     {"$" +
-                      item.qbp2
+                      (item.qbp2 / 1000)
                         .toFixed(0)
                         .toString()
                         .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                   </li>
                   <li className="AVBTableFig">
                     {"$" +
-                      item.qsp2
+                      (item.qsp2 / 1000)
                         .toFixed(0)
                         .toString()
                         .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
@@ -1251,14 +1251,14 @@ const AVBBarChart = ({
                   </li>
                   <li className="AVBTableFig">
                     {"$" +
-                      item.qbp3
+                      (item.qbp3 / 1000)
                         .toFixed(0)
                         .toString()
                         .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                   </li>
                   <li className="AVBTableFig">
                     {"$" +
-                      item.qsp3
+                      (item.qsp3 / 1000)
                         .toFixed(0)
                         .toString()
                         .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
@@ -1270,14 +1270,14 @@ const AVBBarChart = ({
                   </li>
                   <li className="AVBTableFig">
                     {"$" +
-                      item.qbp4
+                      (item.qbp4 / 1000)
                         .toFixed(0)
                         .toString()
                         .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                   </li>
                   <li className="AVBTableFig">
                     {"$" +
-                      item.qsp4
+                      (item.qsp4 / 1000)
                         .toFixed(0)
                         .toString()
                         .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
@@ -1289,7 +1289,7 @@ const AVBBarChart = ({
                   </li>
                   <li className="AVBTableFig">
                     {"$" +
-                      item.totalbprofit
+                      (item.totalbprofit / 1000)
                         .toFixed(0)
                         .toString()
                         .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
@@ -1300,19 +1300,19 @@ const AVBBarChart = ({
                     <li className="AVBTableFig">
                       {currentquarter === 1
                         ? "$" +
-                          item.qbp1
+                          (item.qbp1 / 1000)
                             .toFixed(0)
                             .toString()
                             .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                         : currentquarter === 2
                         ? "$" +
-                          (item.qbp1 + item.qbp2)
+                          ((item.qbp1 + item.qbp2) / 1000)
                             .toFixed(0)
                             .toString()
                             .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                         : currentquarter === 3
                         ? "$" +
-                          (item.qbp1 + item.qbp2 + item.qbp3)
+                          ((item.qbp1 + item.qbp2 + item.qbp3) / 1000)
                             .toFixed(0)
                             .toString()
                             .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
@@ -1322,7 +1322,7 @@ const AVBBarChart = ({
 
                   <li className="AVBTableFig">
                     {"$" +
-                      item.totalsprofit
+                      (item.totalsprofit / 1000)
                         .toFixed(0)
                         .toString()
                         .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
@@ -1371,14 +1371,14 @@ const AVBBarChart = ({
           <li className="AVBFirstCol">TOTAL</li>
           <li className="AVBTableFig">
             {"$" +
-              qb1totalp
+              (qb1totalp / 1000)
                 .toFixed(0)
                 .toString()
                 .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
           </li>
           <li className="AVBTableFig">
             {"$" +
-              qs1totalp
+              (qs1totalp / 1000)
                 .toFixed(0)
                 .toString()
                 .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
@@ -1390,14 +1390,14 @@ const AVBBarChart = ({
           </li>
           <li className="AVBTableFig">
             {"$" +
-              qb2totalp
+              (qb2totalp / 1000)
                 .toFixed(0)
                 .toString()
                 .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
           </li>
           <li className="AVBTableFig">
             {"$" +
-              qs2totalp
+              (qs2totalp / 1000)
                 .toFixed(0)
                 .toString()
                 .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
@@ -1409,14 +1409,14 @@ const AVBBarChart = ({
           </li>
           <li className="AVBTableFig">
             {"$" +
-              qb3totalp
+              (qb3totalp / 1000)
                 .toFixed(0)
                 .toString()
                 .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
           </li>
           <li className="AVBTableFig">
             {"$" +
-              qs3totalp
+              (qs3totalp / 1000)
                 .toFixed(0)
                 .toString()
                 .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
@@ -1428,14 +1428,14 @@ const AVBBarChart = ({
           </li>
           <li className="AVBTableFig">
             {"$" +
-              qb4totalp
+              (qb4totalp / 1000)
                 .toFixed(0)
                 .toString()
                 .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
           </li>
           <li className="AVBTableFig">
             {"$" +
-              qs4totalp
+              (qs4totalp / 1000)
                 .toFixed(0)
                 .toString()
                 .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
@@ -1447,7 +1447,7 @@ const AVBBarChart = ({
           </li>
           <li className="AVBTableFig">
             {"$" +
-              totaltotalbp
+              (totaltotalbp / 1000)
                 .toFixed(0)
                 .toString()
                 .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
@@ -1458,19 +1458,19 @@ const AVBBarChart = ({
             <li className="AVBTableFig">
               {currentquarter === 1
                 ? "$" +
-                  qb1totalp
+                  (qb1totalp / 1000)
                     .toFixed(0)
                     .toString()
                     .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                 : currentquarter === 2
                 ? "$" +
-                  (qb1totalp + qb2totalp)
+                  ((qb1totalp + qb2totalp) / 1000)
                     .toFixed(0)
                     .toString()
                     .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                 : currentquarter === 3
                 ? "$" +
-                  (qb1totalp + qb2totalp + qb3totalp)
+                  ((qb1totalp + qb2totalp + qb3totalp) / 1000)
                     .toFixed(0)
                     .toString()
                     .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
@@ -1479,7 +1479,7 @@ const AVBBarChart = ({
           )}
           <li className="AVBTableFig">
             {"$" +
-              totaltotalsp
+              (totaltotalsp / 1000)
                 .toFixed(0)
                 .toString()
                 .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
