@@ -119,6 +119,7 @@ const USPositionReport = () => {
   var group = "";
   var prod = {};
   var u = 0;
+  var uplts = 0;
   var prof = 0;
   var currval = 0;
 
@@ -156,6 +157,7 @@ const USPositionReport = () => {
               </tr>,
               Object.entries(prod).map((j, k) => {
                 u = 0;
+                uplts = 0;
                 prof = 0;
                 currval = 0;
                 return [
@@ -166,6 +168,7 @@ const USPositionReport = () => {
                   </tr>,
                   j[1].map((x) => {
                     u = u + Number(x.Inventory);
+                    uplts = uplts + Number(x.InventoryPallets);
                     var res = handlePProfit(x.QSID, x.Inventory, x.EWPrice);
                     prof = prof + Number(res.replace("$", "").replace(",", ""));
                     currval =
@@ -224,7 +227,7 @@ const USPositionReport = () => {
                               .toString()
                               .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                           </td>
-                          <td>
+                          <td className="fig">
                             {Number(x.InventoryPallets)
                               .toFixed(2)
                               .toString()
@@ -318,7 +321,15 @@ const USPositionReport = () => {
                           .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                       </h4>
                     </td>
-                    <td colSpan={6}></td>
+                    <td className="fig">
+                      <h4>
+                        {uplts
+                          .toFixed(2)
+                          .toString()
+                          .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                      </h4>
+                    </td>
+                    <td colSpan={5}></td>
                     <td className="fig">
                       <h4>{currencify(currval, "$", 0)}</h4>
                     </td>
