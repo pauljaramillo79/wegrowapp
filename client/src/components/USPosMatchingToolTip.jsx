@@ -25,7 +25,8 @@ const USPosMatchingToolTip = ({ usposnumber, usposmatchnumber }) => {
           <h4>WGS</h4>
           <h4>Trader</h4>
           <h4>Customer</h4>
-          <h4>Quantity (mt)</h4>
+          <h4>Qty (mt)</h4>
+          <h4>Qty (pallets)</h4>
           <h4>Sales Price (/mt)</h4>
           <h4>Profit (pmt)</h4>
           <h4>Shipment Date</h4>
@@ -37,6 +38,7 @@ const USPosMatchingToolTip = ({ usposnumber, usposmatchnumber }) => {
                 <p>{item.tCode}</p>
                 <p>{item.companyCode}</p>
                 <p>{item.quantity}</p>
+                <p>{item.quantitypallets}</p>
                 <p>{"$" + item.priceAfterInterest}</p>
                 <p>{"$" + item.tradingProfit}</p>
                 <p>{item.whexit}</p>

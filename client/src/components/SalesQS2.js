@@ -140,6 +140,7 @@ const SalesQS2 = () => {
     bolcharges: 0,
     outboundothers: 0,
     totaloutbound: 0,
+    quantitypallets: 0,
   };
   const QSValuesInit = {
     KTP: "",
@@ -230,6 +231,7 @@ const SalesQS2 = () => {
     bolcharges: "$ 0.00",
     outboundothers: "$ 0.00",
     totaloutbound: "$ 0.00",
+    quantitypallets: "",
   };
 
   // State Variables
@@ -3761,6 +3763,24 @@ const SalesQS2 = () => {
                   onKeyDown={ignoreEnter}
                 />
               </div>
+              {QSData.saleType === 3 ? (
+                <div className="form-group">
+                  <label># Pallets:</label>
+                  <input
+                    className="QSfig2 canceldrag"
+                    name="quantitypallets"
+                    value={QSValues.quantitypallets}
+                    type="text"
+                    placeholder="# pallets"
+                    onChange={QtyChange}
+                    onBlur={QtyBlur}
+                    required
+                    onKeyDown={ignoreEnter}
+                  ></input>
+                </div>
+              ) : (
+                ""
+              )}
               <fieldset>
                 <legend>Costs (per mt)</legend>
                 <div className="form-group">

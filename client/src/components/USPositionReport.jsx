@@ -11,12 +11,13 @@ import USMktPriceTooltip from "./USMktPriceTooltip";
 import { ProfRepContext } from "../contexts/ProfRepProvider";
 
 const USPositionReport = () => {
-  const { setQStoload, setLoaduser, setFromdropdown } =
-    useContext(LoadQSContext);
+  const { setQStoload, setLoaduser, setFromdropdown } = useContext(
+    LoadQSContext
+  );
   const { mktpricedata } = useContext(ProfRepContext);
   // eslint-disable-next-line no-extend-native
-  Array.prototype.groupBy = function (key) {
-    return this.reduce(function (groups, item) {
+  Array.prototype.groupBy = function(key) {
+    return this.reduce(function(groups, item) {
       const val = item[key];
       groups[val] = groups[val] || [];
       groups[val].push(item);
@@ -129,6 +130,7 @@ const USPositionReport = () => {
             <th>USWGP</th>
             <th className="fig">Quantity</th>
             <th className="fig">Inventory</th>
+            <th className="fig">In Pallets</th>
             <th>Warehouse</th>
             <th className="fig">EW Price</th>
             <th className="fig">Storage</th>
@@ -148,7 +150,7 @@ const USPositionReport = () => {
             // eslint-disable-next-line no-sparse-arrays
             return [
               <tr>
-                <td className="usprodgroup" colSpan={13}>
+                <td className="usprodgroup" colSpan={14}>
                   <p>{group}</p>
                 </td>
               </tr>,
@@ -158,7 +160,7 @@ const USPositionReport = () => {
                 currval = 0;
                 return [
                   <tr>
-                    <td className="usproduct" colSpan={13}>
+                    <td className="usproduct" colSpan={14}>
                       <h4>{Object.keys(prod)[k]}</h4>
                     </td>
                   </tr>,
@@ -218,6 +220,12 @@ const USPositionReport = () => {
                           </td>
                           <td className="fig">
                             {Number(x.Inventory)
+                              .toFixed(2)
+                              .toString()
+                              .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                          </td>
+                          <td>
+                            {Number(x.InventoryPallets)
                               .toFixed(2)
                               .toString()
                               .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
