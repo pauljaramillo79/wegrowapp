@@ -87,6 +87,7 @@ const reducer = (state, action) => {
   }
 };
 function App() {
+  const role = JSON.parse(localStorage.getItem("role"));
   const [state, dispatch] = useReducer(reducer, initialState);
   return (
     // <ProfitabilityProvider>
@@ -103,33 +104,84 @@ function App() {
                 <Router>
                   <Nav />
                   <Switch>
-                    <Route exact path="/">
-                      <PositionsGrid />
-                    </Route>
-                    <Route path="/sales">
-                      <SalesGrid2 />
-                    </Route>
+                    {role === 4 ? (
+                      <Route path="/">
+                        <LogisticsProvider>
+                          <LogisticsGrid />
+                        </LogisticsProvider>
+                      </Route>
+                    ) : role === 3 ? (
+                      <>
+                        <Route path="/analysis">
+                          <AnalysisGrid />
+                        </Route>
+                        <Route exact path="/">
+                          <PositionsGrid />
+                        </Route>
+                        <Route path="/sales">
+                          <SalesGrid2 />
+                        </Route>
+                        <Route path="/logistics">
+                          <LogisticsProvider>
+                            <LogisticsGrid />
+                          </LogisticsProvider>
+                        </Route>
+                      </>
+                    ) : role === 2 ? (
+                      <>
+                        <Route path="/management">
+                          <ManagementGrid />
+                        </Route>
+                        <Route path="/analysis">
+                          <AnalysisGrid />
+                        </Route>
+                        <Route exact path="/">
+                          <PositionsGrid />
+                        </Route>
+                        <Route path="/sales">
+                          <SalesGrid2 />
+                        </Route>
+                        <Route path="/logistics">
+                          <LogisticsProvider>
+                            <LogisticsGrid />
+                          </LogisticsProvider>
+                        </Route>
+                        <Route path="/budget">
+                          <BudgetGrid />
+                        </Route>
+                      </>
+                    ) : role === 1 ? (
+                      <>
+                        <Route path="/management">
+                          <ManagementGrid />
+                        </Route>
+                        <Route path="/analysis">
+                          <AnalysisGrid />
+                        </Route>
+                        <Route exact path="/">
+                          <PositionsGrid />
+                        </Route>
+                        <Route path="/sales">
+                          <SalesGrid2 />
+                        </Route>
+                        <Route path="/logistics">
+                          <LogisticsProvider>
+                            <LogisticsGrid />
+                          </LogisticsProvider>
+                        </Route>
+                        <Route path="/budget">
+                          <BudgetGrid />
+                        </Route>
+                        <Route path="/admin">
+                          <Admin />
+                        </Route>
+                      </>
+                    ) : (
+                      ""
+                    )}
                     {/* <Route path="/sales2">
                       <SalesGrid2 />
                     </Route> */}
-                    <Route path="/management">
-                      <ManagementGrid />
-                    </Route>
-                    <Route path="/admin">
-                      <Admin />
-                    </Route>
-                    <Route path="/analysis">
-                      <AnalysisGrid />
-                    </Route>
-
-                    <Route path="/logistics">
-                      <LogisticsProvider>
-                        <LogisticsGrid />
-                      </LogisticsProvider>
-                    </Route>
-                    <Route path="/budget">
-                      <BudgetGrid />
-                    </Route>
                   </Switch>
                 </Router>
               </>
