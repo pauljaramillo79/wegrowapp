@@ -62,39 +62,77 @@ const MyOperations = () => {
   useEffect(() => {
     if (selectedTrafficID)
       Axios.post("/getmyoperations", { selectedTrafficID }).then(
-        (response) => setOperations(response.data)
+        (response) => {
+          setOperations(response.data);
+          setFoperations(response.data);
+        }
         // console.log(response.data)
       );
   }, [selectedTrafficID]);
 
+  const [filtertext, setFiltertext] = useState();
+  const [foperations, setFoperations] = useState();
+
+  useEffect(() => {
+    if (operations && operations.length > 0) {
+      const results = operations.filter(
+        (item) =>
+          item.customer.toLowerCase().includes(filtertext.toLowerCase()) ||
+          item.abbreviation.toLowerCase().includes(filtertext.toLowerCase()) ||
+          item.supplier.toLowerCase().includes(filtertext.toLowerCase()) ||
+          item.portOfDestination
+            .toLowerCase()
+            .includes(filtertext.toLowerCase()) ||
+          item.portOfLoad.toLowerCase().includes(filtertext.toLowerCase()) ||
+          item.KTS.includes(filtertext) ||
+          item.KTP.includes(filtertext) ||
+          item.QSID.toFixed().includes(filtertext)
+      );
+      setFoperations(results);
+      console.log(results);
+    }
+    // console.log(operations);
+  }, [filtertext]);
+
   return (
     <>
-      <div className="trafficbuttons">
-        {trafficmanagers
-          ? trafficmanagers.map((trf) => {
-              return trf.traffic !== "na" ? (
-                <>
-                  <button
-                    className={
-                      selectedTraffic === trf.traffic ? "activetrfbtn" : ""
-                    }
-                    value={trf.traffic}
-                    onClick={(e) => {
-                      setSelectedTraffic(e.target.value);
-                    }}
-                  >
-                    {trf.traffic}
-                  </button>
-                </>
-              ) : (
-                ""
-              );
-            })
-          : ""}
+      <div className="opheader">
+        <div className="trafficbuttons">
+          {trafficmanagers
+            ? trafficmanagers.map((trf) => {
+                return trf.traffic !== "na" ? (
+                  <>
+                    <button
+                      className={
+                        selectedTraffic === trf.traffic ? "activetrfbtn" : ""
+                      }
+                      value={trf.traffic}
+                      onClick={(e) => {
+                        setSelectedTraffic(e.target.value);
+                        setFiltertext("");
+                      }}
+                    >
+                      {trf.traffic}
+                    </button>
+                  </>
+                ) : (
+                  ""
+                );
+              })
+            : ""}
+        </div>
+        <div className="opsearchbar">
+          <input
+            type="text"
+            placeholder="search"
+            value={filtertext}
+            onChange={(e) => setFiltertext(e.target.value)}
+          />
+        </div>
       </div>
       <div className="operations">
-        {operations && operations.length > 0 ? (
-          operations.map((op) => {
+        {foperations && foperations.length > 0 ? (
+          foperations.map((op) => {
             return (
               <SingleOperation
                 operation={op}

@@ -18,3 +18,17 @@
 .trafficbuttons .activetrfbtn {
   background-color: rgb(68, 65, 162);
 }
+.opheader {
+  display: flex;
+  flex-direction: column;
+}
+.opsearchbar {
+  margin-left: 3rem;
+  margin-top: 1.5rem;
+}
+.opsearchbar input {
+  padding: 0.4rem 2rem;
+  border-radius: 0.75rem;
+  border: none;
+  width: 300px;
+}
