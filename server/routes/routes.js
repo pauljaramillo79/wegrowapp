@@ -2399,4 +2399,31 @@ router.post("/loadcurrentbudget", (req, res) => {
   );
 });
 
+router.post("/getmyoperations", (req, res) => {
+  let trafficid = req.body.selectedTrafficID;
+  db.query(
+    "SELECT customerList.companyCode AS customer, abbreviation, quantity, supplierlist.companyCode AS supplier, KTP, KTS, QSID,DATE_FORMAT(`from`,'%Y-%m-%d') AS start, DATE_FORMAT(`to`,'%Y-%m-%d') AS end, portOfDestination, portOfLoad  FROM quotationsheet INNER JOIN customerList ON quotationsheet.customerID = customerList.customerID INNER JOIN (productList INNER JOIN prodNames ON productList.productName = prodNames.prodNameID) ON quotationsheet.productID = productList.productID INNER JOIN supplierlist ON quotationsheet.supplierID = supplierlist.supplierID INNER JOIN POLList ON quotationsheet.POLID = POLList.POLID INNER JOIN PODList ON quotationsheet.PODID = PODList.PODID WHERE saleComplete IN (1, -1) AND finalComplete=0 AND trafficID=?",
+    [trafficid],
+    (err, results) => {
+      if (err) {
+        console.log(err);
+      }
+      if (results.length > 0) {
+        res.status(200).send(results);
+        // } else if (results.length === 0) {
+        //   res.json({
+        //     success: true,
+        //     msg: "No files assigned to this traffic manager",
+        //   });
+      }
+      if (results.length === 0) {
+        res.json({
+          success: true,
+          msg: "No files assigned to this traffic manager",
+        });
+      }
+    }
+  );
+});
+
 module.exports = router;

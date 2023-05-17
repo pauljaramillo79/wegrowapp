@@ -63,7 +63,7 @@ const InProgress = () => {
   useEffect(() => {
     Axios.post("/salesinprogress").then((response) => {
       setInprogresslist(response.data);
-      console.log(response.data[0]);
+      // console.log(response.data[0]);
     });
     Axios.post("/salesinprogressassigned").then((response) => {
       setAssignedlist(response.data);

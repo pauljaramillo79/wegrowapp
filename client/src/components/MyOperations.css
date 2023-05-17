@@ -1,0 +1,20 @@
+.trafficbuttons,
+.operations {
+  margin-top: 1rem;
+  margin-left: 3rem;
+}
+.trafficbuttons button {
+  margin-left: 1rem;
+  padding: 0.4rem 2rem;
+  border-radius: 1rem;
+  border: none;
+  background-color: rgb(149, 148, 199);
+  color: white;
+}
+.trafficbuttons button:hover {
+  cursor: pointer;
+  background-color: rgb(68, 65, 162);
+}
+.trafficbuttons .activetrfbtn {
+  background-color: rgb(68, 65, 162);
+}

@@ -1,0 +1,111 @@
+.operation {
+  background-color: white;
+  min-height: 8rem;
+  margin-bottom: 1rem;
+  width: 80vw;
+  border-radius: 1rem;
+  display: flex;
+  flex-direction: row;
+  font-family: "Roboto", sans-serif;
+}
+.operation:hover {
+  cursor: pointer;
+  background-color: rgb(238, 238, 238);
+}
+.opleftlabel {
+  min-height: 100%;
+  border-top-left-radius: 1rem;
+  border-bottom-left-radius: 1rem;
+  background-color: rgb(68, 65, 162);
+  padding: 1.5rem 2rem;
+  width: 15vw;
+  min-width: 250px;
+  color: white;
+}
+.opleftlabel h2 {
+  text-transform: uppercase;
+  font-size: 1rem;
+}
+.opleftlabel h3 {
+  background-color: rgb(68, 65, 162);
+  font-size: 0.8rem;
+  font-weight: 400;
+}
+.opleftlabel p {
+  margin-top: 1.5rem;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+}
+.opnumberlabel {
+  background-color: black;
+  color: white;
+  min-width: 9.1rem;
+  max-width: 9.1rem;
+  padding: 1rem 0;
+  border-top: 2px solid white;
+  transform: rotate(270deg) translate(-21%, -59%);
+  height: 85px;
+}
+.opnumberlabel p {
+  display: flex;
+  padding: 0;
+  font-size: 0.8rem;
+  /* font-weight: 600; */
+  align-items: center;
+  justify-content: center;
+}
+.optimeline {
+  display: flex;
+  flex-direction: row;
+  margin-top: 2rem;
+  font-size: 0.7rem;
+  width: 500px;
+  justify-content: center;
+}
+.tlsegment {
+  display: flex;
+  flex-direction: column;
+  line-height: 0.8rem;
+  border-top: solid 1px black;
+  padding-top: 0.5rem;
+  position: relative;
+  /* color:rgb(132, 196, 76) */
+}
+.tlsegment::before {
+  content: "";
+  min-height: 9px;
+  min-width: 9px;
+  background-color: black;
+  border-radius: 50%;
+  text-align: right; /* display: inline-block; */
+  position: absolute;
+  top: -5px;
+  /* left: -5px; */
+}
+.tlnow::before {
+  min-height: 12px;
+  min-width: 12px;
+  top: -7px;
+  /* left: -8px; */
+  background-color: rgb(72, 190, 72);
+}
+.tlfsegment {
+  display: flex;
+  flex-direction: column;
+}
+.opprogress {
+  display: flex;
+  flex-direction: column;
+}
+.oporigindestination {
+  margin-top: 2rem;
+  width: 500px;
+  font-family: "Roboto", sans-serif;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+}
+.oporigindestination ul {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+}

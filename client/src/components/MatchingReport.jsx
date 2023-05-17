@@ -14,7 +14,7 @@ import Axios from "axios";
 // import { search } from "../../../server/routes/routes";
 
 const fetchpossales = (uswgp) => {
-  console.log(uswgp);
+  // console.log(uswgp);
 };
 
 const MatchingReport = ({

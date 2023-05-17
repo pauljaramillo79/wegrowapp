@@ -5,6 +5,7 @@ import MatchingGrid from "./MatchingGrid";
 import InProgress from "./InProgress";
 import Axios from "axios";
 import { LogisticsContext } from "../contexts/LogisticsProvider";
+import MyOperations from "./MyOperations";
 
 const LogisticsGrid = () => {
   const { updateScores } = useContext(LogisticsContext);
@@ -18,6 +19,15 @@ const LogisticsGrid = () => {
   return (
     <div className="logcontainer">
       <div className="lognav">
+        <NavLink
+          className="myoper"
+          activeClassName="navbaractive"
+          to="/logistics/myoperations"
+          exact
+        >
+          My Operations
+        </NavLink>
+
         <NavLink
           activeClassName="navbaractive"
           to="/logistics/inprogress"
@@ -42,6 +52,9 @@ const LogisticsGrid = () => {
         </div>
       </div>
       <div className="gridcontainer loggridcontainer">
+        <Route path="/logistics/myoperations">
+          <MyOperations />
+        </Route>
         <Route path="/logistics/matching">
           <MatchingGrid />
         </Route>
