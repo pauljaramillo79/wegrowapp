@@ -2402,7 +2402,7 @@ router.post("/loadcurrentbudget", (req, res) => {
 router.post("/getmyoperations", (req, res) => {
   let trafficid = req.body.selectedTrafficID;
   db.query(
-    "SELECT customerList.companyCode AS customer, abbreviation, quantity, supplierlist.companyCode AS supplier, KTP, KTS, QSID,DATE_FORMAT(`from`,'%Y-%m-%d') AS start, DATE_FORMAT(`to`,'%Y-%m-%d') AS end, portOfDestination, portOfLoad  FROM quotationsheet INNER JOIN customerList ON quotationsheet.customerID = customerList.customerID INNER JOIN (productList INNER JOIN prodNames ON productList.productName = prodNames.prodNameID) ON quotationsheet.productID = productList.productID INNER JOIN supplierlist ON quotationsheet.supplierID = supplierlist.supplierID INNER JOIN POLList ON quotationsheet.POLID = POLList.POLID INNER JOIN PODList ON quotationsheet.PODID = PODList.PODID WHERE saleComplete IN (1, -1) AND finalComplete=0 AND trafficID=?",
+    "SELECT customerList.companyCode AS customer, abbreviation, quantity, supplierlist.companyCode AS supplier, KTP, KTS, QSID,DATE_FORMAT(`from`,'%Y-%m-%d') AS start, DATE_FORMAT(`to`,'%Y-%m-%d') AS end, portOfDestination, portOfLoad, SCComplete, PCComplete, bookingComplete, traderList.tCode AS trader FROM quotationsheet INNER JOIN customerList ON quotationsheet.customerID = customerList.customerID INNER JOIN (productList INNER JOIN prodNames ON productList.productName = prodNames.prodNameID) ON quotationsheet.productID = productList.productID INNER JOIN supplierlist ON quotationsheet.supplierID = supplierlist.supplierID INNER JOIN POLList ON quotationsheet.POLID = POLList.POLID INNER JOIN PODList ON quotationsheet.PODID = PODList.PODID INNER JOIN traderList ON quotationsheet.traderID = traderList.traderID WHERE saleComplete IN (1, -1) AND finalComplete=0 AND trafficID=?",
     [trafficid],
     (err, results) => {
       if (err) {
@@ -2420,6 +2420,25 @@ router.post("/getmyoperations", (req, res) => {
         res.json({
           success: true,
           msg: "No files assigned to this traffic manager",
+        });
+      }
+    }
+  );
+});
+
+router.post("/saveopedits", (req, res) => {
+  let id = req.body.id;
+  let SCComplete = req.body.opedits.SCCompleteBool;
+  db.query(
+    "UPDATE quotationsheet SET SCComplete = ? WHERE QSID=?",
+    [SCComplete, id],
+    (err, results) => {
+      if (err) {
+        console.log(err);
+      } else {
+        res.json({
+          success: true,
+          msg: "Changes Saved",
         });
       }
     }

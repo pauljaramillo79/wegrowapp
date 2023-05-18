@@ -1,8 +1,18 @@
 import React, { useState, useEffect } from "react";
 import "./SingleOperation.css";
 import moment from "moment";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCheckCircle } from "@fortawesome/free-solid-svg-icons";
+import { faMinusCircle } from "@fortawesome/free-solid-svg-icons";
+import { faPenToSquare } from "@fortawesome/free-regular-svg-icons";
+import Axios from "axios";
 
-const SingleOperation = ({ operation, selectedTraffic }) => {
+const SingleOperation = ({
+  operation,
+  selectedTraffic,
+  setReloadops,
+  reloadops,
+}) => {
   const [todaydate, setTodaydate] = useState(moment());
   const [shipmentstart, setShipmentstart] = useState();
   const [shipmentend, setShipmentend] = useState();
@@ -14,6 +24,16 @@ const SingleOperation = ({ operation, selectedTraffic }) => {
   const [distb, setDistb] = useState(
     moment().diff(moment(operation.start), "days")
   );
+  const [editmode, setEditmode] = useState(false);
+
+  const initvalues = {
+    SCCompleteBool: operation.SCComplete,
+    SCComplete:
+      operation.SCComplete === null || operation.SCComplete === 0
+        ? false
+        : true,
+  };
+  const [opedits, setOpedits] = useState(initvalues);
 
   // const setdates = () => {
   //   return new Promise((resolve, reject) => {
@@ -77,8 +97,63 @@ const SingleOperation = ({ operation, selectedTraffic }) => {
   //     : shipmentend.diff(shipmentstart, "days");
 
   //   .format("YYYY-MM-DD")
+
+  function isEqual(obj1, obj2) {
+    var props1 = Object.getOwnPropertyNames(obj1);
+    var props2 = Object.getOwnPropertyNames(obj2);
+    if (props1.length != props2.length) {
+      return false;
+    }
+    for (var i = 0; i < props1.length; i++) {
+      let val1 = obj1[props1[i]];
+      let val2 = obj2[props1[i]];
+      let isObjects = isObject(val1) && isObject(val2);
+      if (
+        (isObjects && !isEqual(val1, val2)) ||
+        (!isObjects && val1 !== val2)
+      ) {
+        return false;
+      }
+    }
+    return true;
+  }
+  function isObject(object) {
+    return object != null && typeof object === "object";
+  }
+
+  const handleSave = (id) => {
+    setEditmode(false);
+    if (!isEqual(initvalues, opedits)) {
+      Axios.post("/saveopedits", { id: id, opedits: opedits }).then(
+        (response) => {
+          console.log(response);
+          setReloadops(!reloadops);
+        }
+      );
+    }
+  };
+
   return (
     <div className="operation">
+      {editmode === false ? (
+        <FontAwesomeIcon
+          icon={faPenToSquare}
+          className="opeditbutton"
+          onClick={(e) => {
+            setEditmode(true);
+          }}
+        />
+      ) : (
+        <button
+          className="opsavebutton"
+          onClick={(e) => {
+            handleSave(operation.QSID);
+          }}
+        >
+          Save
+        </button>
+      )}
+      <p className="optrader">{operation.trader}</p>
       <div className="opleftlabel">
         <h2>{operation.customer}</h2>
         <h3>{operation.abbreviation}</h3>
@@ -98,76 +173,6 @@ const SingleOperation = ({ operation, selectedTraffic }) => {
           </ul>
         </div>
         <div className="optimeline">
-          {/* {shipmentstart.diff(todaydate, "days") > 0 ? (
-            <>
-              <div
-                style={{
-                  width:
-                    (400 * Number(shipmentstart.diff(todaydate, "days"))) /
-                      timelinedays +
-                    "px",
-                  minWidth: "25px",
-                }}
-                className="tlsegment"
-              >
-                <p>{todaydate.format("MMM d")}</p>
-              </div>
-              <div
-                style={{
-                  width:
-                    (400 * Number(shipmentend.diff(shipmentstart, "days"))) /
-                      timelinedays +
-                    "px",
-                  minWidth: "35px",
-                  backgroundColor: "rgba(132,196,76,0.3",
-                }}
-                className="tlsegment"
-              >
-                <p>From: </p>
-                <p>{shipmentstart.format("MMM d")}</p>
-              </div>
-            </>
-          ) : (
-            <>
-              <div
-                style={{
-                  width:
-                    (400 * Number(todaydate.diff(shipmentstart, "days"))) /
-                    timelinedays,
-                  minWidth: "25px",
-                  backgroundColor: "rgba(132,196,76,0.3",
-                }}
-                className="tlsegment"
-              >
-                <p>From: </p>
-                <p>{shipmentstart.format("MMM d")}</p>
-              </div>
-              <div
-                style={{
-                  width:
-                    (400 * Number(shipmentend.diff(todaydate, "days"))) /
-                      timelinedays +
-                    "px",
-                  minWidth: "35px",
-                  backgroundColor: "rgba(132,196,76,0.3",
-                }}
-                className="tlsegment"
-              >
-                <p>{todaydate.format("MMM d")}</p>
-              </div>
-            </>
-          )}
-          <div
-            style={
-              {
-                //   backgroundColor: "rgba(132,196,76,0.3",
-              }
-            }
-            className="tlsegment"
-          >
-            <p>To: </p>
-            <p>{shipmentend.format("MMM d")}</p>
-          </div> */}
           {moment().diff(moment(operation.end), "days") > 0 ? (
             <>
               <div className="tlfsegment">
@@ -302,6 +307,67 @@ const SingleOperation = ({ operation, selectedTraffic }) => {
           ) : (
             ""
           )}
+        </div>
+      </div>
+      <div className="opchecklistsnapshot">
+        <div className="checklist">
+          <div className="checklistitem">
+            {editmode === false ? (
+              operation.SCComplete === 1 ? (
+                <FontAwesomeIcon
+                  icon={faCheckCircle}
+                  className="opgreencheck"
+                />
+              ) : (
+                <FontAwesomeIcon icon={faMinusCircle} />
+              )
+            ) : (
+              <input
+                type="checkbox"
+                checked={
+                  opedits["SCComplete"] === null
+                    ? operation.SCComplete === 1
+                      ? true
+                      : false
+                    : opedits["SCComplete"]
+                }
+                onClick={(e) => {
+                  if (opedits["SCComplete"] !== null) {
+                    setOpedits({
+                      ...opedits,
+                      SCComplete: !opedits["SCComplete"],
+                      SCCompleteBool: opedits["SCComplete"] === true ? 0 : 1,
+                    });
+                  } else if (operation.SCComplete === 1) {
+                    setOpedits({
+                      ...opedits,
+                      SCComplete: false,
+                      SCCompleteBool: 0,
+                    });
+                  } else if (
+                    operation.SCComplete === 0 ||
+                    operation.SCComplete == null
+                  ) {
+                    setOpedits({
+                      ...opedits,
+                      SCComplete: true,
+                      SCCompleteBool: 1,
+                    });
+                  }
+                }}
+              />
+            )}
+            <p>Sales Contract</p>
+          </div>
+
+          <div className="checklistitem">
+            {operation.PCComplete === 1 ? (
+              <FontAwesomeIcon icon={faCheckCircle} className="opgreencheck" />
+            ) : (
+              <FontAwesomeIcon icon={faMinusCircle} />
+            )}
+            <p>Purchase Contract</p>
+          </div>
         </div>
       </div>
     </div>

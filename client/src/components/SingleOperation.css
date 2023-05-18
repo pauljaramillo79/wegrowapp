@@ -7,11 +7,43 @@
   display: flex;
   flex-direction: row;
   font-family: "Roboto", sans-serif;
+  position: relative;
 }
 .operation:hover {
   cursor: pointer;
   background-color: rgb(238, 238, 238);
 }
+.opeditbutton {
+  position: absolute;
+  right: 0;
+  margin: 0.5rem;
+}
+.opeditbutton:hover {
+  color: rgb(23, 180, 23);
+}
+.opsavebutton {
+  position: absolute;
+  right: 0;
+  margin: 0.5rem;
+  padding: 0.3rem 1rem;
+  color: white;
+  border-radius: 0.8rem;
+  border: none;
+  background-color: rgb(68, 65, 162);
+}
+.opsavebutton:hover {
+  background-color: rgb(121, 118, 195);
+}
+.optrader {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  margin: 0.5rem 1rem;
+  font-family: "Roboto", sans-serif;
+  font-size: 0.8rem;
+  color: rgb(159, 158, 158);
+}
+
 .opleftlabel {
   min-height: 100%;
   border-top-left-radius: 1rem;
@@ -108,4 +140,20 @@
   display: flex;
   width: 100%;
   justify-content: space-between;
+}
+.opchecklistsnapshot {
+  margin-top: 2rem;
+  margin-left: 4rem;
+}
+.checklistitem {
+  display: flex;
+  flex-direction: row;
+}
+.checklistitem p {
+  margin-left: 0.5rem;
+  font-family: "Roboto", sans-serif;
+  font-size: 0.9rem;
+}
+.opgreencheck {
+  color: rgb(15, 177, 15);
 }

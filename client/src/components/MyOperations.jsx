@@ -10,6 +10,7 @@ const MyOperations = () => {
   const [selectedTraffic, setSelectedTraffic] = useState();
   const [selectedTrafficID, setSelectedTrafficID] = useState();
   const [operations, setOperations] = useState();
+  const [reloadops, setReloadops] = useState(false);
 
   // const loadmyoperations = () => {
   //   return new Promise((resolve, reject) => {
@@ -68,7 +69,7 @@ const MyOperations = () => {
         }
         // console.log(response.data)
       );
-  }, [selectedTrafficID]);
+  }, [selectedTrafficID, reloadops]);
 
   const [filtertext, setFiltertext] = useState();
   const [foperations, setFoperations] = useState();
@@ -86,7 +87,8 @@ const MyOperations = () => {
           item.portOfLoad.toLowerCase().includes(filtertext.toLowerCase()) ||
           item.KTS.includes(filtertext) ||
           item.KTP.includes(filtertext) ||
-          item.QSID.toFixed().includes(filtertext)
+          item.QSID.toFixed().includes(filtertext) ||
+          item.trader.toLowerCase().includes(filtertext.toLowerCase())
       );
       setFoperations(results);
       console.log(results);
@@ -137,6 +139,8 @@ const MyOperations = () => {
               <SingleOperation
                 operation={op}
                 selectedTraffic={selectedTraffic}
+                setReloadops={setReloadops}
+                reloadops={reloadops}
               />
             );
           })
