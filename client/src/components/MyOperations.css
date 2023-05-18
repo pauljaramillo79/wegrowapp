@@ -21,10 +21,19 @@
 .opheader {
   display: flex;
   flex-direction: column;
+  position: fixed;
+  background-color: rgb(223, 223, 223);
+  width: 100%;
+  z-index: 10;
+  /* top: 7rem; */
+}
+.operations {
+  margin-top: 8rem;
 }
 .opsearchbar {
   margin-left: 3rem;
   margin-top: 1.5rem;
+  padding-bottom: 1rem;
 }
 .opsearchbar input {
   padding: 0.4rem 2rem;
