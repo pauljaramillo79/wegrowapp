@@ -1,6 +1,6 @@
 .operation {
   background-color: white;
-  min-height: 8rem;
+  min-height: 9.5rem;
   margin-bottom: 1rem;
   width: 80vw;
   border-radius: 1rem;
@@ -21,18 +21,31 @@
 .opeditbutton:hover {
   color: rgb(23, 180, 23);
 }
-.opsavebutton {
+.editbuttons {
   position: absolute;
   right: 0;
-  margin: 0.5rem;
+  margin: 0.7rem;
+  display: flex;
+  flex-direction: column;
+}
+.opsavebutton {
   padding: 0.3rem 1rem;
   color: white;
   border-radius: 0.8rem;
   border: none;
   background-color: rgb(68, 65, 162);
+  margin-bottom: 0.5rem;
 }
 .opsavebutton:hover {
   background-color: rgb(121, 118, 195);
+  cursor: pointer;
+}
+.opcancelbutton {
+  background-color: rgb(179, 40, 40);
+}
+.opcancelbutton:hover {
+  background-color: rgb(212, 88, 88);
+  cursor: pointer;
 }
 .optrader {
   position: absolute;
@@ -62,6 +75,7 @@
   background-color: rgb(68, 65, 162);
   font-size: 0.8rem;
   font-weight: 400;
+  z-index: 0;
 }
 .opleftlabel p {
   margin-top: 1.5rem;
@@ -71,11 +85,11 @@
 .opnumberlabel {
   background-color: black;
   color: white;
-  min-width: 9.1rem;
-  max-width: 9.1rem;
+  min-width: 9.5rem;
+  max-width: 9.5rem;
   padding: 1rem 0;
   border-top: 2px solid white;
-  transform: rotate(270deg) translate(-21%, -59%);
+  transform: rotate(270deg) translate(-22%, -39%);
   height: 85px;
 }
 .opnumberlabel p {
@@ -91,7 +105,7 @@
   flex-direction: row;
   margin-top: 2rem;
   font-size: 0.7rem;
-  width: 500px;
+  width: 350px;
   justify-content: center;
 }
 .tlsegment {
@@ -130,8 +144,8 @@
   flex-direction: column;
 }
 .oporigindestination {
-  margin-top: 2rem;
-  width: 500px;
+  margin-top: 1.5rem;
+  width: 350px;
   font-family: "Roboto", sans-serif;
   text-transform: uppercase;
   font-size: 0.8rem;
@@ -142,18 +156,68 @@
   justify-content: space-between;
 }
 .opchecklistsnapshot {
-  margin-top: 2rem;
+  margin-top: 1.5rem;
   margin-left: 4rem;
+  display: flex;
+  flex-direction: row;
+}
+.opchecklist {
+  margin-right: 2.5rem;
+  font-family: "Roboto", sans-serif;
+  font-size: 0.8rem;
+}
+.opchecklist .bookinginfo {
+  padding: 0.1rem 0.7rem;
+  font-family: "Roboto", sans-serif;
+  font-size: 0.8rem;
+  border-radius: 0.3rem;
+  border: solid 1px rgb(155, 155, 155);
+}
+.opchecklist .setbookinginfo {
+  margin-left: 1.3rem;
 }
 .checklistitem {
   display: flex;
   flex-direction: row;
+  align-items: center;
 }
 .checklistitem p {
   margin-left: 0.5rem;
-  font-family: "Roboto", sans-serif;
-  font-size: 0.9rem;
 }
 .opgreencheck {
   color: rgb(15, 177, 15);
+}
+.opsearchbar {
+  display: flex;
+  flex-direction: row;
+}
+.opsearchclearbtn {
+  padding: 0.6rem 2rem;
+  border: none;
+  margin-left: 1rem;
+  border-radius: 1rem;
+  background-color: gray;
+  color: white;
+  background-color: rgb(68, 65, 162);
+}
+.opsearchclearbtn:hover {
+  cursor: pointer;
+  background-color: rgb(119, 117, 197);
+}
+.bookinginputs {
+  display: flex;
+  flex-direction: column;
+}
+.opincoterms {
+  width: 50px;
+  padding: 0.1rem 0.7rem;
+  font-family: "Roboto", sans-serif;
+  font-size: 0.8rem;
+  border-radius: 0.3rem;
+  border: solid 1px rgb(155, 155, 155);
+  margin-left: 0.5rem;
+}
+.incoitem {
+  width: 125px;
+  justify-content: space-between;
 }

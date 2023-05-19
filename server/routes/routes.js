@@ -577,7 +577,7 @@ router.post("/duplicateQS", (req, res) => {
   QSID = req.body.QSID;
   QSDate = req.body.QSDate;
   db.query(
-    `CREATE TEMPORARY TABLE tmptable SELECT * FROM quotationsheet WHERE (QSID='${QSID}'); ALTER TABLE tmptable CHANGE QSID QSID bigint; UPDATE tmptable SET QSID = NULL, QSDate='${QSDate}'; INSERT INTO quotationsheet SELECT * FROM tmptable; DROP TABLE tmptable;`,
+    `CREATE TEMPORARY TABLE tmptable SELECT * FROM quotationsheet WHERE (QSID='${QSID}'); ALTER TABLE tmptable CHANGE QSID QSID bigint; UPDATE tmptable SET QSID = NULL, QSDate='${QSDate}', SCComplete=0, PCComplete=0, KTS=null, KTP=null, saleComplete=0, bookingComplete=0, pincoterms=null, bookingnumber=null, vesselName=null; INSERT INTO quotationsheet SELECT * FROM tmptable; DROP TABLE tmptable;`,
     (err, results) => {
       if (err) {
         console.log(err);
@@ -2402,7 +2402,7 @@ router.post("/loadcurrentbudget", (req, res) => {
 router.post("/getmyoperations", (req, res) => {
   let trafficid = req.body.selectedTrafficID;
   db.query(
-    "SELECT customerList.companyCode AS customer, abbreviation, quantity, supplierlist.companyCode AS supplier, KTP, KTS, QSID,DATE_FORMAT(`from`,'%Y-%m-%d') AS start, DATE_FORMAT(`to`,'%Y-%m-%d') AS end, portOfDestination, portOfLoad, SCComplete, PCComplete, bookingComplete, traderList.tCode AS trader FROM quotationsheet INNER JOIN customerList ON quotationsheet.customerID = customerList.customerID INNER JOIN (productList INNER JOIN prodNames ON productList.productName = prodNames.prodNameID) ON quotationsheet.productID = productList.productID INNER JOIN supplierlist ON quotationsheet.supplierID = supplierlist.supplierID INNER JOIN POLList ON quotationsheet.POLID = POLList.POLID INNER JOIN PODList ON quotationsheet.PODID = PODList.PODID INNER JOIN traderList ON quotationsheet.traderID = traderList.traderID WHERE saleComplete IN (1, -1) AND finalComplete=0 AND trafficID=?",
+    "SELECT customerList.companyCode AS customer, abbreviation, quantity, supplierlist.companyCode AS supplier, KTP, KTS, QSID,DATE_FORMAT(`from`,'%Y-%m-%d') AS start, DATE_FORMAT(`to`,'%Y-%m-%d') AS end, portOfDestination, portOfLoad, SCComplete, PCComplete, bookingComplete, traderList.tCode AS trader, bookingComplete, freightCompany, vesselName, bookingnumber, ETS, ETATo, incoterms, pincoterms FROM quotationsheet INNER JOIN customerList ON quotationsheet.customerID = customerList.customerID INNER JOIN (productList INNER JOIN prodNames ON productList.productName = prodNames.prodNameID) ON quotationsheet.productID = productList.productID INNER JOIN supplierlist ON quotationsheet.supplierID = supplierlist.supplierID INNER JOIN POLList ON quotationsheet.POLID = POLList.POLID INNER JOIN PODList ON quotationsheet.PODID = PODList.PODID INNER JOIN traderList ON quotationsheet.traderID = traderList.traderID WHERE saleComplete IN (1, -1) AND finalComplete=0 AND trafficID=?",
     [trafficid],
     (err, results) => {
       if (err) {
@@ -2429,9 +2429,25 @@ router.post("/getmyoperations", (req, res) => {
 router.post("/saveopedits", (req, res) => {
   let id = req.body.id;
   let SCComplete = req.body.opedits.SCCompleteBool;
+  let PCComplete = req.body.opedits.PCCompleteBool;
+  let bookingComplete = req.body.opedits.bookingCompleteBool;
+  let bookingnumber = req.body.opedits.bookingnumber;
+  let vesselName = req.body.opedits.vesselName;
+  let pincoterms = req.body.opedits.pincoterms;
+  let incoterms = req.body.opedits.incoterms;
+
   db.query(
-    "UPDATE quotationsheet SET SCComplete = ? WHERE QSID=?",
-    [SCComplete, id],
+    "UPDATE quotationsheet SET SCComplete = ?, PCComplete=?, bookingComplete=?, bookingnumber=?, vesselName=?, pincoterms=?, incoterms=? WHERE QSID=?",
+    [
+      SCComplete,
+      PCComplete,
+      bookingComplete,
+      bookingnumber,
+      vesselName,
+      pincoterms,
+      incoterms,
+      id,
+    ],
     (err, results) => {
       if (err) {
         console.log(err);

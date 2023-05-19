@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import "./SingleOperation.css";
 import moment from "moment";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -6,6 +6,7 @@ import { faCheckCircle } from "@fortawesome/free-solid-svg-icons";
 import { faMinusCircle } from "@fortawesome/free-solid-svg-icons";
 import { faPenToSquare } from "@fortawesome/free-regular-svg-icons";
 import Axios from "axios";
+import { LogisticsContext } from "../contexts/LogisticsProvider";
 
 const SingleOperation = ({
   operation,
@@ -13,10 +14,12 @@ const SingleOperation = ({
   setReloadops,
   reloadops,
 }) => {
+  const { updateScores, setUpdateScores } = useContext(LogisticsContext);
+
   const [todaydate, setTodaydate] = useState(moment());
   const [shipmentstart, setShipmentstart] = useState();
   const [shipmentend, setShipmentend] = useState();
-  const timelinewidth = 400;
+  const timelinewidth = 300;
   const [timelinedays, setTimelinedays] = useState();
   const [dista, setDista] = useState(
     moment().diff(moment(operation.end), "days")
@@ -32,6 +35,21 @@ const SingleOperation = ({
       operation.SCComplete === null || operation.SCComplete === 0
         ? false
         : true,
+    PCCompleteBool: operation.PCComplete,
+    PCComplete:
+      operation.PCComplete === null || operation.PCComplete === 0
+        ? false
+        : true,
+    bookingCompleteBool: operation.bookingComplete,
+    bookingComplete:
+      operation.bookingComplete === null || operation.bookingComplete === 0
+        ? false
+        : true,
+    bookingnumber: operation.bookingnumber,
+    vesselName: operation.vesselName,
+    incoterms: operation.incoterms,
+    pincoterms: operation.pincoterms,
+    incoterms: operation.incoterms,
   };
   const [opedits, setOpedits] = useState(initvalues);
 
@@ -128,6 +146,7 @@ const SingleOperation = ({
         (response) => {
           console.log(response);
           setReloadops(!reloadops);
+          setUpdateScores(!updateScores);
         }
       );
     }
@@ -144,14 +163,24 @@ const SingleOperation = ({
           }}
         />
       ) : (
-        <button
-          className="opsavebutton"
-          onClick={(e) => {
-            handleSave(operation.QSID);
-          }}
-        >
-          Save
-        </button>
+        <div className="editbuttons">
+          <button
+            className="opsavebutton"
+            onClick={(e) => {
+              handleSave(operation.QSID);
+            }}
+          >
+            Save
+          </button>
+          <button
+            className="opsavebutton opcancelbutton"
+            onClick={(e) => {
+              setEditmode(false);
+            }}
+          >
+            Cancel
+          </button>
+        </div>
       )}
       <p className="optrader">{operation.trader}</p>
       <div className="opleftlabel">
@@ -180,7 +209,7 @@ const SingleOperation = ({
                 <div
                   style={{
                     width:
-                      (400 *
+                      (300 *
                         moment(operation.end).diff(
                           moment(operation.start),
                           "days"
@@ -198,7 +227,7 @@ const SingleOperation = ({
                 <div
                   style={{
                     width:
-                      (400 * moment().diff(moment(operation.end), "days")) /
+                      (300 * moment().diff(moment(operation.end), "days")) /
                       moment().diff(moment(operation.start), "days"),
                     minWidth: "38px",
                   }}
@@ -222,7 +251,7 @@ const SingleOperation = ({
                 <div
                   style={{
                     width:
-                      (400 * moment().diff(moment(operation.start), "days")) /
+                      (300 * moment().diff(moment(operation.start), "days")) /
                       moment(operation.end).diff(
                         moment(operation.start),
                         "days"
@@ -239,7 +268,7 @@ const SingleOperation = ({
                 <div
                   style={{
                     width:
-                      (400 * moment(operation.end).diff(moment(), "days")) /
+                      (300 * moment(operation.end).diff(moment(), "days")) /
                       moment(operation.end).diff(
                         moment(operation.start),
                         "days"
@@ -265,7 +294,7 @@ const SingleOperation = ({
                 <div
                   style={{
                     width:
-                      (400 * moment(operation.start).diff(moment(), "days")) /
+                      (300 * moment(operation.start).diff(moment(), "days")) /
                       moment(operation.end).diff(moment(), "days"),
                     minWidth: "38px",
                   }}
@@ -279,7 +308,7 @@ const SingleOperation = ({
                 <div
                   style={{
                     width:
-                      (400 *
+                      (300 *
                         moment(operation.end).diff(
                           moment(operation.start),
                           "days"
@@ -310,7 +339,7 @@ const SingleOperation = ({
         </div>
       </div>
       <div className="opchecklistsnapshot">
-        <div className="checklist">
+        <div className="opchecklist">
           <div className="checklistitem">
             {editmode === false ? (
               operation.SCComplete === 1 ? (
@@ -361,13 +390,164 @@ const SingleOperation = ({
           </div>
 
           <div className="checklistitem">
-            {operation.PCComplete === 1 ? (
-              <FontAwesomeIcon icon={faCheckCircle} className="opgreencheck" />
+            {editmode === false ? (
+              operation.PCComplete === 1 ? (
+                <FontAwesomeIcon
+                  icon={faCheckCircle}
+                  className="opgreencheck"
+                />
+              ) : (
+                <FontAwesomeIcon icon={faMinusCircle} />
+              )
             ) : (
-              <FontAwesomeIcon icon={faMinusCircle} />
+              <input
+                type="checkbox"
+                checked={
+                  opedits["PCComplete"] === null
+                    ? operation.PCComplete === 1
+                      ? true
+                      : false
+                    : opedits["PCComplete"]
+                }
+                onClick={(e) => {
+                  if (opedits["PCComplete"] !== null) {
+                    setOpedits({
+                      ...opedits,
+                      PCComplete: !opedits["PCComplete"],
+                      PCCompleteBool: opedits["PCComplete"] === true ? 0 : 1,
+                    });
+                  } else if (operation.PCComplete === 1) {
+                    setOpedits({
+                      ...opedits,
+                      PCComplete: false,
+                      PCCompleteBool: 0,
+                    });
+                  } else if (
+                    operation.PCComplete === 0 ||
+                    operation.PCComplete == null
+                  ) {
+                    setOpedits({
+                      ...opedits,
+                      PCComplete: true,
+                      PCCompleteBool: 1,
+                    });
+                  }
+                }}
+              />
             )}
             <p>Purchase Contract</p>
           </div>
+          <p style={{ marginTop: "1rem" }}>INCOTERMS</p>
+          <div className="checklistitem incoitem">
+            <p>Purchase: </p>
+            {editmode === true ? (
+              <input
+                className="opincoterms"
+                type="text"
+                value={opedits.pincoterms}
+                onChange={(e) =>
+                  setOpedits({ ...opedits, pincoterms: e.target.value })
+                }
+              />
+            ) : (
+              <p>{operation.pincoterms}</p>
+            )}
+          </div>
+          <div className="checklistitem incoitem">
+            <p>Sales: </p>
+            {editmode === true ? (
+              <input
+                className="opincoterms"
+                type="text"
+                value={opedits.incoterms}
+                onChange={(e) =>
+                  setOpedits({ ...opedits, incoterms: e.target.value })
+                }
+              />
+            ) : (
+              <p>{operation.incoterms}</p>
+            )}
+          </div>
+        </div>
+        <div className="opchecklist">
+          <div className="checklistitem">
+            {editmode === false ? (
+              operation.bookingComplete === 1 ? (
+                <FontAwesomeIcon
+                  icon={faCheckCircle}
+                  className="opgreencheck"
+                />
+              ) : (
+                <FontAwesomeIcon icon={faMinusCircle} />
+              )
+            ) : (
+              <input
+                type="checkbox"
+                checked={
+                  opedits["bookingComplete"] === null
+                    ? operation.bookingComplete === 1
+                      ? true
+                      : false
+                    : opedits["bookingComplete"]
+                }
+                onClick={(e) => {
+                  if (opedits["bookingComplete"] !== null) {
+                    setOpedits({
+                      ...opedits,
+                      bookingComplete: !opedits["bookingComplete"],
+                      bookingCompleteBool:
+                        opedits["bookingComplete"] === true ? 0 : 1,
+                    });
+                  } else if (operation.bookingComplete === 1) {
+                    setOpedits({
+                      ...opedits,
+                      bookingComplete: false,
+                      bookingCompleteBool: 0,
+                    });
+                  } else if (
+                    operation.bookingComplete === 0 ||
+                    operation.bookingComplete == null
+                  ) {
+                    setOpedits({
+                      ...opedits,
+                      bookingComplete: true,
+                      bookingCompleteBool: 1,
+                    });
+                  }
+                }}
+              />
+            )}
+            <p>Booking</p>
+          </div>
+          {editmode === true && opedits.bookingComplete === true ? (
+            <div className="bookinginputs">
+              {" "}
+              <input
+                type="text"
+                className="bookinginfo"
+                placeholder="booking#"
+                value={opedits.bookingnumber}
+                onChange={(e) =>
+                  setOpedits({ ...opedits, bookingnumber: e.target.value })
+                }
+              />
+              <input
+                type="text"
+                className="bookinginfo"
+                placeholder="vesselName"
+                value={opedits.vesselName}
+                onChange={(e) =>
+                  setOpedits({ ...opedits, vesselName: e.target.value })
+                }
+              />
+            </div>
+          ) : (
+            <>
+              {" "}
+              <p className="setbookinginfo">{operation.bookingnumber}</p>
+              <p className="setbookinginfo">{operation.vesselName}</p>
+            </>
+          )}
         </div>
       </div>
     </div>

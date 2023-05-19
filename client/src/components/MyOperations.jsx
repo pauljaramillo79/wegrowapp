@@ -71,7 +71,7 @@ const MyOperations = () => {
       );
   }, [selectedTrafficID, reloadops]);
 
-  const [filtertext, setFiltertext] = useState();
+  const [filtertext, setFiltertext] = useState("");
   const [foperations, setFoperations] = useState();
 
   useEffect(() => {
@@ -130,6 +130,16 @@ const MyOperations = () => {
             value={filtertext}
             onChange={(e) => setFiltertext(e.target.value)}
           />
+          {filtertext !== "" ? (
+            <button
+              onClick={(e) => setFiltertext("")}
+              className="opsearchclearbtn"
+            >
+              Clear
+            </button>
+          ) : (
+            ""
+          )}
         </div>
       </div>
       <div className="operations">
