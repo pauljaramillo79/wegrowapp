@@ -13,14 +13,17 @@ const SingleOperation = ({
   selectedTraffic,
   setReloadops,
   reloadops,
+  timeline,
+  timelinelength,
+  timeintervals,
 }) => {
   const { updateScores, setUpdateScores } = useContext(LogisticsContext);
 
   const [todaydate, setTodaydate] = useState(moment());
-  const [shipmentstart, setShipmentstart] = useState();
-  const [shipmentend, setShipmentend] = useState();
-  const timelinewidth = 300;
-  const [timelinedays, setTimelinedays] = useState();
+  // const [shipmentstart, setShipmentstart] = useState();
+  // const [shipmentend, setShipmentend] = useState();
+  // const timelinewidth = 300;
+  // const [timelinedays, setTimelinedays] = useState();
   const [dista, setDista] = useState(
     moment().diff(moment(operation.end), "days")
   );
@@ -47,9 +50,12 @@ const SingleOperation = ({
         : true,
     bookingnumber: operation.bookingnumber,
     vesselName: operation.vesselName,
+    freightCompany: operation.freightCompany,
     incoterms: operation.incoterms,
     pincoterms: operation.pincoterms,
     incoterms: operation.incoterms,
+    ETS: operation.ETS ? moment(operation.ETS).format("YYYY-MM-DD") : "",
+    ETA: operation.ETA ? moment(operation.ETA).format("YYYY-MM-DD") : "",
   };
   const [opedits, setOpedits] = useState(initvalues);
 
@@ -65,7 +71,7 @@ const SingleOperation = ({
     // setShipmentend(moment(operation.end));
     // setDista(todaydate.diff(operation.end, "days"));
     // setDistb(todaydate.diff(operation.start, "days"));
-  }, [selectedTraffic]);
+  }, []);
 
   // useEffect(() => {
 
@@ -85,21 +91,19 @@ const SingleOperation = ({
     // }
     // let a = todaydate.diff(shipmentend, "days");
     // let b = todaydate.diff(shipmentstart, "days");
-
     // setDista(a);
     // setDistb(b);
-
-    if (dista >= 0) {
-      setTimelinedays(todaydate.diff(moment(operation.start), "days"));
-    }
-    if (dista < 0 && distb >= 0) {
-      setTimelinedays(
-        moment(operation.end).diff(moment(operation.start), "days")
-      );
-    }
-    if (distb < 0) {
-      setTimelinedays(moment(operation.end).diff(todaydate, "days"));
-    }
+    // if (dista >= 0) {
+    //   setTimelinedays(todaydate.diff(moment(operation.start), "days"));
+    // }
+    // if (dista < 0 && distb >= 0) {
+    //   setTimelinedays(
+    //     moment(operation.end).diff(moment(operation.start), "days")
+    //   );
+    // }
+    // if (distb < 0) {
+    //   setTimelinedays(moment(operation.end).diff(todaydate, "days"));
+    // }
     // console.log("End: " + shipmentend.format("MMM DD"));
     // console.log("Start: " + shipmentstart.format("MMM DD"));
     // console.log("Today: " + todaydate.format("MMM DD"));
@@ -107,6 +111,38 @@ const SingleOperation = ({
     // console.log(b);
     // console.log(timelinedays);
   }, [dista, distb]);
+
+  // const [timeline, setTimeline] = useState();
+
+  useEffect(() => {
+    // const timeline = [{ Date: moment().format("YYYY-MM-DD"), Detail: "Now" }];
+    // if (operation.start !== null) {
+    //   timeline.push({
+    //     Date: moment(operation.start).format("YYYY-MM-DD"),
+    //     Detail: "From",
+    //   });
+    // }
+    // if (operation.end !== null) {
+    //   timeline.push({
+    //     Date: moment(operation.end).format("YYYY-MM-DD"),
+    //     Detail: "To",
+    //   });
+    // }
+    // if (operation.ETS !== null) {
+    //   timeline.push({
+    //     Date: moment(operation.ETS).format("YYYY-MM-DD"),
+    //     Detail: "ETD",
+    //   });
+    // }
+    // if (operation.ETA !== null) {
+    //   timeline.push({
+    //     Date: moment(operation.ETA).format("YYYY-MM-DD"),
+    //     Detail: "ETA",
+    //   });
+    // }
+    // timeline.sort((a, b) => moment(a.Date) - moment(b.Date));
+    // setTimeline(timeline);
+  }, []);
 
   // const timelinedays =
   //   shipmentend.diff(todaydate, "days") >=
@@ -201,7 +237,7 @@ const SingleOperation = ({
             <li>{operation.portOfDestination}</li>
           </ul>
         </div>
-        <div className="optimeline">
+        {/* <div className="optimeline">
           {moment().diff(moment(operation.end), "days") > 0 ? (
             <>
               <div className="tlfsegment">
@@ -336,6 +372,28 @@ const SingleOperation = ({
           ) : (
             ""
           )}
+        </div> */}
+        <div className="optimeline">
+          {timeline
+            ? timeline.map((el, i) => {
+                return (
+                  <div className="tlfsegment">
+                    <div>{el.Detail}</div>
+                    <div
+                      style={{
+                        width: (300 * timeintervals[i]) / timelinelength,
+                        minWidth: 38,
+                      }}
+                      className={
+                        el.Detail === "Now" ? "tlsegment tlnow" : "tlsegment"
+                      }
+                    >
+                      {moment(el.Date).format("MMM DD")}
+                    </div>
+                  </div>
+                );
+              })
+            : ""}
         </div>
       </div>
       <div className="opchecklistsnapshot">
@@ -386,7 +444,7 @@ const SingleOperation = ({
                 }}
               />
             )}
-            <p>Sales Contract</p>
+            <p className="opcontract">Sales Contract</p>
           </div>
 
           <div className="checklistitem">
@@ -435,7 +493,7 @@ const SingleOperation = ({
                 }}
               />
             )}
-            <p>Purchase Contract</p>
+            <p className="opcontract">Purchase Contract</p>
           </div>
           <p style={{ marginTop: "1rem" }}>INCOTERMS</p>
           <div className="checklistitem incoitem">
@@ -540,14 +598,76 @@ const SingleOperation = ({
                   setOpedits({ ...opedits, vesselName: e.target.value })
                 }
               />
+              <input
+                type="text"
+                className="bookinginfo"
+                placeholder="freightCompany"
+                value={opedits.freightCompany}
+                onChange={(e) =>
+                  setOpedits({ ...opedits, freightCompany: e.target.value })
+                }
+              />
             </div>
           ) : (
             <>
               {" "}
               <p className="setbookinginfo">{operation.bookingnumber}</p>
               <p className="setbookinginfo">{operation.vesselName}</p>
+              <p className="setbookinginfo">{operation.freightCompany}</p>
             </>
           )}
+          <div className="opETDETA">
+            <div
+              className={
+                editmode === false
+                  ? "checklistitem opETDETAitem"
+                  : "checklistitem opETDETAitem1"
+              }
+            >
+              <p>ETD: </p>
+              {editmode === true && opedits.bookingComplete === true ? (
+                <input
+                  type="date"
+                  value={opedits.ETS}
+                  className="bookingdateinfo"
+                  onChange={(e) => {
+                    setOpedits({ ...opedits, ETS: e.target.value });
+                  }}
+                />
+              ) : (
+                <p>
+                  {operation.ETS ? moment(operation.ETS).format("MMM DD") : ""}
+                </p>
+              )}
+            </div>
+            <div
+              className={
+                editmode === false
+                  ? "checklistitem opETDETAitem"
+                  : "checklistitem opETDETAitem1"
+              }
+            >
+              <p>ETA: </p>
+              {editmode === true && opedits.bookingComplete === true ? (
+                <input
+                  type="date"
+                  value={opedits.ETA}
+                  className="bookingdateinfo"
+                  onChange={(e) => {
+                    setOpedits({ ...opedits, ETA: e.target.value });
+                  }}
+                />
+              ) : (
+                <p>
+                  {operation.ETA ? moment(operation.ETA).format("MMM DD") : ""}
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+        <div className="opchecklist">
+          <div className="checklistitem">Insurance</div>
+          <div className="checklistitem">Inspection</div>
         </div>
       </div>
     </div>

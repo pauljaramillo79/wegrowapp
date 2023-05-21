@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Axios from "axios";
 import "./MyOperations.css";
 import SingleOperation from "./SingleOperation";
+import moment from "moment";
 
 const MyOperations = () => {
   const role = JSON.parse(localStorage.getItem("role"));
@@ -93,8 +94,11 @@ const MyOperations = () => {
       setFoperations(results);
       console.log(results);
     }
+
     // console.log(operations);
   }, [filtertext]);
+
+  // const [timeline, setTimeline] = useState();
 
   return (
     <>
@@ -145,12 +149,59 @@ const MyOperations = () => {
       <div className="operations">
         {foperations && foperations.length > 0 ? (
           foperations.map((op) => {
+            let itimeline = [
+              { Date: moment().format("YYYY-MM-DD"), Detail: "Now" },
+            ];
+            if (op.start !== null) {
+              itimeline.push({
+                Date: moment(op.start).format("YYYY-MM-DD"),
+                Detail: "From",
+              });
+            }
+            if (op.end !== null) {
+              itimeline.push({
+                Date: moment(op.end).format("YYYY-MM-DD"),
+                Detail: "To",
+              });
+            }
+            if (op.ETS !== null) {
+              itimeline.push({
+                Date: moment(op.ETS).format("YYYY-MM-DD"),
+                Detail: "ETD",
+              });
+            }
+            if (op.ETA !== null) {
+              itimeline.push({
+                Date: moment(op.ETA).format("YYYY-MM-DD"),
+                Detail: "ETA",
+              });
+            }
+            itimeline.sort((a, b) => moment(a.Date) - moment(b.Date));
+            let timelinelength = moment(itimeline.slice(-1)[0].Date).diff(
+              itimeline[0].Date,
+              "days"
+            );
+            let timeintervals = [];
+            itimeline.forEach((el, i) => {
+              if (i + 1 < itimeline.length) {
+                timeintervals.push(
+                  moment(itimeline[i + 1].Date).diff(itimeline[i].Date, "days")
+                );
+                // console.log("hi");
+              }
+            });
+            timeintervals.push(0);
+            // console.log(timeintervals);
+            // setTimeline(itimeline);
             return (
               <SingleOperation
                 operation={op}
                 selectedTraffic={selectedTraffic}
                 setReloadops={setReloadops}
                 reloadops={reloadops}
+                timeline={itimeline}
+                timelinelength={timelinelength}
+                timeintervals={timeintervals}
               />
             );
           })

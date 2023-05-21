@@ -22,11 +22,12 @@
 .loggridcontainer {
   /* margin-left: 10%; */
   display: flex;
-  flex-basis: 90%;
+  /* flex-basis: 90%; */
   display: inline-block;
-  width: 100%;
+  /* width: 100%; */
   position: relative;
   left: 230px;
+  /* background-color: rgb(223, 223, 223); */
 }
 .scores {
   color: white;

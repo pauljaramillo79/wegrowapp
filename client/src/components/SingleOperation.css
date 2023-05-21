@@ -2,7 +2,7 @@
   background-color: white;
   min-height: 9.5rem;
   margin-bottom: 1rem;
-  width: 80vw;
+  width: 82vw;
   border-radius: 1rem;
   display: flex;
   flex-direction: row;
@@ -160,11 +160,15 @@
   margin-left: 4rem;
   display: flex;
   flex-direction: row;
+  overflow-x: scroll;
 }
 .opchecklist {
-  margin-right: 2.5rem;
+  margin-right: 1.2rem;
   font-family: "Roboto", sans-serif;
   font-size: 0.8rem;
+  border-right: dashed 1px black;
+  /* margin-bottom: 1rem; */
+  padding-right: 1.2rem;
 }
 .opchecklist .bookinginfo {
   padding: 0.1rem 0.7rem;
@@ -172,6 +176,7 @@
   font-size: 0.8rem;
   border-radius: 0.3rem;
   border: solid 1px rgb(155, 155, 155);
+  width: 152px;
 }
 .opchecklist .setbookinginfo {
   margin-left: 1.3rem;
@@ -220,4 +225,31 @@
 .incoitem {
   width: 125px;
   justify-content: space-between;
+}
+.opETDETAitem {
+  width: 125px;
+  justify-content: space-between;
+  width: 90px;
+  margin-left: 1.2rem;
+}
+.opETDETAitem1 {
+  margin-left: 0;
+}
+.opETDETAitem p {
+  margin-left: 0;
+}
+.opETDETA {
+  margin-top: 0rem;
+}
+.bookingdateinfo {
+  width: 110px;
+  padding: 0.1rem 0.7rem;
+  font-family: "Roboto", sans-serif;
+  font-size: 0.8rem;
+  border-radius: 0.3rem;
+  border: solid 1px rgb(155, 155, 155);
+  margin-left: 0.5rem;
+}
+.opcontract {
+  min-width: 120px;
 }
