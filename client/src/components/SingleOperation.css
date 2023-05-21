@@ -254,7 +254,7 @@
   min-width: 120px;
 }
 
-@media screen and (max-width: 1400px) {
+@media screen and (max-width: 1440px) {
   .optimeline,
   .oporigindestination {
     width: 250px;
