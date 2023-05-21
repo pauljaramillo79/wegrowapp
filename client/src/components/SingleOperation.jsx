@@ -18,7 +18,7 @@ const SingleOperation = ({
   timelinelength,
   timeintervals,
 }) => {
-  const isLaptop = UseMediaQuery("(max-width:1400px)");
+  const isLaptop = UseMediaQuery("(max-width:1440px)");
 
   const { updateScores, setUpdateScores } = useContext(LogisticsContext);
 
@@ -379,7 +379,7 @@ const SingleOperation = ({
         <div className="optimeline">
           {timeline
             ? timeline.map((el, i) => {
-                let tlscale = isLaptop ? 160 : 300;
+                let tlscale = isLaptop ? 200 : 300;
                 return (
                   <div className="tlfsegment">
                     <div>{el.Detail}</div>
