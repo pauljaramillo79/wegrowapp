@@ -379,7 +379,7 @@ const SingleOperation = ({
         <div className="optimeline">
           {timeline
             ? timeline.map((el, i) => {
-                let tlscale = isLaptop ? 200 : 300;
+                let tlscale = isLaptop ? 160 : 300;
                 return (
                   <div className="tlfsegment">
                     <div>{el.Detail}</div>

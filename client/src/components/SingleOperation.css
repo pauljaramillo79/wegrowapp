@@ -24,9 +24,10 @@
 .editbuttons {
   position: absolute;
   right: 0;
+  top: -20px;
   margin: 0.7rem;
   display: flex;
-  flex-direction: column;
+  flex-direction: row-reverse;
 }
 .opsavebutton {
   padding: 0.3rem 1rem;
@@ -34,7 +35,7 @@
   border-radius: 0.8rem;
   border: none;
   background-color: rgb(68, 65, 162);
-  margin-bottom: 0.5rem;
+  margin-left: 0.5rem;
 }
 .opsavebutton:hover {
   background-color: rgb(121, 118, 195);
@@ -259,7 +260,12 @@
   .oporigindestination {
     width: 250px;
   }
-  .operation {
-    width: 77vw;
+  .loggridcontainer {
+    left: 155px;
+    /* width: 77vw; */
+  }
+  .lognav {
+    flex-basis: auto;
+    width: auto;
   }
 }
