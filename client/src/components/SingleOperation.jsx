@@ -7,6 +7,7 @@ import { faMinusCircle } from "@fortawesome/free-solid-svg-icons";
 import { faPenToSquare } from "@fortawesome/free-regular-svg-icons";
 import Axios from "axios";
 import { LogisticsContext } from "../contexts/LogisticsProvider";
+import UseMediaQuery from "./UseMediaQuery";
 
 const SingleOperation = ({
   operation,
@@ -17,12 +18,14 @@ const SingleOperation = ({
   timelinelength,
   timeintervals,
 }) => {
+  const isLaptop = UseMediaQuery("(max-width:1400px)");
+
   const { updateScores, setUpdateScores } = useContext(LogisticsContext);
 
   const [todaydate, setTodaydate] = useState(moment());
   // const [shipmentstart, setShipmentstart] = useState();
   // const [shipmentend, setShipmentend] = useState();
-  // const timelinewidth = 300;
+  // const timelinewidth = tlscale;
   // const [timelinedays, setTimelinedays] = useState();
   const [dista, setDista] = useState(
     moment().diff(moment(operation.end), "days")
@@ -376,12 +379,13 @@ const SingleOperation = ({
         <div className="optimeline">
           {timeline
             ? timeline.map((el, i) => {
+                let tlscale = isLaptop ? 200 : 300;
                 return (
                   <div className="tlfsegment">
                     <div>{el.Detail}</div>
                     <div
                       style={{
-                        width: (300 * timeintervals[i]) / timelinelength,
+                        width: (tlscale * timeintervals[i]) / timelinelength,
                         minWidth: 38,
                       }}
                       className={

@@ -253,3 +253,13 @@
 .opcontract {
   min-width: 120px;
 }
+
+@media screen and (max-width: 1400px) {
+  .optimeline,
+  .oporigindestination {
+    width: 250px;
+  }
+  .operation {
+    width: 77vw;
+  }
+}
