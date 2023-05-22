@@ -1,0 +1,51 @@
+.opnotes {
+  min-height: 80%;
+  font-family: "Roboto", sans-serif;
+  font-size: 0.9rem;
+  overflow-y: scroll;
+}
+.opnoteinputs {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  background-color: white;
+  padding-top: 1rem;
+}
+.opnoteinput {
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  width: 82%;
+  height: 80px;
+  font-family: "Roboto", sans-serif;
+  font-size: 0.9rem;
+}
+.opnotepost {
+  padding: 0.4rem 1rem;
+  background-color: rgb(68, 65, 162);
+  border-radius: 0.5rem;
+  border: none;
+  color: white;
+}
+.opnotepost:hover {
+  background-color: rgb(125, 123, 200);
+  cursor: pointer;
+}
+.opnotegroup {
+  display: flex;
+  flex-direction: column;
+}
+.opnote {
+  width: 100%;
+  background-color: rgb(68, 65, 162);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+}
+.opnotemetadata {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin: 0 0.5rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.8rem;
+}

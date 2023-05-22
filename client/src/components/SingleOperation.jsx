@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import "./SingleOperation.css";
 import moment from "moment";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -17,6 +17,9 @@ const SingleOperation = ({
   timeline,
   timelinelength,
   timeintervals,
+  setToggleOpDetail,
+  toggleOpDetail,
+  setOpToEdit,
 }) => {
   const isLaptop = UseMediaQuery("(max-width:1440px)");
 
@@ -61,99 +64,6 @@ const SingleOperation = ({
     ETA: operation.ETA ? moment(operation.ETA).format("YYYY-MM-DD") : "",
   };
   const [opedits, setOpedits] = useState(initvalues);
-
-  // const setdates = () => {
-  //   return new Promise((resolve, reject) => {
-  //     setShipmentstart(moment(operation.start));
-  //     setShipmentend(moment(operation.end));
-  //     resolve(true);
-  //   });
-  // };
-  useEffect(() => {
-    // setShipmentstart(moment(operation.start));
-    // setShipmentend(moment(operation.end));
-    // setDista(todaydate.diff(operation.end, "days"));
-    // setDistb(todaydate.diff(operation.start, "days"));
-  }, []);
-
-  // useEffect(() => {
-
-  // }, [shipmentend, shipmentstart]);
-
-  useEffect(() => {
-    // await setdates();
-    // console.log(shipmentend.diff(todaydate, "days"));
-    // console.log(shipmentend.diff(shipmentstart, "days"));
-    // if (
-    //   shipmentend.diff(todaydate, "days") >=
-    //   shipmentend.diff(shipmentstart, "days")
-    // ) {
-    //   setTimelinedays(shipmentend.diff(todaydate, "days"));
-    // } else {
-    //   setTimelinedays(shipmentend.diff(shipmentstart, "days"));
-    // }
-    // let a = todaydate.diff(shipmentend, "days");
-    // let b = todaydate.diff(shipmentstart, "days");
-    // setDista(a);
-    // setDistb(b);
-    // if (dista >= 0) {
-    //   setTimelinedays(todaydate.diff(moment(operation.start), "days"));
-    // }
-    // if (dista < 0 && distb >= 0) {
-    //   setTimelinedays(
-    //     moment(operation.end).diff(moment(operation.start), "days")
-    //   );
-    // }
-    // if (distb < 0) {
-    //   setTimelinedays(moment(operation.end).diff(todaydate, "days"));
-    // }
-    // console.log("End: " + shipmentend.format("MMM DD"));
-    // console.log("Start: " + shipmentstart.format("MMM DD"));
-    // console.log("Today: " + todaydate.format("MMM DD"));
-    // console.log(a);
-    // console.log(b);
-    // console.log(timelinedays);
-  }, [dista, distb]);
-
-  // const [timeline, setTimeline] = useState();
-
-  useEffect(() => {
-    // const timeline = [{ Date: moment().format("YYYY-MM-DD"), Detail: "Now" }];
-    // if (operation.start !== null) {
-    //   timeline.push({
-    //     Date: moment(operation.start).format("YYYY-MM-DD"),
-    //     Detail: "From",
-    //   });
-    // }
-    // if (operation.end !== null) {
-    //   timeline.push({
-    //     Date: moment(operation.end).format("YYYY-MM-DD"),
-    //     Detail: "To",
-    //   });
-    // }
-    // if (operation.ETS !== null) {
-    //   timeline.push({
-    //     Date: moment(operation.ETS).format("YYYY-MM-DD"),
-    //     Detail: "ETD",
-    //   });
-    // }
-    // if (operation.ETA !== null) {
-    //   timeline.push({
-    //     Date: moment(operation.ETA).format("YYYY-MM-DD"),
-    //     Detail: "ETA",
-    //   });
-    // }
-    // timeline.sort((a, b) => moment(a.Date) - moment(b.Date));
-    // setTimeline(timeline);
-  }, []);
-
-  // const timelinedays =
-  //   shipmentend.diff(todaydate, "days") >=
-  //   shipmentend.diff(shipmentstart, "days")
-  //     ? shipmentend.diff(todaydate, "days")
-  //     : shipmentend.diff(shipmentstart, "days");
-
-  //   .format("YYYY-MM-DD")
 
   function isEqual(obj1, obj2) {
     var props1 = Object.getOwnPropertyNames(obj1);
@@ -222,7 +132,13 @@ const SingleOperation = ({
         </div>
       )}
       <p className="optrader">{operation.trader}</p>
-      <div className="opleftlabel">
+      <div
+        onClick={(e) => {
+          setToggleOpDetail(true);
+          setOpToEdit(operation.QSID);
+        }}
+        className="opleftlabel"
+      >
         <h2>{operation.customer}</h2>
         <h3>{operation.abbreviation}</h3>
         <h4>{operation.quantity.toFixed(0)} mt</h4>

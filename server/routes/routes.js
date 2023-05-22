@@ -2466,5 +2466,64 @@ router.post("/saveopedits", (req, res) => {
     }
   );
 });
+router.post("/savenewnote", (req, res) => {
+  let QSID = req.body.QSID;
+  let opNote = req.body.opNote;
+  let opNoteDate = req.body.opNoteDate;
+  let userCode = req.body.userCode;
+  // console.log(QSID, opNote, opNoteDate, userCode);
+  db.query(
+    "INSERT INTO operationNotes (QSID, opNote, opNoteDate, userCode) VALUES (?,?,?,?);",
+    [QSID, opNote, opNoteDate, userCode],
+    (err) => {
+      if (err) {
+        console.log(err);
+      } else {
+        return res.json({
+          success: true,
+          message: "New Note Posted",
+        });
+      }
+    }
+  );
+});
+
+router.post("/getopnotes", (req, res) => {
+  let QSID = req.body.QSID;
+  db.query(
+    "SELECT * FROM operationNotes WHERE QSID=?",
+    [QSID],
+    (err, results) => {
+      if (err) {
+        console.log(err);
+      }
+      if (results.length > 0) {
+        res.status(200).send(results);
+      }
+      if (results.length === 0) {
+        return res.json({
+          success: true,
+          message: "New Notes Yet",
+        });
+      }
+    }
+  );
+});
+
+router.post("/getfulloptoedit", (req, res) => {
+  let QSID = req.body.QSID;
+  db.query(
+    "SELECT QSID, abbreviation, quantity FROM quotationsheet INNER JOIN (productList INNER JOIN prodNames ON productList.productName = prodNames.prodNameID ) ON quotationsheet.productID = productList.productID WHERE QSID=?",
+    [QSID],
+    (err, results) => {
+      if (err) {
+        console.log(err);
+      }
+      if (results.length > 0) {
+        res.status(200).send(results);
+      }
+    }
+  );
+});
 
 module.exports = router;

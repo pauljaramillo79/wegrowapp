@@ -1,0 +1,29 @@
+.operationDetail {
+  padding: 2rem;
+  min-height: 600px;
+  height: 55vh;
+  padding: 1rem;
+  margin: 1rem;
+  border: 1px solid gray;
+  width: 450px;
+  border-radius: 0.7rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border: solid 1px rgb(68, 65, 162);
+}
+.opDetailHeader {
+  width: 100%;
+  /* background-color: red; */
+  margin: 2rem;
+}
+.opDetailQSID {
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 1.5rem;
+}
+.opDetailMIItem {
+  display: flex;
+  flex-direction: row;
+  width: 300px;
+}

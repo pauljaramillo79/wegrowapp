@@ -23,13 +23,16 @@
   flex-direction: column;
   position: fixed;
   /* background-color: rgb(223, 223, 223); */
-  width: 100%;
+  min-width: 100%;
   z-index: 20;
+  height: 115px;
+
   /* top: 7rem; */
 }
 .operations {
   margin-top: 8rem;
   background-color: rgb(223, 223, 223);
+  position: relative;
 }
 .opsearchbar {
   margin-left: 3rem;
@@ -41,4 +44,15 @@
   border-radius: 0.75rem;
   border: none;
   width: 300px;
+}
+.operationdetail {
+  min-height: 70vh;
+  background-color: white;
+  min-width: 80vw;
+  position: absolute;
+  left: 120%;
+  border-top-left-radius: 1rem;
+  border-bottom-left-radius: 1rem;
+  top: 125px;
+  border: solid rgb(68, 65, 162);
 }

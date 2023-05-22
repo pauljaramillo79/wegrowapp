@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Axios from "axios";
 import "./MyOperations.css";
 import SingleOperation from "./SingleOperation";
 import moment from "moment";
+import { gsap } from "gsap";
+import OperationDetail from "./OperationDetail";
 
 const MyOperations = () => {
   const role = JSON.parse(localStorage.getItem("role"));
@@ -12,7 +14,30 @@ const MyOperations = () => {
   const [selectedTrafficID, setSelectedTrafficID] = useState();
   const [operations, setOperations] = useState();
   const [reloadops, setReloadops] = useState(false);
+  const [opToEditFull, setOpToEditFull] = useState();
 
+  const [toggleOpDetail, setToggleOpDetail] = useState(false);
+
+  const refOpDetail = useRef(null);
+
+  useEffect(() => {
+    if (toggleOpDetail === true) {
+      const element = refOpDetail.current;
+      gsap.fromTo(
+        element,
+        { x: 0 },
+        { x: "-120%", display: "block", duration: 0.2 }
+      );
+    }
+    if (toggleOpDetail === false) {
+      const element = refOpDetail.current;
+      gsap.fromTo(
+        element,
+        { x: "-120%" },
+        { x: 0, display: "none", duration: 0.2 }
+      );
+    }
+  }, [toggleOpDetail]);
   // const loadmyoperations = () => {
   //   return new Promise((resolve, reject) => {
   //     Axios.post("/trafficmgrs").then((response) => {
@@ -98,11 +123,35 @@ const MyOperations = () => {
     // console.log(operations);
   }, [filtertext]);
 
+  const [opToEdit, setOpToEdit] = useState();
+
+  useEffect(() => {
+    Axios.post("/getfulloptoedit", { QSID: opToEdit }).then((response) => {
+      setOpToEditFull(response.data[0]);
+    });
+  }, [opToEdit]);
+
   // const [timeline, setTimeline] = useState();
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (refOpDetail.current && !refOpDetail.current.contains(event.target)) {
+        setToggleOpDetail(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [refOpDetail]);
 
   return (
     <>
       <div className="opheader">
+        <div ref={refOpDetail} className="operationdetail">
+          <OperationDetail opToEdit={opToEdit} opToEditFull={opToEditFull} />
+        </div>
+
         <div className="trafficbuttons">
           {trafficmanagers
             ? trafficmanagers.map((trf) => {
@@ -146,6 +195,7 @@ const MyOperations = () => {
           )}
         </div>
       </div>
+
       <div className="operations">
         {foperations && foperations.length > 0 ? (
           foperations.map((op) => {
@@ -202,6 +252,9 @@ const MyOperations = () => {
                 timeline={itimeline}
                 timelinelength={timelinelength}
                 timeintervals={timeintervals}
+                setToggleOpDetail={setToggleOpDetail}
+                toggleOpDetail={toggleOpDetail}
+                setOpToEdit={setOpToEdit}
               />
             );
           })

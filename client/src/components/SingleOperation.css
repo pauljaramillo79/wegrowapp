@@ -10,8 +10,10 @@
   position: relative;
 }
 .operation:hover {
-  cursor: pointer;
   background-color: rgb(238, 238, 238);
+}
+.opleftlabel:hover {
+  cursor: pointer;
 }
 .opeditbutton {
   position: absolute;
