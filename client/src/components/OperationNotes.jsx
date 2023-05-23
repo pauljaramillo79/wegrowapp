@@ -37,7 +37,7 @@ const OperationNotes = ({
   }, [opNotes]);
 
   return (
-    <>
+    <div className="operationNotes">
       <div className="opnotes">
         {opNotes && opNotes.length > 0 ? (
           opNotes.map((note, ind) => {
@@ -80,7 +80,7 @@ const OperationNotes = ({
           Post
         </button>
       </div>
-    </>
+    </div>
   );
 };
 

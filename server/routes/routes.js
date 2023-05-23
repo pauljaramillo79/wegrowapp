@@ -693,9 +693,10 @@ router.post("/saveQS", (req, res) => {
     netback,
     saleComplete,
     finalComplete,
+    shipmentType,
   } = req.body.QSData;
   db.query(
-    "INSERT INTO quotationsheet (KTS, KTP, saleTypeID, QSDate, productID, supplierID, customerID, packingSize, marks, `from`, `to`, POLID, PODID, traderID, trafficID, incoterms, pTermID, FreightTotal, freightCompany, containerCapacity, inspectionCostPer250, quantity, materialCost, pAgentCommission, pFinancialCostP, sFinancialCost, oFreight, insuranceCost, inspectionCost, sAgentCommission, interestCost, interestRate, interestPeriod, legal, pallets, others, totalCost, saleInterestRate, salePaymentPeriod, priceBeforeInterest, saleInterest, priceAfterInterest, tradingProfit, tradingMargin, salesTurnover, percentageMargin, netback, saleComplete, finalComplete, generalduty, additionalduty, harborpct, merchprocpct, flatfee, tsca, isf, drayage, unloading, collectcharges, inboundothers, warehouseID, whentry, storagefixed, storagevariable, stggraceperiod, stgaccrualperiod, quantitypallets, loading, bolcharges, outboundothers, storagepmt, whexit, insurancerate, insurancefactor) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);",
+    "INSERT INTO quotationsheet (KTS, KTP, saleTypeID, QSDate, productID, supplierID, customerID, packingSize, marks, `from`, `to`, POLID, PODID, traderID, trafficID, incoterms, pTermID, FreightTotal, freightCompany, containerCapacity, inspectionCostPer250, quantity, materialCost, pAgentCommission, pFinancialCostP, sFinancialCost, oFreight, insuranceCost, inspectionCost, sAgentCommission, interestCost, interestRate, interestPeriod, legal, pallets, others, totalCost, saleInterestRate, salePaymentPeriod, priceBeforeInterest, saleInterest, priceAfterInterest, tradingProfit, tradingMargin, salesTurnover, percentageMargin, netback, saleComplete, finalComplete, generalduty, additionalduty, harborpct, merchprocpct, flatfee, tsca, isf, drayage, unloading, collectcharges, inboundothers, warehouseID, whentry, storagefixed, storagevariable, stggraceperiod, stgaccrualperiod, quantitypallets, loading, bolcharges, outboundothers, storagepmt, whexit, insurancerate, insurancefactor, shipmentTypeID) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);",
     [
       KTS,
       KTP,
@@ -771,6 +772,7 @@ router.post("/saveQS", (req, res) => {
       whexit === "" ? null : whexit,
       insurancerate,
       insurancefactor,
+      shipmentType,
     ],
     (err) => {
       if (err) {
@@ -972,6 +974,10 @@ router.post("/updateQS", (req, res) => {
   var index = keys.indexOf("saleType");
   if (index !== -1) {
     keys[index] = "saleTypeID";
+  }
+  var index = keys.indexOf("shipmentType");
+  if (index !== -1) {
+    keys[index] = "shipmentTypeID";
   }
   var index = keys.indexOf("warehouse");
   if (index !== -1) {
@@ -2402,7 +2408,7 @@ router.post("/loadcurrentbudget", (req, res) => {
 router.post("/getmyoperations", (req, res) => {
   let trafficid = req.body.selectedTrafficID;
   db.query(
-    "SELECT customerList.companyCode AS customer, abbreviation, quantity, supplierlist.companyCode AS supplier, KTP, KTS, QSID,DATE_FORMAT(`from`,'%Y-%m-%d') AS start, DATE_FORMAT(`to`,'%Y-%m-%d') AS end, portOfDestination, portOfLoad, SCComplete, PCComplete, bookingComplete, traderList.tCode AS trader, bookingComplete, freightCompany, vesselName, bookingnumber, ETS, ETA, incoterms, pincoterms FROM quotationsheet INNER JOIN customerList ON quotationsheet.customerID = customerList.customerID INNER JOIN (productList INNER JOIN prodNames ON productList.productName = prodNames.prodNameID) ON quotationsheet.productID = productList.productID INNER JOIN supplierlist ON quotationsheet.supplierID = supplierlist.supplierID INNER JOIN POLList ON quotationsheet.POLID = POLList.POLID INNER JOIN PODList ON quotationsheet.PODID = PODList.PODID INNER JOIN traderList ON quotationsheet.traderID = traderList.traderID WHERE saleComplete IN (1, -1) AND finalComplete=0 AND trafficID=?",
+    "SELECT customerList.companyCode AS customer, abbreviation, quantity, supplierlist.companyCode AS supplier, KTP, KTS, QSID,DATE_FORMAT(`from`,'%Y-%m-%d') AS start, DATE_FORMAT(`to`,'%Y-%m-%d') AS end, portOfDestination, portOfLoad, SCComplete, PCComplete, bookingComplete, traderList.tCode AS trader, bookingComplete, freightCompany, vesselName, bookingnumber, ETS, ETA, incoterms, pincoterms, quotationsheet.shipmentTypeID, shipmentTypes.shipmentType AS shipmentType FROM quotationsheet INNER JOIN customerList ON quotationsheet.customerID = customerList.customerID INNER JOIN (productList INNER JOIN prodNames ON productList.productName = prodNames.prodNameID) ON quotationsheet.productID = productList.productID INNER JOIN supplierlist ON quotationsheet.supplierID = supplierlist.supplierID INNER JOIN POLList ON quotationsheet.POLID = POLList.POLID INNER JOIN PODList ON quotationsheet.PODID = PODList.PODID INNER JOIN traderList ON quotationsheet.traderID = traderList.traderID INNER JOIN shipmentTypes ON quotationsheet.shipmentTypeID = shipmentTypes.shipmentTypeID WHERE saleComplete IN (1, -1) AND finalComplete=0 AND trafficID=?",
     [trafficid],
     (err, results) => {
       if (err) {
@@ -2513,7 +2519,7 @@ router.post("/getopnotes", (req, res) => {
 router.post("/getfulloptoedit", (req, res) => {
   let QSID = req.body.QSID;
   db.query(
-    "SELECT QSID, abbreviation, quantity FROM quotationsheet INNER JOIN (productList INNER JOIN prodNames ON productList.productName = prodNames.prodNameID ) ON quotationsheet.productID = productList.productID WHERE QSID=?",
+    "SELECT QSID, abbreviation, quantity, KTS, KTP, supplierlist.companyCode as supplier, customerList.companyCode as customer FROM quotationsheet INNER JOIN (productList INNER JOIN prodNames ON productList.productName = prodNames.prodNameID ) ON quotationsheet.productID = productList.productID INNER JOIN supplierlist ON quotationsheet.supplierID = supplierlist.supplierID INNER JOIN customerList ON quotationsheet.customerID=customerList.customerID WHERE QSID=?",
     [QSID],
     (err, results) => {
       if (err) {

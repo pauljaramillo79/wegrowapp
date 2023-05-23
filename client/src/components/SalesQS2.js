@@ -3590,6 +3590,7 @@ const SalesQS2 = () => {
                 setQSData({ ...QSData, shipmentType: 1 });
                 setQSValues({ ...QSValues, shipmentType: "Container" });
               }}
+              checked={QSData.shipmentType === 1}
             />
             <label style={{ minWidth: "auto" }} htmlFor="">
               Container
@@ -3604,6 +3605,7 @@ const SalesQS2 = () => {
                 setQSData({ ...QSData, shipmentType: 2 });
                 setQSValues({ ...QSValues, shipmentType: "Breakbulk" });
               }}
+              checked={QSData.shipmentType === 2}
             />
             <label style={{ minWidth: "auto" }} htmlFor="">
               Breakbulk
@@ -3617,6 +3619,7 @@ const SalesQS2 = () => {
                 setQSData({ ...QSData, shipmentType: 3 });
                 setQSValues({ ...QSValues, shipmentType: "Truck" });
               }}
+              checked={QSData.shipmentType === 3}
             />
             <label style={{ minWidth: "auto" }} htmlFor="">
               Truck

@@ -26,6 +26,7 @@
   min-width: 100%;
   z-index: 20;
   height: 115px;
+  background-color: #dfdfdf;
 
   /* top: 7rem; */
 }

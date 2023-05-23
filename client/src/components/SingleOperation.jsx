@@ -5,6 +5,10 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheckCircle } from "@fortawesome/free-solid-svg-icons";
 import { faMinusCircle } from "@fortawesome/free-solid-svg-icons";
 import { faPenToSquare } from "@fortawesome/free-regular-svg-icons";
+import { faTruck } from "@fortawesome/free-solid-svg-icons";
+import { faShip } from "@fortawesome/free-solid-svg-icons";
+import { faTrailer } from "@fortawesome/free-solid-svg-icons";
+
 import Axios from "axios";
 import { LogisticsContext } from "../contexts/LogisticsProvider";
 import UseMediaQuery from "./UseMediaQuery";
@@ -142,7 +146,18 @@ const SingleOperation = ({
         <h2>{operation.customer}</h2>
         <h3>{operation.abbreviation}</h3>
         <h4>{operation.quantity.toFixed(0)} mt</h4>
-        <p>{operation.supplier}</p>
+        <div className="opleftlabelbottom">
+          <p>{operation.supplier}</p>
+          {operation.shipmentTypeID === 1 ? (
+            <FontAwesomeIcon className="fa-2x" icon={faTrailer} />
+          ) : operation.shipmentTypeID === 2 ? (
+            <FontAwesomeIcon className="fa-2x" icon={faShip} />
+          ) : operation.shipmentTypeID === 3 ? (
+            <FontAwesomeIcon className="fa-2x" icon={faTruck} />
+          ) : (
+            ""
+          )}
+        </div>
       </div>
       <div className="opnumberlabel">
         <p>WGS: {operation.KTS}</p>

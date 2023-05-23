@@ -111,10 +111,11 @@ const MyOperations = () => {
             .toLowerCase()
             .includes(filtertext.toLowerCase()) ||
           item.portOfLoad.toLowerCase().includes(filtertext.toLowerCase()) ||
-          item.KTS.includes(filtertext) ||
-          item.KTP.includes(filtertext) ||
           item.QSID.toFixed().includes(filtertext) ||
           item.trader.toLowerCase().includes(filtertext.toLowerCase())
+        // ||
+        // item.KTS.includes(filtertext) ||
+        // item.KTP.includes(filtertext)
       );
       setFoperations(results);
       console.log(results);
@@ -149,7 +150,11 @@ const MyOperations = () => {
     <>
       <div className="opheader">
         <div ref={refOpDetail} className="operationdetail">
-          <OperationDetail opToEdit={opToEdit} opToEditFull={opToEditFull} />
+          <OperationDetail
+            opToEdit={opToEdit}
+            opToEditFull={opToEditFull}
+            setOpToEditFull={setOpToEditFull}
+          />
         </div>
 
         <div className="trafficbuttons">

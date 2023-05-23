@@ -3,7 +3,7 @@ import OperationNotes from "./OperationNotes";
 import "./OperationDetail.css";
 import Axios from "axios";
 
-const OperationDetail = ({ opToEdit, opToEditFull }) => {
+const OperationDetail = ({ opToEdit, opToEditFull, setOpToEditFull }) => {
   const [opNotes, setOpNotes] = useState();
   const [reloadnotes, setReloadnotes] = useState(false);
 
@@ -36,6 +36,50 @@ const OperationDetail = ({ opToEdit, opToEditFull }) => {
         )}
       </div>
       <div className="operationDetail">
+        <div className="opDetailSupplyside">
+          {opToEditFull ? (
+            <>
+              <div className="opDetailItem">
+                <p>WGP:</p>
+                <input
+                  type="text"
+                  value={opToEditFull.KTP}
+                  onChange={(e) => {
+                    setOpToEditFull({ ...opToEditFull, KTP: e.target.value });
+                  }}
+                />
+              </div>
+              <div className="opDetailItem">
+                <p>Supplier:</p>
+                <p className="opDItext">{opToEditFull.supplier}</p>
+              </div>
+            </>
+          ) : (
+            ""
+          )}
+        </div>
+        <div className="opDetailDemandside">
+          {opToEditFull ? (
+            <>
+              <div className="opDetailItem">
+                <p>WGS:</p>
+                <input
+                  type="text"
+                  value={opToEditFull.KTS}
+                  onChange={(e) => {
+                    setOpToEditFull({ ...opToEditFull, KTS: e.target.value });
+                  }}
+                />
+              </div>
+              <div className="opDetailItem">
+                <p>Customer:</p>
+                <p className="opDItext">{opToEditFull.customer}</p>
+              </div>
+            </>
+          ) : (
+            ""
+          )}
+        </div>
         <OperationNotes
           opToEdit={opToEdit}
           opNotes={opNotes}
