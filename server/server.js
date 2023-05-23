@@ -28,23 +28,23 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use("/", require("./routes/routes"));
 
-app.listen(PORT, () => {
-  console.log(`Server listening in port ${PORT}`);
+// app.listen(PORT, () => {
+//   console.log(`Server listening in port ${PORT}`);
+// });
+
+http.listen(PORT, () => {
+  let host = http.address().address;
+  let port = http.address().port;
+  console.log("App listening at http://%s:%s", host, port);
 });
 
-// http.listen(PORT, () => {
-//   let host = http.address().address;
-//   let port = http.address().port;
-//   console.log("App listening at http://%s:%s", host, port);
-// });
-
-// io.on("connection", (socket) => {
-//   console.log("Client connected to the websocket");
-//   socket.on("disconnect", () => {
-//     console.log("Client disconnected");
-//   });
-//   socket.on("sendmsg", (msg) => {
-//     console.log("Received a chat msg");
-//     io.emit("sendmsg");
-//   });
-// });
+io.on("connection", (socket) => {
+  console.log("Client connected to the websocket");
+  socket.on("disconnect", () => {
+    console.log("Client disconnected");
+  });
+  socket.on("sendmsg", (msg) => {
+    console.log("Received a chat msg");
+    io.emit("sendmsg");
+  });
+});
