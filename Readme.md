@@ -28,3 +28,11 @@ database: "ebdb", // replace ebdb with name of your AWS RDS Instance
 ```
 
 https://git-codecommit.us-east-2.amazonaws.com/v1/repos/wegrowapp
+
+/etc/nginx/conf.d/websocketupgrade.conf:
+mode: "000755"
+owner: root
+group: root
+content: |
+proxy_set_header Upgrade $http_upgrade;
+proxy_set_header Connection "upgrade";
