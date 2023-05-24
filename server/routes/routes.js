@@ -2532,4 +2532,54 @@ router.post("/getfulloptoedit", (req, res) => {
   );
 });
 
+router.post("/addQStonewmsglist", (req, res) => {
+  let QSID = req.body.QSID;
+  let user = req.body.user;
+  db.query(
+    "INSERT INTO newMsgList (QSID, user) VALUES (?,?)",
+    [QSID, user],
+    (err, results) => {
+      if (err) {
+        console.log(err);
+      } else {
+        return res.json({
+          success: true,
+          message: "New QSID added to List",
+        });
+      }
+    }
+  );
+});
+
+router.post("/getQSListwithNewMsg", (req, res) => {
+  let user = req.body.user;
+  db.query("SELECT * FROM newMsgList WHERE user!=?", [user], (err, results) => {
+    if (err) {
+      console.log(err);
+    }
+    if (results.length > 0) {
+      res.status(200).send(results);
+    }
+    if (results.length === 0) {
+      return res.json({
+        success: true,
+        message: "No QS with new msgs",
+      });
+    }
+  });
+});
+
+router.post("/removeQSfromNewmsglist", (req, res) => {
+  let QSID = req.body.QSID;
+  // let user = req.body.user;
+  db.query(`DELETE FROM newMsgList WHERE QSID=${QSID}`, (err, results) => {
+    if (err) {
+      console.log(err);
+    }
+    if (results) {
+      res.sendStatus(200);
+    }
+  });
+});
+
 module.exports = router;

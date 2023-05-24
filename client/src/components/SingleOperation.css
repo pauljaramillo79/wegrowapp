@@ -266,6 +266,15 @@
 .shipmentTypeIcon {
   width: 40px;
 }
+.iconopwithmsg {
+}
+.iconopwithmsg-wrapper {
+  background-color: rgb(223, 82, 82);
+  padding: 0.3rem;
+  border-radius: 2rem;
+  position: absolute;
+  top: -15px;
+}
 
 @media screen and (max-width: 1440px) {
   .optimeline,

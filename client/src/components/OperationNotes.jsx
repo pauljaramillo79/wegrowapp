@@ -15,7 +15,13 @@ const OperationNotes = ({
   setReloadnotes,
   socket,
 }) => {
-  const { opToEdit, opNotes, setOpNotes } = useContext(LogisticsContext);
+  const {
+    opToEdit,
+    opNotes,
+    setOpNotes,
+    setOpsWithNewNotes,
+    opsWithNewNotes,
+  } = useContext(LogisticsContext);
 
   const user = JSON.parse(localStorage.getItem("WGusercode"));
   const [noteDate, setNoteDate] = useState(moment().format("YYYY-MM-DD"));
@@ -39,6 +45,7 @@ const OperationNotes = ({
 
       // if (Array.isArray(opNotes)) {
       setOpNotes((opNotes) => [...opNotes, msg]);
+
       // } else {
       //   setOpNotes([msg]);
       // }
@@ -64,10 +71,15 @@ const OperationNotes = ({
         // setReloadnotes(!reloadnotes);
         // if (Array.isArray(opNotes)) {
         setOpNotes([...opNotes, msgdata]);
+        // setOpsWithNewNotes([...opsWithNewNotes, QSID]);
         // } else {
         //   setOpNotes([msgdata]);
         // }
       });
+      if (!opsWithNewNotes.includes(QSID)) {
+        console.log("sending");
+        Axios.post("/addQStonewmsglist", { QSID: QSID, user: user });
+      }
     }
     setNoteToAdd("");
   };

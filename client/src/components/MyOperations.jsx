@@ -12,7 +12,12 @@ import io from "socket.io-client";
 const socket = io.connect("https://www.wgappdev.com");
 
 const MyOperations = () => {
-  const { opToEdit, setOpToEdit } = useContext(LogisticsContext);
+  const {
+    opToEdit,
+    setOpToEdit,
+    setOpsWithNewNotes,
+    opsWithNewNotes,
+  } = useContext(LogisticsContext);
 
   const role = JSON.parse(localStorage.getItem("role"));
   const usercode = JSON.parse(localStorage.getItem("WGusercode"));
@@ -26,6 +31,23 @@ const MyOperations = () => {
   const [toggleOpDetail, setToggleOpDetail] = useState(false);
 
   const refOpDetail = useRef(null);
+
+  useEffect(() => {
+    const mainroom = 123;
+    socket.emit("joinmyoperations", mainroom);
+  }, []);
+
+  useEffect(() => {
+    socket.on("receivemsg2", (data) => {
+      setOpsWithNewNotes((opsWithNewNotes) => {
+        if (opsWithNewNotes.includes(data)) {
+          return [...opsWithNewNotes];
+        } else {
+          return [...opsWithNewNotes, data];
+        }
+      });
+    });
+  }, [socket]);
 
   useEffect(() => {
     if (toggleOpDetail === true) {

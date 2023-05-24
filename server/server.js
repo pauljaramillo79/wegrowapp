@@ -51,14 +51,20 @@ io.on("connection", (socket) => {
     // console.log("left room", room);
     socket.leave(room);
   });
+
+  socket.on("joinmyoperations", (data) => {
+    socket.join(data);
+    console.log("joined", data);
+  });
   socket.on("joinroom", (data) => {
     socket.join(data);
-    // console.log(`joined room ${data}`);
+    console.log(`joined room ${data}`);
   });
 
   socket.on("sendmsg", (msg) => {
     // console.log("Received a chat msg", msg);
     // io.emit("sendmsg");
+    socket.to(123).emit("receivemsg2", msg.QSID);
     socket.to(msg.QSID).emit("receivemsg", msg);
   });
   socket.on("disconnect", () => {

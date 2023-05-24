@@ -8,6 +8,7 @@ import { faPenToSquare } from "@fortawesome/free-regular-svg-icons";
 import { faTruck } from "@fortawesome/free-solid-svg-icons";
 import { faShip } from "@fortawesome/free-solid-svg-icons";
 import { faTrailer } from "@fortawesome/free-solid-svg-icons";
+import { faEnvelope } from "@fortawesome/free-solid-svg-icons";
 
 import Axios from "axios";
 import { LogisticsContext } from "../contexts/LogisticsProvider";
@@ -28,9 +29,14 @@ const SingleOperation = ({
 }) => {
   const isLaptop = UseMediaQuery("(max-width:1440px)");
 
-  const { updateScores, setUpdateScores, setOpToEdit, opToEdit } = useContext(
-    LogisticsContext
-  );
+  const {
+    updateScores,
+    setUpdateScores,
+    setOpToEdit,
+    opToEdit,
+    opsWithNewNotes,
+    setOpsWithNewNotes,
+  } = useContext(LogisticsContext);
 
   const [todaydate, setTodaydate] = useState(moment());
   // const [shipmentstart, setShipmentstart] = useState();
@@ -153,6 +159,17 @@ const SingleOperation = ({
           setToggleOpDetail(true);
           setOpToEdit(operation.QSID);
           joinRoom(operation.QSID);
+
+          let newopswithnewnotes = opsWithNewNotes.filter(
+            (el) => el != operation.QSID
+          );
+          setOpsWithNewNotes(newopswithnewnotes);
+          if (opsWithNewNotes.includes(operation.QSID)) {
+            Axios.post("/removeQSfromNewmsglist", {
+              QSID: operation.QSID,
+              user: user,
+            });
+          }
         }}
         className="opleftlabel"
       >
@@ -171,6 +188,13 @@ const SingleOperation = ({
             ""
           )}
         </div>
+        {opsWithNewNotes.includes(operation.QSID) ? (
+          <div className="iconopwithmsg-wrapper">
+            <FontAwesomeIcon className="iconopwithmsg" icon={faEnvelope} />
+          </div>
+        ) : (
+          ""
+        )}
       </div>
       <div className="opnumberlabel">
         <p>WGS: {operation.KTS}</p>
