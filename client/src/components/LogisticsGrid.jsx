@@ -56,9 +56,9 @@ const LogisticsGrid = () => {
         </div>
       </div>
       <div className="gridcontainer loggridcontainer">
-        <Route path="/logistics/myoperations">
+        {/* <Route path="/logistics/myoperations">
           <MyOperations />
-        </Route>
+        </Route> */}
         <Route path="/logistics/matching">
           <MatchingGrid />
         </Route>
