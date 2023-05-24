@@ -23,11 +23,14 @@ const SingleOperation = ({
   timeintervals,
   setToggleOpDetail,
   toggleOpDetail,
-  setOpToEdit,
+  // setOpToEdit,
+  socket,
 }) => {
   const isLaptop = UseMediaQuery("(max-width:1440px)");
 
-  const { updateScores, setUpdateScores } = useContext(LogisticsContext);
+  const { updateScores, setUpdateScores, setOpToEdit, opToEdit } = useContext(
+    LogisticsContext
+  );
 
   const [todaydate, setTodaydate] = useState(moment());
   // const [shipmentstart, setShipmentstart] = useState();
@@ -41,6 +44,8 @@ const SingleOperation = ({
     moment().diff(moment(operation.start), "days")
   );
   const [editmode, setEditmode] = useState(false);
+
+  const user = JSON.parse(localStorage.getItem("WGusercode"));
 
   const initvalues = {
     SCCompleteBool: operation.SCComplete,
@@ -105,6 +110,13 @@ const SingleOperation = ({
     }
   };
 
+  const joinRoom = (QSID) => {
+    socket.emit("leaveroom", opToEdit);
+    if (user !== "" && QSID !== "") {
+      socket.emit("joinroom", QSID);
+    }
+  };
+
   return (
     <div className="operation">
       {editmode === false ? (
@@ -140,6 +152,7 @@ const SingleOperation = ({
         onClick={(e) => {
           setToggleOpDetail(true);
           setOpToEdit(operation.QSID);
+          joinRoom(operation.QSID);
         }}
         className="opleftlabel"
       >
@@ -171,142 +184,7 @@ const SingleOperation = ({
             <li>{operation.portOfDestination}</li>
           </ul>
         </div>
-        {/* <div className="optimeline">
-          {moment().diff(moment(operation.end), "days") > 0 ? (
-            <>
-              <div className="tlfsegment">
-                <div>From</div>
-                <div
-                  style={{
-                    width:
-                      (300 *
-                        moment(operation.end).diff(
-                          moment(operation.start),
-                          "days"
-                        )) /
-                      moment().diff(moment(operation.start), "days"),
-                    minWidth: "38px",
-                  }}
-                  className="tlsegment"
-                >
-                  {moment(operation.start).format("MMM DD")}
-                </div>
-              </div>
-              <div className="tlfsegment">
-                <div>To</div>
-                <div
-                  style={{
-                    width:
-                      (300 * moment().diff(moment(operation.end), "days")) /
-                      moment().diff(moment(operation.start), "days"),
-                    minWidth: "38px",
-                  }}
-                  className="tlsegment"
-                >
-                  {moment(operation.end).format("MMM DD")}
-                </div>
-              </div>
-              <div className="tlfsegment">
-                <div>.</div>
-                <div style={{ minWidth: "38px" }} className="tlsegment tlnow">
-                  {todaydate.format("MMM DD")}
-                </div>
-              </div>
-            </>
-          ) : moment().diff(moment(operation.end), "days") <= 0 &&
-            moment().diff(moment(operation.start), "days") > 0 ? (
-            <>
-              <div className="tlfsegment">
-                <div>From</div>
-                <div
-                  style={{
-                    width:
-                      (300 * moment().diff(moment(operation.start), "days")) /
-                      moment(operation.end).diff(
-                        moment(operation.start),
-                        "days"
-                      ),
-                    minWidth: "38px",
-                  }}
-                  className="tlsegment"
-                >
-                  {moment(operation.start).format("MMM DD")}
-                </div>
-              </div>
-              <div className="tlfsegment">
-                <div>.</div>
-                <div
-                  style={{
-                    width:
-                      (300 * moment(operation.end).diff(moment(), "days")) /
-                      moment(operation.end).diff(
-                        moment(operation.start),
-                        "days"
-                      ),
-                    minWidth: "38px",
-                  }}
-                  className="tlsegment tlnow"
-                >
-                  {todaydate.format("MMM DD")}
-                </div>
-              </div>
-              <div className="tlfsegment">
-                <div>To</div>
-                <div style={{ minWidth: "38px" }} className="tlsegment">
-                  {moment(operation.end).format("MMM DD")}
-                </div>
-              </div>
-            </>
-          ) : moment().diff(moment(operation.start), "days") <= 0 ? (
-            <>
-              <div className="tlfsegment">
-                <div>.</div>
-                <div
-                  style={{
-                    width:
-                      (300 * moment(operation.start).diff(moment(), "days")) /
-                      moment(operation.end).diff(moment(), "days"),
-                    minWidth: "38px",
-                  }}
-                  className="tlsegment tlnow"
-                >
-                  {todaydate.format("MMM DD")}
-                </div>
-              </div>
-              <div className="tlfsegment">
-                <div>From</div>
-                <div
-                  style={{
-                    width:
-                      (300 *
-                        moment(operation.end).diff(
-                          moment(operation.start),
-                          "days"
-                        )) /
-                      moment(operation.end).diff(moment(), "days"),
-                    minWidth: "38px",
-                  }}
-                  className="tlsegment"
-                >
-                  {moment(operation.start).format("MMM DD")}
-                </div>
-              </div>
-              <div className="tlfsegment">
-                <div>To</div>
-                <div
-                  style={{
-                    minWidth: "38px",
-                  }}
-                  className="tlsegment"
-                >
-                  {moment(operation.end).format("MMM DD")}
-                </div>
-              </div>
-            </>
-          ) : (
-            ""
-          )}
-        </div> */}
+
         <div className="optimeline">
           {timeline
             ? timeline.map((el, i) => {

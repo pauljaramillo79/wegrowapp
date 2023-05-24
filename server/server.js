@@ -4,7 +4,9 @@ const path = require("path");
 const app = express();
 const http = require("http").createServer(app);
 
-var io = require("socket.io")(http);
+var io = require("socket.io")(http, {
+  cors: { origin: "http://localhost:3000", methods: ["GET", "POST"] },
+});
 
 const bodyParser = require("body-parser");
 
@@ -39,12 +41,23 @@ http.listen(PORT, () => {
 });
 
 io.on("connection", (socket) => {
-  console.log("Client connected to the websocket");
+  // console.log(`Client connected to: ${socket.id}`);
+
+  socket.on("leaveroom", (room) => {
+    // console.log("left room", room);
+    socket.leave(room);
+  });
+  socket.on("joinroom", (data) => {
+    socket.join(data);
+    // console.log(`joined room ${data}`);
+  });
+
+  socket.on("sendmsg", (msg) => {
+    // console.log("Received a chat msg", msg);
+    // io.emit("sendmsg");
+    socket.to(msg.QSID).emit("receivemsg", msg);
+  });
   socket.on("disconnect", () => {
     console.log("Client disconnected");
-  });
-  socket.on("sendmsg", (msg) => {
-    console.log("Received a chat msg");
-    io.emit("sendmsg");
   });
 });

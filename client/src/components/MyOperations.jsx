@@ -1,12 +1,18 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 import Axios from "axios";
 import "./MyOperations.css";
 import SingleOperation from "./SingleOperation";
 import moment from "moment";
 import { gsap } from "gsap";
 import OperationDetail from "./OperationDetail";
+import { LogisticsContext } from "../contexts/LogisticsProvider";
+
+import io from "socket.io-client";
+const socket = io.connect("http://localhost:4001");
 
 const MyOperations = () => {
+  const { opToEdit, setOpToEdit } = useContext(LogisticsContext);
+
   const role = JSON.parse(localStorage.getItem("role"));
   const usercode = JSON.parse(localStorage.getItem("WGusercode"));
   const [trafficmanagers, setTrafficmanagers] = useState();
@@ -124,7 +130,7 @@ const MyOperations = () => {
     // console.log(operations);
   }, [filtertext]);
 
-  const [opToEdit, setOpToEdit] = useState();
+  // const [opToEdit, setOpToEdit] = useState();
 
   useEffect(() => {
     Axios.post("/getfulloptoedit", { QSID: opToEdit }).then((response) => {
@@ -151,9 +157,10 @@ const MyOperations = () => {
       <div className="opheader">
         <div ref={refOpDetail} className="operationdetail">
           <OperationDetail
-            opToEdit={opToEdit}
+            // opToEdit={opToEdit}
             opToEditFull={opToEditFull}
             setOpToEditFull={setOpToEditFull}
+            socket={socket}
           />
         </div>
 
@@ -259,7 +266,8 @@ const MyOperations = () => {
                 timeintervals={timeintervals}
                 setToggleOpDetail={setToggleOpDetail}
                 toggleOpDetail={toggleOpDetail}
-                setOpToEdit={setOpToEdit}
+                // setOpToEdit={setOpToEdit}
+                socket={socket}
               />
             );
           })

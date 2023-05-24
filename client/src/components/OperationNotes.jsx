@@ -1,28 +1,72 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useContext } from "react";
 import Axios from "axios";
 import moment from "moment";
 import "./OperationNotes.css";
+import { LogisticsContext } from "../contexts/LogisticsProvider";
+
+// import io from "socket.io-client";
+// const socket = io.connect("http://localhost:4001");
 
 const OperationNotes = ({
-  opToEdit,
-  opNotes,
-  setOpNotes,
+  // opToEdit,
+  // opNotes,
+  // setOpNotes,
   reloadnotes,
   setReloadnotes,
+  socket,
 }) => {
+  const { opToEdit, opNotes, setOpNotes } = useContext(LogisticsContext);
+
   const user = JSON.parse(localStorage.getItem("WGusercode"));
   const [noteDate, setNoteDate] = useState(moment().format("YYYY-MM-DD"));
   const [noteToAdd, setNoteToAdd] = useState("");
 
+  const [messageList, setMessageList] = useState();
+
+  // useEffect(() => {
+  //   setMessageList(opNotes);
+  // }, [opToEdit]);
+  // useEffect(() => {
+  //   if (user !== "" && opToEdit !== "" && opToEdit !== null) {
+  //     socket.emit("joinroom", opToEdit);
+  //     console.log("room:", opToEdit);
+  //   }
+  // }, [opToEdit]);
+
+  useEffect(() => {
+    socket.on("receivemsg", (msg) => {
+      console.log(msg);
+
+      // if (Array.isArray(opNotes)) {
+      setOpNotes((opNotes) => [...opNotes, msg]);
+      // } else {
+      //   setOpNotes([msg]);
+      // }
+    });
+  }, [socket]);
+
   const handleSaveNote = (QSID) => {
-    if (noteToAdd !== "") {
+    if (noteToAdd !== "" && user !== "") {
+      const msgdata = {
+        // room: QSID,
+        QSID: QSID,
+        opnote: noteToAdd,
+        opNoteDate: moment().format("YYYY-MM-DD HH:mm"),
+        userCode: user,
+      };
       Axios.post("/savenewnote", {
         QSID: QSID,
         opNote: noteToAdd,
         opNoteDate: moment().format("YYYY-MM-DD HH:mm"),
         userCode: user,
-      }).then((response) => {
-        setReloadnotes(!reloadnotes);
+      }).then(async (response) => {
+        await socket.emit("sendmsg", msgdata);
+        // setReloadnotes(!reloadnotes);
+        // if (Array.isArray(opNotes)) {
+        setOpNotes([...opNotes, msgdata]);
+        // } else {
+        //   setOpNotes([msgdata]);
+        // }
       });
     }
     setNoteToAdd("");
@@ -39,7 +83,7 @@ const OperationNotes = ({
   return (
     <div className="operationNotes">
       <div className="opnotes">
-        {opNotes && opNotes.length > 0 ? (
+        {opNotes ? (
           opNotes.map((note, ind) => {
             if (note.opnote) {
               return (

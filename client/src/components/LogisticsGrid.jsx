@@ -6,6 +6,7 @@ import InProgress from "./InProgress";
 import Axios from "axios";
 import { LogisticsContext } from "../contexts/LogisticsProvider";
 import MyOperations from "./MyOperations";
+// import Chat from "./Chat";
 
 const LogisticsGrid = () => {
   const { updateScores } = useContext(LogisticsContext);
@@ -38,6 +39,9 @@ const LogisticsGrid = () => {
         <NavLink activeClassName="navbaractive" to="/logistics/matching" exact>
           Matching Report
         </NavLink>
+        <NavLink activeClassName="navbaractive" to="/logistics/chat" exact>
+          Chat
+        </NavLink>
         <div className="scores">
           <h4 style={{ marginBottom: "1rem" }}>Scores:</h4>
           {tmcscores
@@ -61,6 +65,9 @@ const LogisticsGrid = () => {
         <Route path="/logistics/inprogress">
           <InProgress />
         </Route>
+        {/* <Route path="/logistics/chat">
+          <Chat />
+        </Route> */}
       </div>
     </div>
   );

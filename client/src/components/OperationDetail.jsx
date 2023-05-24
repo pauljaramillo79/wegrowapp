@@ -1,17 +1,28 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import OperationNotes from "./OperationNotes";
 import "./OperationDetail.css";
 import Axios from "axios";
+import Chat from "./Chat";
+import { LogisticsContext } from "../contexts/LogisticsProvider";
 
-const OperationDetail = ({ opToEdit, opToEditFull, setOpToEditFull }) => {
-  const [opNotes, setOpNotes] = useState();
+const OperationDetail = ({
+  // opToEdit,
+  opToEditFull,
+  setOpToEditFull,
+  socket,
+}) => {
+  const { opToEdit, setOpToEdit, opNotes, setOpNotes } = useContext(
+    LogisticsContext
+  );
+
+  // const [opNotes, setOpNotes] = useState();
   const [reloadnotes, setReloadnotes] = useState(false);
 
-  useEffect(() => {
-    Axios.post("/getopnotes", { QSID: opToEdit }).then((response) =>
-      setOpNotes(response.data)
-    );
-  }, [opToEdit, reloadnotes]);
+  // useEffect(() => {
+  //   Axios.post("/getopnotes", { QSID: opToEdit }).then((response) =>
+  //     setOpNotes(response.data)
+  //   );
+  // }, [opToEdit, reloadnotes]);
 
   return (
     <>
@@ -81,11 +92,12 @@ const OperationDetail = ({ opToEdit, opToEditFull, setOpToEditFull }) => {
           )}
         </div>
         <OperationNotes
-          opToEdit={opToEdit}
-          opNotes={opNotes}
-          setOpNotes={setOpNotes}
+          // opToEdit={opToEdit}
+          // opNotes={opNotes}
+          // setOpNotes={setOpNotes}
           reloadnotes={reloadnotes}
           setReloadnotes={setReloadnotes}
+          socket={socket}
         />
       </div>
     </>
