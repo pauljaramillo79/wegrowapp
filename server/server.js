@@ -4,8 +4,12 @@ const path = require("path");
 const app = express();
 const http = require("http").createServer(app);
 
+// var io = require("socket.io")(http, {
+//   cors: { origin: "http://localhost:3000", methods: ["GET", "POST"] },
+// });
+
 var io = require("socket.io")(http, {
-  cors: { origin: "http://localhost:3000", methods: ["GET", "POST"] },
+  cors: { origin: "https://www.wgappdev.com", methods: ["GET", "POST"] },
 });
 
 const bodyParser = require("body-parser");

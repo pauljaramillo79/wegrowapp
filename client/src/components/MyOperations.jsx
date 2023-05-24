@@ -8,7 +8,8 @@ import OperationDetail from "./OperationDetail";
 import { LogisticsContext } from "../contexts/LogisticsProvider";
 
 import io from "socket.io-client";
-const socket = io.connect("http://localhost:4001");
+// const socket = io.connect("http://localhost:4001");
+const socket = io.connect("https://www.wgappdev.com");
 
 const MyOperations = () => {
   const { opToEdit, setOpToEdit } = useContext(LogisticsContext);
