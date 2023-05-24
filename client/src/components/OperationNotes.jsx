@@ -87,7 +87,13 @@ const OperationNotes = ({
           opNotes.map((note, ind) => {
             if (note.opnote) {
               return (
-                <div className="opnotegroup">
+                <div
+                  className={
+                    note.userCode === user
+                      ? "opnotegroup"
+                      : "opnotegroup otherusermsg"
+                  }
+                >
                   {ind === opNotes.length - 1 ? (
                     <p ref={refBottomNote} className="opnote">
                       {note.opnote}
@@ -116,10 +122,13 @@ const OperationNotes = ({
           type="text"
           placeholder="type new note"
           className="opnoteinput"
+          onKeyDown={(e) => {
+            e.key === "Enter" && handleSaveNote(opToEdit);
+          }}
         ></textarea>
         <button
           className="opnotepost"
-          onClick={(e) => handleSaveNote(opToEdit, e.target.value)}
+          onClick={(e) => handleSaveNote(opToEdit)}
         >
           Post
         </button>

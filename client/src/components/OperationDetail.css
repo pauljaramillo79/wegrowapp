@@ -28,14 +28,14 @@
 }
 .opDetailSupplyside {
   display: flex;
-  flex-basis: 33%;
-  min-width: 33%;
+  flex-basis: 27%;
+  min-width: 27%;
   flex-direction: column;
 }
 .opDetailDemandside {
   display: flex;
-  flex-basis: 33%;
-  min-width: 33%;
+  flex-basis: 27%;
+  min-width: 27%;
   flex-direction: column;
 }
 .opDetailItem {
@@ -43,7 +43,7 @@
   flex-direction: row;
   height: fit-content;
   align-items: center;
-  width: 80%;
+  width: 90%;
   justify-content: space-between;
   margin-bottom: 0.5rem;
 }
