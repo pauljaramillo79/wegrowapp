@@ -21,9 +21,11 @@ const MyOperations = () => {
 
   const role = JSON.parse(localStorage.getItem("role"));
   const usercode = JSON.parse(localStorage.getItem("WGusercode"));
+  const userid = JSON.parse(localStorage.getItem("WGuserID"));
   const [trafficmanagers, setTrafficmanagers] = useState();
   const [selectedTraffic, setSelectedTraffic] = useState();
   const [selectedTrafficID, setSelectedTrafficID] = useState();
+  const [traderlooking, setTraderlooking] = useState(false);
   const [operations, setOperations] = useState();
   const [reloadops, setReloadops] = useState(false);
   const [opToEditFull, setOpToEditFull] = useState();
@@ -67,26 +69,10 @@ const MyOperations = () => {
       );
     }
   }, [toggleOpDetail]);
-  // const loadmyoperations = () => {
-  //   return new Promise((resolve, reject) => {
-  //     Axios.post("/trafficmgrs").then((response) => {
-  //       setTrafficmanagers(response.data);
-  //       if (role === 4) {
-  //         setSelectedTraffic(JSON.parse(localStorage.getItem("WGusercode")));
-  //       } else {
-  //         setSelectedTraffic(response.data[0].traffic);
-  //       }
-  //     });
-  //     resolve(true);
-  //   });
-  // };
-  useEffect(async () => {
-    // await loadmyoperations();
 
+  useEffect(async () => {
     Axios.post("/trafficmgrs").then((response) => {
       setTrafficmanagers(response.data);
-
-      // const gettrindex = (el) => el.traffic === selectedTraffic;
 
       if (role === 4) {
         setSelectedTraffic(JSON.parse(localStorage.getItem("WGusercode")));
@@ -98,7 +84,6 @@ const MyOperations = () => {
         setSelectedTraffic(response.data[0].traffic);
         const gettrindex = (el) => el.traffic === response.data[0].traffic;
         let trafficindex = response.data.findIndex(gettrindex);
-        console.log(trafficindex);
       }
 
       // (response.data[trafficindex].trafficID);
@@ -109,8 +94,6 @@ const MyOperations = () => {
     if (trafficmanagers && selectedTraffic) {
       const gettrindex = (el) => el.traffic === selectedTraffic;
       let trafficindex = trafficmanagers.findIndex(gettrindex);
-      // console.log(selectedTraffic);
-      // let trafficID = trafficmanagers[trafficindex].trafficID;
       setSelectedTrafficID(trafficmanagers[trafficindex].trafficID);
     }
   }, [trafficmanagers, selectedTraffic]);
@@ -175,6 +158,13 @@ const MyOperations = () => {
     };
   }, [refOpDetail]);
 
+  const loadTraderOps = (userID) => {
+    Axios.post("/gettraderoperations", { userID: userID }).then((response) => {
+      setOperations(response.data);
+      setFoperations(response.data);
+    });
+  };
+
   return (
     <>
       <div className="opheader">
@@ -194,10 +184,14 @@ const MyOperations = () => {
                   <>
                     <button
                       className={
-                        selectedTraffic === trf.traffic ? "activetrfbtn" : ""
+                        selectedTraffic === trf.traffic &&
+                        traderlooking === false
+                          ? "activetrfbtn"
+                          : ""
                       }
                       value={trf.traffic}
                       onClick={(e) => {
+                        setTraderlooking(false);
                         setSelectedTraffic(e.target.value);
                         setFiltertext("");
                       }}
@@ -209,7 +203,25 @@ const MyOperations = () => {
                   ""
                 );
               })
-            : ""}
+            : ""}{" "}
+          {role == 1 || role == 2 || role == 3 ? (
+            <button
+              onClick={(e) => {
+                setTraderlooking(true);
+                loadTraderOps(userid);
+              }}
+              className={
+                traderlooking === true
+                  ? "traderOpButtonActive"
+                  : "traderOpButton"
+              }
+            >
+              {" "}
+              {usercode}
+            </button>
+          ) : (
+            ""
+          )}
         </div>
         <div className="opsearchbar">
           <input

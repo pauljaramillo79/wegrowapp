@@ -2432,6 +2432,33 @@ router.post("/getmyoperations", (req, res) => {
   );
 });
 
+router.post("/gettraderoperations", (req, res) => {
+  let traderid = req.body.userID;
+  db.query(
+    "SELECT customerList.companyCode AS customer, abbreviation, quantity, supplierlist.companyCode AS supplier, KTP, KTS, QSID,DATE_FORMAT(`from`,'%Y-%m-%d') AS start, DATE_FORMAT(`to`,'%Y-%m-%d') AS end, portOfDestination, portOfLoad, SCComplete, PCComplete, bookingComplete, traderList.tCode AS trader, bookingComplete, freightCompany, vesselName, bookingnumber, ETS, ETA, incoterms, pincoterms, quotationsheet.shipmentTypeID, shipmentTypes.shipmentType AS shipmentType FROM quotationsheet INNER JOIN customerList ON quotationsheet.customerID = customerList.customerID INNER JOIN (productList INNER JOIN prodNames ON productList.productName = prodNames.prodNameID) ON quotationsheet.productID = productList.productID INNER JOIN supplierlist ON quotationsheet.supplierID = supplierlist.supplierID INNER JOIN POLList ON quotationsheet.POLID = POLList.POLID INNER JOIN PODList ON quotationsheet.PODID = PODList.PODID INNER JOIN traderList ON quotationsheet.traderID = traderList.traderID INNER JOIN shipmentTypes ON quotationsheet.shipmentTypeID = shipmentTypes.shipmentTypeID WHERE saleComplete IN (1, -1) AND finalComplete=0 AND quotationsheet.traderID=?",
+    [traderid],
+    (err, results) => {
+      if (err) {
+        console.log(err);
+      }
+      if (results.length > 0) {
+        res.status(200).send(results);
+        // } else if (results.length === 0) {
+        //   res.json({
+        //     success: true,
+        //     msg: "No files assigned to this traffic manager",
+        //   });
+      }
+      if (results.length === 0) {
+        res.json({
+          success: true,
+          msg: "No files assigned to this traffic manager",
+        });
+      }
+    }
+  );
+});
+
 router.post("/saveopedits", (req, res) => {
   let id = req.body.id;
   let SCComplete = req.body.opedits.SCCompleteBool;

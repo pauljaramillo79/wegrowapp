@@ -57,3 +57,15 @@
   top: 125px;
   border: solid rgb(68, 65, 162);
 }
+.trafficbuttons .traderOpButton {
+  background-color: rgb(208, 173, 109);
+}
+.trafficbuttons .traderOpButton:hover {
+  background-color: rgb(254, 146, 23);
+}
+.trafficbuttons .traderOpButtonActive {
+  background-color: rgb(254, 146, 23);
+}
+.trafficbuttons .traderOpButtonActive:hover {
+  background-color: rgb(254, 146, 23);
+}
