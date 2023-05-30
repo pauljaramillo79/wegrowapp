@@ -176,7 +176,7 @@ const SingleOperation = ({
       >
         <h2>{operation.customer}</h2>
         <h3>{operation.abbreviation}</h3>
-        <h4>{operation.quantity.toFixed(0)} mt</h4>
+        <h4>{operation.quantity.toFixed(3)} mt</h4>
         <div className="opleftlabelbottom">
           <p>{operation.supplier}</p>
           {operation.shipmentTypeID === 1 ? (
