@@ -124,7 +124,8 @@ const MyOperations = () => {
             .includes(filtertext.toLowerCase()) ||
           item.portOfLoad.toLowerCase().includes(filtertext.toLowerCase()) ||
           item.QSID.toFixed().includes(filtertext) ||
-          item.trader.toLowerCase().includes(filtertext.toLowerCase())
+          item.trader.toLowerCase().includes(filtertext.toLowerCase()) ||
+          item.traffic.toLowerCase().includes(filtertext.toLowerCase())
         // ||
         // item.KTS.includes(filtertext) ||
         // item.KTP.includes(filtertext)
@@ -208,6 +209,7 @@ const MyOperations = () => {
             <button
               onClick={(e) => {
                 setTraderlooking(true);
+                setFiltertext("");
                 loadTraderOps(userid);
               }}
               className={

@@ -43,7 +43,9 @@
   align-self: flex-start;
 }
 .otherusermsg .opnote {
-  background-color: red;
+  background-color: rgb(227, 226, 235);
+  color: rgb(68, 65, 162);
+  border: solid 1px rgb(68, 65, 162);
 }
 .opnote {
   width: 100%;

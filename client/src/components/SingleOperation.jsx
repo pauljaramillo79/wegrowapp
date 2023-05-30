@@ -154,6 +154,7 @@ const SingleOperation = ({
         </div>
       )}
       <p className="optrader">{operation.trader}</p>
+      <p className="optraffic">{operation.traffic}</p>
       <div
         onClick={(e) => {
           setToggleOpDetail(true);
