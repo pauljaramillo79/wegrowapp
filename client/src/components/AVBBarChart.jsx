@@ -837,8 +837,8 @@ const AVBBarChart = ({
               qs4total += item.qs4;
               totaltotalb += item.totalb;
               totaltotals += item.totals;
-              console.log(qs1total + qs2total);
-              console.log(qb1total + qb2total);
+              // console.log(qs1total + qs2total);
+              // console.log(qb1total + qb2total);
               return [
                 <ul className="AVBTableRow">
                   <li className="AVBFirstCol">
@@ -1200,6 +1200,8 @@ const AVBBarChart = ({
               qs2totalp += item.qsp2;
               qs3totalp += item.qsp3;
               qs4totalp += item.qsp4;
+              totaltotalbp += item.totalbprofit;
+              totaltotalsp += item.totalsprofit;
               return [
                 <ul className="AVBTableRow">
                   <li className="AVBFirstCol">
