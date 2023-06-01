@@ -1097,20 +1097,16 @@ const AVBBarChart = ({
           <li className="AVBTableFig">
             {currentquarter === 1
               ? qb1total > 0
-                ? ((qs1total / qb1total) * 100).toFixed(0) + "%"
+                ? ((totaltotals / qb1total) * 100).toFixed(0) + "%"
                 : "NB"
               : currentquarter === 2
               ? qb1total + qb2total > 0
-                ? (
-                    ((qs1total + qs2total) / (qb1total + qb2total)) *
-                    100
-                  ).toFixed(0) + "%"
+                ? ((totaltotals / (qb1total + qb2total)) * 100).toFixed(0) + "%"
                 : "NB"
               : currentquarter === 3
               ? qb1total + qb2total + qb3total > 0
                 ? (
-                    ((qs1total + qs2total + qs3total) /
-                      (qb1total + qb2total + qb3total)) *
+                    (totaltotals / (qb1total + qb2total + qb3total)) *
                     100
                   ).toFixed(0) + "%"
                 : "NB"
@@ -1204,8 +1200,6 @@ const AVBBarChart = ({
               qs2totalp += item.qsp2;
               qs3totalp += item.qsp3;
               qs4totalp += item.qsp4;
-              totaltotalbp += item.totalbprofit;
-              totaltotalsp += item.totalsprofit;
               return [
                 <ul className="AVBTableRow">
                   <li className="AVBFirstCol">
@@ -1491,20 +1485,17 @@ const AVBBarChart = ({
           <li className="AVBTableFig">
             {currentquarter === 1
               ? qb1totalp > 0
-                ? ((qs1totalp / qb1totalp) * 100).toFixed(0) + "%"
+                ? ((totaltotalsp / qb1totalp) * 100).toFixed(0) + "%"
                 : "NB"
               : currentquarter === 2
               ? qb1totalp + qb2totalp > 0
-                ? (
-                    ((qs1totalp + qs2totalp) / (qb1totalp + qb2totalp)) *
-                    100
-                  ).toFixed(0) + "%"
+                ? ((totaltotalsp / (qb1totalp + qb2totalp)) * 100).toFixed(0) +
+                  "%"
                 : "NB"
               : currentquarter === 3
               ? qb1totalp + qb2totalp + qb3totalp > 0
                 ? (
-                    ((qs1totalp + qs2totalp + qs3totalp) /
-                      (qb1totalp + qb2totalp + qb3totalp)) *
+                    (totaltotalsp / (qb1totalp + qb2totalp + qb3totalp)) *
                     100
                   ).toFixed(0) + "%"
                 : "NB"
