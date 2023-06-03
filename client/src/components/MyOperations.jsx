@@ -14,9 +14,11 @@ const socket = io.connect("https://www.wgappdev.com");
 const MyOperations = () => {
   const {
     opToEdit,
-    setOpToEdit,
-    setOpsWithNewNotes,
-    opsWithNewNotes,
+    opNotes,
+    setOpNotes,
+    activeusers,
+    opsWithNewNotes1,
+    setOpsWithNewNotes1,
   } = useContext(LogisticsContext);
 
   const role = JSON.parse(localStorage.getItem("role"));
@@ -39,13 +41,27 @@ const MyOperations = () => {
     socket.emit("joinmyoperations", mainroom);
   }, []);
 
+  const handletest = (data) => {
+    let objI = opsWithNewNotes1.findIndex((obj) => obj.QSID === data.QSID);
+    console.log(objI);
+  };
+
   useEffect(() => {
     socket.on("receivemsg2", (data) => {
-      setOpsWithNewNotes((opsWithNewNotes) => {
-        if (opsWithNewNotes.includes(data)) {
-          return [...opsWithNewNotes];
-        } else {
-          return [...opsWithNewNotes, data];
+      setOpsWithNewNotes1((opsWithNewNotes1) => {
+        let objInd = opsWithNewNotes1.findIndex(
+          (obj) => obj.QSID === data.QSID
+        );
+        if (objInd !== -1) {
+          let newopslist = opsWithNewNotes1;
+          newopslist[objInd].unreadusers = data.unreadusers;
+          return newopslist;
+        }
+        if (objInd === -1) {
+          return [
+            ...opsWithNewNotes1,
+            { user: data.user, QSID: data.QSID, unreadusers: data.unreadusers },
+          ];
         }
       });
     });
@@ -294,6 +310,7 @@ const MyOperations = () => {
             // setTimeline(itimeline);
             return (
               <SingleOperation
+                key={op.QSID}
                 operation={op}
                 selectedTraffic={selectedTraffic}
                 setReloadops={setReloadops}

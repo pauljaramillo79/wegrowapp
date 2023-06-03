@@ -36,6 +36,8 @@ const SingleOperation = ({
     opToEdit,
     opsWithNewNotes,
     setOpsWithNewNotes,
+    opsWithNewNotes1,
+    setOpsWithNewNotes1,
   } = useContext(LogisticsContext);
 
   const [todaydate, setTodaydate] = useState(moment());
@@ -52,6 +54,7 @@ const SingleOperation = ({
   const [editmode, setEditmode] = useState(false);
 
   const user = JSON.parse(localStorage.getItem("WGusercode"));
+  const userID = JSON.parse(localStorage.getItem("WGuserID"));
 
   const initvalues = {
     SCCompleteBool: operation.SCComplete,
@@ -123,6 +126,14 @@ const SingleOperation = ({
     }
   };
 
+  // console.log(
+  //   opsWithNewNotes1.filter((item) => item.QSID == operation.QSID)[0]
+  //     ? opsWithNewNotes1.filter((item) => item.QSID == operation.QSID)[0][
+  //         "unreadusers"
+  //       ]
+  //     : ""
+  // );
+
   return (
     <div className="operation">
       {editmode === false ? (
@@ -161,15 +172,33 @@ const SingleOperation = ({
           setOpToEdit(operation.QSID);
           joinRoom(operation.QSID);
 
-          let newopswithnewnotes = opsWithNewNotes.filter(
-            (el) => el != operation.QSID
+          // let newopswithnewnotes = opsWithNewNotes.filter(
+          //   (el) => el != operation.QSID
+          // );
+          // setOpsWithNewNotes(newopswithnewnotes);
+
+          let objIndex = opsWithNewNotes1.findIndex(
+            (obj) => obj.QSID === operation.QSID
           );
-          setOpsWithNewNotes(newopswithnewnotes);
-          if (opsWithNewNotes.includes(operation.QSID)) {
-            Axios.post("/removeQSfromNewmsglist", {
-              QSID: operation.QSID,
-              user: user,
-            });
+          if (objIndex !== -1) {
+            if (opsWithNewNotes1[objIndex].unreadusers === userID + user) {
+              opsWithNewNotes1.splice(objIndex, 1);
+              Axios.post("/removeQSfromNewmsglist", {
+                QSID: operation.QSID,
+              });
+            } else {
+              if (
+                opsWithNewNotes1[objIndex].unreadusers.includes(userID + user)
+              ) {
+                opsWithNewNotes1[objIndex].unreadusers = opsWithNewNotes1[
+                  objIndex
+                ].unreadusers.replace(userID + user, "");
+                Axios.post("/removeUnreaduser", {
+                  QSID: operation.QSID,
+                  unreadusers: opsWithNewNotes1[objIndex].unreadusers,
+                });
+              }
+            }
           }
         }}
         className="opleftlabel"
@@ -189,7 +218,11 @@ const SingleOperation = ({
             ""
           )}
         </div>
-        {opsWithNewNotes.includes(operation.QSID) ? (
+        {// opsWithNewNotes.includes(operation.QSID)
+        opsWithNewNotes1.filter((item) => item.QSID == operation.QSID)[0] &&
+        opsWithNewNotes1
+          .filter((item) => item.QSID == operation.QSID)[0]
+          ["unreadusers"].includes(userID + user) ? (
           <div className="iconopwithmsg-wrapper">
             <FontAwesomeIcon className="iconopwithmsg" icon={faEnvelope} />
           </div>

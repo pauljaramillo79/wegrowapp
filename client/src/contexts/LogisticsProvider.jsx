@@ -8,7 +8,9 @@ export const LogisticsProvider = ({ children }) => {
 
   const [opToEdit, setOpToEdit] = useState(0);
   const [opNotes, setOpNotes] = useState();
-  const [opsWithNewNotes, setOpsWithNewNotes] = useState([]);
+  // const [opsWithNewNotes, setOpsWithNewNotes] = useState([]);
+  const [activeusers, setActiveusers] = useState();
+  const [opsWithNewNotes1, setOpsWithNewNotes1] = useState([]);
 
   useEffect(() => {
     Axios.post("/getopnotes", { QSID: opToEdit }).then((response) => {
@@ -21,11 +23,19 @@ export const LogisticsProvider = ({ children }) => {
   }, [opToEdit]);
 
   useEffect(() => {
-    Axios.post("/getQSListwithNewMsg", { user: user }).then((response) => {
+    Axios.post("/getQSListwithNewMsg").then((response) => {
       if (Array.isArray(response.data)) {
-        let newlist = response.data.map((item) => item.QSID);
-        setOpsWithNewNotes(newlist);
+        // let newlist = response.data.map((item) => item.QSID);
+        // setOpsWithNewNotes(newlist);
+        setOpsWithNewNotes1(response.data);
       }
+    });
+    Axios.post("/getActiveUsers").then((response) => {
+      let userlist = "";
+      response.data.forEach((item) => {
+        userlist += item.traderID + item.tCode;
+      });
+      setActiveusers(userlist);
     });
   }, []);
 
@@ -39,8 +49,10 @@ export const LogisticsProvider = ({ children }) => {
         setOpToEdit,
         opNotes,
         setOpNotes,
-        opsWithNewNotes,
-        setOpsWithNewNotes,
+        activeusers,
+        setActiveusers,
+        opsWithNewNotes1,
+        setOpsWithNewNotes1,
       }}
     >
       {children}

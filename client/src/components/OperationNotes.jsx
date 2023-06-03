@@ -19,11 +19,13 @@ const OperationNotes = ({
     opToEdit,
     opNotes,
     setOpNotes,
-    setOpsWithNewNotes,
-    opsWithNewNotes,
+    activeusers,
+    opsWithNewNotes1,
+    setOpsWithNewNotes1,
   } = useContext(LogisticsContext);
 
   const user = JSON.parse(localStorage.getItem("WGusercode"));
+  const userID = JSON.parse(localStorage.getItem("WGuserID"));
   const [noteDate, setNoteDate] = useState(moment().format("YYYY-MM-DD"));
   const [noteToAdd, setNoteToAdd] = useState("");
 
@@ -53,13 +55,15 @@ const OperationNotes = ({
   }, [socket]);
 
   const handleSaveNote = (QSID) => {
+    let pactiveusers = activeusers.replace(userID + user, "");
+
     if (noteToAdd !== "" && user !== "") {
       const msgdata = {
-        // room: QSID,
         QSID: QSID,
         opnote: noteToAdd,
         opNoteDate: moment().format("YYYY-MM-DD HH:mm"),
         userCode: user,
+        unreadusers: pactiveusers,
       };
       Axios.post("/savenewnote", {
         QSID: QSID,
@@ -68,17 +72,29 @@ const OperationNotes = ({
         userCode: user,
       }).then(async (response) => {
         await socket.emit("sendmsg", msgdata);
-        // setReloadnotes(!reloadnotes);
-        // if (Array.isArray(opNotes)) {
         setOpNotes([...opNotes, msgdata]);
-        // setOpsWithNewNotes([...opsWithNewNotes, QSID]);
-        // } else {
-        //   setOpNotes([msgdata]);
-        // }
       });
-      if (!opsWithNewNotes.includes(QSID)) {
-        console.log("sending");
-        Axios.post("/addQStonewmsglist", { QSID: QSID, user: user });
+
+      let objIndex = opsWithNewNotes1.findIndex((obj) => obj.QSID === QSID);
+      if (objIndex === -1) {
+        Axios.post("/addQStonewmsglist", {
+          QSID: QSID,
+          user: user,
+          activeusers: pactiveusers,
+        }).then(
+          setOpsWithNewNotes1((opsWithNewNotes1) => [
+            ...opsWithNewNotes1,
+            { QSID: QSID, user: user, unreadusers: pactiveusers },
+          ])
+        );
+      }
+      if (objIndex !== -1) {
+        if (opsWithNewNotes1[objIndex].unreadusers !== pactiveusers) {
+          Axios.post("/resetunreadusers", {
+            QSID: QSID,
+            unreadusers: pactiveusers,
+          }).then((opsWithNewNotes1[objIndex].unreadusers = pactiveusers));
+        }
       }
     }
     setNoteToAdd("");

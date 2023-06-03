@@ -64,7 +64,7 @@ io.on("connection", (socket) => {
   socket.on("sendmsg", (msg) => {
     // console.log("Received a chat msg", msg);
     // io.emit("sendmsg");
-    socket.to(123).emit("receivemsg2", msg.QSID);
+    socket.to(123).emit("receivemsg2", msg);
     socket.to(msg.QSID).emit("receivemsg", msg);
   });
   socket.on("disconnect", () => {
