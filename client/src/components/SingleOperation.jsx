@@ -218,13 +218,17 @@ const SingleOperation = ({
             ""
           )}
         </div>
-        {opsWithNewNotes1.filter((item) => item.QSID == operation.QSID)[0] ? (
-          opsWithNewNotes1
-            .filter((item) => item.QSID == operation.QSID)[0]
-            ["unreadusers"].includes(userID + user) ? (
-            <div className="iconopwithmsg-wrapper">
-              <FontAwesomeIcon className="iconopwithmsg" icon={faEnvelope} />
-            </div>
+        {opsWithNewNotes1 ? (
+          opsWithNewNotes1.filter((item) => item.QSID == operation.QSID)[0] ? (
+            opsWithNewNotes1
+              .filter((item) => item.QSID == operation.QSID)[0]
+              ["unreadusers"].includes(userID + user) ? (
+              <div className="iconopwithmsg-wrapper">
+                <FontAwesomeIcon className="iconopwithmsg" icon={faEnvelope} />
+              </div>
+            ) : (
+              ""
+            )
           ) : (
             ""
           )
