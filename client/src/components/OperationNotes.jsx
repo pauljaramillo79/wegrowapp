@@ -4,9 +4,6 @@ import moment from "moment";
 import "./OperationNotes.css";
 import { LogisticsContext } from "../contexts/LogisticsProvider";
 
-// import io from "socket.io-client";
-// const socket = io.connect("http://localhost:4001");
-
 const OperationNotes = ({
   // opToEdit,
   // opNotes,
@@ -31,26 +28,9 @@ const OperationNotes = ({
 
   const [messageList, setMessageList] = useState();
 
-  // useEffect(() => {
-  //   setMessageList(opNotes);
-  // }, [opToEdit]);
-  // useEffect(() => {
-  //   if (user !== "" && opToEdit !== "" && opToEdit !== null) {
-  //     socket.emit("joinroom", opToEdit);
-  //     console.log("room:", opToEdit);
-  //   }
-  // }, [opToEdit]);
-
   useEffect(() => {
     socket.on("receivemsg", (msg) => {
-      console.log(msg);
-
-      // if (Array.isArray(opNotes)) {
       setOpNotes((opNotes) => [...opNotes, msg]);
-
-      // } else {
-      //   setOpNotes([msg]);
-      // }
     });
   }, [socket]);
 

@@ -2408,7 +2408,7 @@ router.post("/loadcurrentbudget", (req, res) => {
 router.post("/getmyoperations", (req, res) => {
   let trafficid = req.body.selectedTrafficID;
   db.query(
-    "SELECT customerList.companyCode AS customer, abbreviation, quantity, supplierlist.companyCode AS supplier, KTP, KTS, QSID,DATE_FORMAT(`from`,'%Y-%m-%d') AS start, DATE_FORMAT(`to`,'%Y-%m-%d') AS end, portOfDestination, portOfLoad, SCComplete, PCComplete, bookingComplete, traderList.tCode AS trader, trafficList.tCode AS traffic, bookingComplete, freightCompany, vesselName, bookingnumber, ETS, ETA, incoterms, pincoterms, quotationsheet.shipmentTypeID, shipmentTypes.shipmentType AS shipmentType FROM quotationsheet INNER JOIN customerList ON quotationsheet.customerID = customerList.customerID INNER JOIN (productList INNER JOIN prodNames ON productList.productName = prodNames.prodNameID) ON quotationsheet.productID = productList.productID INNER JOIN supplierlist ON quotationsheet.supplierID = supplierlist.supplierID INNER JOIN POLList ON quotationsheet.POLID = POLList.POLID INNER JOIN PODList ON quotationsheet.PODID = PODList.PODID INNER JOIN traderList ON quotationsheet.traderID = traderList.traderID INNER JOIN shipmentTypes ON quotationsheet.shipmentTypeID = shipmentTypes.shipmentTypeID INNER JOIN trafficList ON trafficList.trafficID = quotationsheet.trafficID WHERE saleComplete IN (1, -1) AND finalComplete=0 AND quotationsheet.trafficID=?",
+    "SELECT customerList.companyCode AS customer, abbreviation, quantity, supplierlist.companyCode AS supplier, KTP, KTS, QSID,DATE_FORMAT(`from`,'%Y-%m-%d') AS start, DATE_FORMAT(`to`,'%Y-%m-%d') AS end, portOfDestination, portOfLoad, SCComplete, PCComplete, bookingComplete, traderList.tCode AS trader, trafficList.tCode AS traffic, bookingComplete, freightCompany, vesselName, bookingnumber, ETS, ETA, incoterms, pincoterms, quotationsheet.shipmentTypeID, shipmentTypes.shipmentType AS shipmentType,InsComplete, InsNumber, inspection, inspectionCompany  FROM quotationsheet INNER JOIN customerList ON quotationsheet.customerID = customerList.customerID INNER JOIN (productList INNER JOIN prodNames ON productList.productName = prodNames.prodNameID) ON quotationsheet.productID = productList.productID INNER JOIN supplierlist ON quotationsheet.supplierID = supplierlist.supplierID INNER JOIN POLList ON quotationsheet.POLID = POLList.POLID INNER JOIN PODList ON quotationsheet.PODID = PODList.PODID INNER JOIN traderList ON quotationsheet.traderID = traderList.traderID INNER JOIN shipmentTypes ON quotationsheet.shipmentTypeID = shipmentTypes.shipmentTypeID INNER JOIN trafficList ON trafficList.trafficID = quotationsheet.trafficID WHERE saleComplete IN (1, -1) AND finalComplete=0 AND quotationsheet.trafficID=?",
     [trafficid],
     (err, results) => {
       if (err) {
@@ -2435,7 +2435,7 @@ router.post("/getmyoperations", (req, res) => {
 router.post("/gettraderoperations", (req, res) => {
   let traderid = req.body.userID;
   db.query(
-    "SELECT customerList.companyCode AS customer, abbreviation, quantity, supplierlist.companyCode AS supplier, KTP, KTS, QSID,DATE_FORMAT(`from`,'%Y-%m-%d') AS start, DATE_FORMAT(`to`,'%Y-%m-%d') AS end, portOfDestination, portOfLoad, SCComplete, PCComplete, bookingComplete, traderList.tCode AS trader, trafficList.tCode AS traffic, bookingComplete, freightCompany, vesselName, bookingnumber, ETS, ETA, incoterms, pincoterms, quotationsheet.shipmentTypeID, shipmentTypes.shipmentType AS shipmentType FROM quotationsheet INNER JOIN customerList ON quotationsheet.customerID = customerList.customerID INNER JOIN (productList INNER JOIN prodNames ON productList.productName = prodNames.prodNameID) ON quotationsheet.productID = productList.productID INNER JOIN supplierlist ON quotationsheet.supplierID = supplierlist.supplierID INNER JOIN POLList ON quotationsheet.POLID = POLList.POLID INNER JOIN PODList ON quotationsheet.PODID = PODList.PODID INNER JOIN traderList ON quotationsheet.traderID = traderList.traderID INNER JOIN shipmentTypes ON quotationsheet.shipmentTypeID = shipmentTypes.shipmentTypeID INNER JOIN trafficList ON trafficList.trafficID = quotationsheet.trafficID WHERE saleComplete IN (1, -1) AND finalComplete=0 AND quotationsheet.traderID=?",
+    "SELECT customerList.companyCode AS customer, abbreviation, quantity, supplierlist.companyCode AS supplier, KTP, KTS, QSID,DATE_FORMAT(`from`,'%Y-%m-%d') AS start, DATE_FORMAT(`to`,'%Y-%m-%d') AS end, portOfDestination, portOfLoad, SCComplete, PCComplete, bookingComplete, traderList.tCode AS trader, trafficList.tCode AS traffic, bookingComplete, freightCompany, vesselName, bookingnumber, ETS, ETA, incoterms, pincoterms, quotationsheet.shipmentTypeID, shipmentTypes.shipmentType AS shipmentType, InsComplete, InsNumber , inspection, inspectionCompany FROM quotationsheet INNER JOIN customerList ON quotationsheet.customerID = customerList.customerID INNER JOIN (productList INNER JOIN prodNames ON productList.productName = prodNames.prodNameID) ON quotationsheet.productID = productList.productID INNER JOIN supplierlist ON quotationsheet.supplierID = supplierlist.supplierID INNER JOIN POLList ON quotationsheet.POLID = POLList.POLID INNER JOIN PODList ON quotationsheet.PODID = PODList.PODID INNER JOIN traderList ON quotationsheet.traderID = traderList.traderID INNER JOIN shipmentTypes ON quotationsheet.shipmentTypeID = shipmentTypes.shipmentTypeID INNER JOIN trafficList ON trafficList.trafficID = quotationsheet.trafficID WHERE saleComplete IN (1, -1) AND finalComplete=0 AND quotationsheet.traderID=?",
     [traderid],
     (err, results) => {
       if (err) {
@@ -2463,8 +2463,12 @@ router.post("/saveopedits", (req, res) => {
   let id = req.body.id;
   let SCComplete = req.body.opedits.SCCompleteBool;
   let PCComplete = req.body.opedits.PCCompleteBool;
+  let InsComplete = req.body.opedits.InsCompleteBool;
+  let InsNumber = req.body.opedits.InsNumber;
   let bookingComplete = req.body.opedits.bookingCompleteBool;
   let bookingnumber = req.body.opedits.bookingnumber;
+  let inspection = req.body.opedits.inspection;
+  let inspectionCompany = req.body.opedits.inspectionCompany;
   let vesselName = req.body.opedits.vesselName;
   let freightCompany = req.body.opedits.freightCompany;
   let pincoterms = req.body.opedits.pincoterms;
@@ -2473,7 +2477,7 @@ router.post("/saveopedits", (req, res) => {
   let ETA = req.body.opedits.ETA === "" ? null : req.body.opedits.ETA;
 
   db.query(
-    "UPDATE quotationsheet SET SCComplete = ?, PCComplete=?, bookingComplete=?, bookingnumber=?, vesselName=?, freightCompany=?, pincoterms=?, incoterms=?, ETS=?, ETA=? WHERE QSID=?",
+    "UPDATE quotationsheet SET SCComplete = ?, PCComplete=?, bookingComplete=?, bookingnumber=?, vesselName=?, freightCompany=?, pincoterms=?, incoterms=?, ETS=?, ETA=?, InsComplete=?, InsNumber=? , inspection=?, inspectionCompany=? WHERE QSID=?",
     [
       SCComplete,
       PCComplete,
@@ -2485,6 +2489,10 @@ router.post("/saveopedits", (req, res) => {
       incoterms,
       ETS,
       ETA,
+      InsComplete,
+      InsNumber,
+      inspection,
+      inspectionCompany,
       id,
     ],
     (err, results) => {

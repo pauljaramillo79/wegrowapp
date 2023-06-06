@@ -112,7 +112,7 @@
   flex-direction: row;
   margin-top: 2rem;
   font-size: 0.7rem;
-  width: 350px;
+  width: 300px;
   justify-content: center;
 }
 .tlsegment {
@@ -152,7 +152,7 @@
 }
 .oporigindestination {
   margin-top: 1.5rem;
-  width: 350px;
+  width: 300px;
   font-family: "Roboto", sans-serif;
   text-transform: uppercase;
   font-size: 0.8rem;
@@ -278,6 +278,9 @@
   border-radius: 2rem;
   position: absolute;
   top: -15px;
+}
+.insuranceinfo {
+  margin-bottom: 1rem;
 }
 
 @media screen and (max-width: 1440px) {

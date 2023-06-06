@@ -80,6 +80,18 @@ const SingleOperation = ({
     incoterms: operation.incoterms,
     ETS: operation.ETS ? moment(operation.ETS).format("YYYY-MM-DD") : "",
     ETA: operation.ETA ? moment(operation.ETA).format("YYYY-MM-DD") : "",
+    InsComplete:
+      operation.InsComplete === null || operation.InsComplete === 0
+        ? false
+        : true,
+    InsCompleteBool: operation.InsComplete,
+    InsNumber: operation.InsNumber,
+    inspection:
+      operation.inspection === null || operation.inspection === 0
+        ? false
+        : true,
+    inspectionBool: operation.inspection,
+    inspectionCompany: operation.inspectionCompany,
   };
   const [opedits, setOpedits] = useState(initvalues);
 
@@ -261,7 +273,7 @@ const SingleOperation = ({
         <div className="optimeline">
           {timeline
             ? timeline.map((el, i) => {
-                let tlscale = isLaptop ? 200 : 300;
+                let tlscale = isLaptop ? 200 : 250;
                 return (
                   <div className="tlfsegment">
                     <div>{el.Detail}</div>
@@ -552,8 +564,145 @@ const SingleOperation = ({
           </div>
         </div>
         <div className="opchecklist">
-          <div className="checklistitem">Insurance</div>
-          <div className="checklistitem">Inspection</div>
+          <div className="checklistitem">
+            {editmode === false ? (
+              operation.InsComplete === 1 ? (
+                <>
+                  <FontAwesomeIcon
+                    icon={faCheckCircle}
+                    className="opgreencheck"
+                  />
+                  <p>Insurance</p>
+                </>
+              ) : (
+                <>
+                  <FontAwesomeIcon icon={faMinusCircle} />
+                  <p>Insurance</p>
+                </>
+              )
+            ) : (
+              <>
+                <input
+                  type="checkbox"
+                  checked={
+                    opedits["InsComplete"] === null
+                      ? operation.InsComplete === 1
+                        ? true
+                        : false
+                      : opedits["InsComplete"]
+                  }
+                  onClick={(e) => {
+                    if (opedits["InsComplete"] !== null) {
+                      setOpedits({
+                        ...opedits,
+                        InsComplete: !opedits["InsComplete"],
+                        InsCompleteBool:
+                          opedits["InsComplete"] === true ? 0 : 1,
+                      });
+                    } else if (operation.InsComplete === 1) {
+                      setOpedits({
+                        ...opedits,
+                        InsComplete: false,
+                        InsCompleteBool: 0,
+                      });
+                    } else if (
+                      operation.InsComplete === 0 ||
+                      operation.InsComplete === null
+                    ) {
+                      setOpedits({
+                        ...opedits,
+                        InsComplete: true,
+                        InsCompleteBool: 1,
+                      });
+                    }
+                  }}
+                />
+                <p>Insurance</p>
+              </>
+            )}
+          </div>{" "}
+          {editmode === true && opedits.InsComplete === true ? (
+            <input
+              type="text"
+              className="insuranceinfo"
+              placeholder="insurance#"
+              value={opedits.InsNumber}
+              onChange={(e) => {
+                setOpedits({ ...opedits, InsNumber: e.target.value });
+              }}
+            />
+          ) : (
+            <p>{operation.InsNumber}</p>
+          )}
+          <div className="checklistitem">
+            {editmode === false ? (
+              operation.inspection === 1 ? (
+                <>
+                  <FontAwesomeIcon
+                    icon={faCheckCircle}
+                    className="opgreencheck"
+                  />
+                  <p>Inspection</p>
+                </>
+              ) : (
+                <>
+                  <FontAwesomeIcon icon={faMinusCircle} />
+                  <p>Inspection</p>
+                </>
+              )
+            ) : (
+              <>
+                <input
+                  type="checkbox"
+                  checked={
+                    opedits["inspection"] === null
+                      ? operation.inspection === 1
+                        ? true
+                        : false
+                      : opedits["inspection"]
+                  }
+                  onClick={(e) => {
+                    if (opedits["inspection"] !== null) {
+                      setOpedits({
+                        ...opedits,
+                        inspection: !opedits["inspection"],
+                        inspectionBool: opedits["inspection"] === true ? 0 : 1,
+                      });
+                    } else if (operation.inspection === 1) {
+                      setOpedits({
+                        ...opedits,
+                        inspection: false,
+                        inspectionBool: 0,
+                      });
+                    } else if (
+                      operation.inspection === 0 ||
+                      operation.inspection === null
+                    ) {
+                      setOpedits({
+                        ...opedits,
+                        inspection: true,
+                        inspectionBool: 1,
+                      });
+                    }
+                  }}
+                />
+                <p>Inspection</p>
+              </>
+            )}
+          </div>
+          {editmode === true && opedits.inspection === true ? (
+            <input
+              type="text"
+              className="inspectioninfo"
+              placeholder="ins company"
+              value={opedits.inspectionCompany}
+              onChange={(e) => {
+                setOpedits({ ...opedits, inspectionCompany: e.target.value });
+              }}
+            />
+          ) : (
+            <p>{operation.inspectionCompany}</p>
+          )}
         </div>
       </div>
     </div>
