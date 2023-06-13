@@ -273,6 +273,7 @@ const SalesQS2 = () => {
   const [userID, setUserID] = useState(
     JSON.parse(localStorage.getItem("WGusercode"))
   );
+  const role = JSON.parse(localStorage.getItem("role"));
 
   // Load and set warehouse list for dropdown menu
   useEffect(() => {
@@ -2958,33 +2959,37 @@ const SalesQS2 = () => {
         </span>
         <div className="QSindexbox">
           <div className="salesQSnavbuttons">
-            <select
-              // onClick={(e) => {
-              //   console.log("ajaja");
+            {role === 1 || role === 2 || role === 3 ? (
+              <select
+                // onClick={(e) => {
+                //   console.log("ajaja");
 
-              // }}
-              onChange={(e) => {
-                setFromdropdown(true);
-                setLoaduser(e.target.value);
-              }}
-            >
-              <option value="all">All</option>
-              {traders
-                ? traders.map((trader) => {
-                    if (trader.trader === loaduser) {
-                      return (
-                        <option selected value={trader.trader}>
-                          {trader.trader}
-                        </option>
-                      );
-                    } else {
-                      return (
-                        <option value={trader.trader}>{trader.trader}</option>
-                      );
-                    }
-                  })
-                : "reload"}
-            </select>
+                // }}
+                onChange={(e) => {
+                  setFromdropdown(true);
+                  setLoaduser(e.target.value);
+                }}
+              >
+                <option value="all">All</option>
+                {traders
+                  ? traders.map((trader) => {
+                      if (trader.trader === loaduser) {
+                        return (
+                          <option selected value={trader.trader}>
+                            {trader.trader}
+                          </option>
+                        );
+                      } else {
+                        return (
+                          <option value={trader.trader}>{trader.trader}</option>
+                        );
+                      }
+                    })
+                  : "reload"}
+              </select>
+            ) : (
+              ""
+            )}
             <button
               onClick={(e) => {
                 e.preventDefault();

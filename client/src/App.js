@@ -104,7 +104,18 @@ function App() {
                 <Router>
                   <Nav />
                   <Switch>
-                    {role === 4 ? (
+                    {role === 5 ? (
+                      <>
+                        <Route path="/sales">
+                          <SalesGrid2 />
+                        </Route>
+                        <Route path="/logistics">
+                          <LogisticsProvider>
+                            <LogisticsGrid />
+                          </LogisticsProvider>
+                        </Route>
+                      </>
+                    ) : role === 4 ? (
                       <Route path="/">
                         <LogisticsProvider>
                           <LogisticsGrid />

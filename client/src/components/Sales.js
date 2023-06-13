@@ -7,9 +7,12 @@ import { RefreshPositionsContext } from "../contexts/RefreshPositionsProvider";
 import { LoadQSContext } from "../contexts/LoadQSProvider";
 
 const Sales = (props) => {
+  const role = JSON.parse(localStorage.getItem("role"));
+
   const { toggleQSrefresh } = useContext(RefreshPositionsContext);
-  const { loaduser, setLoaduser, QStoload, setFromdropdown } =
-    useContext(LoadQSContext);
+  const { loaduser, setLoaduser, QStoload, setFromdropdown } = useContext(
+    LoadQSContext
+  );
   const [traders, setTraders] = useState();
   const [userID, setUserID] = useState(
     // QStoload && loaduser
@@ -121,31 +124,37 @@ const Sales = (props) => {
           <option value={1000}>1000</option>
           <option value={"no limit"}>no limit</option>
         </select>
-        <select
-          // onClick={(e) => {
-          //   console.log("hiya");
+        {role === 1 || role === 2 || role === 3 ? (
+          <select
+            // onClick={(e) => {
+            //   console.log("hiya");
 
-          // }}
-          onChange={(e) => {
-            setFromdropdown(true);
-            setLoaduser(e.target.value);
-          }}
-        >
-          <option value="all">All</option>
-          {traders
-            ? traders.map((trader) => {
-                if (trader.trader === loaduser) {
-                  return (
-                    <option selected value={trader.trader}>
-                      {trader.trader}
-                    </option>
-                  );
-                } else {
-                  return <option value={trader.trader}>{trader.trader}</option>;
-                }
-              })
-            : "reload"}
-        </select>
+            // }}
+            onChange={(e) => {
+              setFromdropdown(true);
+              setLoaduser(e.target.value);
+            }}
+          >
+            <option value="all">All</option>
+            {traders
+              ? traders.map((trader) => {
+                  if (trader.trader === loaduser) {
+                    return (
+                      <option selected value={trader.trader}>
+                        {trader.trader}
+                      </option>
+                    );
+                  } else {
+                    return (
+                      <option value={trader.trader}>{trader.trader}</option>
+                    );
+                  }
+                })
+              : "reload"}
+          </select>
+        ) : (
+          ""
+        )}
         <RefreshIcon
           className="refreshicon"
           onClick={(e) => {
