@@ -106,6 +106,10 @@ function App() {
                   <Switch>
                     {role === 5 ? (
                       <>
+                        {" "}
+                        <Route path="/analysis">
+                          <AnalysisGrid />
+                        </Route>
                         <Route path="/sales">
                           <SalesGrid2 />
                         </Route>

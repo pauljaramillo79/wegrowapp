@@ -20,23 +20,24 @@ const Nav = () => {
         ) : (
           ""
         )}
+        {role === 1 || role === 2 || role === 3 || role === 5 ? (
+          <li>
+            <NavLink
+              activeClassName="navbaractive"
+              to="/analysis/actualvsbudget"
+            >
+              Analysis
+            </NavLink>
+          </li>
+        ) : (
+          ""
+        )}
         {role === 1 || role === 2 || role === 3 ? (
-          <>
-            <li>
-              <NavLink
-                activeClassName="navbaractive"
-                to="/analysis/actualvsbudget"
-              >
-                Analysis
-              </NavLink>
-            </li>
-
-            <li>
-              <NavLink exact activeClassName="navbaractive" to="/">
-                Positions
-              </NavLink>
-            </li>
-          </>
+          <li>
+            <NavLink exact activeClassName="navbaractive" to="/">
+              Positions
+            </NavLink>
+          </li>
         ) : (
           ""
         )}

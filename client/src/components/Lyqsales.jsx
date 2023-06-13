@@ -45,6 +45,8 @@ const Lyqsales = () => {
   );
   const [traders, setTraders] = useState();
 
+  const role = JSON.parse(localStorage.getItem("role"));
+
   useEffect(() => {
     Axios.post("/traders").then((response) => {
       setTraders(response.data);
@@ -68,24 +70,28 @@ const Lyqsales = () => {
         <div id="lastyearsales" key="a">
           <div className="lystitlesection">
             <h3 className="lystitle">Last Year Sales and Indications</h3>
-            <select onChange={(e) => setLyuser(e.target.value)}>
-              <option value="all">All</option>
-              {traders
-                ? traders.map((trader) => {
-                    if (trader.trader === lyuser) {
-                      return (
-                        <option selected value={trader.trader}>
-                          {trader.trader}
-                        </option>
-                      );
-                    } else {
-                      return (
-                        <option value={trader.trader}>{trader.trader}</option>
-                      );
-                    }
-                  })
-                : "reload"}
-            </select>
+            {role === 1 || role === 2 || role === 3 ? (
+              <select onChange={(e) => setLyuser(e.target.value)}>
+                <option value="all">All</option>
+                {traders
+                  ? traders.map((trader) => {
+                      if (trader.trader === lyuser) {
+                        return (
+                          <option selected value={trader.trader}>
+                            {trader.trader}
+                          </option>
+                        );
+                      } else {
+                        return (
+                          <option value={trader.trader}>{trader.trader}</option>
+                        );
+                      }
+                    })
+                  : "reload"}
+              </select>
+            ) : (
+              ""
+            )}
           </div>
           <AnalysisLastYSales userID={lyuser} />
         </div>
