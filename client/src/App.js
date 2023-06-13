@@ -110,6 +110,9 @@ function App() {
                         <Route path="/analysis">
                           <AnalysisGrid />
                         </Route>
+                        <Route exact path="/">
+                          <PositionsGrid />
+                        </Route>
                         <Route path="/sales">
                           <SalesGrid2 />
                         </Route>

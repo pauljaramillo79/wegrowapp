@@ -32,7 +32,7 @@ const Nav = () => {
         ) : (
           ""
         )}
-        {role === 1 || role === 2 || role === 3 ? (
+        {role === 1 || role === 2 || role === 3 || role === 5 ? (
           <li>
             <NavLink exact activeClassName="navbaractive" to="/">
               Positions
