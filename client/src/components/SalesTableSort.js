@@ -15,6 +15,7 @@ import "./SalesTableSort.css";
 
 const SalesTableSort = (props) => {
   const role = JSON.parse(localStorage.getItem("role"));
+  const userCode = JSON.parse(localStorage.getItem("WGusercode"));
 
   const { state } = useContext(AuthContext);
   const { QSrefresh, toggleQSrefresh } = useContext(RefreshPositionsContext);
@@ -139,19 +140,19 @@ const SalesTableSort = (props) => {
     return sort.column === column ? ascOrDesc : "";
   };
   var operators = {
-    "<": function (x, y) {
+    "<": function(x, y) {
       return x < y;
     },
-    "<=": function (x, y) {
+    "<=": function(x, y) {
       return x <= y;
     },
-    ">": function (x, y) {
+    ">": function(x, y) {
       return x > y;
     },
-    ">=": function (x, y) {
+    ">=": function(x, y) {
       return x >= y;
     },
-    "==": function (x, y) {
+    "==": function(x, y) {
       return x === y;
     },
   };
@@ -177,7 +178,10 @@ const SalesTableSort = (props) => {
         filters[column] = (x) => {
           if (x) {
             return (
-              x.toString().toLowerCase().indexOf(filterText.toLowerCase()) > -1
+              x
+                .toString()
+                .toLowerCase()
+                .indexOf(filterText.toLowerCase()) > -1
             );
           }
         };
@@ -191,8 +195,8 @@ const SalesTableSort = (props) => {
   });
   var sortedItems = _.sortBy(filteredItems, sort.column);
   if (sort.order === "desc") sortedItems.reverse();
-  var cell = function (x) {
-    return columnNames.map(function (c, i) {
+  var cell = function(x) {
+    return columnNames.map(function(c, i) {
       if (c === "quantity") {
         if (x[c]) {
           return (
@@ -319,7 +323,7 @@ const SalesTableSort = (props) => {
           >
             Duplicate
           </button>
-          {role === 1 || role === 2 ? (
+          {role === 1 || role === 2 || userCode === "NIR" ? (
             <button
               className="editbutton"
               onClick={(e) => {
