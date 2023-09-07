@@ -1153,7 +1153,7 @@ const Budget2024a = () => {
                     return [
                       <div className="bdgtpnametable">
                         <div className="bdgtpnametabletitle">
-                          <h3>2023 {prod} Budget</h3>
+                          <h3>2024 {prod} Budget</h3>
                           <FontAwesomeIcon
                             icon={faPlusCircle}
                             onClick={(e) => {
@@ -2069,7 +2069,7 @@ const Budget2024a = () => {
           </div>
         </div>
         <div className="budgetbyprod">
-          <h4>Budget Summary Figures 2023</h4>
+          <h4>Budget Summary Figures 2024</h4>
 
           <div className="bdgtsummarybuttons1">
             <p>Level 1:</p>
