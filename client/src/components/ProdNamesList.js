@@ -10,13 +10,17 @@ const ProdNamesList = ({
   updateList,
   updateList2,
   handleProdGroupClick, // setSelectedgprods,
+  setSelectedprodgroupforced,
+  setSelectedprodgroupforcedID,
+  setNewprodname,
+  newprodname,
 }) => {
   const [listdata, setListdata] = useState([]);
   // eslint-disable-next-line react-hooks/exhaustive-deps
 
   // eslint-disable-next-line no-extend-native
-  Array.prototype.groupBy = function (key) {
-    return this.reduce(function (groups, item) {
+  Array.prototype.groupBy = function(key) {
+    return this.reduce(function(groups, item) {
       const val = item[key];
       groups[val] = groups[val] || [];
       groups[val].push(item);
@@ -59,6 +63,10 @@ const ProdNamesList = ({
             data={prodcatname}
             handleProductClick={handleProductClick}
             handleProdGroupClick={handleProdGroupClick}
+            setSelectedprodgroupforced={setSelectedprodgroupforced}
+            setSelectedprodgroupforcedID={setSelectedprodgroupforcedID}
+            setNewprodname={setNewprodname}
+            newprodname={newprodname}
             // setSelectedgprods={setSelectedgprods}
           />,
         ];

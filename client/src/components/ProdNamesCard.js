@@ -6,7 +6,21 @@ const ProdNamesCard = ({
   data,
   handleProductClick,
   handleProdGroupClick,
+  setSelectedprodgroupforced,
+  setSelectedprodgroupforcedID,
+  setNewprodname,
+  newprodname,
 }) => {
+  const forceselectgroup = () => {
+    Axios.post("/forceselectgroup", { group }).then((response) => {
+      setNewprodname({
+        ...newprodname,
+        prodgroupID: response.data[0].prodgroupID,
+        productGroup: group,
+      });
+    });
+  };
+
   return (
     <div className="prodgroupcard">
       <h4
@@ -24,6 +38,9 @@ const ProdNamesCard = ({
             onClick={(e) => {
               e.preventDefault();
               handleProductClick(Object.keys(data)[k]);
+              // setSelectedprodgroupforced(group);
+
+              forceselectgroup();
             }}
           >
             {Object.keys(data)[k]}

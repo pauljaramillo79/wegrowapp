@@ -28,6 +28,7 @@ const Admin = () => {
   const [newproducer, setNewproducer] = useState({});
   const [newprodgroup, setNewprodgroup] = useState();
   const [newprodcatname, setNewprodcatname] = useState();
+  const [newprodname, setNewprodname] = useState();
   const [deletecustomer, setDeletecustomer] = useState();
   const [deleteproducer, setDeleteproducer] = useState();
   const [updatelist, setUpdatelist] = useState(true);
@@ -49,6 +50,12 @@ const Admin = () => {
   const [showaddprodcatname, setShowaddprodcatname] = useState(false);
   const [showeditprodcatname, setShoweditprodcatname] = useState(false);
   const [showeditprodname, setShoweditprodname] = useState(false);
+  const [showaddprodname, setShowaddprodname] = useState(false);
+
+  const [selectedprodgroupforced, setSelectedprodgroupforced] = useState("");
+  const [selectedprodgroupforcedID, setSelectedprodgroupforcedID] = useState(
+    ""
+  );
 
   const showhideadd = showadd ? "editTrader displayblock" : "displaynone";
   const showhideedit = showedit
@@ -81,6 +88,9 @@ const Admin = () => {
   const showhideeditprodname = showeditprodname
     ? "editProdName displayblock"
     : "displaynone";
+  const showhideaddprodname = showaddprodname
+    ? "editProdName displayblock"
+    : "displaynone";
   // eslint-disable-next-line react-hooks/exhaustive-deps
   //   useEffect(async () => {
   //     if (selectedlist) {
@@ -107,6 +117,7 @@ const Admin = () => {
     setShoweditprodcatname(false);
     setShowaddprodcatname(false);
     setShoweditprodname(false);
+    setShowaddprodname(false);
   };
 
   const handleChange = (e, key) => {
@@ -229,6 +240,8 @@ const Admin = () => {
     setShoweditprodgroup(false);
     setShoweditprodcatname(false);
     setShowaddprodcatname(false);
+    setShoweditprodname(false);
+    setShowaddprodname(false);
   };
 
   const addNewProdCatName = () => {
@@ -236,6 +249,22 @@ const Admin = () => {
     setShoweditprodgroup(false);
     setShoweditprodcatname(false);
     setShowaddprodcatname(true);
+    setShoweditprodname(false);
+    setShowaddprodname(false);
+  };
+
+  const addNewProdName = () => {
+    setShowaddprodgroup(false);
+    setShoweditprodgroup(false);
+    setShoweditprodcatname(false);
+    setShowaddprodcatname(false);
+    setShoweditprodname(false);
+    setShowaddprodname(true);
+    setNewprodname({
+      ...newprodname,
+      prodCatNameID: selectedprodcatname.prodCatNameID,
+      prodCatName: selectedprodcatname.prodCatName,
+    });
   };
 
   const handleNewTraderChange = (e) => {
@@ -284,6 +313,10 @@ const Admin = () => {
     e.preventDefault();
     setNewprodcatname({ ...newprodcatname, [e.target.name]: e.target.value });
   };
+  const handleNewProdChange = (e) => {
+    e.preventDefault();
+    setNewprodname({ ...newprodname, [e.target.name]: e.target.value });
+  };
   const handleCustomerDeleteChange = (e) => {
     e.preventDefault();
     setDeletecustomer(e.target.value);
@@ -330,6 +363,13 @@ const Admin = () => {
       }
     );
   };
+  const addProdName = async (e) => {
+    e.preventDefault();
+    await Axios.post("/addnewProdName", { newprodname }).then((response) => {
+      setUpdateprodnameslist(!updateprodnameslist);
+      setNewprodname("");
+    });
+  };
   const deleteCustomer = (e) => {
     e.preventDefault();
     Axios.post("/deleteCustomer", { selectedcustomer }).then((response) => {
@@ -355,6 +395,7 @@ const Admin = () => {
     setShoweditprodgroup(false);
     setShowaddprodgroup(false);
     setShoweditprodname(false);
+    setShowaddprodname(false);
     Axios.post("/selectedprodcatname", { prodcatname: prod }).then(
       (response) => {
         setSelectedprodcatname(response.data[0]);
@@ -373,6 +414,8 @@ const Admin = () => {
     setShowaddprodgroup(false);
     setShoweditprodcatname(false);
     setShowaddprodcatname(false);
+    setShoweditprodname(false);
+    setShowaddprodname(false);
     Axios.post("/selectprodgroup", { productGroup: prodgroup }).then(
       (response) => {
         // console.log(response);
@@ -390,6 +433,7 @@ const Admin = () => {
     setShoweditprodcatname(false);
     setShowaddprodcatname(false);
     setShoweditprodname(true);
+    setShowaddprodname(false);
     Axios.post("/selectprodname", { prodnameID: prodnameID }).then(
       (response) => {
         setSelectedprodname(response.data[0]);
@@ -409,6 +453,27 @@ const Admin = () => {
       ...selectedprodname,
       prodGroupID: x,
       productGroup: y,
+    });
+  };
+  const setProdCatNameandIDinNewProd = (x, y) => {
+    setNewprodname({
+      ...newprodname,
+      prodCatNameID: x,
+      prodCatName: y,
+    });
+  };
+  const setBUandIDinNewProd = (x, y) => {
+    setNewprodname({
+      ...newprodname,
+      BUID: x,
+      bunit: y,
+    });
+  };
+  const setIMOandIDinNewProd = (x, y) => {
+    setNewprodname({
+      ...newprodname,
+      IMOID: x,
+      IMO: y,
     });
   };
 
@@ -477,13 +542,18 @@ const Admin = () => {
                 addNewProdCatName={addNewProdCatName}
                 updateList={updateprodcatnameslist}
                 updateList2={updateprodnameslist}
-                handleProdGroupClick={handleProdGroupClick} // setSelectedgprods={setSelectedgprods}
+                handleProdGroupClick={handleProdGroupClick}
+                setSelectedprodgroupforced={setSelectedprodgroupforced}
+                setSelectedprodgroupforcedID={setSelectedprodgroupforcedID}
+                setNewprodname={setNewprodname}
+                newprodname={newprodname}
               />,
               <GProdList
                 selectedgprods={selectedgprods}
                 selectedprodgroup={selectedprodgroup}
                 handleProdNameClick={handleProdNameClick}
                 updateList={updateprodnameslist}
+                addNewProdName={addNewProdName}
               />,
               // <p>{selectedgprods.map((item) => item.abbreviation)}</p>,
             ]
@@ -1225,6 +1295,92 @@ const Admin = () => {
               </div>
             </div>
             <button type="submit">Edit Product Name Details</button>
+          </fieldset>
+        </form>
+        <form
+          className={showhideaddprodname}
+          onSubmit={(e) => {
+            addProdName(e);
+          }}
+        >
+          <fieldset>
+            <legend>Add New Product Name:</legend>
+            <div className="editprodcatname-form-group">
+              <label>prodNameID:</label>
+              <input placeholder="...Leave Blank" readOnly />
+            </div>
+            <div className="editprodcatname-form-group">
+              <label>prodGroup:</label>
+              <input
+                placeholder="...Leave Blank"
+                readOnly
+                value={newprodname ? newprodname.productGroup : ""}
+              />
+            </div>
+            <div className="editprodcatname-form-group">
+              <label>prodCatName:</label>
+              <div className="prodnamesearchv">
+                <SearchField
+                  searchURL={"/prodcatnameslist"}
+                  searchName={"prodCatName"}
+                  searchID={"prodCatNameID"}
+                  setResetfield={setResetfield}
+                  value={newprodname ? newprodname.prodCatName : ""}
+                  setProdSupplier={setProdCatNameandIDinNewProd}
+                />
+              </div>
+              {/* <input
+                placeholder="...Leave Blank"
+                readOnly
+                value={newprodname ? newprodname.prodCatName : ""}
+              /> */}
+            </div>
+            <div className="editprodcatname-form-group">
+              <label>prodName:</label>
+              <input
+                name="prodName"
+                placeholder="...Type New Product Name"
+                onChange={handleNewProdChange}
+                value={newprodname ? newprodname.prodName : ""}
+              />
+            </div>
+            <div className="editprodcatname-form-group">
+              <label>abbreviation:</label>
+              <input
+                name="abbreviation"
+                placeholder="...Type New Product Abbreviation"
+                onChange={handleNewProdChange}
+                value={newprodname ? newprodname.abbreviation : ""}
+              />
+            </div>
+            <div className="editprodcatname-form-group">
+              <label>Business Unit:</label>
+              <div className="prodnamesearchv">
+                <SearchField
+                  searchURL={"/bunitlist"}
+                  searchName={"businessUnit"}
+                  searchID={"BUID"}
+                  setResetfield={setResetfield}
+                  value={newprodname ? newprodname.bunit : ""}
+                  setProdSupplier={setBUandIDinNewProd}
+                />
+              </div>
+            </div>
+            <div className="editprodcatname-form-group">
+              <label>IMO Class:</label>
+              <div className="prodnamesearchv">
+                <SearchField
+                  // style={{ flexDirection: "column" }}
+                  searchURL={"/IMOlist"}
+                  searchName={"IMO"}
+                  searchID={"IMOID"}
+                  setResetfield={setResetfield}
+                  value={newprodname ? newprodname.IMO : ""}
+                  setProdSupplier={setIMOandIDinNewProd}
+                />
+              </div>
+            </div>
+            <button type="submit">Add New Product Name</button>
           </fieldset>
         </form>
       </div>

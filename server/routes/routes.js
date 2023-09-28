@@ -1500,10 +1500,24 @@ router.post("/prodnameslist", (req, res) => {
 
 router.post("/selectgroupedprods", (req, res) => {
   let selectedprod = req.body.selectedprod;
-  console.log(selectedprod);
   db.query(
     "SELECT abbreviation, prodNameID, prodGroupID FROM prodNames INNER JOIN prodCatNames ON prodNames.prodCatNameID = prodCatNames.prodCatNameID WHERE prodCatNames.prodCatName = ?",
     [selectedprod],
+    (err, results) => {
+      if (err) {
+        console.log(err);
+      }
+      if (results.length > 0) {
+        return res.status(200).send(results);
+      }
+    }
+  );
+});
+router.post("/forceselectgroup", (req, res) => {
+  let group = req.body.group;
+  db.query(
+    "SELECT prodgroupID FROM productGroups WHERE productGroup=?",
+    [group],
     (err, results) => {
       if (err) {
         console.log(err);
@@ -1659,6 +1673,62 @@ router.post("/prodcatnameslist", (req, res) => {
       }
       if (results.length > 0) {
         return res.status(200).send(results);
+      }
+    }
+  );
+});
+router.post("/bunitlist", (req, res) => {
+  db.query(
+    "SELECT BUID, businessUnit FROM businessUnits ORDER BY BUID ASC",
+    (err, results) => {
+      if (err) {
+        console.log(err);
+      }
+      if (results.length > 0) {
+        return res.status(200).send(results);
+      }
+    }
+  );
+});
+router.post("/IMOlist", (req, res) => {
+  db.query(
+    "SELECT IMOID, IMO FROM IMOGroups ORDER BY IMOID ASC",
+    (err, results) => {
+      if (err) {
+        console.log(err);
+      }
+      if (results.length > 0) {
+        return res.status(200).send(results);
+      }
+    }
+  );
+});
+
+router.post("/addNewProdName", (req, res) => {
+  let prodCatNameID = req.body.newprodname.prodCatNameID;
+  let abbreviation = req.body.newprodname.abbreviation;
+  let prodName = req.body.newprodname.prodName;
+  let BUID = req.body.newprodname.BUID;
+  let IMOID = req.body.newprodname.IMOID;
+  let prodgroupID = req.body.newprodname.prodgroupID;
+  db.query(
+    "INSERT IGNORE INTO prodNames (prodCatNameID, abbreviation, prodName, BUID, IMOID, prodGroupID) VALUES (?,?,?,?,?,?)",
+    [prodCatNameID, abbreviation, prodName, BUID, IMOID, prodgroupID],
+    (err, results) => {
+      if (err) {
+        console.log(err);
+      } else if (results.affectedRows == "0") {
+        console.log("ProdName Already Exists");
+        return res.json({
+          success: false,
+          message: "Product Name Already Exists",
+        });
+      } else {
+        console.log("Added Product  Name");
+        return res.json({
+          success: true,
+          message: "Successfully added New Product  Name",
+        });
       }
     }
   );
