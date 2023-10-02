@@ -1486,7 +1486,7 @@ router.post("/deleteProducer", async (req, res) => {
 
 router.post("/prodnameslist", (req, res) => {
   db.query(
-    "SELECT productGroups.prodGroupID, productGroup, abbreviation, prodCatName, prodNames.prodCatNameID FROM prodNames INNER JOIN productGroups ON prodNames.prodGroupID = productGroups.prodGroupID INNER JOIN prodCatNames ON prodNames.prodCatNameID=prodCatNames.prodCatNameID ORDER BY productGroups.prodGroupID ASC, prodCatName ASC",
+    "SELECT productGroups.prodGroupID, productGroup, abbreviation, prodCatName, prodNames.prodCatNameID, prodNames.prodNameID FROM prodNames INNER JOIN productGroups ON prodNames.prodGroupID = productGroups.prodGroupID INNER JOIN prodCatNames ON prodNames.prodCatNameID=prodCatNames.prodCatNameID ORDER BY productGroups.prodGroupID ASC, prodCatName ASC",
     (err, results) => {
       if (err) {
         console.log(err);
@@ -1760,6 +1760,28 @@ router.post("/updateprodname", (req, res) => {
         return res.json({
           success: true,
           message: "Succesfully edited Product Name Info",
+        });
+      }
+    }
+  );
+});
+
+// PRODLIST
+
+router.post("/addnewProduct", (req, res) => {
+  let prodnameID = req.body.newproddetail.prodnameID;
+  let supplierID = req.body.newproddetail.supplierID;
+  db.query(
+    "INSERT INTO productList (productName, supplierID) VALUES (?,?)",
+    [prodnameID, supplierID],
+    (err) => {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log("Added Product");
+        return res.json({
+          success: true,
+          message: "Successfully added New Product",
         });
       }
     }

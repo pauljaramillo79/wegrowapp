@@ -7,6 +7,7 @@ const GProdList = ({
   handleProdNameClick,
   updateList,
   addNewProdName,
+  addNewProdDetail,
 }) => {
   const [selectedproducts, setSelectedproducts] = useState();
   const [prodnameID, setProdnameID] = useState();
@@ -78,6 +79,13 @@ const GProdList = ({
               </p>
             ))
           : ""}
+        {selectedprodgroup ? (
+          <p style={{ marginTop: "1rem" }} onClick={addNewProdDetail}>
+            + Add New Product
+          </p>
+        ) : (
+          ""
+        )}
       </div>
     </div>
   );

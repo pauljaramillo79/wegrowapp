@@ -29,6 +29,7 @@ const Admin = () => {
   const [newprodgroup, setNewprodgroup] = useState();
   const [newprodcatname, setNewprodcatname] = useState();
   const [newprodname, setNewprodname] = useState();
+  const [newproddetail, setNewproddetail] = useState();
   const [deletecustomer, setDeletecustomer] = useState();
   const [deleteproducer, setDeleteproducer] = useState();
   const [updatelist, setUpdatelist] = useState(true);
@@ -36,6 +37,7 @@ const Admin = () => {
   const [updateproducerlist, setUpdateproducerlist] = useState(true);
   const [updateprodcatnameslist, setUpdateprodcatnameslist] = useState(true);
   const [updateprodnameslist, setUpdateprodnameslist] = useState(true);
+  const [updateprodnamesdetail, setUpdateprodnamesdetail] = useState(true);
 
   const [showedit, setShowedit] = useState(false);
   const [showadd, setShowadd] = useState(false);
@@ -51,6 +53,8 @@ const Admin = () => {
   const [showeditprodcatname, setShoweditprodcatname] = useState(false);
   const [showeditprodname, setShoweditprodname] = useState(false);
   const [showaddprodname, setShowaddprodname] = useState(false);
+  const [showeditproddetail, setShoweditproddetail] = useState(false);
+  const [showaddproddetail, setShowaddproddetail] = useState(false);
 
   const [selectedprodgroupforced, setSelectedprodgroupforced] = useState("");
   const [selectedprodgroupforcedID, setSelectedprodgroupforcedID] = useState(
@@ -89,6 +93,9 @@ const Admin = () => {
     ? "editProdName displayblock"
     : "displaynone";
   const showhideaddprodname = showaddprodname
+    ? "editProdName displayblock"
+    : "displaynone";
+  const showhideaddproddetail = showaddproddetail
     ? "editProdName displayblock"
     : "displaynone";
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -242,6 +249,8 @@ const Admin = () => {
     setShowaddprodcatname(false);
     setShoweditprodname(false);
     setShowaddprodname(false);
+    setShoweditproddetail(false);
+    setShowaddproddetail(false);
   };
 
   const addNewProdCatName = () => {
@@ -251,6 +260,8 @@ const Admin = () => {
     setShowaddprodcatname(true);
     setShoweditprodname(false);
     setShowaddprodname(false);
+    setShoweditproddetail(false);
+    setShowaddproddetail(false);
   };
 
   const addNewProdName = () => {
@@ -260,11 +271,24 @@ const Admin = () => {
     setShowaddprodcatname(false);
     setShoweditprodname(false);
     setShowaddprodname(true);
+    setShoweditproddetail(false);
+    setShowaddproddetail(false);
     setNewprodname({
       ...newprodname,
       prodCatNameID: selectedprodcatname.prodCatNameID,
       prodCatName: selectedprodcatname.prodCatName,
     });
+  };
+
+  const addNewProdDetail = () => {
+    setShowaddprodgroup(false);
+    setShoweditprodgroup(false);
+    setShoweditprodcatname(false);
+    setShowaddprodcatname(false);
+    setShoweditprodname(false);
+    setShowaddprodname(false);
+    setShoweditproddetail(false);
+    setShowaddproddetail(true);
   };
 
   const handleNewTraderChange = (e) => {
@@ -370,6 +394,13 @@ const Admin = () => {
       setNewprodname("");
     });
   };
+  const addProdDetail = async (e) => {
+    e.preventDefault();
+    await Axios.post("/addnewProduct", { newproddetail }).then((response) => {
+      setUpdateprodnamesdetail(!updateprodnamesdetail);
+      setNewproddetail("");
+    });
+  };
   const deleteCustomer = (e) => {
     e.preventDefault();
     Axios.post("/deleteCustomer", { selectedcustomer }).then((response) => {
@@ -396,6 +427,7 @@ const Admin = () => {
     setShowaddprodgroup(false);
     setShoweditprodname(false);
     setShowaddprodname(false);
+    setShowaddproddetail(false);
     Axios.post("/selectedprodcatname", { prodcatname: prod }).then(
       (response) => {
         setSelectedprodcatname(response.data[0]);
@@ -416,6 +448,7 @@ const Admin = () => {
     setShowaddprodcatname(false);
     setShoweditprodname(false);
     setShowaddprodname(false);
+    setShowaddproddetail(false);
     Axios.post("/selectprodgroup", { productGroup: prodgroup }).then(
       (response) => {
         // console.log(response);
@@ -434,6 +467,7 @@ const Admin = () => {
     setShowaddprodcatname(false);
     setShoweditprodname(true);
     setShowaddprodname(false);
+    setShowaddproddetail(false);
     Axios.post("/selectprodname", { prodnameID: prodnameID }).then(
       (response) => {
         setSelectedprodname(response.data[0]);
@@ -474,6 +508,20 @@ const Admin = () => {
       ...newprodname,
       IMOID: x,
       IMO: y,
+    });
+  };
+  const setProdNameandIDinProdDetail = (x, y) => {
+    setNewproddetail({
+      ...newproddetail,
+      prodnameID: x,
+      abbreviation: y,
+    });
+  };
+  const setSupplierandIDinProdDetail = (x, y) => {
+    setNewproddetail({
+      ...newproddetail,
+      supplierID: x,
+      companyCode: y,
     });
   };
 
@@ -554,6 +602,7 @@ const Admin = () => {
                 handleProdNameClick={handleProdNameClick}
                 updateList={updateprodnameslist}
                 addNewProdName={addNewProdName}
+                addNewProdDetail={addNewProdDetail}
               />,
               // <p>{selectedgprods.map((item) => item.abbreviation)}</p>,
             ]
@@ -1381,6 +1430,43 @@ const Admin = () => {
               </div>
             </div>
             <button type="submit">Add New Product Name</button>
+          </fieldset>
+        </form>
+        <form
+          className={showhideaddproddetail}
+          onSubmit={(e) => {
+            addProdDetail(e);
+          }}
+        >
+          <fieldset>
+            <legend>Add New Product:</legend>
+            <div className="editprodcatname-form-group">
+              <label>ProdName:</label>
+              <div className="prodnamesearchv">
+                <SearchField
+                  searchURL={"/prodnameslist"}
+                  searchName={"abbreviation"}
+                  searchID={"prodNameID"}
+                  setResetfield={setResetfield}
+                  value={newproddetail ? newproddetail.abbreviation : ""}
+                  setProdSupplier={setProdNameandIDinProdDetail}
+                />
+              </div>
+            </div>
+            <div className="editprodcatname-form-group">
+              <label>Supplier:</label>
+              <div className="prodnamesearchv">
+                <SearchField
+                  searchURL={"/producerlist"}
+                  searchName={"companyCode"}
+                  searchID={"supplierID"}
+                  setResetfield={setResetfield}
+                  value={newproddetail ? newproddetail.companyCode : ""}
+                  setProdSupplier={setSupplierandIDinProdDetail}
+                />
+              </div>
+            </div>
+            <button type="submit">Add New Product</button>
           </fieldset>
         </form>
       </div>
