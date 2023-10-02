@@ -50,11 +50,24 @@ const Nav = () => {
         ) : (
           ""
         )}
-        <li>
-          <NavLink activeClassName="navbaractive" to="/logistics/inprogress">
-            Logistics
-          </NavLink>
-        </li>
+        {role === 1 || role === 2 || role === 3 || role === 4 || role === 5 ? (
+          <li>
+            <NavLink activeClassName="navbaractive" to="/logistics/inprogress">
+              Logistics
+            </NavLink>
+          </li>
+        ) : (
+          ""
+        )}
+        {role === 6 ? (
+          <li>
+            <NavLink activeClassName="navbaractive" to="/sales">
+              Sales
+            </NavLink>
+          </li>
+        ) : (
+          ""
+        )}
         {role === 1 || role === 2 ? (
           <li>
             <NavLink activeClassName="navbaractive" to="/budget/budget2023">
