@@ -13,8 +13,12 @@ import {
 } from "react-accessible-accordion";
 import { gsap } from "gsap";
 import * as XLSX from "xlsx";
+import useContextMenu from "../contexts/useContextMenu";
+import "./Budget2024a.css";
 
 const Budget2024a = () => {
+  const { clicked, setClicked, points, setPoints } = useContextMenu();
+
   const refresmsg = useRef(null);
   const [showmsg, setShowmsg] = useState(false);
 
@@ -505,7 +509,6 @@ const Budget2024a = () => {
     setShowdelctybtns(showctydelprod);
     setShowprodctyadd(showmainctyadd);
     // console.log(showctydelprod);
-    // console.log(Object.keys(allvalues));
     return allvalues;
   };
 
@@ -568,9 +571,13 @@ const Budget2024a = () => {
         regel[1].forEach((ctyel) => {
           // console.log(prodind, regind, ctyel["country"], ctyel["quantity"]);
           ctylevel[ctyel["country"]] = {
-            quantity: Number(ctyel["quantity"]),
-            avgprice: Number(ctyel["avgprice"].replace(/,/g, "")),
-            avgprofit: Number(ctyel["avgprofit"].replace(/,/g, "")),
+            quantity: Number(ctyel["quantity"].toFixed(0)),
+            avgprice: ctyel["avgprice"]
+              ? Number(ctyel["avgprice"].replace(/,/g, ""))
+              : 0,
+            avgprofit: ctyel["avgprofit"]
+              ? Number(ctyel["avgprofit"].replace(/,/g, ""))
+              : 0,
           };
         });
         reglevel[regind] = ctylevel;
@@ -629,6 +636,8 @@ const Budget2024a = () => {
     return prodlevel;
   };
 
+  const [lybformateddata, setLybformateddata] = useState();
+
   useEffect(() => {
     if (activePCatName && activePCatName !== "") {
       Axios.post("/getbudgetdata", {
@@ -651,6 +660,14 @@ const Budget2024a = () => {
       }).then((response) => {
         // setBdgtlyearsales(response.data);
         setBdgtlyearsales(formatsaleslastyeardata(response.data));
+        // console.log(formatsaleslastyeardata(response.data));
+      });
+      Axios.post("/bdgtlyearbdgt", {
+        prodcat: activePCatName,
+        year: bdgtyear,
+      }).then((response) => {
+        console.log(formatsaleslastyeardata(response.data));
+        setLybformateddata(formatsaleslastyeardata(response.data));
       });
     }
   }, [activePCatName, reloadbdgdata]);
@@ -1539,7 +1556,18 @@ const Budget2024a = () => {
                                               // console.log(index);
                                               ind = ind + 1;
                                               return [
-                                                <td className="bdgtdatacol">
+                                                <td
+                                                  onContextMenu={(e) => {
+                                                    e.preventDefault();
+                                                    setClicked(true);
+                                                    setPoints({
+                                                      x: e.pageX,
+                                                      y: e.pageY,
+                                                    });
+                                                    console.log("Right Click");
+                                                  }}
+                                                  className="bdgtdatacol"
+                                                >
                                                   <div
                                                     className={`tile ${
                                                       activeIndex === index
@@ -1586,10 +1614,28 @@ const Budget2024a = () => {
                                                         setShowmsg(!showmsg);
                                                       }}
                                                     />
+                                                    {clicked &&
+                                                      activeIndex === index && (
+                                                        <div
+                                                          className="contextMenu"
+                                                          top={points.y}
+                                                          left={points.x}
+                                                        >
+                                                          <ul>
+                                                            <li>
+                                                              Add Comment:
+                                                            </li>
+                                                            <li>
+                                                              <input type="text" />
+                                                            </li>
+                                                          </ul>
+                                                        </div>
+                                                      )}
                                                   </div>
                                                 </td>,
                                               ];
                                             })}
+
                                             <td className="bdgtcountrytotals">
                                               {formatedData[prod][reg][cty][
                                                 "0"
@@ -1764,7 +1810,6 @@ const Budget2024a = () => {
                                                   ).toFixed(1) + "%"
                                                 : "0%"}
                                             </td>
-
                                             <FontAwesomeIcon
                                               className="bdgtctydelete"
                                               icon={faMinusCircle}
@@ -2046,19 +2091,244 @@ const Budget2024a = () => {
                           ];
                         })}
                         <tr>
-                          <td className="lyearcountrycolttl">Total</td>
-                          <td className="lyeardatattl">{lyearqtytotal}</td>
-                          <td className="lyeardatattl">
+                          <td
+                            className="lyearcountrycolttl"
+                            style={{ background: "rgb(160, 182, 103)" }}
+                          >
+                            Total
+                          </td>
+                          <td
+                            className="lyeardatattl"
+                            style={{ background: "rgb(160, 182, 103)" }}
+                          >
+                            {lyearqtytotal}
+                          </td>
+                          <td
+                            className="lyeardatattl"
+                            style={{ background: "rgb(160, 182, 103)" }}
+                          >
                             {lyearqtytotal === 0
                               ? 0
                               : "$ " +
                                 (lyearpricetotal / lyearqtytotal).toFixed(0)}
                           </td>
-                          <td className="lyeardatattl">
+                          <td
+                            className="lyeardatattl"
+                            style={{ background: "rgb(160, 182, 103)" }}
+                          >
                             {lyearqtytotal === 0
                               ? 0
                               : "$ " +
                                 (lyearprofittotal / lyearqtytotal).toFixed(0)}
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>,
+                  ];
+                })
+              : ""}
+          </div>
+          <div className="lyearfigures">
+            {formatedData && lybformateddata
+              ? Object.keys(formatedData).map((prod) => {
+                  let lyearbqtytotal = 0;
+                  let lyearbpricetotal = 0;
+                  let lyearbprofittotal = 0;
+                  return [
+                    <h3>
+                      {bdgtyear - 1} {prod} Budget
+                    </h3>,
+                    <table className="lyeartable">
+                      <thead className="lyearhead">
+                        <tr>
+                          {/* <td className="lyearcountrycol">Country</td> */}
+                          <td
+                            className="lyeardatah"
+                            style={{ background: "rgb(68, 65, 162)" }}
+                          >
+                            Qty
+                          </td>
+                          <td
+                            className="lyeardatah"
+                            style={{ background: "rgb(68, 65, 162)" }}
+                          >
+                            Price
+                          </td>
+                          <td
+                            className="lyeardatah"
+                            style={{ background: "rgb(68, 65, 162)" }}
+                          >
+                            Profit
+                          </td>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {Object.keys(formatedData[prod]).map((reg) => {
+                          let lyearregbqty = 0;
+                          let lyearregbprice = 0;
+                          let lyearregbprofit = 0;
+                          Object.keys(formatedData[prod][reg]).forEach(
+                            (ctry) => {
+                              if (
+                                lybformateddata &&
+                                lybformateddata[prod] &&
+                                lybformateddata[prod][reg] &&
+                                lybformateddata[prod][reg][ctry] &&
+                                lybformateddata[prod][reg][ctry]["quantity"] &&
+                                lybformateddata[prod][reg][ctry]["avgprice"] &&
+                                lybformateddata[prod][reg][ctry]["avgprofit"]
+                              ) {
+                                lyearregbqty =
+                                  lyearregbqty +
+                                  lybformateddata[prod][reg][ctry]["quantity"];
+                                lyearregbprice =
+                                  lyearregbprice +
+                                  lybformateddata[prod][reg][ctry]["quantity"] *
+                                    lybformateddata[prod][reg][ctry][
+                                      "avgprice"
+                                    ];
+                                lyearregbprofit =
+                                  lyearregbprofit +
+                                  lybformateddata[prod][reg][ctry]["quantity"] *
+                                    lybformateddata[prod][reg][ctry][
+                                      "avgprofit"
+                                    ];
+                              }
+                            }
+                          );
+                          return [
+                            <tr>
+                              {/* <td className="lyearregrow lyearcountrycol">
+                                {reg === "Latin America" ? "L. America" : reg}
+                              </td> */}
+                              <td className="lyearregrowdata">
+                                {lyearregbqty}
+                              </td>
+                              <td className="lyearregrowdata">
+                                {lyearregbqty === 0
+                                  ? 0
+                                  : "$ " +
+                                    (lyearregbprice / lyearregbqty).toFixed(0)}
+                              </td>
+                              <td className="lyearregrowdata">
+                                {lyearregbqty === 0
+                                  ? 0
+                                  : "$ " +
+                                    (lyearregbprofit / lyearregbqty).toFixed(0)}
+                              </td>
+                              {/* <td colSpan={3}></td> */}
+                            </tr>,
+                            Object.keys(formatedData[prod][reg]).map((cty) => {
+                              if (
+                                lybformateddata &&
+                                lybformateddata[prod] &&
+                                lybformateddata[prod][reg] &&
+                                lybformateddata[prod][reg][cty] &&
+                                lybformateddata[prod][reg][cty]["quantity"]
+                              ) {
+                                lyearbqtytotal =
+                                  lyearbqtytotal +
+                                  lybformateddata[prod][reg][cty]["quantity"];
+                              }
+                              if (
+                                lybformateddata &&
+                                lybformateddata[prod] &&
+                                lybformateddata[prod][reg] &&
+                                lybformateddata[prod][reg][cty] &&
+                                lybformateddata[prod][reg][cty]["quantity"] &&
+                                lybformateddata[prod][reg][cty]["avgprice"]
+                              ) {
+                                lyearbpricetotal =
+                                  lyearbpricetotal +
+                                  lybformateddata[prod][reg][cty]["avgprice"] *
+                                    lybformateddata[prod][reg][cty]["quantity"];
+                              }
+                              if (
+                                lybformateddata &&
+                                lybformateddata[prod] &&
+                                lybformateddata[prod][reg] &&
+                                lybformateddata[prod][reg][cty] &&
+                                lybformateddata[prod][reg][cty]["quantity"] &&
+                                lybformateddata[prod][reg][cty]["avgprofit"]
+                              ) {
+                                lyearbprofittotal =
+                                  lyearbprofittotal +
+                                  lybformateddata[prod][reg][cty]["avgprofit"] *
+                                    lybformateddata[prod][reg][cty]["quantity"];
+                              }
+
+                              return [
+                                <tr>
+                                  {/* <td className="lyearcountrycol">
+                                    {cty === "Dominican Republic"
+                                      ? "Dom Rep"
+                                      : cty}
+                                  </td> */}
+                                  <td className="lyeardata">
+                                    {lybformateddata &&
+                                    lybformateddata[prod] &&
+                                    lybformateddata[prod][reg] &&
+                                    lybformateddata[prod][reg][cty] &&
+                                    lybformateddata[prod][reg][cty]["quantity"]
+                                      ? lybformateddata[prod][reg][cty][
+                                          "quantity"
+                                        ]
+                                      : 0}
+                                  </td>
+                                  <td className="lyeardata">
+                                    {lybformateddata &&
+                                    lybformateddata[prod] &&
+                                    lybformateddata[prod][reg] &&
+                                    lybformateddata[prod][reg][cty] &&
+                                    lybformateddata[prod][reg][cty]["avgprice"]
+                                      ? "$ " +
+                                        lybformateddata[prod][reg][cty][
+                                          "avgprice"
+                                        ]
+                                      : 0}
+                                  </td>
+                                  <td className="lyeardata">
+                                    {lybformateddata &&
+                                    lybformateddata[prod] &&
+                                    lybformateddata[prod][reg] &&
+                                    lybformateddata[prod][reg][cty] &&
+                                    lybformateddata[prod][reg][cty]["avgprofit"]
+                                      ? "$ " +
+                                        lybformateddata[prod][reg][cty][
+                                          "avgprofit"
+                                        ]
+                                      : 0}
+                                  </td>
+                                </tr>,
+                              ];
+                            }),
+                          ];
+                        })}
+                        <tr>
+                          {/* <td className="lyearcountrycolttl">Total</td> */}
+                          <td
+                            className="lyeardatattl"
+                            style={{ background: "rgb(68, 65, 162)" }}
+                          >
+                            {lyearbqtytotal}
+                          </td>
+                          <td
+                            className="lyeardatattl"
+                            style={{ background: "rgb(68, 65, 162)" }}
+                          >
+                            {lyearbqtytotal === 0
+                              ? 0
+                              : "$ " +
+                                (lyearbpricetotal / lyearbqtytotal).toFixed(0)}
+                          </td>
+                          <td
+                            className="lyeardatattl"
+                            style={{ background: "rgb(68, 65, 162)" }}
+                          >
+                            {lyearbqtytotal === 0
+                              ? 0
+                              : "$ " +
+                                (lyearbprofittotal / lyearbqtytotal).toFixed(0)}
                           </td>
                         </tr>
                       </tbody>

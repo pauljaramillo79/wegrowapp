@@ -2416,6 +2416,26 @@ router.post("/budgetlyearsales", (req, res) => {
   );
 });
 
+router.post("/bdgtlyearbdgt", (req, res) => {
+  let year = req.body.year;
+  let lastyear = year - 1;
+  let prodcat = req.body.prodcat;
+  db.query(
+    "SELECT abbreviation, countryList.country, countryList.region, SUM(quantity) AS quantity, format(SUM(price*quantity)/SUM(quantity),0) AS avgprice, format(SUM(profit*quantity)/SUM(quantity),0) AS avgprofit FROM budgets INNER JOIN prodNames ON prodNames.prodNameID = budgets.prodNameID INNER JOIN prodCatNames ON prodCatNames.prodCatNameID = budgets.prodCatNameID INNER JOIN countryList on countryList.countryID = budgets.countryID WHERE YEAR(budgets.date)=? AND budgets.prodCatNameID=? GROUP BY abbreviation, countryList.country, countryList.region",
+    [lastyear, prodcat],
+    (err, results) => {
+      console.log(results);
+
+      if (err) {
+        console.log(err);
+      }
+      if (results.length > 0) {
+        res.status(200).send(results);
+      }
+    }
+  );
+});
+
 router.post("/loadbudgetfile", (req, res) => {
   let data = req.body.data;
   let values = "";
