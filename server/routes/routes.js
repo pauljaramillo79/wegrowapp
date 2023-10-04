@@ -2394,6 +2394,12 @@ router.post("/bdgtlyearsalestotals", (req, res) => {
       if (results.length > 0) {
         res.status(200).send(results);
       }
+      if (results.length === 0) {
+        res.json({
+          success: true,
+          msg: "No last year sales",
+        });
+      }
     }
   );
 });
@@ -2424,7 +2430,7 @@ router.post("/bdgtlyearbdgt", (req, res) => {
     "SELECT abbreviation, countryList.country, countryList.region, SUM(quantity) AS quantity, format(SUM(price*quantity)/SUM(quantity),0) AS avgprice, format(SUM(profit*quantity)/SUM(quantity),0) AS avgprofit FROM budgets INNER JOIN prodNames ON prodNames.prodNameID = budgets.prodNameID INNER JOIN prodCatNames ON prodCatNames.prodCatNameID = budgets.prodCatNameID INNER JOIN countryList on countryList.countryID = budgets.countryID WHERE YEAR(budgets.date)=? AND budgets.prodCatNameID=? GROUP BY abbreviation, countryList.country, countryList.region",
     [lastyear, prodcat],
     (err, results) => {
-      console.log(results);
+      // console.log(results);
 
       if (err) {
         console.log(err);
