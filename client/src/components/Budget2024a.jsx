@@ -15,9 +15,41 @@ import { gsap } from "gsap";
 import * as XLSX from "xlsx";
 import useContextMenu from "../contexts/useContextMenu";
 import "./Budget2024a.css";
+import moment from "moment";
 
 const Budget2024a = () => {
   const { clicked, setClicked, points, setPoints } = useContextMenu();
+
+  const [newcomment, setNewcomment] = useState("");
+
+  const usercode = JSON.parse(localStorage.getItem("WGusercode"));
+
+  const commentRef = useRef(null);
+
+  const delayedclicked = () => {
+    return new Promise((resolve, reject) => {
+      setClicked(true);
+      resolve(true);
+    });
+  };
+
+  const saveNewBudgetComment = (ind, pcatnameid) => {
+    if (newcomment !== "") {
+      // console.log("hahaha");
+      Axios.post("/savenewbudgetcomment", {
+        id: ind,
+        commentdate: moment().format("YYYY-MM-DD HH:mm"),
+        newcomment: newcomment,
+        user: usercode,
+        prodCatNameID: pcatnameid,
+        bdgtyear: bdgtyear,
+      }).then((response) => {
+        console.log(response);
+        setNewcomment("");
+        setClicked(false);
+      });
+    }
+  };
 
   const refresmsg = useRef(null);
   const [showmsg, setShowmsg] = useState(false);
@@ -638,6 +670,9 @@ const Budget2024a = () => {
 
   const [lybformateddata, setLybformateddata] = useState();
 
+  const [bdgtcomments, setBdgtcomments] = useState();
+  const [bdgtcommentset, setBdgtcommentset] = useState();
+
   useEffect(() => {
     if (activePCatName && activePCatName !== "") {
       Axios.post("/getbudgetdata", {
@@ -658,17 +693,27 @@ const Budget2024a = () => {
         year: bdgtyear,
         prodcat: activePCatName,
       }).then((response) => {
-        // setBdgtlyearsales(response.data);
         setBdgtlyearsales(formatsaleslastyeardata(response.data));
-        // console.log(formatsaleslastyeardata(response.data));
       });
       Axios.post("/bdgtlyearbdgt", {
         prodcat: activePCatName,
         year: bdgtyear,
       }).then((response) => {
-        console.log(formatsaleslastyeardata(response.data));
+        // console.log(formatsaleslastyeardata(response.data));
         setLybformateddata(formatsaleslastyeardata(response.data));
       });
+      Axios.post("/getbdgtcomments", {
+        prodcat: activePCatName,
+        year: bdgtyear,
+      }).then((response) => {
+        console.log(response.data);
+        setBdgtcomments(response.data);
+        let commentset = [
+          ...new Set(response.data.map((x) => x.budgetEntryID)),
+        ];
+        setBdgtcommentset(commentset);
+      });
+      // console.log(activePCatName);
     }
   }, [activePCatName, reloadbdgdata]);
 
@@ -1557,21 +1602,47 @@ const Budget2024a = () => {
                                               ind = ind + 1;
                                               return [
                                                 <td
-                                                  onContextMenu={(e) => {
+                                                  onContextMenu={async (e) => {
                                                     e.preventDefault();
-                                                    setClicked(true);
+
+                                                    const clickdone = await delayedclicked();
+                                                    if (
+                                                      // commentRef &&
+                                                      clickdone === true
+                                                    ) {
+                                                      // console.log("how");
+                                                      commentRef.current.focus();
+                                                    }
                                                     setPoints({
                                                       x: e.pageX,
                                                       y: e.pageY,
                                                     });
-                                                    console.log("Right Click");
+                                                    // console.log("Right Click");
                                                   }}
-                                                  className="bdgtdatacol"
+                                                  className={
+                                                    bdgtcommentset &&
+                                                    bdgtcommentset.includes(
+                                                      budgetdata[index][
+                                                        "budgetentryID"
+                                                      ]
+                                                    )
+                                                      ? "bdgtdatacol cellwithcomment"
+                                                      : "bdgtdatacol"
+                                                  }
                                                 >
                                                   <div
                                                     className={`tile ${
                                                       activeIndex === index
                                                         ? "active"
+                                                        : ""
+                                                    } ${
+                                                      bdgtcommentset &&
+                                                      bdgtcommentset.includes(
+                                                        budgetdata[index][
+                                                          "budgetentryID"
+                                                        ]
+                                                      )
+                                                        ? "cellwithcomment"
                                                         : ""
                                                     }`}
                                                   >
@@ -1590,12 +1661,23 @@ const Budget2024a = () => {
                                                           q
                                                         );
                                                       }}
-                                                      className="cell-input"
+                                                      className={
+                                                        bdgtcommentset &&
+                                                        bdgtcommentset.includes(
+                                                          budgetdata[index][
+                                                            "budgetentryID"
+                                                          ]
+                                                        )
+                                                          ? "cell-input cellwithcomment"
+                                                          : "cell-input"
+                                                      }
                                                       onFocus={(e) => {
                                                         setActiveIndex(index);
                                                         e.target.select();
                                                         setEditingQty(true);
                                                         setEditingEcon(false);
+                                                        setClicked(false);
+                                                        setNewcomment("");
                                                       }}
                                                       ref={(el) =>
                                                         (inputRefs.current[
@@ -1613,6 +1695,11 @@ const Budget2024a = () => {
                                                         );
                                                         setShowmsg(!showmsg);
                                                       }}
+                                                      id={
+                                                        budgetdata[index][
+                                                          "budgetentryID"
+                                                        ]
+                                                      }
                                                     />
                                                     {clicked &&
                                                       activeIndex === index && (
@@ -1620,13 +1707,86 @@ const Budget2024a = () => {
                                                           className="contextMenu"
                                                           top={points.y}
                                                           left={points.x}
+                                                          // onBlur={(e) => {
+                                                          //   e.preventDefault();
+                                                          //   setClicked(false);
+                                                          //   setNewcomment("");
+                                                          // }}
                                                         >
                                                           <ul>
-                                                            <li>
-                                                              Add Comment:
+                                                            <li className="bdgtcomment">
+                                                              {bdgtcomments
+                                                                ? bdgtcomments.map(
+                                                                    (comm) => {
+                                                                      // console.log(
+                                                                      //   comm.bdgtEntryID
+                                                                      // );
+                                                                      if (
+                                                                        comm.budgetEntryID ===
+                                                                        budgetdata[
+                                                                          index
+                                                                        ][
+                                                                          "budgetentryID"
+                                                                        ]
+                                                                      ) {
+                                                                        return (
+                                                                          <p>
+                                                                            {comm.user +
+                                                                              ": " +
+                                                                              comm.bdgtComment}
+                                                                          </p>
+                                                                        );
+                                                                      }
+                                                                    }
+                                                                  )
+                                                                : ""}
                                                             </li>
                                                             <li>
-                                                              <input type="text" />
+                                                              <textarea
+                                                                ref={commentRef}
+                                                                maxLength={200}
+                                                                onChange={(
+                                                                  e
+                                                                ) => {
+                                                                  setNewcomment(
+                                                                    e.target
+                                                                      .value
+                                                                  );
+                                                                  console.log(
+                                                                    budgetdata[
+                                                                      index
+                                                                    ]
+                                                                  );
+                                                                }}
+                                                                type="textarea"
+                                                                value={
+                                                                  newcomment
+                                                                }
+                                                              />
+                                                            </li>
+                                                            <li>
+                                                              <button
+                                                                onClick={(
+                                                                  e
+                                                                ) => {
+                                                                  e.preventDefault();
+
+                                                                  saveNewBudgetComment(
+                                                                    budgetdata[
+                                                                      index
+                                                                    ][
+                                                                      "budgetentryID"
+                                                                    ],
+                                                                    budgetdata[
+                                                                      index
+                                                                    ][
+                                                                      "prodCatNameID"
+                                                                    ]
+                                                                  );
+                                                                }}
+                                                              >
+                                                                Add Comment
+                                                              </button>
                                                             </li>
                                                           </ul>
                                                         </div>

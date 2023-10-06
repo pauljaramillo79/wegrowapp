@@ -1,0 +1,56 @@
+.contextMenu {
+  position: absolute;
+  width: 270px;
+  background-color: white;
+  border-radius: 5px;
+  box-sizing: border-box;
+  z-index: 10;
+  border: solid 1px black;
+}
+.contextMenu ul {
+  box-sizing: border-box;
+  padding: 10px;
+  margin: 0;
+  list-style: none;
+}
+.contextMenu ul li {
+  /* padding: 18px 12px; */
+  background-color: white;
+}
+.bdgtpnametable .contextMenu ul li textarea {
+  width: 100%;
+  height: 60px;
+  border: solid 1px;
+  text-align: left;
+}
+.contextMenu ul li button {
+  margin: 0.5rem;
+  padding: 0.25rem 1rem;
+  border-radius: 0.75rem;
+  border: none;
+  background-color: rgb(68, 65, 162);
+  color: white;
+}
+.contextMenu ul li button:hover {
+  cursor: pointer;
+  background-color: rgb(121, 119, 190);
+}
+.contextMenu ul li button:active {
+  background-color: rgb(68, 65, 162);
+}
+
+.cellwithcomment {
+  background-color: rgb(241, 228, 221);
+}
+.contextMenu .bdgtcomment {
+  color: black;
+  text-align: left;
+  font-size: 0.8rem;
+  margin-bottom: 0.75rem;
+}
+/* hover */
+/* .contextMenu ul li:hover {
+  cursor: pointer;
+  background-color: #000000;
+  color: white;
+} */

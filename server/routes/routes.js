@@ -2529,6 +2529,59 @@ router.post("/loadcurrentbudget", (req, res) => {
   );
 });
 
+router.post("/savenewbudgetcomment", (req, res) => {
+  let budgetentryID = req.body.id;
+  let bdgtcommentdate = req.body.commentdate;
+  let bdgtcomment = req.body.newcomment;
+  let user = req.body.user;
+  let prodCatNameID = req.body.prodCatNameID;
+  let bdgtyear = req.body.bdgtyear;
+  db.query(
+    "INSERT INTO budgetnotes (budgetEntryID, bdgtCommentDate, bdgtcomment, user, prodCatNameID, bdgtyear) VALUES (?,?,?,?,?,?)",
+    [
+      budgetentryID,
+      bdgtcommentdate,
+      bdgtcomment,
+      user,
+      prodCatNameID,
+      bdgtyear,
+    ],
+    (err, results) => {
+      if (err) {
+        console.log(err);
+      } else {
+        res.json({
+          success: true,
+          msg: "Comment succesfully saved",
+        });
+      }
+    }
+  );
+});
+
+router.post("/getbdgtcomments", (req, res) => {
+  let prodCatNameID = req.body.prodcat;
+  let date = req.body.year;
+  db.query(
+    "SELECT * FROM budgetnotes WHERE prodCatNameID=? AND bdgtyear=?",
+    [prodCatNameID, date],
+    (err, results) => {
+      if (err) {
+        console.log(err);
+      }
+      if (results.length > 0) {
+        res.status(200).send(results);
+      }
+      if (results.length === 0) {
+        res.json({
+          success: true,
+          msg: "No comments yet",
+        });
+      }
+    }
+  );
+});
+
 router.post("/getmyoperations", (req, res) => {
   let trafficid = req.body.selectedTrafficID;
   db.query(
