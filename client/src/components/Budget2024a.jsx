@@ -175,19 +175,22 @@ const Budget2024a = () => {
   const inputEconRefs = useRef([]);
 
   const handleChange1 = (e, prod, reg, cty, qtr) => {
-    setFormatedData({
-      ...formatedData,
-      [prod]: {
-        ...formatedData[prod],
-        [reg]: {
-          ...formatedData[prod][reg],
-          [cty]: {
-            ...formatedData[prod][reg][cty],
-            [qtr]: Number(e.target.value),
+    const isdecimalnumber = RegExp("^[0-9.%]+$");
+    if (isdecimalnumber.test(e.target.value)) {
+      setFormatedData({
+        ...formatedData,
+        [prod]: {
+          ...formatedData[prod],
+          [reg]: {
+            ...formatedData[prod][reg],
+            [cty]: {
+              ...formatedData[prod][reg][cty],
+              [qtr]: Number(e.target.value),
+            },
           },
         },
-      },
-    });
+      });
+    }
   };
 
   const handleEconChange = (e, prod, reg, cty, item) => {
