@@ -2444,6 +2444,12 @@ router.post("/bdgtlyearbdgt", (req, res) => {
       if (results.length > 0) {
         res.status(200).send(results);
       }
+      if (results.length === 0) {
+        res.json({
+          success: true,
+          msg: "No last year budget",
+        });
+      }
     }
   );
 });

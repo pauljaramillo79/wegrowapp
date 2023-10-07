@@ -44,7 +44,7 @@ const Budget2024a = () => {
         prodCatNameID: pcatnameid,
         bdgtyear: bdgtyear,
       }).then((response) => {
-        console.log(response);
+        // console.log(response);
         setNewcomment("");
         setClicked(false);
       });
@@ -153,7 +153,7 @@ const Budget2024a = () => {
       year: bdgtyear,
     }).then((response) => {
       // console.log(response);
-      console.log(response);
+      // console.log(response);
       setUpdatebuttons(!updatebuttons);
     });
     setShowprodnamefilter(false);
@@ -590,7 +590,7 @@ const Budget2024a = () => {
   const [bdgtlyearsales, setBdgtlyearsales] = useState({});
 
   const formatsaleslastyeardata = (arr) => {
-    console.log(arr);
+    // console.log(arr);
     if (Array.isArray(arr)) {
       let ctylevel = {};
       let reglevel = {};
@@ -708,18 +708,18 @@ const Budget2024a = () => {
         prodcat: activePCatName,
         year: bdgtyear,
       }).then((response) => {
-        console.log(response.data);
+        // console.log(response.data);
         setBdgtcomments(response.data);
         if (Array.isArray(response.data)) {
           let commentset = [
             ...new Set(response.data.map((x) => x.budgetEntryID)),
           ];
           setBdgtcommentset(commentset);
-          console.log(bdgtcommentset);
+          // console.log(bdgtcommentset);
         } else {
           let commentset = [];
           setBdgtcommentset(commentset);
-          console.log(bdgtcommentset);
+          // console.log(bdgtcommentset);
         }
       });
       // console.log(activePCatName);
@@ -867,7 +867,7 @@ const Budget2024a = () => {
 
   const loaddata = () => {
     Axios.post("/loadbudgetfile", { data: datatoload }).then((response) => {
-      console.log(response);
+      // console.log(response);
       setFilename("");
       setLoadmsg(response.data.msg);
       setLoadmsgrefresh(!loadmsgrefresh);
@@ -1776,11 +1776,11 @@ const Budget2024a = () => {
                                                                     e.target
                                                                       .value
                                                                   );
-                                                                  console.log(
-                                                                    budgetdata[
-                                                                      index
-                                                                    ]
-                                                                  );
+                                                                  // console.log(
+                                                                  //   budgetdata[
+                                                                  //     index
+                                                                  //   ]
+                                                                  // );
                                                                 }}
                                                                 type="textarea"
                                                                 value={
