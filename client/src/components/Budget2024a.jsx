@@ -47,6 +47,7 @@ const Budget2024a = () => {
         // console.log(response);
         setNewcomment("");
         setClicked(false);
+        setReloadcomments(!reloadcomments);
       });
     }
   };
@@ -704,27 +705,33 @@ const Budget2024a = () => {
         // console.log(formatsaleslastyeardata(response.data));
         setLybformateddata(formatsaleslastyeardata(response.data));
       });
-      Axios.post("/getbdgtcomments", {
-        prodcat: activePCatName,
-        year: bdgtyear,
-      }).then((response) => {
-        // console.log(response.data);
-        setBdgtcomments(response.data);
-        if (Array.isArray(response.data)) {
-          let commentset = [
-            ...new Set(response.data.map((x) => x.budgetEntryID)),
-          ];
-          setBdgtcommentset(commentset);
-          // console.log(bdgtcommentset);
-        } else {
-          let commentset = [];
-          setBdgtcommentset(commentset);
-          // console.log(bdgtcommentset);
-        }
-      });
+
       // console.log(activePCatName);
     }
   }, [activePCatName, reloadbdgdata]);
+
+  const [reloadcomments, setReloadcomments] = useState(false);
+
+  useEffect(() => {
+    Axios.post("/getbdgtcomments", {
+      prodcat: activePCatName,
+      year: bdgtyear,
+    }).then((response) => {
+      // console.log(response.data);
+      setBdgtcomments(response.data);
+      if (Array.isArray(response.data)) {
+        let commentset = [
+          ...new Set(response.data.map((x) => x.budgetEntryID)),
+        ];
+        setBdgtcommentset(commentset);
+        // console.log(bdgtcommentset);
+      } else {
+        let commentset = [];
+        setBdgtcommentset(commentset);
+        // console.log(bdgtcommentset);
+      }
+    });
+  }, [activePCatName, reloadbdgdata, reloadcomments]);
 
   const handleProdCatClick = (e, i, item) => {
     e.preventDefault();
