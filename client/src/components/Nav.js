@@ -68,9 +68,9 @@ const Nav = () => {
         ) : (
           ""
         )}
-        {role === 1 || role === 2 ? (
+        {role === 1 || role === 2 || role === 3 || role == 5 ? (
           <li>
-            <NavLink activeClassName="navbaractive" to="/budget/budget2023">
+            <NavLink activeClassName="navbaractive" to="/budget/budget2024">
               Budget
             </NavLink>
           </li>

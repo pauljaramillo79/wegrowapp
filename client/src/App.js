@@ -127,6 +127,9 @@ function App() {
                             <LogisticsGrid />
                           </LogisticsProvider>
                         </Route>
+                        <Route path="/budget">
+                          <BudgetGrid />
+                        </Route>
                       </>
                     ) : role === 4 ? (
                       <Route path="/">
@@ -149,6 +152,9 @@ function App() {
                           <LogisticsProvider>
                             <LogisticsGrid />
                           </LogisticsProvider>
+                        </Route>
+                        <Route path="/budget">
+                          <BudgetGrid />
                         </Route>
                       </>
                     ) : role === 2 ? (
