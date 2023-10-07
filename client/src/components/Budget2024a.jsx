@@ -590,35 +590,37 @@ const Budget2024a = () => {
   const [bdgtlyearsales, setBdgtlyearsales] = useState({});
 
   const formatsaleslastyeardata = (arr) => {
-    // console.log(arr);
-    let ctylevel = {};
-    let reglevel = {};
-    let prodlevel = {};
-    let prodgrouped = Object.entries(arr.groupBy("abbreviation"));
-    prodgrouped.forEach((prodel) => {
-      let prodind = prodel[0];
-      let regrouped = Object.entries(prodel[1].groupBy("region"));
-      regrouped.forEach((regel) => {
-        let regind = regel[0];
-        regel[1].forEach((ctyel) => {
-          // console.log(prodind, regind, ctyel["country"], ctyel["quantity"]);
-          ctylevel[ctyel["country"]] = {
-            quantity: Number(ctyel["quantity"].toFixed(0)),
-            avgprice: ctyel["avgprice"]
-              ? Number(ctyel["avgprice"].replace(/,/g, ""))
-              : 0,
-            avgprofit: ctyel["avgprofit"]
-              ? Number(ctyel["avgprofit"].replace(/,/g, ""))
-              : 0,
-          };
+    console.log(arr);
+    if (Array.isArray(arr)) {
+      let ctylevel = {};
+      let reglevel = {};
+      let prodlevel = {};
+      let prodgrouped = Object.entries(arr.groupBy("abbreviation"));
+      prodgrouped.forEach((prodel) => {
+        let prodind = prodel[0];
+        let regrouped = Object.entries(prodel[1].groupBy("region"));
+        regrouped.forEach((regel) => {
+          let regind = regel[0];
+          regel[1].forEach((ctyel) => {
+            // console.log(prodind, regind, ctyel["country"], ctyel["quantity"]);
+            ctylevel[ctyel["country"]] = {
+              quantity: Number(ctyel["quantity"].toFixed(0)),
+              avgprice: ctyel["avgprice"]
+                ? Number(ctyel["avgprice"].replace(/,/g, ""))
+                : 0,
+              avgprofit: ctyel["avgprofit"]
+                ? Number(ctyel["avgprofit"].replace(/,/g, ""))
+                : 0,
+            };
+          });
+          reglevel[regind] = ctylevel;
+          ctylevel = {};
         });
-        reglevel[regind] = ctylevel;
-        ctylevel = {};
+        prodlevel[prodind] = reglevel;
+        reglevel = {};
       });
-      prodlevel[prodind] = reglevel;
-      reglevel = {};
-    });
-    return prodlevel;
+      return prodlevel;
+    }
   };
 
   const [bdgtecondata, setBdgtecondata] = useState({});
@@ -708,6 +710,7 @@ const Budget2024a = () => {
       }).then((response) => {
         console.log(response.data);
         setBdgtcomments(response.data);
+
         let commentset = [
           ...new Set(response.data.map((x) => x.budgetEntryID)),
         ];
@@ -1620,14 +1623,17 @@ const Budget2024a = () => {
                                                     // console.log("Right Click");
                                                   }}
                                                   className={
-                                                    bdgtcommentset &&
-                                                    bdgtcommentset.includes(
-                                                      budgetdata[index][
-                                                        "budgetentryID"
-                                                      ]
-                                                    )
-                                                      ? "bdgtdatacol cellwithcomment"
-                                                      : "bdgtdatacol"
+                                                    budgetdata &&
+                                                    budgetdata[index]
+                                                      ? bdgtcommentset &&
+                                                        bdgtcommentset.includes(
+                                                          budgetdata[index][
+                                                            "budgetentryID"
+                                                          ]
+                                                        )
+                                                        ? "bdgtdatacol cellwithcomment"
+                                                        : "bdgtdatacol"
+                                                      : ""
                                                   }
                                                 >
                                                   <div
@@ -1636,13 +1642,16 @@ const Budget2024a = () => {
                                                         ? "active"
                                                         : ""
                                                     } ${
-                                                      bdgtcommentset &&
-                                                      bdgtcommentset.includes(
-                                                        budgetdata[index][
-                                                          "budgetentryID"
-                                                        ]
-                                                      )
-                                                        ? "cellwithcomment"
+                                                      budgetdata &&
+                                                      budgetdata[index]
+                                                        ? bdgtcommentset &&
+                                                          bdgtcommentset.includes(
+                                                            budgetdata[index][
+                                                              "budgetentryID"
+                                                            ]
+                                                          )
+                                                          ? "cellwithcomment"
+                                                          : ""
                                                         : ""
                                                     }`}
                                                   >
@@ -1662,14 +1671,17 @@ const Budget2024a = () => {
                                                         );
                                                       }}
                                                       className={
-                                                        bdgtcommentset &&
-                                                        bdgtcommentset.includes(
-                                                          budgetdata[index][
-                                                            "budgetentryID"
-                                                          ]
-                                                        )
-                                                          ? "cell-input cellwithcomment"
-                                                          : "cell-input"
+                                                        budgetdata &&
+                                                        budgetdata[index]
+                                                          ? bdgtcommentset &&
+                                                            bdgtcommentset.includes(
+                                                              budgetdata[index][
+                                                                "budgetentryID"
+                                                              ]
+                                                            )
+                                                            ? "cell-input cellwithcomment"
+                                                            : "cell-input"
+                                                          : ""
                                                       }
                                                       onFocus={(e) => {
                                                         setActiveIndex(index);
@@ -1696,9 +1708,12 @@ const Budget2024a = () => {
                                                         setShowmsg(!showmsg);
                                                       }}
                                                       id={
-                                                        budgetdata[index][
-                                                          "budgetentryID"
-                                                        ]
+                                                        budgetdata &&
+                                                        budgetdata[index]
+                                                          ? budgetdata[index][
+                                                              "budgetentryID"
+                                                            ]
+                                                          : ""
                                                       }
                                                     />
                                                     {clicked &&
