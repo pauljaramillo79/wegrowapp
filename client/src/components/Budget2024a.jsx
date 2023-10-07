@@ -710,11 +710,17 @@ const Budget2024a = () => {
       }).then((response) => {
         console.log(response.data);
         setBdgtcomments(response.data);
-
-        let commentset = [
-          ...new Set(response.data.map((x) => x.budgetEntryID)),
-        ];
-        setBdgtcommentset(commentset);
+        if (Array.isArray(response.data)) {
+          let commentset = [
+            ...new Set(response.data.map((x) => x.budgetEntryID)),
+          ];
+          setBdgtcommentset(commentset);
+          console.log(bdgtcommentset);
+        } else {
+          let commentset = [];
+          setBdgtcommentset(commentset);
+          console.log(bdgtcommentset);
+        }
       });
       // console.log(activePCatName);
     }
@@ -1730,7 +1736,10 @@ const Budget2024a = () => {
                                                         >
                                                           <ul>
                                                             <li className="bdgtcomment">
-                                                              {bdgtcomments
+                                                              {bdgtcomments &&
+                                                              Array.isArray(
+                                                                bdgtcomments
+                                                              )
                                                                 ? bdgtcomments.map(
                                                                     (comm) => {
                                                                       // console.log(
