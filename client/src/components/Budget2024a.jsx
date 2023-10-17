@@ -615,6 +615,9 @@ const Budget2024a = () => {
               avgprofit: ctyel["avgprofit"]
                 ? Number(ctyel["avgprofit"].replace(/,/g, ""))
                 : 0,
+              totalprofit: ctyel["totalprofit"]
+                ? Number(ctyel["totalprofit"].replace(/,/g, ""))
+                : 0,
             };
           });
           reglevel[regind] = ctylevel;
@@ -2144,6 +2147,7 @@ const Budget2024a = () => {
                           <td className="lyeardatah">Qty</td>
                           <td className="lyeardatah">Price</td>
                           <td className="lyeardatah">Profit</td>
+                          <td className="lyeardatah">Ttl Profit</td>
                         </tr>
                       </thead>
                       <tbody>
@@ -2151,6 +2155,7 @@ const Budget2024a = () => {
                           let lyearregqty = 0;
                           let lyearregprice = 0;
                           let lyearregprofit = 0;
+                          let lyearregttlprofit = 0;
                           Object.keys(formatedData[prod][reg]).forEach(
                             (ctry) => {
                               if (
@@ -2160,7 +2165,8 @@ const Budget2024a = () => {
                                 bdgtlyearsales[prod][reg][ctry] &&
                                 bdgtlyearsales[prod][reg][ctry]["quantity"] &&
                                 bdgtlyearsales[prod][reg][ctry]["avgprice"] &&
-                                bdgtlyearsales[prod][reg][ctry]["avgprofit"]
+                                bdgtlyearsales[prod][reg][ctry]["avgprofit"] &&
+                                bdgtlyearsales[prod][reg][ctry]["totalprofit"]
                               ) {
                                 lyearregqty =
                                   lyearregqty +
@@ -2175,6 +2181,11 @@ const Budget2024a = () => {
                                     bdgtlyearsales[prod][reg][ctry][
                                       "avgprofit"
                                     ];
+                                lyearregttlprofit =
+                                  lyearregttlprofit +
+                                  bdgtlyearsales[prod][reg][ctry][
+                                    "totalprofit"
+                                  ];
                               }
                             }
                           );
@@ -2196,6 +2207,15 @@ const Budget2024a = () => {
                                   : "$ " +
                                     (lyearregprofit / lyearregqty).toFixed(0)}
                               </td>
+                              <td className="lyearregrowdata">
+                                {lyearregqty === 0
+                                  ? "$ " + 0
+                                  : "$ " +
+                                    lyearregprofit
+                                      .toFixed(0)
+                                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                              </td>
+
                               {/* <td colSpan={3}></td> */}
                             </tr>,
                             Object.keys(formatedData[prod][reg]).map((cty) => {
@@ -2279,6 +2299,31 @@ const Budget2024a = () => {
                                         ]
                                       : 0}
                                   </td>
+                                  <td
+                                    className="lyeardata"
+                                    style={{ width: "80px" }}
+                                  >
+                                    {bdgtlyearsales &&
+                                    bdgtlyearsales[prod] &&
+                                    bdgtlyearsales[prod][reg] &&
+                                    bdgtlyearsales[prod][reg][cty] &&
+                                    bdgtlyearsales[prod][reg][cty][
+                                      "avgprofit"
+                                    ] &&
+                                    bdgtlyearsales[prod][reg][cty]["quantity"]
+                                      ? "$ " +
+                                        (
+                                          bdgtlyearsales[prod][reg][cty][
+                                            "avgprofit"
+                                          ] *
+                                          bdgtlyearsales[prod][reg][cty][
+                                            "quantity"
+                                          ]
+                                        )
+                                          .toFixed(0)
+                                          .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                      : "$ " + 0}
+                                  </td>
                                 </tr>,
                               ];
                             }),
@@ -2314,6 +2359,17 @@ const Budget2024a = () => {
                               ? 0
                               : "$ " +
                                 (lyearprofittotal / lyearqtytotal).toFixed(0)}
+                          </td>
+                          <td
+                            className="lyeardatattl"
+                            style={{ background: "rgb(160, 182, 103)" }}
+                          >
+                            {lyearqtytotal === 0
+                              ? "$ " + 0
+                              : "$ " +
+                                lyearprofittotal
+                                  .toFixed(0)
+                                  .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                           </td>
                         </tr>
                       </tbody>
@@ -2353,6 +2409,12 @@ const Budget2024a = () => {
                             style={{ background: "rgb(68, 65, 162)" }}
                           >
                             Profit
+                          </td>
+                          <td
+                            className="lyeardatah"
+                            style={{ background: "rgb(68, 65, 162)" }}
+                          >
+                            Ttl Profit
                           </td>
                         </tr>
                       </thead>
@@ -2410,6 +2472,18 @@ const Budget2024a = () => {
                                   : "$ " +
                                     (lyearregbprofit / lyearregbqty).toFixed(0)}
                               </td>
+                              <td
+                                className="lyearregrowdata"
+                                style={{ width: "80px" }}
+                              >
+                                {lyearregbqty === 0
+                                  ? "$ " + 0
+                                  : "$ " +
+                                    lyearregbprofit
+                                      .toFixed(0)
+                                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                              </td>
+
                               {/* <td colSpan={3}></td> */}
                             </tr>,
                             Object.keys(formatedData[prod][reg]).map((cty) => {
@@ -2493,6 +2567,28 @@ const Budget2024a = () => {
                                         ]
                                       : 0}
                                   </td>
+                                  <td className="lyeardata">
+                                    {lybformateddata &&
+                                    lybformateddata[prod] &&
+                                    lybformateddata[prod][reg] &&
+                                    lybformateddata[prod][reg][cty] &&
+                                    lybformateddata[prod][reg][cty][
+                                      "avgprofit"
+                                    ] &&
+                                    lybformateddata[prod][reg][cty]["quantity"]
+                                      ? "$ " +
+                                        (
+                                          lybformateddata[prod][reg][cty][
+                                            "avgprofit"
+                                          ] *
+                                          lybformateddata[prod][reg][cty][
+                                            "quantity"
+                                          ]
+                                        )
+                                          .toFixed(0)
+                                          .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                      : "$ " + 0}
+                                  </td>
                                 </tr>,
                               ];
                             }),
@@ -2523,6 +2619,17 @@ const Budget2024a = () => {
                               ? 0
                               : "$ " +
                                 (lyearbprofittotal / lyearbqtytotal).toFixed(0)}
+                          </td>
+                          <td
+                            className="lyeardatattl"
+                            style={{ background: "rgb(68, 65, 162)" }}
+                          >
+                            {lyearbqtytotal === 0
+                              ? "$ " + 0
+                              : "$ " +
+                                lyearbprofittotal
+                                  .toFixed(0)
+                                  .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                           </td>
                         </tr>
                       </tbody>
