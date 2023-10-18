@@ -48,6 +48,20 @@
   font-size: 0.8rem;
   margin-bottom: 0.75rem;
 }
+.singlecomment {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  vertical-align: bottom;
+  justify-content: space-between;
+}
+.commenticon {
+  color: red;
+}
+.commenticon:hover {
+  cursor: pointer;
+  color: rgb(159, 20, 20);
+}
 /* hover */
 /* .contextMenu ul li:hover {
   cursor: pointer;

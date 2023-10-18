@@ -52,6 +52,12 @@ const Budget2024a = () => {
     }
   };
 
+  const deleteComment = (ind) => {
+    Axios.post("/deletebudgetcomment", { id: ind }).then((response) => {
+      setReloadcomments(!reloadcomments);
+    });
+  };
+
   const refresmsg = useRef(null);
   const [showmsg, setShowmsg] = useState(false);
 
@@ -723,7 +729,7 @@ const Budget2024a = () => {
       prodcat: activePCatName,
       year: bdgtyear,
     }).then((response) => {
-      // console.log(response.data);
+      console.log(response.data);
       setBdgtcomments(response.data);
       if (Array.isArray(response.data)) {
         let commentset = [
@@ -1776,13 +1782,29 @@ const Budget2024a = () => {
                                                                           "budgetentryID"
                                                                         ]
                                                                       ) {
-                                                                        return (
-                                                                          <p>
-                                                                            {comm.user +
-                                                                              ": " +
-                                                                              comm.bdgtComment}
-                                                                          </p>
-                                                                        );
+                                                                        return [
+                                                                          <div className="singlecomment">
+                                                                            <p>
+                                                                              {comm.user +
+                                                                                ": " +
+                                                                                comm.bdgtComment}
+                                                                            </p>
+
+                                                                            <FontAwesomeIcon
+                                                                              icon={
+                                                                                faMinusCircle
+                                                                              }
+                                                                              className="commenticon"
+                                                                              onClick={(
+                                                                                e
+                                                                              ) => {
+                                                                                deleteComment(
+                                                                                  comm.bdgtcommentID
+                                                                                );
+                                                                              }}
+                                                                            />
+                                                                          </div>,
+                                                                        ];
                                                                       }
                                                                     }
                                                                   )

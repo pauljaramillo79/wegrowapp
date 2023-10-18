@@ -2564,6 +2564,20 @@ router.post("/savenewbudgetcomment", (req, res) => {
     }
   );
 });
+router.post("/deletebudgetcomment", (req, res) => {
+  let id = req.body.id;
+  db.query(
+    `DELETE FROM budgetnotes WHERE bdgtcommentID=${id}`,
+    (err, results) => {
+      if (err) {
+        console.log(err);
+      }
+      if (results) {
+        res.sendStatus(200);
+      }
+    }
+  );
+});
 
 router.post("/getbdgtcomments", (req, res) => {
   let prodCatNameID = req.body.prodcat;
