@@ -1638,6 +1638,8 @@ const Budget2024a = () => {
                                                     setPoints({
                                                       x: e.pageX,
                                                       y: e.pageY,
+                                                      // x: 0,
+                                                      // y: 0,
                                                     });
                                                     // console.log("Right Click");
                                                   }}
@@ -1656,6 +1658,9 @@ const Budget2024a = () => {
                                                   }
                                                 >
                                                   <div
+                                                    style={{
+                                                      position: "relative",
+                                                    }}
                                                     className={`tile ${
                                                       activeIndex === index
                                                         ? "active"
@@ -1739,8 +1744,13 @@ const Budget2024a = () => {
                                                       activeIndex === index && (
                                                         <div
                                                           className="contextMenu"
-                                                          top={points.y}
-                                                          left={points.x}
+                                                          style={{
+                                                            zIndex: 10,
+                                                          }}
+                                                          // top={points.y}
+                                                          // left={points.x}
+                                                          // top={0}
+                                                          // left={0}
                                                           // onBlur={(e) => {
                                                           //   e.preventDefault();
                                                           //   setClicked(false);
