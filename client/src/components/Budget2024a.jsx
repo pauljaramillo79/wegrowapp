@@ -2342,7 +2342,7 @@ const Budget2024a = () => {
                                   </td>
                                   <td
                                     className="lyeardata"
-                                    style={{ width: "80px" }}
+                                    style={{ width: "85px" }}
                                   >
                                     {bdgtlyearsales &&
                                     bdgtlyearsales[prod] &&
@@ -2552,7 +2552,7 @@ const Budget2024a = () => {
                               </td>
                               <td
                                 className="lyearregrowdata"
-                                style={{ width: "80px" }}
+                                style={{ width: "85px" }}
                               >
                                 {lyearregbqty === 0
                                   ? "$ " + 0
