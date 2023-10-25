@@ -1185,7 +1185,7 @@ const Budget2024a = () => {
             </p>
             <p className="bdgttyearname">Margin</p>
             <div className="bdgtlyearfigs">
-              <p>{bdgtyear - 1} Sales:</p>
+              <p>{bdgtyear - 1} YTD:</p>
               <p>
                 {lysalestotals &&
                 lysalestotals["profit"] &&
