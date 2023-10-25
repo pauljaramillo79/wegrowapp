@@ -745,11 +745,14 @@ const Budget2024a = () => {
     });
   }, [activePCatName, reloadbdgdata, reloadcomments]);
 
+  const [activeCname, setActiveCname] = useState();
+
   const handleProdCatClick = (e, i, item) => {
     e.preventDefault();
     setClickedProdCat(i);
     // setSelectedPN(item.prodCatName);
     setActivePCatName(item.prodCatNameID);
+    setActiveCname(item.prodCatName);
   };
 
   let ind = 0;
@@ -822,7 +825,8 @@ const Budget2024a = () => {
 
   useEffect(() => {
     Axios.post("/bdgtlyearsalestotals", { year: bdgtyear }).then((response) => {
-      setLysalestotals(response.data);
+      setLysalestotals(response.data[0]);
+      console.log(response.data);
     });
   }, []);
 
@@ -838,6 +842,13 @@ const Budget2024a = () => {
   let r2total = 0;
   let r3total = 0;
   let r4total = 0;
+
+  let bdgtq1qtytotal = 0;
+  let bdgtq2qtytotal = 0;
+  let bdgtq3qtytotal = 0;
+  let bdgtq4qtytotal = 0;
+  let bdgtpriceprodtotal = 0;
+  let bdgtprofitprodtotal = 0;
 
   const sumvalues = (data, sstr) => {
     let total = 0;
@@ -996,6 +1007,17 @@ const Budget2024a = () => {
             </p>
             <p className="bdgttyearname">Quantity</p>
             <div className="bdgtlyearfigs">
+              <p>{bdgtyear - 1} YTD:</p>
+              <p>
+                {lysalestotals && lysalestotals["quantity"]
+                  ? lysalestotals["quantity"]
+                      .toFixed()
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                  : ""}{" "}
+                mt
+              </p>
+            </div>
+            <div className="bdgtlyearfigs">
               <p>{bdgtyear - 1} Budget:</p>
               <p>
                 {budgetyeartotals &&
@@ -1028,6 +1050,17 @@ const Budget2024a = () => {
             </p>
             <p className="bdgttyearname">Revenue</p>
             <div className="bdgtlyearfigs">
+              <p>{bdgtyear - 1} YTD:</p>
+              <p>
+                {lysalestotals && lysalestotals["revenue"]
+                  ? "$" +
+                    lysalestotals["revenue"]
+                      .toFixed()
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                  : ""}
+              </p>
+            </div>
+            <div className="bdgtlyearfigs">
               <p>{bdgtyear - 1} Budget:</p>
               <p>
                 {budgetyeartotals &&
@@ -1058,6 +1091,17 @@ const Budget2024a = () => {
                 : 0}
             </p>
             <p className="bdgttyearname">Profit</p>
+            <div className="bdgtlyearfigs">
+              <p>{bdgtyear - 1} YTD:</p>
+              <p>
+                {lysalestotals && lysalestotals["profit"]
+                  ? "$" +
+                    lysalestotals["profit"]
+                      .toFixed()
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                  : ""}
+              </p>
+            </div>
             <div className="bdgtlyearfigs">
               <p>{bdgtyear - 1} Budget:</p>
               <p>
@@ -1093,6 +1137,19 @@ const Budget2024a = () => {
             </p>
             <p className="bdgttyearname">Avg Profit</p>
             <div className="bdgtlyearfigs">
+              <p>{bdgtyear - 1} YTD:</p>
+              <p>
+                {lysalestotals &&
+                lysalestotals["quantity"] &&
+                lysalestotals["profit"]
+                  ? "$" +
+                    (lysalestotals["profit"] / lysalestotals["quantity"])
+                      .toFixed()
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                  : ""}
+              </p>
+            </div>
+            <div className="bdgtlyearfigs">
               <p>{bdgtyear - 1} Budget:</p>
               <p>
                 {budgetyeartotals &&
@@ -1127,6 +1184,20 @@ const Budget2024a = () => {
                 : 0}
             </p>
             <p className="bdgttyearname">Margin</p>
+            <div className="bdgtlyearfigs">
+              <p>{bdgtyear - 1} Sales:</p>
+              <p>
+                {lysalestotals &&
+                lysalestotals["profit"] &&
+                lysalestotals["revenue"]
+                  ? (
+                      (lysalestotals["profit"] / lysalestotals["revenue"]) *
+                      100
+                    ).toFixed(1)
+                  : ""}
+                %
+              </p>
+            </div>
             <div className="bdgtlyearfigs">
               <p>{bdgtyear - 1} Budget:</p>
               <p>
@@ -1426,6 +1497,13 @@ const Budget2024a = () => {
                                   q3prodtotal = q3prodtotal + q3reg;
                                   q4prodtotal = q4prodtotal + q4reg;
 
+                                  bdgtq1qtytotal = bdgtq1qtytotal + q1reg;
+                                  bdgtq2qtytotal = bdgtq2qtytotal + q2reg;
+                                  bdgtq3qtytotal = bdgtq3qtytotal + q3reg;
+                                  bdgtq4qtytotal = bdgtq4qtytotal + q4reg;
+
+                                  // console.log(bdgtq1qtytotal);
+
                                   let regprice =
                                     priceqty === 0
                                       ? 0
@@ -1439,6 +1517,12 @@ const Budget2024a = () => {
                                         (q1reg + q2reg + q3reg + q4reg);
                                   pricetotal = pricetotal + priceqty;
                                   profittotal = profittotal + profitqty;
+
+                                  bdgtpriceprodtotal =
+                                    bdgtpriceprodtotal + priceqty;
+                                  bdgtprofitprodtotal =
+                                    bdgtprofitprodtotal + profitqty;
+
                                   return [
                                     <tr className="bdgtregionrow">
                                       <td className="bdgtregioncol">
@@ -2157,6 +2241,86 @@ const Budget2024a = () => {
                     ];
                   })
                 : ""}
+              {formatedData ? (
+                <div className="bdgtpnametable">
+                  <div className="bdgtpnametabletitle">
+                    <h3>2024 Total {activeCname} Summary</h3>
+                  </div>
+                  <div className="board">
+                    <table>
+                      <thead>
+                        <tr>
+                          <td className="countrycol">Total Summary</td>
+                          <td className="bdgtdatacol">Q1</td>
+                          <td className="bdgtdatacol">Q2</td>
+                          <td className="bdgtdatacol">Q3</td>
+                          <td className="bdgtdatacol">Q4</td>
+                          <td className="bdgtdatacol">Total</td>
+                          <td className="bdgtcolseparation"></td>
+                          <td className="bdgtdatacol">Price</td>
+                          <td className="bdgtdatacol">Profit</td>
+                          <td className="bdgtdatacol">Ttl Profit</td>
+                          <td className="bdgtdatacol">% Mgn</td>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td className="countrycol bdgtctyttl">Global</td>
+                          <td className="bdgtprodtotals">{bdgtq1qtytotal}</td>
+                          <td className="bdgtprodtotals">{bdgtq2qtytotal}</td>
+                          <td className="bdgtprodtotals">{bdgtq3qtytotal}</td>
+                          <td className="bdgtprodtotals">{bdgtq4qtytotal}</td>
+
+                          <td className="bdgtprodtotals bdgtcountrytotals">
+                            {bdgtq1qtytotal +
+                              bdgtq2qtytotal +
+                              bdgtq3qtytotal +
+                              bdgtq4qtytotal}
+                          </td>
+                          <td className="bdgtcolseparation"></td>
+                          <td className="bdgtctyeconomics bdgtprodtotals">
+                            {"$ " +
+                              (
+                                bdgtpriceprodtotal /
+                                (bdgtq1qtytotal +
+                                  bdgtq2qtytotal +
+                                  bdgtq3qtytotal +
+                                  bdgtq4qtytotal)
+                              ).toFixed(0)}
+                          </td>
+                          <td className="bdgtctyeconomics bdgtprodtotals">
+                            {"$ " +
+                              (
+                                bdgtprofitprodtotal /
+                                (bdgtq1qtytotal +
+                                  bdgtq2qtytotal +
+                                  bdgtq3qtytotal +
+                                  bdgtq4qtytotal)
+                              ).toFixed(0)}
+                          </td>
+                          <td
+                            className="bdgtctyeconomics bdgtprodtotals"
+                            style={{ width: "auto" }}
+                          >
+                            {"$ " + bdgtprofitprodtotal}
+                          </td>
+                          <td
+                            className="bdgtctyeconomics bdgtprodtotals"
+                            style={{ width: "auto" }}
+                          >
+                            {(
+                              (bdgtprofitprodtotal / bdgtpriceprodtotal) *
+                              100
+                            ).toFixed(0) + "%"}
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              ) : (
+                ""
+              )}
             </div>
             <span className="bdgtresponsemsg" ref={refresmsg}>
               {bdgtresponsemsg}
