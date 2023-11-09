@@ -910,89 +910,98 @@ const Budget2024a = () => {
     <div>
       <div className="bdgttitles">
         <h2 className="bdgttitle">{bdgtyear} Budget</h2>
-
-        <div className="addprodgroup">
-          <button
-            className="addprodbutton"
-            onClick={(e) => {
-              showaddProd();
-            }}
-          >
-            Add Product
-          </button>
-          {showprodnamefilter ? (
-            <div className="addprodpane">
-              <input
-                ref={searchProdRef}
-                value={searchterm}
-                onChange={(e) => {
-                  setSearchterm(e.target.value);
-                }}
-                placeholder="Search Product Name"
-                type="text"
-              />
-              <ul>
-                {filteredProdnames
-                  ? filteredProdnames.map((item) => {
-                      return [
-                        <div className="addprodrow">
-                          <input
-                            type="checkbox"
-                            name={item.prodNameID}
-                            id={item.prodNameID}
-                            value={item.prodNameID}
-                            onClick={(e) => {
-                              if (e.target.checked) {
-                                prodstoadd.push(item.prodNameID);
-                                prodscattoadd.push(item.prodCatNameID);
-                                // console.log(prodstoadd);
-                                // console.log(prodscattoadd);
-                              } else {
-                                for (var i = 0; i < prodstoadd.length; i++) {
-                                  if (prodstoadd[i] === item.prodNameID) {
-                                    prodstoadd.splice(i, 1);
+        {lock === false ? (
+          <div className="addprodgroup">
+            <button
+              className="addprodbutton"
+              onClick={(e) => {
+                showaddProd();
+              }}
+            >
+              Add Product
+            </button>
+            {showprodnamefilter ? (
+              <div className="addprodpane">
+                <input
+                  ref={searchProdRef}
+                  value={searchterm}
+                  onChange={(e) => {
+                    setSearchterm(e.target.value);
+                  }}
+                  placeholder="Search Product Name"
+                  type="text"
+                />
+                <ul>
+                  {filteredProdnames
+                    ? filteredProdnames.map((item) => {
+                        return [
+                          <div className="addprodrow">
+                            <input
+                              type="checkbox"
+                              name={item.prodNameID}
+                              id={item.prodNameID}
+                              value={item.prodNameID}
+                              onClick={(e) => {
+                                if (e.target.checked) {
+                                  prodstoadd.push(item.prodNameID);
+                                  prodscattoadd.push(item.prodCatNameID);
+                                  // console.log(prodstoadd);
+                                  // console.log(prodscattoadd);
+                                } else {
+                                  for (var i = 0; i < prodstoadd.length; i++) {
+                                    if (prodstoadd[i] === item.prodNameID) {
+                                      prodstoadd.splice(i, 1);
+                                    }
+                                    if (
+                                      prodscattoadd[i] === item.prodCatNameID
+                                    ) {
+                                      prodscattoadd.splice(i, 1);
+                                    }
                                   }
-                                  if (prodscattoadd[i] === item.prodCatNameID) {
-                                    prodscattoadd.splice(i, 1);
-                                  }
+                                  // console.log(prodstoadd);
                                 }
-                                // console.log(prodstoadd);
-                              }
-                            }}
-                          />{" "}
-                          <label for={item.prodNameID}>
-                            {item.abbreviation}
-                          </label>
-                        </div>,
-                      ];
-                    })
-                  : "Please add a product."}
-              </ul>
-              <div className="addprodcanceladd">
-                <button
-                  className="cancelprodbutton"
-                  onClick={(e) => {
-                    setShowprodnamefilter(false);
-                    setSearchterm("");
-                  }}
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={(e) => {
-                    addprod();
-                  }}
-                  className="addprodbutton"
-                >
-                  Confirm
-                </button>
+                              }}
+                            />{" "}
+                            <label for={item.prodNameID}>
+                              {item.abbreviation}
+                            </label>
+                          </div>,
+                        ];
+                      })
+                    : "Please add a product."}
+                </ul>
+                <div className="addprodcanceladd">
+                  <button
+                    className="cancelprodbutton"
+                    onClick={(e) => {
+                      setShowprodnamefilter(false);
+                      setSearchterm("");
+                    }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      addprod();
+                    }}
+                    className="addprodbutton"
+                  >
+                    Confirm
+                  </button>
+                </div>
               </div>
-            </div>
-          ) : (
-            ""
-          )}
-        </div>
-        <ExportToCSV csvData={bdgtregiondta} fileName={"budget2024"} />
+            ) : (
+              ""
+            )}
+          </div>
+        ) : (
+          ""
+        )}
+        {lock === false ? (
+          <ExportToCSV csvData={bdgtregiondta} fileName={"budget2024"} />
+        ) : (
+          ""
+        )}
       </div>
       <div className="bdgttotals">
         <ul className="bdgttotalsul">
@@ -1317,15 +1326,19 @@ const Budget2024a = () => {
                       <div className="bdgtpnametable">
                         <div className="bdgtpnametabletitle">
                           <h3>2024 {prod} Budget</h3>
-                          <FontAwesomeIcon
-                            icon={faPlusCircle}
-                            onClick={(e) => {
-                              setShowprodctyadd({
-                                ...showprodctyadd,
-                                [prod]: !showprodctyadd[prod],
-                              });
-                            }}
-                          />
+                          {lock === false ? (
+                            <FontAwesomeIcon
+                              icon={faPlusCircle}
+                              onClick={(e) => {
+                                setShowprodctyadd({
+                                  ...showprodctyadd,
+                                  [prod]: !showprodctyadd[prod],
+                                });
+                              }}
+                            />
+                          ) : (
+                            ""
+                          )}
                           <div
                             className={
                               showprodctyadd && showprodctyadd[prod]
@@ -2128,42 +2141,50 @@ const Budget2024a = () => {
                                                   ).toFixed(1) + "%"
                                                 : "0%"}
                                             </td>
-                                            <FontAwesomeIcon
-                                              className="bdgtctydelete"
-                                              icon={faMinusCircle}
-                                              onClick={(e) => {
-                                                setShowdelctybtns({
-                                                  ...showdelctybtns,
-                                                  [prod]: {
-                                                    ...showdelctybtns[prod],
-                                                    [reg]: {
-                                                      ...showdelctybtns[prod][
-                                                        reg
-                                                      ],
-                                                      [cty]: !showdelctybtns[
-                                                        prod
-                                                      ][reg][cty],
+                                            {lock === false ? (
+                                              <FontAwesomeIcon
+                                                className="bdgtctydelete"
+                                                icon={faMinusCircle}
+                                                onClick={(e) => {
+                                                  setShowdelctybtns({
+                                                    ...showdelctybtns,
+                                                    [prod]: {
+                                                      ...showdelctybtns[prod],
+                                                      [reg]: {
+                                                        ...showdelctybtns[prod][
+                                                          reg
+                                                        ],
+                                                        [cty]: !showdelctybtns[
+                                                          prod
+                                                        ][reg][cty],
+                                                      },
                                                     },
-                                                  },
-                                                });
-                                              }}
-                                            />
-                                            <button
-                                              className={
-                                                showdelctybtns &&
-                                                showdelctybtns[prod] &&
-                                                showdelctybtns[prod][reg][
-                                                  cty
-                                                ] === true
-                                                  ? "bdgtctydeletebtn showbdgtpane"
-                                                  : "bdgtctydeletebtn hidebdgtpane"
-                                              }
-                                              onClick={(e) => {
-                                                deletectyrow(prod, cty);
-                                              }}
-                                            >
-                                              Delete
-                                            </button>
+                                                  });
+                                                }}
+                                              />
+                                            ) : (
+                                              ""
+                                            )}
+                                            {lock === false ? (
+                                              <button
+                                                className={
+                                                  showdelctybtns &&
+                                                  showdelctybtns[prod] &&
+                                                  showdelctybtns[prod][reg][
+                                                    cty
+                                                  ] === true
+                                                    ? "bdgtctydeletebtn showbdgtpane"
+                                                    : "bdgtctydeletebtn hidebdgtpane"
+                                                }
+                                                onClick={(e) => {
+                                                  deletectyrow(prod, cty);
+                                                }}
+                                              >
+                                                Delete
+                                              </button>
+                                            ) : (
+                                              ""
+                                            )}
                                           </tr>,
                                         ];
                                       }
