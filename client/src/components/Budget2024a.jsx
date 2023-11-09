@@ -1541,20 +1541,24 @@ const Budget2024a = () => {
                                   return [
                                     <tr className="bdgtregionrow">
                                       <td className="bdgtregioncol">
-                                        <FontAwesomeIcon
-                                          className="bdgtctyrowadd"
-                                          icon={faPlusCircle}
-                                          onClick={(e) => {
-                                            setShowaddcty({
-                                              ...showaddcty,
-                                              [prod]: {
-                                                ...showaddcty[prod],
-                                                [reg]: !showaddcty[prod][reg],
-                                              },
-                                            });
-                                            loadregcountries(reg);
-                                          }}
-                                        />
+                                        {lock === false ? (
+                                          <FontAwesomeIcon
+                                            className="bdgtctyrowadd"
+                                            icon={faPlusCircle}
+                                            onClick={(e) => {
+                                              setShowaddcty({
+                                                ...showaddcty,
+                                                [prod]: {
+                                                  ...showaddcty[prod],
+                                                  [reg]: !showaddcty[prod][reg],
+                                                },
+                                              });
+                                              loadregcountries(reg);
+                                            }}
+                                          />
+                                        ) : (
+                                          ""
+                                        )}
                                         {reg === "Latin America"
                                           ? "L. America"
                                           : reg}
