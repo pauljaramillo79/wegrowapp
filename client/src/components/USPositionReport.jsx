@@ -31,7 +31,7 @@ const USPositionReport = () => {
     Axios.post("/usapositionreport").then((result) => {
       const rep = result.data.groupBy("productGroup");
       setGdata(rep);
-      // console.log(rep);
+      console.log(rep);
     });
   }, []);
 
@@ -48,7 +48,7 @@ const USPositionReport = () => {
       moment().diff(moment(whentry), "days") > 0
         ? moment().diff(moment(whentry), "days")
         : 0;
-    let daysinstg = daysinwh > stggrace ? (daysinwh = stggrace) : 0;
+    let daysinstg = daysinwh > stggrace ? daysinwh - stggrace : 0;
     return (
       stgfix / qty + (Math.ceil(daysinstg / stgaccrual) * stgvar * qtypal) / qty
     );
@@ -181,8 +181,8 @@ const USPositionReport = () => {
                             x.storagevariable,
                             x.stggraceperiod,
                             x.stgaccrualperiod,
-                            x.quantitypallets,
-                            x.quantity
+                            x.InventoryPallets,
+                            x.Inventory
                           ));
                     return (
                       <>
@@ -245,8 +245,8 @@ const USPositionReport = () => {
                                 x.storagevariable,
                                 x.stggraceperiod,
                                 x.stgaccrualperiod,
-                                x.quantitypallets,
-                                x.quantity
+                                x.InventoryPallets,
+                                x.Inventory
                               ).toFixed(2)}
                           </td>
                           <td>{x.supplier}</td>
@@ -271,8 +271,8 @@ const USPositionReport = () => {
                                     x.storagevariable,
                                     x.stggraceperiod,
                                     x.stgaccrualperiod,
-                                    x.quantitypallets,
-                                    x.quantity
+                                    x.InventoryPallets,
+                                    x.Inventory
                                   ))
                               )
                                 .toFixed(0)
@@ -329,7 +329,7 @@ const USPositionReport = () => {
                           .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                       </h4>
                     </td>
-                    <td colSpan={5}></td>
+                    <td colSpan={6}></td>
                     <td className="fig">
                       <h4>{currencify(currval, "$", 0)}</h4>
                     </td>
