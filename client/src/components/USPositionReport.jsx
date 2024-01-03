@@ -133,7 +133,7 @@ const USPositionReport = () => {
             <th className="fig">Inventory</th>
             <th className="fig">In Pallets</th>
             <th>Warehouse</th>
-            <th className="fig">EW Price</th>
+            <th className="fig">DDP Price</th>
             <th className="fig">Storage</th>
             <th>Supplier</th>
             <th>From</th>
