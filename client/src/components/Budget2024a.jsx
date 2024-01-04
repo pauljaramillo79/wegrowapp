@@ -1735,13 +1735,10 @@ const Budget2024a = () => {
                                                 <td
                                                   onContextMenu={async (e) => {
                                                     e.preventDefault();
-
+                                                    //Right click
                                                     const clickdone = await delayedclicked();
-                                                    if (
-                                                      // commentRef &&
-                                                      clickdone === true
-                                                    ) {
-                                                      // console.log("how");
+                                                    //Give focus to new comment textarea
+                                                    if (clickdone === true) {
                                                       commentRef.current.focus();
                                                     }
                                                     setPoints({
@@ -1750,7 +1747,6 @@ const Budget2024a = () => {
                                                       // x: 0,
                                                       // y: 0,
                                                     });
-                                                    // console.log("Right Click");
                                                   }}
                                                   className={
                                                     budgetdata &&
