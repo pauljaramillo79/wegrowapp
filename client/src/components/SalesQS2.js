@@ -274,6 +274,7 @@ const SalesQS2 = () => {
     JSON.parse(localStorage.getItem("WGusercode"))
   );
   const role = JSON.parse(localStorage.getItem("role"));
+  const user = JSON.parse(localStorage.getItem("WGusercode"));
 
   // Load and set warehouse list for dropdown menu
   useEffect(() => {
@@ -2986,6 +2987,21 @@ const SalesQS2 = () => {
                       }
                     })
                   : "reload"}
+              </select>
+            ) : (
+              ""
+            )}
+            {role === 5 && user === "LC" ? (
+              <select
+                onChange={(e) => {
+                  setFromdropdown(true);
+                  setLoaduser(e.target.value);
+                }}
+              >
+                <option selected value={"LC"}>
+                  LC
+                </option>
+                <option value={"OSC"}>OSC</option>
               </select>
             ) : (
               ""
