@@ -18,7 +18,7 @@ import "./Budget2024a.css";
 import moment from "moment";
 
 const Budget2024a = () => {
-  const [lock, setLock] = useState(true);
+  const [lock, setLock] = useState(false);
 
   const { clicked, setClicked, points, setPoints } = useContextMenu();
 
@@ -1790,7 +1790,7 @@ const Budget2024a = () => {
                                                           cty
                                                         ][q]
                                                       }
-                                                      // readOnly
+                                                      readOnly
                                                       onChange={(e) => {
                                                         handleChange1(
                                                           e,
@@ -2007,7 +2007,7 @@ const Budget2024a = () => {
                                                     "price"
                                                   );
                                                 }}
-                                                // readOnly
+                                                readOnly
                                                 onFocus={(e) => {
                                                   setActiveEconIndex(indexecon);
                                                   e.target.select();
@@ -2035,7 +2035,7 @@ const Budget2024a = () => {
                                             </td>
                                             <td className="bdgtctyeconomics">
                                               <input
-                                                // readOnly
+                                                readOnly
                                                 className="cell-input"
                                                 value={
                                                   bdgtecondata &&
