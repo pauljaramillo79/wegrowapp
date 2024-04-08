@@ -18,7 +18,7 @@ import "./Budget2024a.css";
 import moment from "moment";
 
 const Budget2024a = () => {
-  const [lock, setLock] = useState(false);
+  const [lock, setLock] = useState(true);
 
   const { clicked, setClicked, points, setPoints } = useContextMenu();
 
