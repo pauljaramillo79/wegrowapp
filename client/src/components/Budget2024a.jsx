@@ -1790,7 +1790,7 @@ const Budget2024a = () => {
                                                           cty
                                                         ][q]
                                                       }
-                                                      readOnly
+                                                      // readOnly
                                                       onChange={(e) => {
                                                         handleChange1(
                                                           e,
@@ -2007,7 +2007,7 @@ const Budget2024a = () => {
                                                     "price"
                                                   );
                                                 }}
-                                                readOnly
+                                                // readOnly
                                                 onFocus={(e) => {
                                                   setActiveEconIndex(indexecon);
                                                   e.target.select();
@@ -2035,7 +2035,7 @@ const Budget2024a = () => {
                                             </td>
                                             <td className="bdgtctyeconomics">
                                               <input
-                                                readOnly
+                                                // readOnly
                                                 className="cell-input"
                                                 value={
                                                   bdgtecondata &&
