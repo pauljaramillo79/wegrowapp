@@ -25,6 +25,7 @@ const Budget2025a = () => {
   const [newcomment, setNewcomment] = useState("");
 
   const usercode = JSON.parse(localStorage.getItem("WGusercode"));
+  const role = JSON.parse(localStorage.getItem("role"));
 
   const commentRef = useRef(null);
 
@@ -910,7 +911,7 @@ const Budget2025a = () => {
     <div>
       <div className="bdgttitles">
         <h2 className="bdgttitle">{bdgtyear} Budget</h2>
-        {lock === false ? (
+        {lock === false && role === 1 ? (
           <div className="addprodgroup">
             <button
               className="addprodbutton"
@@ -997,7 +998,7 @@ const Budget2025a = () => {
         ) : (
           ""
         )}
-        {lock === false ? (
+        {lock === false && role === 1 ? (
           <ExportToCSV csvData={bdgtregiondta} fileName={"budget2024"} />
         ) : (
           ""
@@ -1044,7 +1045,7 @@ const Budget2025a = () => {
             <div className="bdgtlyearfigs">
               <p>{bdgtyear - 2} Budget:</p>
 
-              <p>115,479 mt</p>
+              <p>156,019 mt</p>
               {/* <p>152,915 mt</p> */}
             </div>
           </li>
@@ -2950,7 +2951,7 @@ const Budget2025a = () => {
           </div>
         </div>
         <div className="budgetbyprod">
-          <h4>Budget Summary Figures 2024</h4>
+          <h4>Budget Summary Figures {bdgtyear}</h4>
 
           <div className="bdgtsummarybuttons1">
             <p>Level 1:</p>
