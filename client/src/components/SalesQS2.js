@@ -3006,6 +3006,20 @@ const SalesQS2 = () => {
             ) : (
               ""
             )}
+            {role === 6 && user === "JMN" && (
+              <select
+                onChange={(e) => {
+                  setFromdropdown(true);
+                  setLoaduser(e.target.value);
+                }}
+              >
+                <option selected value={"JMN"}>
+                  JMN
+                </option>
+                <option value={"DAS"}>DAS</option>
+                <option value={"NIR"}>NIR</option>
+              </select>
+            )}
             <button
               onClick={(e) => {
                 e.preventDefault();
@@ -3478,13 +3492,30 @@ const SalesQS2 = () => {
             <legend>In Charge</legend>
             <div className="form-group">
               <label htmlFor="">Trader:</label>
-              <input
-                className="canceldrag"
-                value={QSValues.TIC}
-                type="text"
-                readOnly
-                onKeyDown={ignoreEnter}
-              />
+              {role === 6 && user === "JMN" ? (
+                <select
+                  className="canceldrag"
+                  style={{ minWidth: "42%", margin: 0 }}
+                  onChange={(e) => {
+                    setFromdropdown(true);
+                    setLoaduser(e.target.value);
+                  }}
+                >
+                  <option selected value={"JMN"}>
+                    JMN
+                  </option>
+                  <option value={"DAS"}>DAS</option>
+                  <option value={"NIR"}>NIR</option>
+                </select>
+              ) : (
+                <input
+                  className="canceldrag"
+                  value={QSValues.TIC}
+                  type="text"
+                  readOnly
+                  onKeyDown={ignoreEnter}
+                />
+              )}
             </div>
             <div className="form-group">
               <label htmlFor="">Traffic:</label>
