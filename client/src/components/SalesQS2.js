@@ -340,11 +340,17 @@ const SalesQS2 = () => {
             resolve();
           });
         };
-        const doWork = async () => {
+        const doWork1 = async () => {
           await loadQSList(response);
         };
-        doWork();
+        doWork1();
       });
+      // .then(() => {
+      //   if (loaduser === "DAS") {
+      //     setQSData((prev) => ({ ...prev, ["TIC"]: 2 }));
+      //     setQSValues((prev) => ({ ...prev, ["TIC"]: loaduser }));
+      //   }
+      // });
     }
     if (QStoload) {
       Axios.post("/warehouses").then(async (res) => {
@@ -360,14 +366,22 @@ const SalesQS2 = () => {
                 // console.log("this just in ");
                 setQSindex(result.length);
                 setQSIDtoedit("");
+
                 setFromdropdown(false);
               }
               // loadQS(QStoload);
             });
           });
+          // .then(() => {
+          //   if (loaduser === "DAS") {
+          //     setQSData((prev) => ({ ...prev, ["TIC"]: 2 }));
+          //     setQSValues((prev) => ({ ...prev, ["TIC"]: loaduser }));
+          //   }
+          // });
         });
       });
     }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [QSsaved, loaduser, duplicateBoolean]);
 
@@ -1511,8 +1525,13 @@ const SalesQS2 = () => {
     }
     // otherwise, this is a new QS and set initial values
     if (QSindex === QSIDList.length) {
-      setQSValues(QSValuesInit);
-      setQSData(QSDataInit);
+      if (user === "JMN") {
+        setQSValues({ ...QSValuesInit, ["TIC"]: loaduser || user });
+        setQSData({ ...QSDataInit, ["TIC"]: loaduserID || userID });
+      } else {
+        setQSValues(QSValuesInit);
+        setQSData(QSDataInit);
+      }
       setExchangerate(null);
     }
     // reset to non-editing mode everytime a QS is loaded or a new QS is started
@@ -2950,6 +2969,22 @@ const SalesQS2 = () => {
     }
   };
 
+  const tradlis = ["JMN", "DAS", "NIR"];
+  const tradids = [45, 2, 17];
+
+  const [loaduserID, setLoaduserID] = useState();
+
+  useEffect(() => {
+    setQSData({
+      ...QSData,
+      ["TIC"]: loaduserID,
+    });
+    setQSValues((prev) => ({
+      ...prev,
+      ["TIC"]: loaduser,
+    }));
+  }, [loaduser, loaduserID]);
+
   return (
     <div className="salesQS">
       <div className="salesQStitleline">
@@ -3007,18 +3042,19 @@ const SalesQS2 = () => {
               ""
             )}
             {role === 6 && user === "JMN" && (
-              <select
-                onChange={(e) => {
-                  setFromdropdown(true);
-                  setLoaduser(e.target.value);
-                }}
-              >
-                <option selected value={"JMN"}>
-                  JMN
-                </option>
-                <option value={"DAS"}>DAS</option>
-                <option value={"NIR"}>NIR</option>
-              </select>
+              // <select
+              //   onChange={(e) => {
+              //     setFromdropdown(true);
+              //     setLoaduser(e.target.value);
+              //   }}
+              // >
+              //   <option selected value={"JMN"}>
+              //     JMN
+              //   </option>
+              //   <option value={"DAS"}>DAS</option>
+              //   <option value={"NIR"}>NIR</option>
+              // </select>
+              <></>
             )}
             <button
               onClick={(e) => {
@@ -3499,13 +3535,45 @@ const SalesQS2 = () => {
                   onChange={(e) => {
                     setFromdropdown(true);
                     setLoaduser(e.target.value);
+                    const selectedOption =
+                      e.target.options[e.target.selectedIndex];
+                    console.log(selectedOption.dataset.id);
+                    setLoaduserID(Number(selectedOption.dataset.id));
+                    // setQSData({
+                    //   ...QSData,
+                    //   ["TIC"]: Number(selectedOption.dataset.id),
+                    // });
+                    // setQSValues((prev) => ({
+                    //   ...prev,
+                    //   ["TIC"]: e.target.value,
+                    // }));
                   }}
                 >
-                  <option selected value={"JMN"}>
+                  {tradlis &&
+                    tradlis.map((trad, i) => {
+                      if (trad === loaduser) {
+                        return (
+                          <option selected value={trad} data-id={tradids[i]}>
+                            {trad}
+                          </option>
+                        );
+                      } else {
+                        return (
+                          <option value={trad} data-id={tradids[i]}>
+                            {trad}
+                          </option>
+                        );
+                      }
+                    })}
+                  {/* <option selected data-id={45} value={"JMN"}>
                     JMN
                   </option>
-                  <option value={"DAS"}>DAS</option>
-                  <option value={"NIR"}>NIR</option>
+                  <option data-id={2} value={"DAS"}>
+                    DAS
+                  </option>
+                  <option data-id={17} value={"NIR"}>
+                    NIR
+                  </option> */}
                 </select>
               ) : (
                 <input
