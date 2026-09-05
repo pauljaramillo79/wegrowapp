@@ -12,7 +12,6 @@ import Nav from "./components/Nav";
 import { RefreshPositionsProvider } from "./contexts/RefreshPositionsProvider";
 import ManagementGrid from "./components/ManagementGrid";
 import Admin from "./components/Admin";
-import SunburstData from "./components/SunburstData";
 import AnalysisGrid from "./components/AnalysisGrid";
 import LogisticsGrid from "./components/LogisticsGrid";
 import { LoadQSProvider } from "./contexts/LoadQSProvider";
@@ -39,16 +38,16 @@ const reducer = (state, action) => {
       localStorage.setItem("user", JSON.stringify(action.payload.user));
       localStorage.setItem(
         "WGusercode",
-        JSON.stringify(action.payload.usercode)
+        JSON.stringify(action.payload.usercode),
       );
       localStorage.setItem("WGuserID", JSON.stringify(action.payload.userID));
       localStorage.setItem(
         "refreshtoken",
-        JSON.stringify(action.payload.refreshtoken)
+        JSON.stringify(action.payload.refreshtoken),
       );
       localStorage.setItem(
         "accesstoken",
-        JSON.stringify(action.payload.accesstoken)
+        JSON.stringify(action.payload.accesstoken),
       );
       localStorage.setItem("isAuthenticated", true);
       localStorage.setItem("role", action.payload.role);
