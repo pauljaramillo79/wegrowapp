@@ -14,18 +14,19 @@ import {
 import { gsap } from "gsap";
 import * as XLSX from "xlsx";
 import useContextMenu from "../contexts/useContextMenu";
-import "./Budget2025a.css";
+import "./Budget.css";
 import moment from "moment";
+import BudgetRowHistory from "./BudgetRowHistory";
+import BudgetAllocationDrawer from "./BudgetAllocationDrawer";
+import BudgetCategorySubmission from "./BudgetCategorySubmission";
 
-const Budget2025a = () => {
-  const [lock, setLock] = useState(false);
-
+const Budget = ({ year }) => {
+  const bdgtyear = Number(year);
   const { clicked, setClicked, points, setPoints } = useContextMenu();
 
   const [newcomment, setNewcomment] = useState("");
 
   const usercode = JSON.parse(localStorage.getItem("WGusercode"));
-  const role = JSON.parse(localStorage.getItem("role"));
 
   const commentRef = useRef(null);
 
@@ -68,8 +69,6 @@ const Budget2025a = () => {
     setBdgtresponsemsg("");
   };
 
-  const [bdgtyear, setBdgtyear] = useState(2025);
-
   useEffect(() => {
     const elem = refresmsg.current;
     gsap.fromTo(
@@ -80,7 +79,7 @@ const Budget2025a = () => {
         duration: 2,
         ease: "power1.inOut",
         onComplete: onComplete,
-      }
+      },
     );
   }, [showmsg]);
 
@@ -96,77 +95,170 @@ const Budget2025a = () => {
         duration: 15,
         ease: "power1.inOut",
         // onComplete: onComplete,
-      }
+      },
     );
   }, [loadmsgrefresh]);
 
   const [prodList, setProdList] = useState();
+  const [activePCatName, setActivePCatName] = useState();
+  const [budgetdata, setBudgetdata] = useState();
+  const [productAdditionRefresh, setProductAdditionRefresh] = useState(0);
   const searchProdRef = useRef(null);
 
   useEffect(() => {
-    Axios.post("/budgetprodNames").then((response) => {
+    Axios.post("/budgetprodNames", { year: bdgtyear }).then((response) => {
       setProdList(response.data);
       setFilteredProdnames(response.data);
     });
-  }, []);
+  }, [bdgtyear, productAdditionRefresh]);
 
   const [showprodnamefilter, setShowprodnamefilter] = useState(false);
+  const [selectedProductsToAdd, setSelectedProductsToAdd] = useState({});
+  const [addingProducts, setAddingProducts] = useState(false);
+  const [searchterm, setSearchterm] = useState("");
+  const [filteredProdnames, setFilteredProdnames] = useState();
 
-  const setaddingProd = () => {
-    return new Promise((resolve, reject) => {
-      setShowprodnamefilter(!showprodnamefilter);
-      resolve();
-    });
+  const showaddProd = () => {
+    setSelectedProductsToAdd({});
+    setShowprodnamefilter(true);
   };
 
-  const showaddProd = async () => {
-    await setaddingProd();
-    if (showprodnamefilter === false) {
+  const closeProductPicker = () => {
+    setSelectedProductsToAdd({});
+    setShowprodnamefilter(false);
+  };
+
+  const finishProductPicker = () => {
+    setSelectedProductsToAdd({});
+    setSearchterm("");
+    setShowprodnamefilter(false);
+  };
+
+  const setProductToAdd = (item, checked) => {
+    setSelectedProductsToAdd((current) => {
+      const next = { ...current };
+
+      if (checked) {
+        next[item.prodNameID] = item;
+      } else {
+        delete next[item.prodNameID];
+      }
+
+      return next;
+    });
+
+    setTimeout(() => {
+      if (searchProdRef.current) {
+        searchProdRef.current.focus();
+      }
+    }, 0);
+  };
+
+  useEffect(() => {
+    if (showprodnamefilter && searchProdRef.current) {
       searchProdRef.current.focus();
     }
-    setSearchterm("");
-  };
-
-  const prodstoadd = [];
-  const prodscattoadd = [];
-
-  const [searchterm, setSearchterm] = useState();
-  const [filteredProdnames, setFilteredProdnames] = useState();
+  }, [showprodnamefilter]);
 
   useEffect(() => {
     if (prodList) {
+      const availableProducts = prodList;
+
       if (searchterm && searchterm !== "") {
-        const results = prodList.filter((item) => {
-          if (searchterm && searchterm !== "") {
-            return item.abbreviation
-              .toLowerCase()
-              .includes(searchterm.toLowerCase());
-          }
+        const results = availableProducts.filter((item) => {
+          const query = searchterm.toLowerCase();
+          const abbreviation = String(item.abbreviation || "").toLowerCase();
+          const productGroup = String(item.productGroup || "").toLowerCase();
+
+          return abbreviation.includes(query) || productGroup.includes(query);
         });
         setFilteredProdnames(results);
       } else {
-        setFilteredProdnames(prodList);
+        setFilteredProdnames(availableProducts);
       }
     }
-  }, [searchterm]);
+  }, [searchterm, prodList]);
 
   const [updatebuttons, setUpdatebuttons] = useState(false);
 
   const [prodgroupsbtn, setProdgroupsbtn] = useState();
 
   const [budgetbtns, setBudgetbtns] = useState();
+  const navigationRequestRef = useRef(0);
 
   const addprod = () => {
+    const selectedProducts = Object.keys(selectedProductsToAdd).map(
+      (productID) => selectedProductsToAdd[productID],
+    );
+
+    if (selectedProducts.length === 0 || addingProducts) {
+      return;
+    }
+
+    const prodstoadd = selectedProducts.map((item) => item.prodNameID);
+    const addedCategoryID = Number(selectedProducts[0].prodCatNameID);
+
+    setAddingProducts(true);
+
     Axios.post("/addprodbudget", {
-      prodstoadd,
-      prodscattoadd,
+      prodstoadd: prodstoadd,
       year: bdgtyear,
-    }).then((response) => {
-      // console.log(response);
-      // console.log(response);
-      setUpdatebuttons(!updatebuttons);
-    });
-    setShowprodnamefilter(false);
+    })
+      .then((response) => {
+        const refreshedGroups = response.data.productGroups || [];
+        const refreshedCategories = response.data.productCategories || [];
+
+        const categoryIndex = refreshedCategories.findIndex((item) => {
+          return Number(item.prodCatNameID) === addedCategoryID;
+        });
+
+        setBdgtresponsemsg(response.data.msg);
+
+        // Prevent an older navigation request from overwriting this response.
+        navigationRequestRef.current += 1;
+
+        // Immediately replace both pill datasets.
+        setProdgroupsbtn(refreshedGroups);
+        setBudgetbtns(refreshedCategories);
+
+        // Open the newly added product category.
+        setActivePCatName(addedCategoryID);
+
+        if (categoryIndex !== -1) {
+          const addedCategory = refreshedCategories[categoryIndex];
+
+          const groupIndex = refreshedGroups.findIndex((item) => {
+            return item.productGroup === addedCategory.productGroup;
+          });
+
+          // Select the new product-group pill.
+          setSelectedPG(addedCategory.productGroup);
+
+          if (groupIndex !== -1) {
+            setClickedProdGroup(groupIndex);
+          }
+
+          // Select the new product-category pill.
+          setSelectedPN(addedCategory.prodCatName);
+          setClickedProdCat(categoryIndex);
+        }
+
+        // Refresh the actual budget table.
+        setProductAdditionRefresh((current) => current + 1);
+
+        finishProductPicker();
+      })
+      .catch((error) => {
+        const message =
+          error.response && error.response.data && error.response.data.error
+            ? error.response.data.error
+            : "The selected products could not be added. Please try again.";
+
+        setBdgtresponsemsg(message);
+      })
+      .then(() => {
+        setAddingProducts(false);
+      });
   };
 
   const [numRows, setNumRows] = useState();
@@ -175,6 +267,12 @@ const Budget2025a = () => {
 
   // const [numRows, numCols] = [19, 4]; // No magic numbers
   const [activeIndex, setActiveIndex] = useState(-1); // Track which cell to highlight
+  const [selectedBudgetRow, setSelectedBudgetRow] = useState(null);
+  const [selectedBudgetCell, setSelectedBudgetCell] = useState(null);
+  const [showAllocationDrawer, setShowAllocationDrawer] = useState(false);
+  const [allocationStatuses, setAllocationStatuses] = useState({});
+  const [allocationStatusRefresh, setAllocationStatusRefresh] = useState(false);
+  const [categorySubmitted, setCategorySubmitted] = useState(false);
   const [activeEconIndex, setActiveEconIndex] = useState(-1);
   const [isNavigating, setIsNavigating] = useState(false); // Track navigation
   const [isEditing, setIsEditing] = useState(false); // Track editing
@@ -234,13 +332,6 @@ const Budget2025a = () => {
       setYearbudgetdata(response.data);
       setBudgetyeartotals(getbudgetyeartotals(response.data));
     });
-    Axios.post("/budgetgroupbtns", { year: bdgtyear }).then((response) => {
-      setProdgroupsbtn(response.data);
-    });
-    Axios.post("/budgetfilterbtns", { year: bdgtyear }).then((resp) => {
-      setBudgetbtns(resp.data);
-      // console.log(resp.data);
-    });
     Axios.post("/bdgtregiondata", { year: bdgtyear }).then((response) => {
       setBdgtregiondata(response.data);
       // Object.entries(response.data.groupBy("region")).map((item) =>
@@ -250,11 +341,22 @@ const Budget2025a = () => {
   }, [reloadyearbdgdata]);
 
   useEffect(() => {
-    Axios.post("/budgetfilterbtns", { year: bdgtyear }).then((resp) => {
-      setBudgetbtns(resp.data);
-      // console.log(resp.data);
+    const requestID = navigationRequestRef.current + 1;
+    navigationRequestRef.current = requestID;
+
+    Promise.all([
+      Axios.post("/budgetgroupbtns", { year: bdgtyear }),
+      Axios.post("/budgetfilterbtns", { year: bdgtyear }),
+    ]).then((responses) => {
+      if (navigationRequestRef.current !== requestID) {
+        return;
+      }
+
+      setProdgroupsbtn(responses[0].data);
+      setBudgetbtns(responses[1].data);
     });
-  }, [updatebuttons]);
+  }, [reloadyearbdgdata, updatebuttons]);
+
   // useEffect(() => {
 
   // }, [reloadyearbdgdata]);
@@ -340,7 +442,7 @@ const Budget2025a = () => {
         setIsNavigating(false);
       }
     },
-    [boardRef, setIsNavigating]
+    [boardRef, setIsNavigating],
   );
 
   const [editingQty, setEditingQty] = useState(false);
@@ -454,6 +556,15 @@ const Budget2025a = () => {
   const [clickedlevel1, setClickedlevel1] = useState(1);
   const [clickedlevel2, setClickedlevel2] = useState(5);
   const [clickedlevel3, setClickedlevel3] = useState(1);
+  const [showBudgetSummary, setShowBudgetSummary] = useState(false);
+
+  useEffect(() => {
+    const closeSummaryOnEscape = (event) => {
+      if (event.key === "Escape") setShowBudgetSummary(false);
+    };
+    document.addEventListener("keydown", closeSummaryOnEscape);
+    return () => document.removeEventListener("keydown", closeSummaryOnEscape);
+  }, []);
 
   // const handleClicklevel1 = (e, i) => {
   //   setClickedlevel1(i);
@@ -465,6 +576,34 @@ const Budget2025a = () => {
 
   const [clickedProdCat, setClickedProdCat] = useState();
   const [selectedPN, setSelectedPN] = useState();
+
+  useEffect(() => {
+    if (!activePCatName || !budgetbtns || !prodgroupsbtn) {
+      return;
+    }
+
+    const categoryIndex = budgetbtns.findIndex((item) => {
+      return Number(item.prodCatNameID) === Number(activePCatName);
+    });
+
+    if (categoryIndex === -1) {
+      return;
+    }
+
+    const activeCategory = budgetbtns[categoryIndex];
+    const productGroup = activeCategory.productGroup;
+    const groupIndex = prodgroupsbtn.findIndex((item) => {
+      return item.productGroup === productGroup;
+    });
+
+    setSelectedPN(activeCategory.prodCatName);
+    setSelectedPG(productGroup);
+    setClickedProdCat(categoryIndex);
+
+    if (groupIndex !== -1) {
+      setClickedProdGroup(groupIndex);
+    }
+  }, [activePCatName, budgetbtns, prodgroupsbtn]);
 
   Array.prototype.groupBy = function(key) {
     return this.reduce(function(groups, item) {
@@ -497,7 +636,6 @@ const Budget2025a = () => {
     return totals;
   };
 
-  const [budgetdata, setBudgetdata] = useState();
   const [editablevalues, setEditablevalues] = useState();
   const [intervalues, setIntervalues] = useState();
   const [originalvalues, setOriginalvalues] = useState();
@@ -565,40 +703,173 @@ const Budget2025a = () => {
   const [prodkeys, setProdkeys] = useState();
 
   const getkeys = (arr) => {
-    let countrynames = [...new Set(arr.map((x) => x.country))];
-    let countryIDs = [...new Set(arr.map((x) => x.countryID))];
     var result1 = {};
-    countrynames.forEach((key, i) => (result1[key] = countryIDs[i]));
-    setCountrykeys(result1);
-    let prodnames = [...new Set(arr.map((x) => x.abbreviation))];
-    let prodIDs = [...new Set(arr.map((x) => x.prodNameID))];
     var result2 = {};
-    prodnames.forEach((key, i) => (result2[key] = prodIDs[i]));
+
+    arr.forEach((item) => {
+      if (item.country !== undefined && item.countryID !== undefined) {
+        result1[item.country] = item.countryID;
+      }
+
+      if (item.abbreviation !== undefined && item.prodNameID !== undefined) {
+        result2[item.abbreviation] = item.prodNameID;
+      }
+    });
+
+    setCountrykeys(result1);
     setProdkeys(result2);
   };
 
   const [prodforctytoadd, setProdfroctytoadd] = useState();
 
   const [prodcountriestoadd, setProdcountriestoadd] = useState({});
+  const [countrySearch, setCountrySearch] = useState("");
 
   // let [countriestoadd, setCountriestoadd] = useState([]);
 
-  const addbdgtcountry = (pr) => {
-    Axios.post("/addbdgtcty", {
-      countries: Object.keys(prodcountriestoadd[pr]),
-      pname: prodkeys[pr],
-      pcatname: activePCatName,
-      year: bdgtyear,
-    }).then(() => {
-      setReloadbdgtdata(!reloadbdgdata);
-      // if (response.data.success === true) {
+  const clearCountriesToAdd = (pr) => {
+    setCountrySearch("");
+    setProdcountriestoadd((current) => {
+      const next = { ...current };
+      delete next[pr];
+      return next;
     });
-
-    // });
   };
 
-  const [activePCatName, setActivePCatName] = useState();
+  const setCountryToAdd = (pr, country, checked) => {
+    setProdcountriestoadd((current) => {
+      const next = { ...current };
+      const productCountries = { ...(next[pr] || {}) };
+
+      if (checked) {
+        productCountries[country.countryID] = country.country;
+      } else {
+        delete productCountries[country.countryID];
+      }
+
+      if (Object.keys(productCountries).length > 0) {
+        next[pr] = productCountries;
+      } else {
+        delete next[pr];
+      }
+
+      return next;
+    });
+  };
+
+  const closeCountryPickers = (pr) => {
+    setShowprodctyadd((current) => ({
+      ...(current || {}),
+      [pr]: false,
+    }));
+    setShowaddcty((current) => ({
+      ...(current || {}),
+      [pr]: {},
+    }));
+  };
+
+  const cancelCountrySelection = (pr) => {
+    clearCountriesToAdd(pr);
+    closeCountryPickers(pr);
+  };
+
+  const addbdgtcountry = (pr) => {
+    const selectedCountries = prodcountriestoadd[pr] || {};
+    const matchingProduct =
+      Array.isArray(budgetdata) &&
+      budgetdata.find((item) => item.abbreviation === pr);
+    const productNameID =
+      prodkeys && prodkeys[pr] !== undefined
+        ? prodkeys[pr]
+        : matchingProduct && matchingProduct.prodNameID;
+
+    if (Object.keys(selectedCountries).length === 0) {
+      return;
+    }
+
+    if (productNameID === undefined || productNameID === null) {
+      setBdgtresponsemsg(
+        "The product could not be identified. Refresh the budget and try again.",
+      );
+      return;
+    }
+
+    Axios.post("/addbdgtcty", {
+      countries: Object.keys(selectedCountries),
+      pname: productNameID,
+      prodNameID: productNameID,
+      pcatname: activePCatName,
+      year: bdgtyear,
+    })
+      .then(() => {
+        clearCountriesToAdd(pr);
+        closeCountryPickers(pr);
+        setReloadbdgtdata((current) => !current);
+      })
+      .catch((error) => {
+        const message =
+          error.response && error.response.data && error.response.data.error
+            ? error.response.data.error
+            : "The countries could not be added. Please try again.";
+        setBdgtresponsemsg(message);
+      });
+  };
+
   const [reloadbdgdata, setReloadbdgtdata] = useState(false);
+
+  useEffect(() => {
+    if (activePCatName && bdgtyear) {
+      Axios.post("/budgetallocationstatuses", {
+        year: bdgtyear,
+        prodcat: activePCatName,
+      }).then((response) => {
+        const statuses = {};
+
+        if (Array.isArray(response.data)) {
+          response.data.forEach((item) => {
+            statuses[String(item.budgetEntryID)] = item;
+          });
+        }
+
+        setAllocationStatuses(statuses);
+      });
+    }
+  }, [
+    activePCatName,
+    bdgtyear,
+    reloadbdgdata,
+    reloadyearbdgdata,
+    allocationStatusRefresh,
+  ]);
+
+  const openAllocationDrawer = (index, prod, reg, cty, q) => {
+    if (!budgetdata || !budgetdata[index]) {
+      return;
+    }
+
+    const entry = budgetdata[index];
+
+    setSelectedBudgetCell({
+      budgetEntryID: entry.budgetentryID,
+      prodNameID: entry.prodNameID,
+      product: prod,
+      region: reg,
+      country: cty,
+      quarter: Number(q) + 1,
+    });
+    setShowAllocationDrawer(true);
+  };
+
+  const openAllocationFromReview = (cell) => {
+    setSelectedBudgetCell({
+      budgetEntryID: cell.budgetEntryID,
+      prodNameID: cell.prodNameID,
+      product: cell.product,
+      country: cell.country,
+      quarter: cell.quarter,
+    });
+    setShowAllocationDrawer(true);
+  };
 
   const [bdgtlyearsales, setBdgtlyearsales] = useState({});
 
@@ -723,7 +994,7 @@ const Budget2025a = () => {
 
       // console.log(activePCatName);
     }
-  }, [activePCatName, reloadbdgdata]);
+  }, [activePCatName, reloadbdgdata, productAdditionRefresh]);
 
   const [reloadcomments, setReloadcomments] = useState(false);
 
@@ -748,14 +1019,15 @@ const Budget2025a = () => {
     });
   }, [activePCatName, reloadbdgdata, reloadcomments]);
 
-  const [activeCname, setActiveCname] = useState();
-
   const handleProdCatClick = (e, i, item) => {
     e.preventDefault();
+    setProdcountriestoadd({});
+    setShowprodctyadd({});
+    setShowaddcty({});
     setClickedProdCat(i);
-    // setSelectedPN(item.prodCatName);
+    setSelectedPN(item.prodCatName);
+    setCategorySubmitted(false);
     setActivePCatName(item.prodCatNameID);
-    setActiveCname(item.prodCatName);
   };
 
   let ind = 0;
@@ -763,24 +1035,64 @@ const Budget2025a = () => {
   var totalcountry = 0;
   let countryind = 0;
 
-  const [showaddcty, setShowaddcty] = useState();
+  const [showaddcty, setShowaddcty] = useState({});
 
-  const [loadregcties, setLoadregcties] = useState();
+  useEffect(() => {
+    if (categorySubmitted) {
+      setShowprodnamefilter(false);
+      setProdcountriestoadd({});
+      setShowprodctyadd({});
+      setShowaddcty({});
+      setShowdelctybtns({});
+    }
+  }, [categorySubmitted]);
+
+  const [loadregcties, setLoadregcties] = useState({});
 
   const loadregcountries = (reg) => {
     Axios.post("/bdgtloadregcty", { reg }).then((response) => {
-      setLoadregcties({ ...loadregcties, [reg]: [response.data] });
+      setLoadregcties((current) => ({
+        ...(current || {}),
+        [reg]: response.data,
+      }));
     });
   };
 
   const deletectyrow = (pr, ct) => {
-    // console.log(prodkeys[pr], countrykeys[ct]);
     Axios.post("/bdgtdelctyrow", {
       pname: prodkeys[pr],
       countryid: countrykeys[ct],
+      prodcat: activePCatName,
       year: bdgtyear,
     }).then((response) => {
-      setReloadbdgtdata(!reloadbdgdata);
+      navigationRequestRef.current += 1;
+      setProdgroupsbtn(response.data.productGroups || []);
+      setBudgetbtns(response.data.productCategories || []);
+      setReloadyearbdgdata((current) => !current);
+
+      if (response.data.categoryHasRows) {
+        setReloadbdgtdata((current) => !current);
+        return;
+      }
+
+      setBudgetdata([]);
+      setFormatedData({});
+      setOFormatedData({});
+      setIFormatedData({});
+      setBdgtecondata({});
+      setOBdgtecondata({});
+      setIBdgtecondata({});
+      setNumRows(0);
+      setActivePCatName(undefined);
+      setSelectedPN(undefined);
+      setSelectedPG(undefined);
+      setClickedProdCat(undefined);
+      setClickedProdGroup(undefined);
+      setSelectedBudgetRow(null);
+      setSelectedBudgetCell(null);
+      setShowAllocationDrawer(false);
+      setAllocationStatuses({});
+      setShowdelctybtns({});
     });
   };
 
@@ -828,8 +1140,7 @@ const Budget2025a = () => {
 
   useEffect(() => {
     Axios.post("/bdgtlyearsalestotals", { year: bdgtyear }).then((response) => {
-      setLysalestotals(response.data[0]);
-      console.log(response.data);
+      setLysalestotals(response.data);
     });
   }, []);
 
@@ -845,13 +1156,6 @@ const Budget2025a = () => {
   let r2total = 0;
   let r3total = 0;
   let r4total = 0;
-
-  let bdgtq1qtytotal = 0;
-  let bdgtq2qtytotal = 0;
-  let bdgtq3qtytotal = 0;
-  let bdgtq4qtytotal = 0;
-  let bdgtpriceprodtotal = 0;
-  let bdgtprofitprodtotal = 0;
 
   const sumvalues = (data, sstr) => {
     let total = 0;
@@ -908,101 +1212,139 @@ const Budget2025a = () => {
   };
 
   return (
-    <div>
+    <div className="budget-page">
       <div className="bdgttitles">
         <h2 className="bdgttitle">{bdgtyear} Budget</h2>
-        {lock === false && role === 1 ? (
-          <div className="addprodgroup">
-            <button
-              className="addprodbutton"
-              onClick={(e) => {
-                showaddProd();
-              }}
-            >
-              Add Product
-            </button>
-            {showprodnamefilter ? (
-              <div className="addprodpane">
-                <input
-                  ref={searchProdRef}
-                  value={searchterm}
-                  onChange={(e) => {
-                    setSearchterm(e.target.value);
-                  }}
-                  placeholder="Search Product Name"
-                  type="text"
-                />
-                <ul>
-                  {filteredProdnames
-                    ? filteredProdnames.map((item) => {
-                        return [
-                          <div className="addprodrow">
-                            <input
-                              type="checkbox"
-                              name={item.prodNameID}
-                              id={item.prodNameID}
-                              value={item.prodNameID}
-                              onClick={(e) => {
-                                if (e.target.checked) {
-                                  prodstoadd.push(item.prodNameID);
-                                  prodscattoadd.push(item.prodCatNameID);
-                                  // console.log(prodstoadd);
-                                  // console.log(prodscattoadd);
-                                } else {
-                                  for (var i = 0; i < prodstoadd.length; i++) {
-                                    if (prodstoadd[i] === item.prodNameID) {
-                                      prodstoadd.splice(i, 1);
-                                    }
-                                    if (
-                                      prodscattoadd[i] === item.prodCatNameID
-                                    ) {
-                                      prodscattoadd.splice(i, 1);
-                                    }
-                                  }
-                                  // console.log(prodstoadd);
-                                }
-                              }}
-                            />{" "}
-                            <label for={item.prodNameID}>
-                              {item.abbreviation}
-                            </label>
-                          </div>,
-                        ];
-                      })
-                    : "Please add a product."}
+
+        <div className="addprodgroup">
+          <button
+            className={
+              categorySubmitted
+                ? "addprodbutton addprodbutton--disabled"
+                : "addprodbutton"
+            }
+            disabled={categorySubmitted}
+            type="button"
+            onClick={(e) => {
+              showaddProd();
+            }}
+          >
+            Add Product
+          </button>
+          {showprodnamefilter ? (
+            <React.Fragment>
+              <button
+                type="button"
+                className="addproduct-backdrop"
+                aria-label="Close product selector"
+                onClick={closeProductPicker}
+              ></button>
+              <div
+                className="addprodpane"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="add-product-title"
+                onKeyDown={(e) => {
+                  if (e.key === "Escape") {
+                    closeProductPicker();
+                  }
+                }}
+              >
+                <div className="addproduct-header">
+                  <div>
+                    <h3 id="add-product-title">Add products</h3>
+                    <p>
+                      {activePCatName && selectedPN
+                        ? "Search and select products for " + selectedPN + "."
+                        : "Search and select one or more products."}
+                    </p>
+                  </div>
+                  <span>
+                    {Object.keys(selectedProductsToAdd).length} selected
+                  </span>
+                </div>
+                <div className="addproduct-search">
+                  <input
+                    ref={searchProdRef}
+                    value={searchterm}
+                    autoComplete="off"
+                    aria-label="Search products"
+                    onChange={(e) => {
+                      setSearchterm(e.target.value);
+                    }}
+                    placeholder="Search products..."
+                    type="search"
+                  />
+                </div>
+                <ul className="addproduct-list">
+                  {filteredProdnames && filteredProdnames.length > 0 ? (
+                    filteredProdnames.map((item) => {
+                      const checkboxId = "add-product-" + item.prodNameID;
+                      return (
+                        <li className="addprodrow" key={item.prodNameID}>
+                          <input
+                            id={checkboxId}
+                            type="checkbox"
+                            name={item.prodNameID}
+                            value={item.prodNameID}
+                            checked={Boolean(
+                              selectedProductsToAdd[item.prodNameID],
+                            )}
+                            onChange={(e) => {
+                              setProductToAdd(item, e.target.checked);
+                            }}
+                          />
+                          <label htmlFor={checkboxId}>
+                            <strong>{item.abbreviation}</strong>
+                            {item.productGroup ? (
+                              <span>{item.productGroup}</span>
+                            ) : null}
+                          </label>
+                        </li>
+                      );
+                    })
+                  ) : (
+                    <li className="addproduct-empty">
+                      No matching products available.
+                    </li>
+                  )}
                 </ul>
                 <div className="addprodcanceladd">
                   <button
                     className="cancelprodbutton"
-                    onClick={(e) => {
-                      setShowprodnamefilter(false);
-                      setSearchterm("");
-                    }}
+                    type="button"
+                    disabled={addingProducts}
+                    onClick={closeProductPicker}
                   >
                     Cancel
                   </button>
                   <button
-                    onClick={(e) => {
-                      addprod();
-                    }}
+                    onClick={addprod}
                     className="addprodbutton"
+                    type="button"
+                    disabled={
+                      Object.keys(selectedProductsToAdd).length === 0 ||
+                      addingProducts
+                    }
                   >
-                    Confirm
+                    {addingProducts ? "Adding..." : "Add selected"}
                   </button>
                 </div>
               </div>
-            ) : (
-              ""
-            )}
-          </div>
-        ) : (
-          ""
-        )}
-        {lock === false && role === 1 ? (
-          <ExportToCSV csvData={bdgtregiondta} fileName={"budget2024"} />
-        ) : (
-          ""
-        )}
+            </React.Fragment>
+          ) : (
+            ""
+          )}
+        </div>
+        <ExportToCSV csvData={bdgtregiondta} fileName={"budget" + bdgtyear} />
+        <BudgetCategorySubmission
+          year={bdgtyear}
+          prodCatNameID={activePCatName}
+          prodCatName={selectedPN}
+          refreshKey={allocationStatusRefresh}
+          onOpenAllocation={openAllocationFromReview}
+          onSubmittedChange={setCategorySubmitted}
+        />
       </div>
       <div className="bdgttotals">
         <ul className="bdgttotalsul">
@@ -1019,17 +1361,6 @@ const Budget2025a = () => {
             </p>
             <p className="bdgttyearname">Quantity</p>
             <div className="bdgtlyearfigs">
-              <p>{bdgtyear - 1} YTD:</p>
-              <p>
-                {lysalestotals && lysalestotals["quantity"]
-                  ? lysalestotals["quantity"]
-                      .toFixed()
-                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                  : ""}{" "}
-                mt
-              </p>
-            </div>
-            <div className="bdgtlyearfigs">
               <p>{bdgtyear - 1} Budget:</p>
               <p>
                 {budgetyeartotals &&
@@ -1045,7 +1376,7 @@ const Budget2025a = () => {
             <div className="bdgtlyearfigs">
               <p>{bdgtyear - 2} Budget:</p>
 
-              <p>156,019 mt</p>
+              <p>115,479 mt</p>
               {/* <p>152,915 mt</p> */}
             </div>
           </li>
@@ -1061,17 +1392,6 @@ const Budget2025a = () => {
                 : 0}
             </p>
             <p className="bdgttyearname">Revenue</p>
-            <div className="bdgtlyearfigs">
-              <p>{bdgtyear - 1} YTD:</p>
-              <p>
-                {lysalestotals && lysalestotals["revenue"]
-                  ? "$" +
-                    lysalestotals["revenue"]
-                      .toFixed()
-                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                  : ""}
-              </p>
-            </div>
             <div className="bdgtlyearfigs">
               <p>{bdgtyear - 1} Budget:</p>
               <p>
@@ -1103,17 +1423,6 @@ const Budget2025a = () => {
                 : 0}
             </p>
             <p className="bdgttyearname">Profit</p>
-            <div className="bdgtlyearfigs">
-              <p>{bdgtyear - 1} YTD:</p>
-              <p>
-                {lysalestotals && lysalestotals["profit"]
-                  ? "$" +
-                    lysalestotals["profit"]
-                      .toFixed()
-                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                  : ""}
-              </p>
-            </div>
             <div className="bdgtlyearfigs">
               <p>{bdgtyear - 1} Budget:</p>
               <p>
@@ -1149,19 +1458,6 @@ const Budget2025a = () => {
             </p>
             <p className="bdgttyearname">Avg Profit</p>
             <div className="bdgtlyearfigs">
-              <p>{bdgtyear - 1} YTD:</p>
-              <p>
-                {lysalestotals &&
-                lysalestotals["quantity"] &&
-                lysalestotals["profit"]
-                  ? "$" +
-                    (lysalestotals["profit"] / lysalestotals["quantity"])
-                      .toFixed()
-                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                  : ""}
-              </p>
-            </div>
-            <div className="bdgtlyearfigs">
               <p>{bdgtyear - 1} Budget:</p>
               <p>
                 {budgetyeartotals &&
@@ -1196,20 +1492,6 @@ const Budget2025a = () => {
                 : 0}
             </p>
             <p className="bdgttyearname">Margin</p>
-            <div className="bdgtlyearfigs">
-              <p>{bdgtyear - 1} YTD:</p>
-              <p>
-                {lysalestotals &&
-                lysalestotals["profit"] &&
-                lysalestotals["revenue"]
-                  ? (
-                      (lysalestotals["profit"] / lysalestotals["revenue"]) *
-                      100
-                    ).toFixed(1)
-                  : ""}
-                %
-              </p>
-            </div>
             <div className="bdgtlyearfigs">
               <p>{bdgtyear - 1} Budget:</p>
               <p>
@@ -1323,25 +1605,44 @@ const Budget2025a = () => {
                     let q4prodtotal = 0;
                     let pricetotal = 0;
                     let profittotal = 0;
+                    const normalizedCountrySearch = countrySearch
+                      .trim()
+                      .toLowerCase();
+                    const filteredFullCountryList = fullcountrylist
+                      ? fullcountrylist.filter((countryItem) => {
+                          return (
+                            normalizedCountrySearch === "" ||
+                            String(countryItem.country)
+                              .toLowerCase()
+                              .indexOf(normalizedCountrySearch) !== -1
+                          );
+                        })
+                      : [];
                     return [
-                      <div className="bdgtpnametable">
+                      <div className="bdgtpnametable" key={prod}>
                         <div className="bdgtpnametabletitle">
                           <h3>
                             {bdgtyear} {prod} Budget
                           </h3>
-                          {lock === false ? (
+                          {!categorySubmitted ? (
                             <FontAwesomeIcon
                               icon={faPlusCircle}
                               onClick={(e) => {
-                                setShowprodctyadd({
-                                  ...showprodctyadd,
-                                  [prod]: !showprodctyadd[prod],
-                                });
+                                const willOpen = !(
+                                  showprodctyadd && showprodctyadd[prod]
+                                );
+                                clearCountriesToAdd(prod);
+                                setShowaddcty((current) => ({
+                                  ...(current || {}),
+                                  [prod]: {},
+                                }));
+                                setShowprodctyadd((current) => ({
+                                  ...(current || {}),
+                                  [prod]: willOpen,
+                                }));
                               }}
                             />
-                          ) : (
-                            ""
-                          )}
+                          ) : null}
                           <div
                             className={
                               showprodctyadd && showprodctyadd[prod]
@@ -1350,64 +1651,77 @@ const Budget2025a = () => {
                             }
                           >
                             <h4>Select countries to add.</h4>
+                            <div className="bdgtcountrysearch">
+                              <input
+                                type="search"
+                                value={countrySearch}
+                                autoComplete="off"
+                                placeholder="Search countries..."
+                                aria-label="Search countries"
+                                onChange={(e) => {
+                                  setCountrySearch(e.target.value);
+                                }}
+                              />
+                            </div>
                             <div className="bdgtselectctycty">
-                              {fullcountrylist
-                                ? fullcountrylist.map((ctyel) => {
-                                    return (
-                                      <div className="addctyrow">
-                                        <input
-                                          type="checkbox"
-                                          name={ctyel.countryID}
-                                          onClick={(e) => {
-                                            if (
-                                              e.target.checked &&
-                                              prodcountriestoadd
-                                            ) {
-                                              setProdcountriestoadd({
-                                                ...prodcountriestoadd,
-                                                [prod]: {
-                                                  ...prodcountriestoadd[prod],
-                                                  [ctyel.countryID]:
-                                                    ctyel.country,
-                                                },
-                                              });
-                                            } else {
-                                              setProdcountriestoadd(
-                                                (current) => {
-                                                  const copy = {
-                                                    ...current,
-                                                  };
-                                                  delete copy[prod][
-                                                    ctyel.countryID
-                                                  ];
-                                                  return copy;
-                                                }
-                                              );
-                                            }
-                                          }}
-                                        />
-                                        <label for={ctyel.countyID}>
-                                          {ctyel.country}
-                                        </label>
-                                      </div>
-                                    );
-                                  })
-                                : ""}
+                              {filteredFullCountryList.length > 0 ? (
+                                filteredFullCountryList.map((ctyel) => {
+                                  const checkboxId =
+                                    "all-" + prod + "-" + ctyel.countryID;
+                                  return (
+                                    <div
+                                      className="addctyrow"
+                                      key={ctyel.countryID}
+                                    >
+                                      <input
+                                        id={checkboxId}
+                                        type="checkbox"
+                                        name={ctyel.countryID}
+                                        checked={Boolean(
+                                          prodcountriestoadd[prod] &&
+                                            prodcountriestoadd[prod][
+                                              ctyel.countryID
+                                            ],
+                                        )}
+                                        onChange={(e) => {
+                                          setCountryToAdd(
+                                            prod,
+                                            ctyel,
+                                            e.target.checked,
+                                          );
+                                          setCountrySearch("");
+                                        }}
+                                      />
+                                      <label htmlFor={checkboxId}>
+                                        {ctyel.country}
+                                      </label>
+                                    </div>
+                                  );
+                                })
+                              ) : (
+                                <p className="bdgtcountrysearch__empty">
+                                  No countries found.
+                                </p>
+                              )}
                             </div>
                             <div className="addprodcanceladd">
                               <button
                                 className="cancelprodbutton"
+                                type="button"
                                 onClick={(e) => {
-                                  setShowprodctyadd({
-                                    ...showprodctyadd,
-                                    [prod]: false,
-                                  });
+                                  cancelCountrySelection(prod);
                                 }}
                               >
                                 Cancel
                               </button>
                               <button
                                 className="addprodbutton"
+                                type="button"
+                                disabled={
+                                  !prodcountriestoadd[prod] ||
+                                  Object.keys(prodcountriestoadd[prod])
+                                    .length === 0
+                                }
                                 onClick={(e) => {
                                   addbdgtcountry(prod);
                                 }}
@@ -1508,19 +1822,12 @@ const Budget2025a = () => {
                                                 "3"
                                               ]);
                                       }
-                                    }
+                                    },
                                   );
                                   q1prodtotal = q1prodtotal + q1reg;
                                   q2prodtotal = q2prodtotal + q2reg;
                                   q3prodtotal = q3prodtotal + q3reg;
                                   q4prodtotal = q4prodtotal + q4reg;
-
-                                  bdgtq1qtytotal = bdgtq1qtytotal + q1reg;
-                                  bdgtq2qtytotal = bdgtq2qtytotal + q2reg;
-                                  bdgtq3qtytotal = bdgtq3qtytotal + q3reg;
-                                  bdgtq4qtytotal = bdgtq4qtytotal + q4reg;
-
-                                  // console.log(bdgtq1qtytotal);
 
                                   let regprice =
                                     priceqty === 0
@@ -1535,33 +1842,39 @@ const Budget2025a = () => {
                                         (q1reg + q2reg + q3reg + q4reg);
                                   pricetotal = pricetotal + priceqty;
                                   profittotal = profittotal + profitqty;
-
-                                  bdgtpriceprodtotal =
-                                    bdgtpriceprodtotal + priceqty;
-                                  bdgtprofitprodtotal =
-                                    bdgtprofitprodtotal + profitqty;
-
                                   return [
-                                    <tr className="bdgtregionrow">
+                                    <tr
+                                      className="bdgtregionrow"
+                                      key={prod + "-" + reg}
+                                    >
                                       <td className="bdgtregioncol">
-                                        {lock === false ? (
+                                        {!categorySubmitted ? (
                                           <FontAwesomeIcon
                                             className="bdgtctyrowadd"
                                             icon={faPlusCircle}
                                             onClick={(e) => {
-                                              setShowaddcty({
-                                                ...showaddcty,
-                                                [prod]: {
-                                                  ...showaddcty[prod],
-                                                  [reg]: !showaddcty[prod][reg],
-                                                },
-                                              });
-                                              loadregcountries(reg);
+                                              const willOpen = !(
+                                                showaddcty &&
+                                                showaddcty[prod] &&
+                                                showaddcty[prod][reg]
+                                              );
+                                              clearCountriesToAdd(prod);
+                                              setShowprodctyadd((current) => ({
+                                                ...(current || {}),
+                                                [prod]: false,
+                                              }));
+                                              setShowaddcty((current) => ({
+                                                ...(current || {}),
+                                                [prod]: willOpen
+                                                  ? { [reg]: true }
+                                                  : {},
+                                              }));
+                                              if (willOpen) {
+                                                loadregcountries(reg);
+                                              }
                                             }}
                                           />
-                                        ) : (
-                                          ""
-                                        )}
+                                        ) : null}
                                         {reg === "Latin America"
                                           ? "L. America"
                                           : reg}
@@ -1571,7 +1884,7 @@ const Budget2025a = () => {
                                               ? showaddcty[prod][reg]
                                                 ? "bdgtselectcty showbdgtpane"
                                                 : "bdgtselectcty hidebdgtpane"
-                                              : ""
+                                              : "bdgtselectcty hidebdgtpane"
                                           }
                                         >
                                           <h4>
@@ -1579,72 +1892,69 @@ const Budget2025a = () => {
                                           </h4>
                                           <div className="bdgtselectctycty">
                                             {loadregcties && loadregcties[reg]
-                                              ? loadregcties[reg][0].map(
-                                                  (el) => (
-                                                    <div className="addctyrow">
+                                              ? loadregcties[reg].map((el) => {
+                                                  const checkboxId =
+                                                    "region-" +
+                                                    prod +
+                                                    "-" +
+                                                    reg +
+                                                    "-" +
+                                                    el.countryID;
+                                                  return (
+                                                    <div
+                                                      className="addctyrow"
+                                                      key={el.countryID}
+                                                    >
                                                       <input
+                                                        id={checkboxId}
                                                         type="checkbox"
                                                         name={el.countryID}
                                                         value={prod}
-                                                        onClick={(e) => {
-                                                          if (
-                                                            e.target.checked &&
-                                                            prodcountriestoadd
-                                                          ) {
-                                                            setProdcountriestoadd(
-                                                              {
-                                                                ...prodcountriestoadd,
-                                                                [prod]: {
-                                                                  ...prodcountriestoadd[
-                                                                    prod
-                                                                  ],
-                                                                  [el.countryID]:
-                                                                    el.country,
-                                                                },
-                                                              }
-                                                            );
-                                                          } else {
-                                                            setProdcountriestoadd(
-                                                              (current) => {
-                                                                const copy = {
-                                                                  ...current,
-                                                                };
-                                                                delete copy[
-                                                                  prod
-                                                                ][el.countryID];
-                                                                return copy;
-                                                              }
-                                                            );
-                                                          }
+                                                        checked={Boolean(
+                                                          prodcountriestoadd[
+                                                            prod
+                                                          ] &&
+                                                            prodcountriestoadd[
+                                                              prod
+                                                            ][el.countryID],
+                                                        )}
+                                                        onChange={(e) => {
+                                                          setCountryToAdd(
+                                                            prod,
+                                                            el,
+                                                            e.target.checked,
+                                                          );
                                                         }}
                                                       />
-                                                      <label for={el.countryID}>
+                                                      <label
+                                                        htmlFor={checkboxId}
+                                                      >
                                                         {el.country}
                                                       </label>
                                                     </div>
-                                                  )
-                                                )
+                                                  );
+                                                })
                                               : ""}
                                           </div>
                                           <div className="addprodcanceladd">
                                             <button
                                               className="cancelprodbutton"
+                                              type="button"
                                               onClick={(e) => {
-                                                setShowaddcty({
-                                                  ...showaddcty,
-                                                  [prod]: {
-                                                    ...showaddcty[prod],
-                                                    [reg]: !showaddcty[prod][
-                                                      reg
-                                                    ],
-                                                  },
-                                                });
+                                                cancelCountrySelection(prod);
                                               }}
                                             >
                                               Cancel
                                             </button>
                                             <button
                                               className="addprodbutton"
+                                              type="button"
+                                              disabled={
+                                                !prodcountriestoadd[prod] ||
+                                                Object.keys(
+                                                  prodcountriestoadd[prod],
+                                                ).length === 0
+                                              }
                                               onClick={(e) => {
                                                 addbdgtcountry(prod);
                                               }}
@@ -1683,7 +1993,7 @@ const Budget2025a = () => {
                                             .toFixed(0)
                                             .replace(
                                               /\B(?=(\d{3})+(?!\d))/g,
-                                              ","
+                                              ",",
                                             )}
                                       </td>
                                       <td className="bdgtregioncolttl">
@@ -1692,7 +2002,7 @@ const Budget2025a = () => {
                                             .toFixed(0)
                                             .replace(
                                               /\B(?=(\d{3})+(?!\d))/g,
-                                              ","
+                                              ",",
                                             )}
                                       </td>
                                       <td className="bdgtregioncolttl">
@@ -1704,7 +2014,7 @@ const Budget2025a = () => {
                                             .toFixed(0)
                                             .replace(
                                               /\B(?=(\d{3})+(?!\d))/g,
-                                              ","
+                                              ",",
                                             )}
                                       </td>
                                       <td className="bdgtregioncolttl">
@@ -1729,7 +2039,7 @@ const Budget2025a = () => {
                                                 : cty}
                                             </td>
                                             {Object.keys(
-                                              formatedData[prod][reg][cty]
+                                              formatedData[prod][reg][cty],
                                             ).map((q) => {
                                               let index = ind;
                                               // console.log(index);
@@ -1738,10 +2048,13 @@ const Budget2025a = () => {
                                                 <td
                                                   onContextMenu={async (e) => {
                                                     e.preventDefault();
-                                                    //Right click
+
                                                     const clickdone = await delayedclicked();
-                                                    //Give focus to new comment textarea
-                                                    if (clickdone === true) {
+                                                    if (
+                                                      // commentRef &&
+                                                      clickdone === true
+                                                    ) {
+                                                      // console.log("how");
                                                       commentRef.current.focus();
                                                     }
                                                     setPoints({
@@ -1750,6 +2063,7 @@ const Budget2025a = () => {
                                                       // x: 0,
                                                       // y: 0,
                                                     });
+                                                    // console.log("Right Click");
                                                   }}
                                                   className={
                                                     budgetdata &&
@@ -1758,7 +2072,7 @@ const Budget2025a = () => {
                                                         bdgtcommentset.includes(
                                                           budgetdata[index][
                                                             "budgetentryID"
-                                                          ]
+                                                          ],
                                                         )
                                                         ? "bdgtdatacol cellwithcomment"
                                                         : "bdgtdatacol"
@@ -1780,7 +2094,7 @@ const Budget2025a = () => {
                                                           bdgtcommentset.includes(
                                                             budgetdata[index][
                                                               "budgetentryID"
-                                                            ]
+                                                            ],
                                                           )
                                                           ? "cellwithcomment"
                                                           : ""
@@ -1788,19 +2102,21 @@ const Budget2025a = () => {
                                                     }`}
                                                   >
                                                     <input
+                                                      disabled={
+                                                        categorySubmitted
+                                                      }
                                                       value={
                                                         formatedData[prod][reg][
                                                           cty
                                                         ][q]
                                                       }
-                                                      // readOnly
                                                       onChange={(e) => {
                                                         handleChange1(
                                                           e,
                                                           prod,
                                                           reg,
                                                           cty,
-                                                          q
+                                                          q,
                                                         );
                                                       }}
                                                       className={
@@ -1810,13 +2126,18 @@ const Budget2025a = () => {
                                                             bdgtcommentset.includes(
                                                               budgetdata[index][
                                                                 "budgetentryID"
-                                                              ]
+                                                              ],
                                                             )
                                                             ? "cell-input cellwithcomment"
                                                             : "cell-input"
                                                           : ""
                                                       }
                                                       onFocus={(e) => {
+                                                        setSelectedBudgetRow({
+                                                          product: prod,
+                                                          region: reg,
+                                                          country: cty,
+                                                        });
                                                         setActiveIndex(index);
                                                         e.target.select();
                                                         setEditingQty(true);
@@ -1836,7 +2157,7 @@ const Budget2025a = () => {
                                                           prod,
                                                           reg,
                                                           cty,
-                                                          q
+                                                          q,
                                                         );
                                                         setShowmsg(!showmsg);
                                                       }}
@@ -1849,6 +2170,91 @@ const Budget2025a = () => {
                                                           : ""
                                                       }
                                                     />
+                                                    {budgetdata &&
+                                                    budgetdata[index] &&
+                                                    Number(
+                                                      formatedData[prod][reg][
+                                                        cty
+                                                      ][q],
+                                                    ) > 0 ? (
+                                                      <button
+                                                        type="button"
+                                                        className={
+                                                          "allocation-cell-indicator allocation-cell-indicator--" +
+                                                          (allocationStatuses[
+                                                            String(
+                                                              budgetdata[index][
+                                                                "budgetentryID"
+                                                              ],
+                                                            )
+                                                          ]
+                                                            ? allocationStatuses[
+                                                                String(
+                                                                  budgetdata[
+                                                                    index
+                                                                  ][
+                                                                    "budgetentryID"
+                                                                  ],
+                                                                )
+                                                              ].status
+                                                            : "incomplete")
+                                                        }
+                                                        data-tooltip={
+                                                          allocationStatuses[
+                                                            String(
+                                                              budgetdata[index][
+                                                                "budgetentryID"
+                                                              ],
+                                                            )
+                                                          ]
+                                                            ? Number(
+                                                                allocationStatuses[
+                                                                  String(
+                                                                    budgetdata[
+                                                                      index
+                                                                    ][
+                                                                      "budgetentryID"
+                                                                    ],
+                                                                  )
+                                                                ]
+                                                                  .allocatedQuantity,
+                                                              ).toLocaleString() +
+                                                              " of " +
+                                                              Number(
+                                                                allocationStatuses[
+                                                                  String(
+                                                                    budgetdata[
+                                                                      index
+                                                                    ][
+                                                                      "budgetentryID"
+                                                                    ],
+                                                                  )
+                                                                ]
+                                                                  .budgetQuantity,
+                                                              ).toLocaleString() +
+                                                              " mt allocated"
+                                                            : "Customer and origin allocation required"
+                                                        }
+                                                        aria-label="Open customer and origin allocations"
+                                                        onMouseDown={(e) => {
+                                                          e.preventDefault();
+                                                          e.stopPropagation();
+                                                        }}
+                                                        onClick={(e) => {
+                                                          e.preventDefault();
+                                                          e.stopPropagation();
+                                                          openAllocationDrawer(
+                                                            index,
+                                                            prod,
+                                                            reg,
+                                                            cty,
+                                                            q,
+                                                          );
+                                                        }}
+                                                      >
+                                                        <span aria-hidden="true"></span>
+                                                      </button>
+                                                    ) : null}
                                                     {clicked &&
                                                       activeIndex === index && (
                                                         <div
@@ -1870,7 +2276,7 @@ const Budget2025a = () => {
                                                             <li className="bdgtcomment">
                                                               {bdgtcomments &&
                                                               Array.isArray(
-                                                                bdgtcomments
+                                                                bdgtcomments,
                                                               )
                                                                 ? bdgtcomments.map(
                                                                     (comm) => {
@@ -1899,17 +2305,17 @@ const Budget2025a = () => {
                                                                               }
                                                                               className="commenticon"
                                                                               onClick={(
-                                                                                e
+                                                                                e,
                                                                               ) => {
                                                                                 deleteComment(
-                                                                                  comm.bdgtcommentID
+                                                                                  comm.bdgtcommentID,
                                                                                 );
                                                                               }}
                                                                             />
                                                                           </div>,
                                                                         ];
                                                                       }
-                                                                    }
+                                                                    },
                                                                   )
                                                                 : ""}
                                                             </li>
@@ -1918,11 +2324,11 @@ const Budget2025a = () => {
                                                                 ref={commentRef}
                                                                 maxLength={200}
                                                                 onChange={(
-                                                                  e
+                                                                  e,
                                                                 ) => {
                                                                   setNewcomment(
                                                                     e.target
-                                                                      .value
+                                                                      .value,
                                                                   );
                                                                   // console.log(
                                                                   //   budgetdata[
@@ -1939,7 +2345,7 @@ const Budget2025a = () => {
                                                             <li>
                                                               <button
                                                                 onClick={(
-                                                                  e
+                                                                  e,
                                                                 ) => {
                                                                   e.preventDefault();
 
@@ -1953,7 +2359,7 @@ const Budget2025a = () => {
                                                                       index
                                                                     ][
                                                                       "prodCatNameID"
-                                                                    ]
+                                                                    ],
                                                                   );
                                                                 }}
                                                               >
@@ -1986,6 +2392,7 @@ const Budget2025a = () => {
                                             <td className="bdgtctyeconomics">
                                               <input
                                                 className="cell-input"
+                                                disabled={categorySubmitted}
                                                 value={
                                                   bdgtecondata &&
                                                   bdgtecondata[prod] &&
@@ -2007,11 +2414,15 @@ const Budget2025a = () => {
                                                     prod,
                                                     reg,
                                                     cty,
-                                                    "price"
+                                                    "price",
                                                   );
                                                 }}
-                                                // readOnly
                                                 onFocus={(e) => {
+                                                  setSelectedBudgetRow({
+                                                    product: prod,
+                                                    region: reg,
+                                                    country: cty,
+                                                  });
                                                   setActiveEconIndex(indexecon);
                                                   e.target.select();
                                                   setEditingQty(false);
@@ -2030,7 +2441,7 @@ const Budget2025a = () => {
                                                     prod,
                                                     reg,
                                                     cty,
-                                                    "price"
+                                                    "price",
                                                   );
                                                   setShowmsg(!showmsg);
                                                 }}
@@ -2038,8 +2449,8 @@ const Budget2025a = () => {
                                             </td>
                                             <td className="bdgtctyeconomics">
                                               <input
-                                                // readOnly
                                                 className="cell-input"
+                                                disabled={categorySubmitted}
                                                 value={
                                                   bdgtecondata &&
                                                   bdgtecondata[prod] &&
@@ -2061,12 +2472,17 @@ const Budget2025a = () => {
                                                     prod,
                                                     reg,
                                                     cty,
-                                                    "profit"
+                                                    "profit",
                                                   );
                                                 }}
                                                 onFocus={(e) => {
+                                                  setSelectedBudgetRow({
+                                                    product: prod,
+                                                    region: reg,
+                                                    country: cty,
+                                                  });
                                                   setActiveEconIndex(
-                                                    indexecon + 1
+                                                    indexecon + 1,
                                                   );
                                                   e.target.select();
                                                   setEditingQty(false);
@@ -2085,7 +2501,7 @@ const Budget2025a = () => {
                                                     prod,
                                                     reg,
                                                     cty,
-                                                    "profit"
+                                                    "profit",
                                                   );
                                                   setShowmsg(!showmsg);
                                                 }}
@@ -2144,56 +2560,67 @@ const Budget2025a = () => {
                                                   ).toFixed(1) + "%"
                                                 : "0%"}
                                             </td>
-                                            {lock === false ? (
-                                              <FontAwesomeIcon
-                                                className="bdgtctydelete"
-                                                icon={faMinusCircle}
-                                                onClick={(e) => {
-                                                  setShowdelctybtns({
-                                                    ...showdelctybtns,
-                                                    [prod]: {
-                                                      ...showdelctybtns[prod],
-                                                      [reg]: {
-                                                        ...showdelctybtns[prod][
-                                                          reg
-                                                        ],
-                                                        [cty]: !showdelctybtns[
+                                            {!categorySubmitted ? (
+                                              <React.Fragment>
+                                                <FontAwesomeIcon
+                                                  className="bdgtctydelete"
+                                                  icon={faMinusCircle}
+                                                  onClick={(e) => {
+                                                    setShowdelctybtns({
+                                                      ...showdelctybtns,
+                                                      [prod]: {
+                                                        ...(showdelctybtns[
                                                           prod
-                                                        ][reg][cty],
+                                                        ] || {}),
+                                                        [reg]: {
+                                                          ...((showdelctybtns[
+                                                            prod
+                                                          ] &&
+                                                            showdelctybtns[
+                                                              prod
+                                                            ][reg]) ||
+                                                            {}),
+                                                          [cty]: !(
+                                                            showdelctybtns[
+                                                              prod
+                                                            ] &&
+                                                            showdelctybtns[
+                                                              prod
+                                                            ][reg] &&
+                                                            showdelctybtns[
+                                                              prod
+                                                            ][reg][cty]
+                                                          ),
+                                                        },
                                                       },
-                                                    },
-                                                  });
-                                                }}
-                                              />
-                                            ) : (
-                                              ""
-                                            )}
-                                            {lock === false ? (
-                                              <button
-                                                className={
-                                                  showdelctybtns &&
-                                                  showdelctybtns[prod] &&
-                                                  showdelctybtns[prod][reg][
-                                                    cty
-                                                  ] === true
-                                                    ? "bdgtctydeletebtn showbdgtpane"
-                                                    : "bdgtctydeletebtn hidebdgtpane"
-                                                }
-                                                onClick={(e) => {
-                                                  deletectyrow(prod, cty);
-                                                }}
-                                              >
-                                                Delete
-                                              </button>
-                                            ) : (
-                                              ""
-                                            )}
+                                                    });
+                                                  }}
+                                                />
+                                                <button
+                                                  className={
+                                                    showdelctybtns &&
+                                                    showdelctybtns[prod] &&
+                                                    showdelctybtns[prod][reg] &&
+                                                    showdelctybtns[prod][reg][
+                                                      cty
+                                                    ] === true
+                                                      ? "bdgtctydeletebtn showbdgtpane"
+                                                      : "bdgtctydeletebtn hidebdgtpane"
+                                                  }
+                                                  onClick={(e) => {
+                                                    deletectyrow(prod, cty);
+                                                  }}
+                                                >
+                                                  Delete
+                                                </button>
+                                              </React.Fragment>
+                                            ) : null}
                                           </tr>,
                                         ];
-                                      }
+                                      },
                                     ),
                                   ];
-                                }
+                                },
                               )}
                               <tr>
                                 <td className="bdgttotal">Total</td>
@@ -2270,93 +2697,16 @@ const Budget2025a = () => {
                     ];
                   })
                 : ""}
-              {formatedData ? (
-                <div className="bdgtpnametable">
-                  <div className="bdgtpnametabletitle">
-                    <h3>
-                      {bdgtyear} Total {activeCname} Summary
-                    </h3>
-                  </div>
-                  <div className="board">
-                    <table>
-                      <thead>
-                        <tr>
-                          <td className="countrycol">Total Summary</td>
-                          <td className="bdgtdatacol">Q1</td>
-                          <td className="bdgtdatacol">Q2</td>
-                          <td className="bdgtdatacol">Q3</td>
-                          <td className="bdgtdatacol">Q4</td>
-                          <td className="bdgtdatacol">Total</td>
-                          <td className="bdgtcolseparation"></td>
-                          <td className="bdgtdatacol">Price</td>
-                          <td className="bdgtdatacol">Profit</td>
-                          <td className="bdgtdatacol">Ttl Profit</td>
-                          <td className="bdgtdatacol">% Mgn</td>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td className="countrycol bdgtctyttl">Global</td>
-                          <td className="bdgtprodtotals">{bdgtq1qtytotal}</td>
-                          <td className="bdgtprodtotals">{bdgtq2qtytotal}</td>
-                          <td className="bdgtprodtotals">{bdgtq3qtytotal}</td>
-                          <td className="bdgtprodtotals">{bdgtq4qtytotal}</td>
-
-                          <td className="bdgtprodtotals bdgtcountrytotals">
-                            {bdgtq1qtytotal +
-                              bdgtq2qtytotal +
-                              bdgtq3qtytotal +
-                              bdgtq4qtytotal}
-                          </td>
-                          <td className="bdgtcolseparation"></td>
-                          <td className="bdgtctyeconomics bdgtprodtotals">
-                            {"$ " +
-                              (
-                                bdgtpriceprodtotal /
-                                (bdgtq1qtytotal +
-                                  bdgtq2qtytotal +
-                                  bdgtq3qtytotal +
-                                  bdgtq4qtytotal)
-                              ).toFixed(0)}
-                          </td>
-                          <td className="bdgtctyeconomics bdgtprodtotals">
-                            {"$ " +
-                              (
-                                bdgtprofitprodtotal /
-                                (bdgtq1qtytotal +
-                                  bdgtq2qtytotal +
-                                  bdgtq3qtytotal +
-                                  bdgtq4qtytotal)
-                              ).toFixed(0)}
-                          </td>
-                          <td
-                            className="bdgtctyeconomics bdgtprodtotals"
-                            style={{ width: "auto" }}
-                          >
-                            {"$ " + bdgtprofitprodtotal}
-                          </td>
-                          <td
-                            className="bdgtctyeconomics bdgtprodtotals"
-                            style={{ width: "auto" }}
-                          >
-                            {(
-                              (bdgtprofitprodtotal / bdgtpriceprodtotal) *
-                              100
-                            ).toFixed(0) + "%"}
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              ) : (
-                ""
-              )}
             </div>
             <span className="bdgtresponsemsg" ref={refresmsg}>
               {bdgtresponsemsg}
             </span>
           </div>
+          <BudgetRowHistory
+            row={selectedBudgetRow}
+            year={bdgtyear}
+            prodCatNameID={activePCatName}
+          />
           <div className="lyearfigures">
             {formatedData && bdgtlyearsales
               ? Object.keys(formatedData).map((prod) => {
@@ -2415,7 +2765,7 @@ const Budget2025a = () => {
                                     "totalprofit"
                                   ];
                               }
-                            }
+                            },
                           );
                           return [
                             <tr>
@@ -2723,7 +3073,7 @@ const Budget2025a = () => {
                                       "avgprofit"
                                     ];
                               }
-                            }
+                            },
                           );
                           return [
                             <tr>
@@ -2950,8 +3300,48 @@ const Budget2025a = () => {
               : ""}
           </div>
         </div>
-        <div className="budgetbyprod">
-          <h4>Budget Summary Figures {bdgtyear}</h4>
+        {showBudgetSummary && (
+          <button
+            className="budget-summary-backdrop"
+            aria-label="Close budget summary"
+            onClick={() => setShowBudgetSummary(false)}
+          />
+        )}
+        <aside
+          id="budget-summary-drawer"
+          className={
+            showBudgetSummary
+              ? "budgetbyprod budgetbyprod--open"
+              : "budgetbyprod"
+          }
+          aria-hidden={!showBudgetSummary}
+        >
+          <button
+            className="budget-summary-toggle"
+            type="button"
+            aria-controls="budget-summary-drawer"
+            aria-expanded={showBudgetSummary}
+            aria-label={
+              showBudgetSummary ? "Hide budget summary" : "Show budget summary"
+            }
+            onClick={() => setShowBudgetSummary(!showBudgetSummary)}
+          >
+            <span aria-hidden="true">{showBudgetSummary ? "›" : "‹"}</span>
+            <span className="budget-summary-toggle__text">Summary</span>
+          </button>
+          <div className="budget-summary-heading">
+            <div>
+              <span>Budget analysis</span>
+              <h4>Budget Summary Figures {bdgtyear}</h4>
+            </div>
+            <button
+              type="button"
+              aria-label="Close budget summary"
+              onClick={() => setShowBudgetSummary(false)}
+            >
+              ×
+            </button>
+          </div>
 
           <div className="bdgtsummarybuttons1">
             <p>Level 1:</p>
@@ -3213,7 +3603,7 @@ const Budget2025a = () => {
                                           .toFixed(1)
                                           .replace(
                                             /\B(?=(\d{3})+(?!\d))/g,
-                                            ","
+                                            ",",
                                           ) + "%"
                                       : "-"}
                                   </p>
@@ -3241,7 +3631,7 @@ const Budget2025a = () => {
                                           .toFixed(1)
                                           .replace(
                                             /\B(?=(\d{3})+(?!\d))/g,
-                                            ","
+                                            ",",
                                           ) + "%"
                                       : "-"}
                                   </p>
@@ -3269,7 +3659,7 @@ const Budget2025a = () => {
                                           .toFixed(1)
                                           .replace(
                                             /\B(?=(\d{3})+(?!\d))/g,
-                                            ","
+                                            ",",
                                           ) + "%"
                                       : "-"}
                                   </p>
@@ -3297,7 +3687,7 @@ const Budget2025a = () => {
                                           .toFixed(1)
                                           .replace(
                                             /\B(?=(\d{3})+(?!\d))/g,
-                                            ","
+                                            ",",
                                           ) + "%"
                                       : "-"}
                                   </p>
@@ -3332,7 +3722,7 @@ const Budget2025a = () => {
                                           .toFixed(1)
                                           .replace(
                                             /\B(?=(\d{3})+(?!\d))/g,
-                                            ","
+                                            ",",
                                           ) + "%"
                                       : "-"}
                                   </p>
@@ -3453,7 +3843,7 @@ const Budget2025a = () => {
                                                 .toFixed(0)
                                                 .replace(
                                                   /\B(?=(\d{3})+(?!\d))/g,
-                                                  ","
+                                                  ",",
                                                 )
                                             : summarygroupby3 === "profit"
                                             ? "$ " +
@@ -3461,7 +3851,7 @@ const Budget2025a = () => {
                                                 .toFixed(0)
                                                 .replace(
                                                   /\B(?=(\d{3})+(?!\d))/g,
-                                                  ","
+                                                  ",",
                                                 )
                                             : p21 !== 0 &&
                                               q21 !== 0 &&
@@ -3471,7 +3861,7 @@ const Budget2025a = () => {
                                                 .toFixed(0)
                                                 .replace(
                                                   /\B(?=(\d{3})+(?!\d))/g,
-                                                  ","
+                                                  ",",
                                                 )
                                             : p21 !== 0 &&
                                               r21 !== 0 &&
@@ -3480,7 +3870,7 @@ const Budget2025a = () => {
                                                 .toFixed(1)
                                                 .replace(
                                                   /\B(?=(\d{3})+(?!\d))/g,
-                                                  ","
+                                                  ",",
                                                 ) + "%"
                                             : "-"}
                                         </p>
@@ -3490,7 +3880,7 @@ const Budget2025a = () => {
                                                 .toFixed(0)
                                                 .replace(
                                                   /\B(?=(\d{3})+(?!\d))/g,
-                                                  ","
+                                                  ",",
                                                 )
                                             : summarygroupby3 === "profit"
                                             ? "$ " +
@@ -3498,7 +3888,7 @@ const Budget2025a = () => {
                                                 .toFixed(0)
                                                 .replace(
                                                   /\B(?=(\d{3})+(?!\d))/g,
-                                                  ","
+                                                  ",",
                                                 )
                                             : p22 !== 0 &&
                                               q22 !== 0 &&
@@ -3508,7 +3898,7 @@ const Budget2025a = () => {
                                                 .toFixed(0)
                                                 .replace(
                                                   /\B(?=(\d{3})+(?!\d))/g,
-                                                  ","
+                                                  ",",
                                                 )
                                             : p22 !== 0 &&
                                               r22 !== 0 &&
@@ -3517,7 +3907,7 @@ const Budget2025a = () => {
                                                 .toFixed(1)
                                                 .replace(
                                                   /\B(?=(\d{3})+(?!\d))/g,
-                                                  ","
+                                                  ",",
                                                 ) + "%"
                                             : "-"}
                                         </p>
@@ -3527,7 +3917,7 @@ const Budget2025a = () => {
                                                 .toFixed(0)
                                                 .replace(
                                                   /\B(?=(\d{3})+(?!\d))/g,
-                                                  ","
+                                                  ",",
                                                 )
                                             : summarygroupby3 === "profit"
                                             ? "$ " +
@@ -3535,7 +3925,7 @@ const Budget2025a = () => {
                                                 .toFixed(0)
                                                 .replace(
                                                   /\B(?=(\d{3})+(?!\d))/g,
-                                                  ","
+                                                  ",",
                                                 )
                                             : p23 !== 0 &&
                                               q23 !== 0 &&
@@ -3545,7 +3935,7 @@ const Budget2025a = () => {
                                                 .toFixed(0)
                                                 .replace(
                                                   /\B(?=(\d{3})+(?!\d))/g,
-                                                  ","
+                                                  ",",
                                                 )
                                             : p23 !== 0 &&
                                               r23 !== 0 &&
@@ -3554,7 +3944,7 @@ const Budget2025a = () => {
                                                 .toFixed(1)
                                                 .replace(
                                                   /\B(?=(\d{3})+(?!\d))/g,
-                                                  ","
+                                                  ",",
                                                 ) + "%"
                                             : "-"}
                                         </p>
@@ -3564,7 +3954,7 @@ const Budget2025a = () => {
                                                 .toFixed(0)
                                                 .replace(
                                                   /\B(?=(\d{3})+(?!\d))/g,
-                                                  ","
+                                                  ",",
                                                 )
                                             : summarygroupby3 === "profit"
                                             ? "$ " +
@@ -3572,7 +3962,7 @@ const Budget2025a = () => {
                                                 .toFixed(0)
                                                 .replace(
                                                   /\B(?=(\d{3})+(?!\d))/g,
-                                                  ","
+                                                  ",",
                                                 )
                                             : p24 !== 0 &&
                                               q24 !== 0 &&
@@ -3582,7 +3972,7 @@ const Budget2025a = () => {
                                                 .toFixed(0)
                                                 .replace(
                                                   /\B(?=(\d{3})+(?!\d))/g,
-                                                  ","
+                                                  ",",
                                                 )
                                             : p24 !== 0 &&
                                               r24 !== 0 &&
@@ -3591,7 +3981,7 @@ const Budget2025a = () => {
                                                 .toFixed(1)
                                                 .replace(
                                                   /\B(?=(\d{3})+(?!\d))/g,
-                                                  ","
+                                                  ",",
                                                 ) + "%"
                                             : "-"}
                                         </p>
@@ -3601,7 +3991,7 @@ const Budget2025a = () => {
                                                 .toFixed(0)
                                                 .replace(
                                                   /\B(?=(\d{3})+(?!\d))/g,
-                                                  ","
+                                                  ",",
                                                 )
                                             : summarygroupby3 === "profit"
                                             ? "$ " +
@@ -3609,7 +3999,7 @@ const Budget2025a = () => {
                                                 .toFixed(0)
                                                 .replace(
                                                   /\B(?=(\d{3})+(?!\d))/g,
-                                                  ","
+                                                  ",",
                                                 )
                                             : p21 + p22 + p23 + p24 !== 0 &&
                                               q21 + q22 + q23 + q24 !== 0 &&
@@ -3622,7 +4012,7 @@ const Budget2025a = () => {
                                                 .toFixed(0)
                                                 .replace(
                                                   /\B(?=(\d{3})+(?!\d))/g,
-                                                  ","
+                                                  ",",
                                                 )
                                             : p21 + p22 + p23 + p24 !== 0 &&
                                               r21 + r22 + r23 + r24 !== 0 &&
@@ -3635,7 +4025,7 @@ const Budget2025a = () => {
                                                 .toFixed(1)
                                                 .replace(
                                                   /\B(?=(\d{3})+(?!\d))/g,
-                                                  ","
+                                                  ",",
                                                 ) + "%"
                                             : "-"}
                                         </p>
@@ -3770,10 +4160,19 @@ const Budget2025a = () => {
               </li>
             </div>
           </ul>
-        </div>
+        </aside>
       </div>
+      <BudgetAllocationDrawer
+        open={showAllocationDrawer}
+        cell={selectedBudgetCell}
+        readOnly={categorySubmitted}
+        onClose={() => setShowAllocationDrawer(false)}
+        onAllocationChange={() =>
+          setAllocationStatusRefresh(!allocationStatusRefresh)
+        }
+      />
     </div>
   );
 };
 
-export default Budget2025a;
+export default Budget;

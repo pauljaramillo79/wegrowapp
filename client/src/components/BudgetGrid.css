@@ -2,36 +2,87 @@
   display: flex;
   flex-direction: row;
   width: 100%;
-  max-height: 100vh;
-  overflow-y: clip;
+  min-height: 100vh;
+  overflow-x: hidden;
+  overflow-y: visible;
 }
 .budgetnav {
-  position: fixed;
+  background-color: rgb(65, 64, 73);
+  bottom: 0;
+  color: white;
   display: flex;
   flex-direction: column;
-  flex-basis: 10%;
+  left: 0;
+  padding: 4rem 1.5rem;
+  position: fixed;
+  top: calc(6vh + 2rem);
+  transform: translateX(-100%);
+  transition: transform 220ms ease;
   width: 130px;
-  background-color: rgb(65, 64, 73);
-  /* background-color: black; */
+  z-index: 19;
+}
+.budgetnav--open {
+  box-shadow: 10px 0 28px rgba(26, 27, 34, 0.16);
+  transform: translateX(0);
+}
+.budgetnav-toggle {
+  align-items: center;
+  background: rgb(65, 64, 73);
+  border: 0;
+  border-radius: 0 0.65rem 0.65rem 0;
   color: white;
-  padding: 8rem 2rem;
-  height: 100vh;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-height: 100px;
+  padding: 0.65rem 0.4rem;
+  position: absolute;
+  right: -38px;
+  top: 0%;
+  width: 38px;
+}
+.budgetnav-toggle:hover {
+  background: rgb(83, 81, 101);
+}
+.budgetnav-toggle > span:first-child {
+  font-size: 1.45rem;
+  line-height: 1;
+}
+.budgetnav-toggle__text {
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  writing-mode: vertical-rl;
+}
+.budgetnav a {
+  border-radius: 0.35rem;
+  color: white;
+  margin-bottom: 0.25rem;
+  padding: 0.35rem 0.5rem;
+  text-decoration: none;
+}
+.budgetnav a:hover {
+  background: rgba(255, 255, 255, 0.12);
 }
 .budgetgridcontainer {
   /* margin-left: 10%; */
-  display: flex;
-  flex-basis: 100%;
   display: inline-block;
-
-  /* width: 150%; */
+  flex: 1 1 auto;
+  width: 100%;
   position: relative;
-  left: 130px;
+  left: 0;
+  margin-left: 0;
   background-color: white;
   min-height: 100vh;
   margin-top: 2rem;
   padding-left: 2rem;
   height: auto;
+  transition: margin-left 220ms ease, width 220ms ease;
   /* position: fixed; */
+}
+.budgetcontainer--nav-open .budgetgridcontainer {
+  margin-left: 130px;
+  width: calc(100% - 130px);
 }
 .addprodgroup {
   position: relative;
@@ -46,13 +97,13 @@
   border-radius: 0.75rem;
   border: none;
   color: white;
-  background-color: rgb(68, 65, 162);
+  background-color: #000f9f;
   position: relative;
 }
 .cancelprodbutton {
   background-color: white;
-  border: solid 1px rgb(68, 65, 162);
-  color: rgb(68, 65, 162);
+  border: solid 1px #000f9f;
+  color: #000f9f;
 }
 .addprodbutton:hover {
   cursor: pointer;
@@ -68,7 +119,7 @@
   top: 25px;
   height: 300px;
   width: 230px;
-  border: 1px solid rgb(68, 65, 162);
+  border: 1px solid #000f9f;
   border-radius: 0.75rem;
   background-color: white;
   z-index: 10;
@@ -115,7 +166,7 @@
   padding: 0.5rem 1rem;
   border-radius: 1rem;
   border: rgb(68, 65, 162) solid 1px;
-  color: rgb(68, 65, 162);
+  color: #000f9f;
   background-color: white;
   width: 150px;
   margin-right: 0.5rem;
@@ -126,12 +177,12 @@
   color: white;
 }
 .budgetfilterbutton:active {
-  background-color: rgb(68, 65, 162);
+  background-color: #000f9f;
   color: white;
   border: none;
 }
 .budgetfilterbuttonactive {
-  background-color: rgb(68, 65, 162);
+  background-color: #000f9f;
   color: white;
   border: none;
 }
@@ -162,7 +213,7 @@
   padding: 0.5rem 1rem;
   border-radius: 1rem;
   border: rgb(160, 182, 103) solid 1px;
-  color: rgb(68, 65, 162);
+  color: #000f9f;
   background-color: white;
   width: 150px;
   margin-right: 0.5rem;
@@ -183,7 +234,7 @@
 }
 .bdgtpnametable {
   margin-top: 1rem;
-  margin-right: 2rem;
+  margin-right: 0;
   font-family: "Roboto", sans-serif;
   font-size: 0.8rem;
 }
@@ -290,7 +341,7 @@
   left: 150px;
   z-index: 10;
   top: 0px;
-  border: 1px solid rgb(68, 65, 162);
+  border: 1px solid #000f9f;
   border-radius: 0.75rem;
   background-color: white;
   padding: 1rem;
@@ -304,7 +355,7 @@
   height: 300px;
   z-index: 10;
   top: 18px;
-  border: 1px solid rgb(68, 65, 162);
+  border: 1px solid #000f9f;
   border-radius: 0.75rem;
   background-color: white;
   padding: 1rem;
@@ -346,32 +397,107 @@
   margin-bottom: 0.25rem;
   border-radius: 0.5rem;
   margin-left: 0.25rem;
-  background-color: rgb(68, 65, 162);
+  background-color: #000f9f;
   color: white;
   font-size: 0.7rem;
 }
 .budgetprepdata {
-  height: 54vh;
-  display: flex;
-  justify-content: space-between;
-  /* overflow-y: scroll; */
+  display: block;
+  height: auto;
+  min-height: 54vh;
+  min-width: 0;
 }
 .bdgtleftbottompanel {
-  height: 54vh;
-  overflow-y: scroll;
-  display: flex;
-  justify-content: space-between;
+  align-items: start;
+  display: grid;
+  gap: 1.25rem;
+  grid-template-columns: minmax(0, 1fr) minmax(20rem, 25rem);
+  height: auto;
+  min-width: 0;
+  overflow: visible;
 }
 .budgetbyprod {
-  width: 580px;
-  /* background-color: rgb(247, 247, 247); */
-  border-left: 1px dashed rgb(68, 65, 162);
-  padding: 1rem;
-  padding-left: 2rem;
-
-  /* height: 600px; */
+  background-color: white;
+  border-left: 1px solid rgb(217, 217, 227);
+  bottom: 0;
   display: flex;
   flex-direction: column;
+  max-width: calc(100vw - 2rem);
+  overflow: visible;
+  padding: 1.25rem;
+  position: fixed;
+  right: 0;
+  top: calc(6vh + 2rem);
+  transform: translateX(100%);
+  transition: transform 220ms ease;
+  width: 580px;
+  z-index: 40;
+}
+.budgetbyprod--open {
+  box-shadow: -12px 0 36px rgba(25, 27, 35, 0.18);
+  transform: translateX(0);
+}
+.budget-summary-toggle {
+  align-items: center;
+  background: #000f9f;
+  border: 0;
+  border-radius: 0.65rem 0 0 0.65rem;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  left: -44px;
+  min-height: 112px;
+  padding: 0.65rem 0.45rem;
+  position: absolute;
+  top: 0%;
+  width: 44px;
+}
+.budget-summary-toggle > span:first-child {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+.budget-summary-toggle__text {
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  writing-mode: vertical-rl;
+}
+.budget-summary-heading {
+  align-items: flex-start;
+  border-bottom: 1px solid rgb(226, 226, 232);
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.75rem;
+}
+.budget-summary-heading span {
+  color: #000f9f;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.budget-summary-heading h4 {
+  margin: 0.2rem 0 0;
+}
+.budget-summary-heading button {
+  background: transparent;
+  border: 0;
+  color: rgb(80, 80, 88);
+  cursor: pointer;
+  font-size: 1.6rem;
+  line-height: 1;
+}
+.budget-summary-backdrop {
+  background: rgba(20, 22, 28, 0.2);
+  border: 0;
+  bottom: 0;
+  left: 0;
+  position: fixed;
+  right: 0;
+  top: calc(6vh + 2rem);
+  z-index: 39;
 }
 .budgetbyprod li {
   display: flex;
@@ -444,12 +570,14 @@
   margin-bottom: 1rem;
 }
 .bdgttotals {
+  width: 100%;
   border-bottom: 1px solid gray;
 }
 .bdgttotalsul {
-  display: flex;
-  justify-content: space-between;
-  width: 70%;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: clamp(1rem, 2.5vw, 3rem);
+  width: 100%;
   margin-bottom: 1rem;
   font-family: "Helvetica Neue", sans-serif;
 }
@@ -463,10 +591,11 @@
   margin-bottom: 0.5rem;
 }
 .bdgtlyearfigs {
-  font-size: 0.85rem;
   display: flex;
   justify-content: space-between;
-  width: 180px;
+  width: 100%;
+  max-width: 180px;
+  font-size: 0.85rem;
 }
 .bdgttitle {
   margin-right: 1rem;
@@ -541,8 +670,8 @@
 }
 .bdgtsummarybuttons1 button,
 .bdgtsummarybuttons button {
-  border-left: solid 1px rgb(68, 65, 162);
-  border-right: solid 1px rgb(68, 65, 162);
+  border-left: solid 1px #000f9f;
+  border-right: solid 1px #000f9f;
 }
 .bdgtsummarybuttons button {
   padding: 0.25rem 0.5rem;
@@ -553,7 +682,7 @@
   border-right: solid 1px rgb(160, 182, 103);
 }
 .bdgtsummarybuttons1 .bdgtlvl1active {
-  background-color: rgb(68, 65, 162);
+  background-color: #000f9f;
   color: white;
 }
 .bdgtsummarybuttons2 .bdgtlvl2active {
@@ -578,7 +707,7 @@
   color: black;
 }
 .bdgtsummarybuttons1 button:active {
-  background-color: rgb(68, 65, 162);
+  background-color: #000f9f;
   color: white;
 }
 .bdgtsummarybuttons2 button:active {
@@ -594,8 +723,8 @@
   width: 550px;
 }
 .bdgtsummarydata {
-  height: 50vh;
-  overflow-y: scroll;
+  max-height: calc(100vh - 19rem);
+  overflow-y: auto;
   margin-right: 0;
   /* position: relative; */
 }
@@ -725,4 +854,54 @@ input[type="file"] {
   display: inline;
   margin-left: 1rem;
   color: rgb(24, 139, 24);
+}
+
+@media (max-width: 760px) {
+  .budgetnav {
+    padding-left: 1rem;
+    padding-right: 1rem;
+    width: 110px;
+  }
+  .budgetnav-toggle {
+    right: -34px;
+    width: 34px;
+  }
+  .budgetgridcontainer,
+  .budgetcontainer--nav-open .budgetgridcontainer {
+    margin-left: 0;
+    padding-left: 1rem;
+    width: 100%;
+  }
+  .budgetbyprod {
+    top: calc(6vh + 2rem);
+    width: calc(100vw - 3rem);
+  }
+  .bdgtsummarybuttons1,
+  .bdgtsummarybuttons2,
+  .bdgtsummarybuttons,
+  .bdgtsummarytable {
+    max-width: 100%;
+    width: 100%;
+  }
+}
+
+@media (max-width: 1180px) {
+  .bdgtleftbottompanel {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .bdgttotalsul {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .bdgttotalsul {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 460px) {
+  .bdgttotalsul {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }

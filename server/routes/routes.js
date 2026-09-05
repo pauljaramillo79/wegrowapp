@@ -30,6 +30,255 @@ const authenticateRefreshToken = (req, res, next) => {
   jwt.verify(token, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
     if (err) return res.sendStatus(403);
     req.user = user;
+
+    next();
+  });
+};
+
+const requireEditableBudgetEntry = (req, res, next) => {
+  const budgetEntryID = String(
+    req.body.budgetEntryID || req.body.entryID || "",
+  ).trim();
+
+  if (!/^\d+$/.test(budgetEntryID)) {
+    return res.status(400).json({
+      error: "A valid budgetEntryID is required",
+    });
+  }
+
+  const query = `
+    SELECT
+      budgets.budgetentryID,
+
+      EXISTS(
+        SELECT 1
+        FROM budgetCategorySubmissions
+        WHERE budgetCategorySubmissions.budgetYear =
+              YEAR(budgets.date)
+          AND budgetCategorySubmissions.prodCatNameID =
+              budgets.prodCatNameID
+          AND budgetCategorySubmissions.status =
+              'submitted'
+      ) AS categorySubmitted
+
+    FROM budgets
+    WHERE budgets.budgetentryID = ?
+  `;
+
+  db.query(query, [budgetEntryID], (err, results) => {
+    if (err) {
+      console.log(err);
+
+      return res.status(500).json({
+        error: "Unable to verify budget category status",
+      });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({
+        error: "Budget entry not found",
+      });
+    }
+
+    if (results[0].categorySubmitted) {
+      return res.status(423).json({
+        error: "This product category has been submitted and is read-only",
+        status: "submitted",
+      });
+    }
+
+    next();
+  });
+};
+
+const requireEditableBudgetAllocation = (req, res, next) => {
+  const allocationID = Number(req.body.allocationID);
+
+  if (!Number.isInteger(allocationID) || allocationID <= 0) {
+    return res.status(400).json({
+      error: "A valid allocationID is required",
+    });
+  }
+
+  const query = `
+    SELECT
+      budgetAllocations.allocationID,
+
+      EXISTS(
+        SELECT 1
+        FROM budgetCategorySubmissions
+        WHERE budgetCategorySubmissions.budgetYear =
+              YEAR(budgets.date)
+          AND budgetCategorySubmissions.prodCatNameID =
+              budgets.prodCatNameID
+          AND budgetCategorySubmissions.status =
+              'submitted'
+      ) AS categorySubmitted
+
+    FROM budgetAllocations
+
+    INNER JOIN budgets
+      ON budgetAllocations.budgetEntryID =
+         budgets.budgetentryID
+
+    WHERE budgetAllocations.allocationID = ?
+  `;
+
+  db.query(query, [allocationID], (err, results) => {
+    if (err) {
+      console.log(err);
+
+      return res.status(500).json({
+        error: "Unable to verify budget category status",
+      });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({
+        error: "Allocation not found",
+      });
+    }
+
+    if (results[0].categorySubmitted) {
+      return res.status(423).json({
+        error: "This product category has been submitted and is read-only",
+        status: "submitted",
+      });
+    }
+
+    next();
+  });
+};
+
+const requireEditableBudgetProduct = (req, res, next) => {
+  const year = Number(req.body.year);
+
+  const prodNameID = Number(req.body.prod || req.body.pname);
+
+  if (
+    !Number.isInteger(year) ||
+    !Number.isInteger(prodNameID) ||
+    prodNameID <= 0
+  ) {
+    return res.status(400).json({
+      error: "A valid year and product are required",
+    });
+  }
+
+  const query = `
+    SELECT
+      prodNames.prodCatNameID,
+      COALESCE(
+        budgetCategorySubmissions.status,
+        'draft'
+      ) AS categoryStatus
+
+    FROM prodNames
+
+    LEFT JOIN budgetCategorySubmissions
+      ON budgetCategorySubmissions.prodCatNameID =
+         prodNames.prodCatNameID
+      AND budgetCategorySubmissions.budgetYear = ?
+
+    WHERE prodNames.prodNameID = ?
+  `;
+
+  db.query(query, [year, prodNameID], (err, results) => {
+    if (err) {
+      console.log(err);
+
+      return res.status(500).json({
+        error: "Unable to verify budget category status",
+      });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({
+        error: "Product not found",
+      });
+    }
+
+    if (results[0].categoryStatus === "submitted") {
+      return res.status(423).json({
+        error: "This product category has been submitted and is read-only",
+        status: "submitted",
+      });
+    }
+
+    next();
+  });
+};
+
+const requireEditableBudgetProducts = (req, res, next) => {
+  const year = Number(req.body.year);
+  const products = req.body.prodstoadd;
+
+  if (
+    !Number.isInteger(year) ||
+    !Array.isArray(products) ||
+    products.length === 0
+  ) {
+    return res.status(400).json({
+      error: "A valid year and product list are required",
+    });
+  }
+
+  const productIDs = products
+    .map((product) => Number(product))
+    .filter((product) => {
+      return Number.isInteger(product) && product > 0;
+    });
+
+  if (productIDs.length !== products.length) {
+    return res.status(400).json({
+      error: "The product list contains invalid IDs",
+    });
+  }
+
+  const placeholders = productIDs.map(() => "?").join(",");
+
+  const query = `
+    SELECT DISTINCT
+      prodNames.prodCatNameID,
+      prodCatNames.prodCatName
+
+    FROM prodNames
+
+    INNER JOIN prodCatNames
+      ON prodNames.prodCatNameID =
+         prodCatNames.prodCatNameID
+
+    INNER JOIN budgetCategorySubmissions
+      ON budgetCategorySubmissions.prodCatNameID =
+         prodNames.prodCatNameID
+      AND budgetCategorySubmissions.budgetYear = ?
+      AND budgetCategorySubmissions.status =
+          'submitted'
+
+    WHERE prodNames.prodNameID IN (
+      ${placeholders}
+    )
+  `;
+
+  const values = [year].concat(productIDs);
+
+  db.query(query, values, (err, results) => {
+    if (err) {
+      console.log(err);
+
+      return res.status(500).json({
+        error: "Unable to verify budget category status",
+      });
+    }
+
+    if (results.length > 0) {
+      return res.status(423).json({
+        error: "One or more selected product categories have been submitted",
+        status: "submitted",
+        lockedCategories: results,
+      });
+    }
+
     next();
   });
 };
@@ -78,7 +327,7 @@ router.post("/register", async (req, res) => {
           username: username,
         });
       }
-    }
+    },
   );
 });
 
@@ -120,7 +369,7 @@ router.post("/login", async (req, res) => {
                 // "123",
                 {
                   expiresIn: "10min",
-                }
+                },
               );
               let refreshtoken = jwt.sign(
                 {
@@ -133,7 +382,7 @@ router.post("/login", async (req, res) => {
                 // "123",
                 {
                   expiresIn: "24hrs",
-                }
+                },
               );
               return res.json({
                 success: true,
@@ -160,7 +409,7 @@ router.post("/login", async (req, res) => {
           message: "Username does not exist",
         });
       }
-    }
+    },
   );
 });
 
@@ -183,7 +432,7 @@ router.post("/refreshtoken", authenticateRefreshToken, (req, res) => {
     // "123",
     {
       expiresIn: "10min",
-    }
+    },
   );
   res.json({
     accesstoken: accesstoken,
@@ -215,12 +464,11 @@ router.post("/changepassword", authenticateToken, async (req, res) => {
           } else {
             db.query(
               `UPDATE traderList SET password='${hashedNewPassword}', firstlogin='n' WHERE userName='${username}'`,
-
               (err1) => {
                 if (err1) {
                   console.log(err1);
                 }
-              }
+              },
             );
             res.json({
               success: true,
@@ -229,7 +477,7 @@ router.post("/changepassword", authenticateToken, async (req, res) => {
           }
         });
       }
-    }
+    },
   );
 });
 router.post("/positionreport", authenticateToken, async (req, res) => {
@@ -242,7 +490,7 @@ router.post("/positionreport", authenticateToken, async (req, res) => {
       if (results.length > 0) {
         return res.status(200).send(results);
       }
-    }
+    },
   );
 });
 router.post("/usapositionreport", async (req, res) => {
@@ -256,7 +504,7 @@ router.post("/usapositionreport", async (req, res) => {
       if (results.length > 0) {
         return res.status(200).send(results);
       }
-    }
+    },
   );
 });
 router.post("/positions", authenticateToken, async (req, res) => {
@@ -269,7 +517,7 @@ router.post("/positions", authenticateToken, async (req, res) => {
       if (results.length > 0) {
         return res.status(200).send(results);
       }
-    }
+    },
   );
 });
 router.post("/sales", authenticateToken, async (req, res) => {
@@ -287,7 +535,7 @@ router.post("/sales", authenticateToken, async (req, res) => {
       if (results.length > 0) {
         return res.status(200).send(results);
       }
-    }
+    },
   );
 });
 router.post("/suppliers", (req, res) => {
@@ -300,7 +548,7 @@ router.post("/suppliers", (req, res) => {
       if (results.length > 0) {
         return res.status(200).send(results);
       }
-    }
+    },
   );
 });
 router.post("/customers", (req, res) => {
@@ -313,7 +561,7 @@ router.post("/customers", (req, res) => {
       if (results.length > 0) {
         return res.status(200).send(results);
       }
-    }
+    },
   );
 });
 router.post("/POLS", (req, res) => {
@@ -336,7 +584,7 @@ router.post("/PODS", (req, res) => {
       if (results.length > 0) {
         return res.status(200).send(results);
       }
-    }
+    },
   );
 });
 router.post("/traders", (req, res) => {
@@ -349,7 +597,7 @@ router.post("/traders", (req, res) => {
       if (results.length > 0) {
         return res.status(200).send(results);
       }
-    }
+    },
   );
 });
 router.post("/trafficmgrs", (req, res) => {
@@ -362,7 +610,7 @@ router.post("/trafficmgrs", (req, res) => {
       if (results.length > 0) {
         return res.status(200).send(results);
       }
-    }
+    },
   );
 });
 router.post("/paymentterms", (req, res) => {
@@ -375,7 +623,7 @@ router.post("/paymentterms", (req, res) => {
       if (results.length > 0) {
         return res.status(200).send(results);
       }
-    }
+    },
   );
 });
 router.post("/prodnames", (req, res) => {
@@ -399,7 +647,7 @@ router.post("/productlist", (req, res) => {
       if (results.length > 0) {
         return res.status(200).send(results);
       }
-    }
+    },
   );
 });
 router.post("/checkposition", (req, res) => {
@@ -463,7 +711,7 @@ router.post("/addposition", (req, res) => {
           message: "Succesfully added position",
         });
       }
-    }
+    },
   );
 });
 router.post("/positiontoedit", (req, res) => {
@@ -477,7 +725,7 @@ router.post("/positiontoedit", (req, res) => {
       if (results.length > 0) {
         return res.status(200).send(results);
       }
-    }
+    },
   );
 });
 
@@ -536,7 +784,7 @@ router.post("/positiondropdown", (req, res) => {
       if (results.length > 0) {
         return res.status(200).send(results);
       }
-    }
+    },
   );
 });
 router.post("/uspositiondropdown", (req, res) => {
@@ -549,7 +797,7 @@ router.post("/uspositiondropdown", (req, res) => {
       if (results.length > 0) {
         return res.status(200).send(results);
       }
-    }
+    },
   );
 });
 router.post("/loadusposition", (req, res) => {
@@ -570,7 +818,7 @@ router.post("/loadusposition", (req, res) => {
           message: "No US Allocation with that USWGS Number",
         });
       }
-    }
+    },
   );
 });
 router.post("/duplicateQS", (req, res) => {
@@ -588,7 +836,7 @@ router.post("/duplicateQS", (req, res) => {
           message: "Succesfully Copied QS",
         });
       }
-    }
+    },
   );
 });
 router.post("/QSIDList", (req, res) => {
@@ -606,7 +854,7 @@ router.post("/QSIDList", (req, res) => {
       if (results.length > 0) {
         return res.status(200).send(results);
       }
-    }
+    },
   );
 });
 router.post("/saveQS", (req, res) => {
@@ -784,7 +1032,7 @@ router.post("/saveQS", (req, res) => {
           message: "Succesfully saved QS",
         });
       }
-    }
+    },
   );
 });
 router.post("/QStoedit", (req, res) => {
@@ -802,7 +1050,7 @@ router.post("/QStoedit", (req, res) => {
       if (results.length == 0) {
         res.status(204).send("Not found");
       }
-    }
+    },
   );
 });
 
@@ -821,7 +1069,7 @@ router.post("/loadQStoedit", (req, res) => {
       if (results.length == 0) {
         res.status(204).send("Not found");
       }
-    }
+    },
   );
 });
 
@@ -1130,7 +1378,7 @@ router.post("/sunburstdata", (req, res) => {
         console.log(results);
         return res.status(200).send(results);
       }
-    }
+    },
   );
 });
 router.post("/keyfigures", (req, res) => {
@@ -1152,7 +1400,7 @@ router.post("/keyfigures", (req, res) => {
 
         return res.status(200).send(results);
       }
-    }
+    },
   );
 });
 router.post("/donut", (req, res) => {
@@ -1165,7 +1413,7 @@ router.post("/donut", (req, res) => {
       if (results.length > 0) {
         return res.status(200).send(results);
       }
-    }
+    },
   );
 });
 router.post("/donutqty", (req, res) => {
@@ -1178,7 +1426,7 @@ router.post("/donutqty", (req, res) => {
       if (results.length > 0) {
         return res.status(200).send(results);
       }
-    }
+    },
   );
 });
 router.post("/barsalesperyear", (req, res) => {
@@ -1191,7 +1439,7 @@ router.post("/barsalesperyear", (req, res) => {
       if (results.length > 0) {
         return res.status(200).send(results);
       }
-    }
+    },
   );
 });
 router.post("/pieprofitbycountry", (req, res) => {
@@ -1204,7 +1452,7 @@ router.post("/pieprofitbycountry", (req, res) => {
       if (results.length > 0) {
         return res.status(200).send(results);
       }
-    }
+    },
   );
 });
 router.post("/pievolumebycountry", (req, res) => {
@@ -1217,7 +1465,7 @@ router.post("/pievolumebycountry", (req, res) => {
       if (results.length > 0) {
         return res.status(200).send(results);
       }
-    }
+    },
   );
 });
 
@@ -1231,7 +1479,7 @@ router.post("/waterfallprofit", authenticateToken, (req, res) => {
       if (results.length > 0) {
         return res.status(200).send(results);
       }
-    }
+    },
   );
 });
 
@@ -1248,7 +1496,7 @@ router.post("/traderslist", (req, res) => {
       if (results.length > 0) {
         return res.status(200).send(results);
       }
-    }
+    },
   );
 });
 router.post("/roles", (req, res) => {
@@ -1278,7 +1526,7 @@ router.post("/updatetrader", (req, res) => {
           message: "Succesfully edited Trader",
         });
       }
-    }
+    },
   );
 });
 
@@ -1298,7 +1546,7 @@ router.post("/addNewTrader", async (req, res) => {
           message: "Succesfully added New Trader",
         });
       }
-    }
+    },
   );
 });
 
@@ -1314,7 +1562,7 @@ router.post("/customerlist", (req, res) => {
       if (results.length > 0) {
         return res.status(200).send(results);
       }
-    }
+    },
   );
 });
 
@@ -1349,7 +1597,7 @@ router.post("/updatecustomer", (req, res) => {
           message: "Succesfully edited Customer",
         });
       }
-    }
+    },
   );
 });
 
@@ -1369,7 +1617,7 @@ router.post("/addNewCustomer", async (req, res) => {
           message: "Succesfully added New Customer",
         });
       }
-    }
+    },
   );
 });
 
@@ -1388,7 +1636,7 @@ router.post("/deleteCustomer", async (req, res) => {
           message: "Succesfully deleted Customer",
         });
       }
-    }
+    },
   );
 });
 
@@ -1404,7 +1652,7 @@ router.post("/producerlist", (req, res) => {
       if (results.length > 0) {
         return res.status(200).send(results);
       }
-    }
+    },
   );
 });
 
@@ -1439,7 +1687,7 @@ router.post("/updateproducer", (req, res) => {
           message: "Succesfully edited Supplier",
         });
       }
-    }
+    },
   );
 });
 
@@ -1459,7 +1707,7 @@ router.post("/addNewProducer", async (req, res) => {
           message: "Succesfully added New Producer",
         });
       }
-    }
+    },
   );
 });
 
@@ -1478,7 +1726,7 @@ router.post("/deleteProducer", async (req, res) => {
           message: "Succesfully deleted Producer",
         });
       }
-    }
+    },
   );
 });
 
@@ -1494,7 +1742,7 @@ router.post("/prodnameslist", (req, res) => {
       if (results.length > 0) {
         return res.status(200).send(results);
       }
-    }
+    },
   );
 });
 
@@ -1510,7 +1758,7 @@ router.post("/selectgroupedprods", (req, res) => {
       if (results.length > 0) {
         return res.status(200).send(results);
       }
-    }
+    },
   );
 });
 router.post("/forceselectgroup", (req, res) => {
@@ -1525,7 +1773,7 @@ router.post("/forceselectgroup", (req, res) => {
       if (results.length > 0) {
         return res.status(200).send(results);
       }
-    }
+    },
   );
 });
 router.post("/addNewProdGroup", async (req, res) => {
@@ -1550,7 +1798,7 @@ router.post("/addNewProdGroup", async (req, res) => {
           message: "Succesfully added New Product Group",
         });
       }
-    }
+    },
   );
 });
 router.post("/selectprodgroup", (req, res) => {
@@ -1566,7 +1814,7 @@ router.post("/selectprodgroup", (req, res) => {
       if (results.length > 0) {
         return res.status(200).send(results);
       }
-    }
+    },
   );
 });
 router.post("/updateprodgroup", (req, res) => {
@@ -1584,7 +1832,7 @@ router.post("/updateprodgroup", (req, res) => {
           message: "Succesfully edited Product Group",
         });
       }
-    }
+    },
   );
 });
 router.post("/selectedprodcatname", (req, res) => {
@@ -1599,7 +1847,7 @@ router.post("/selectedprodcatname", (req, res) => {
       if (results.length > 0) {
         return res.status(200).send(results);
       }
-    }
+    },
   );
 });
 router.post("/updateprodcatname", (req, res) => {
@@ -1617,7 +1865,7 @@ router.post("/updateprodcatname", (req, res) => {
           message: "Succesfully edited Product Category Name",
         });
       }
-    }
+    },
   );
 });
 router.post("/addNewProdCatName", (req, res) => {
@@ -1641,7 +1889,7 @@ router.post("/addNewProdCatName", (req, res) => {
           message: "Successfully added New Product Category Name",
         });
       }
-    }
+    },
   );
 });
 
@@ -1660,7 +1908,7 @@ router.post("/selectprodname", (req, res) => {
       if (results.length > 0) {
         return res.status(200).send(results);
       }
-    }
+    },
   );
 });
 
@@ -1674,7 +1922,7 @@ router.post("/prodcatnameslist", (req, res) => {
       if (results.length > 0) {
         return res.status(200).send(results);
       }
-    }
+    },
   );
 });
 router.post("/bunitlist", (req, res) => {
@@ -1687,7 +1935,7 @@ router.post("/bunitlist", (req, res) => {
       if (results.length > 0) {
         return res.status(200).send(results);
       }
-    }
+    },
   );
 });
 router.post("/IMOlist", (req, res) => {
@@ -1700,7 +1948,7 @@ router.post("/IMOlist", (req, res) => {
       if (results.length > 0) {
         return res.status(200).send(results);
       }
-    }
+    },
   );
 });
 
@@ -1730,7 +1978,7 @@ router.post("/addNewProdName", (req, res) => {
           message: "Successfully added New Product  Name",
         });
       }
-    }
+    },
   );
 });
 router.post("/prodgroups", (req, res) => {
@@ -1743,7 +1991,7 @@ router.post("/prodgroups", (req, res) => {
       if (results.length > 0) {
         return res.status(200).send(results);
       }
-    }
+    },
   );
 });
 router.post("/updateprodname", (req, res) => {
@@ -1762,7 +2010,7 @@ router.post("/updateprodname", (req, res) => {
           message: "Succesfully edited Product Name Info",
         });
       }
-    }
+    },
   );
 });
 
@@ -1784,7 +2032,7 @@ router.post("/addnewProduct", (req, res) => {
           message: "Successfully added New Product",
         });
       }
-    }
+    },
   );
 });
 
@@ -1802,7 +2050,7 @@ router.post("/selectproducts", (req, res) => {
       if (results.length > 0) {
         return res.status(200).send(results);
       }
-    }
+    },
   );
 });
 
@@ -1822,7 +2070,7 @@ router.post("/posmatching", (req, res) => {
       if (results.length == 0) {
         return res.status(204).send("204 No Content");
       }
-    }
+    },
   );
 });
 
@@ -1841,7 +2089,7 @@ router.post("/usposmatching", (req, res) => {
       if (results.length == 0) {
         return res.status(204).send("204 No Content");
       }
-    }
+    },
   );
 });
 
@@ -1862,7 +2110,7 @@ router.post("/lysales", (req, res) => {
       if (results.length > 0) {
         return res.status(200).send(results);
       }
-    }
+    },
   );
 });
 router.post("/profitabilityreport", (req, res) => {
@@ -1881,7 +2129,7 @@ router.post("/profitabilityreport", (req, res) => {
       } else {
         return res.status(200).send([]);
       }
-    }
+    },
   );
 });
 router.post("/warehouses", (req, res) => {
@@ -1910,7 +2158,7 @@ router.post("/addusmktprice", (req, res) => {
           message: "Succesfully added New Mkt Price",
         });
       }
-    }
+    },
   );
 });
 router.post("/usmktpriceupdates", (req, res) => {
@@ -1923,7 +2171,7 @@ router.post("/usmktpriceupdates", (req, res) => {
       if (results.length > 0) {
         return res.status(200).send(results);
       }
-    }
+    },
   );
 });
 
@@ -1937,7 +2185,7 @@ router.post("/matchingposreport", (req, res) => {
       if (results.length > 0) {
         return res.status(200).send(results);
       }
-    }
+    },
   );
 });
 router.post("/poslist", (req, res) => {
@@ -1964,7 +2212,7 @@ router.post("/matchingpossales", (req, res) => {
       if (results.length > 0) {
         return res.status(200).send(results);
       }
-    }
+    },
   );
 });
 router.post("/salesinprogress", (req, res) => {
@@ -1977,7 +2225,7 @@ router.post("/salesinprogress", (req, res) => {
       if (results.length > 0) {
         return res.status(200).send(results);
       }
-    }
+    },
   );
 });
 router.post("/salesinprogressassigned", (req, res) => {
@@ -1990,7 +2238,7 @@ router.post("/salesinprogressassigned", (req, res) => {
       if (results.length > 0) {
         return res.status(200).send(results);
       }
-    }
+    },
   );
 });
 router.post("/saveassignment", (req, res) => {
@@ -2067,21 +2315,46 @@ router.post("/tmcscores", (req, res) => {
       if (results.length > 0) {
         return res.status(200).send(results);
       }
-    }
+    },
   );
 });
 
 router.post("/budgetprodNames", (req, res) => {
+  const year = Number(req.body.year);
+
   db.query(
-    "SELECT abbreviation, prodNameID, prodCatNameID FROM prodNames ORDER BY abbreviation ASC;",
+    `
+      SELECT
+        prodNames.abbreviation,
+        prodNames.prodNameID,
+        prodNames.prodCatNameID,
+        prodCatNames.prodCatName,
+        productGroups.productGroup
+      FROM prodNames
+      INNER JOIN prodCatNames
+        ON prodNames.prodCatNameID = prodCatNames.prodCatNameID
+      INNER JOIN productGroups
+        ON prodNames.prodGroupID = productGroups.prodGroupID
+      WHERE NOT EXISTS (
+        SELECT 1
+        FROM budgets
+        WHERE budgets.prodNameID = prodNames.prodNameID
+          AND YEAR(budgets.date) = ?
+      )
+      ORDER BY prodNames.abbreviation ASC
+    `,
+    [year],
     (err, results) => {
       if (err) {
-        console.log(err);
+        console.error("Error loading products for budget:", err);
+
+        return res.status(500).json({
+          error: "Products could not be loaded",
+        });
       }
-      if (results.length > 0) {
-        return res.status(200).send(results);
-      }
-    }
+
+      return res.status(200).send(results);
+    },
   );
 });
 
@@ -2091,83 +2364,191 @@ function pad(num, size) {
   return num;
 }
 
-router.post("/addprodbudget", async (req, res) => {
-  let prodstoadd = req.body.prodstoadd;
-  let prodscattoadd = req.body.prodscattoadd;
-  let year = req.body.year;
-  let yearshort = year - 2000;
-  let lastyear = year - 1 + "-12-31";
-  let twolastyear = year - 2 + "-01-01";
-  console.log(lastyear, twolastyear);
+router.post(
+  "/addprodbudget",
+  requireEditableBudgetProducts,
+  async (req, res) => {
+    const year = Number(req.body.year);
+    const productIDs = [
+      ...new Set(req.body.prodstoadd.map((productID) => Number(productID))),
+    ];
 
-  prodstoadd.forEach((prod, j) => {
-    db.query(
-      "SELECT DISTINCT countryID, prodNames.prodCatNameID FROM quotationsheet INNER JOIN PODList ON quotationsheet.PODID = PODList.PODID INNER JOIN (productList INNER JOIN (prodNames INNER JOIN prodCatNames ON prodNames.prodCatNameID=prodCatNames.prodCatNameID)ON productList.productName = prodNames.prodNameID) ON quotationsheet.productID = productList.productID WHERE DATE(`from`) BETWEEN ? AND ? AND saleComplete=-1 AND prodNameID=?",
-      [twolastyear, lastyear, prod],
-      (err, results) => {
-        if (err) {
-          console.log(err);
-        }
-        if (results.length > 0) {
-          results.forEach((el) => {
-            // console.log(el["countryID"]);
-            let prodcatname = el["prodCatNameID"];
-            let country = el["countryID"];
-            let quarter = [1, 4, 7, 10];
-            quarter.forEach((q) => {
-              let padprod = pad(prod, 3);
-              let padcountry = pad(country, 3);
-              let entryid = Number(
-                yearshort + q.toString() + padprod + padcountry
-              );
-              db.query(
-                `INSERT IGNORE INTO budgets (budgetentryID, date, prodNameID, quantity, customerID, countryID, prodCatNameID, price, profit) VALUES (${entryid},'${year}-${q}-01', ?, 0, 9999, ?, ${prodcatname}, 0,0)`,
-                [prod, country],
-                (err1, res1) => {
-                  if (err1) {
-                    console.log(err1);
-                  }
-                }
-              );
-            });
+    const yearshort = year - 2000;
+    const lastyear = year - 1 + "-12-31";
+    const twolastyear = year - 2 + "-01-01";
+    const quarterMonths = [1, 4, 7, 10];
+
+    const queryAsync = (sql, values) => {
+      return new Promise((resolve, reject) => {
+        db.query(sql, values, (err, results) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(results);
+          }
+        });
+      });
+    };
+
+    const historyQuery = `
+      SELECT DISTINCT
+        prodNames.prodCatNameID,
+        PODList.countryID
+      FROM prodNames
+      LEFT JOIN productList
+        ON productList.productName = prodNames.prodNameID
+      LEFT JOIN quotationsheet
+        ON quotationsheet.productID = productList.productID
+        AND DATE(quotationsheet.\`from\`) BETWEEN ? AND ?
+        AND quotationsheet.saleComplete = -1
+      LEFT JOIN PODList
+        ON quotationsheet.PODID = PODList.PODID
+      WHERE prodNames.prodNameID = ?
+    `;
+
+    try {
+      const productResults = await Promise.all(
+        productIDs.map((productID) => {
+          return queryAsync(historyQuery, [
+            twolastyear,
+            lastyear,
+            productID,
+          ]).then((results) => {
+            return {
+              productID,
+              results,
+            };
           });
-          // db.query(
-          //   "INSERT INTO budgets (date, ?, 0, )"
-          // )
-        } else if (results.length === 0) {
-          let prodcatname = prodscattoadd[j];
-          let country = "32";
-          let quarter = [1, 4, 7, 10];
-          quarter.forEach((q) => {
-            let padprod = pad(prod, 3);
-            let padcountry = pad(country, 3);
-            let entryid = Number(
-              yearshort + q.toString() + padprod + padcountry
-            );
-            db.query(
-              `INSERT IGNORE INTO budgets (budgetentryID, date, prodNameID, quantity, customerID, countryID, prodCatNameID, price, profit) VALUES (${entryid},'${year}-${q}-01', ?, 0, 9999, ?, ${prodcatname},0,0)`,
-              [prod, country],
-              (err1, res1) => {
-                if (err1) {
-                  console.log(err1);
-                }
-              }
-            );
-          });
+        }),
+      );
+
+      const rows = [];
+
+      productResults.forEach((productResult) => {
+        if (productResult.results.length === 0) {
+          return;
         }
+
+        const prodCatNameID = Number(productResult.results[0].prodCatNameID);
+
+        const historicalCountries = productResult.results
+          .map((item) => Number(item.countryID))
+          .filter((countryID) => {
+            return Number.isInteger(countryID) && countryID > 0;
+          });
+
+        const countryIDs =
+          historicalCountries.length > 0
+            ? [...new Set(historicalCountries)]
+            : [32];
+
+        countryIDs.forEach((countryID) => {
+          quarterMonths.forEach((month) => {
+            const entryID = Number(
+              yearshort.toString() +
+                month.toString() +
+                pad(productResult.productID, 3) +
+                pad(countryID, 3),
+            );
+
+            rows.push([
+              entryID,
+              year + "-" + month + "-01",
+              productResult.productID,
+              0,
+              9999,
+              countryID,
+              prodCatNameID,
+              0,
+              0,
+            ]);
+          });
+        });
+      });
+
+      if (rows.length === 0) {
+        return res.status(400).json({
+          error: "None of the selected products could be found",
+        });
       }
-    );
-    // j = j + 1;
-  });
-  // if (err) {
-  //   console.log(err);
-  // } else {
-  res.json({
-    success: true,
-    msg: "Saved",
-  });
-  // }
-});
+
+      const insertQuery = `
+        INSERT IGNORE INTO budgets (
+          budgetentryID,
+          date,
+          prodNameID,
+          quantity,
+          customerID,
+          countryID,
+          prodCatNameID,
+          price,
+          profit
+        )
+        VALUES ?
+      `;
+
+      const insertResults = await queryAsync(insertQuery, [rows]);
+
+      const productGroups = await queryAsync(
+        `
+          SELECT
+            productGroups.productGroup,
+            SUM(budgets.quantity) AS quantity,
+            SUM(budgets.quantity * budgets.profit) AS profit
+          FROM budgets
+          INNER JOIN prodNames
+            ON prodNames.prodNameID = budgets.prodNameID
+          INNER JOIN productGroups
+            ON productGroups.prodGroupID = prodNames.prodGroupID
+          WHERE YEAR(budgets.date) = ?
+          GROUP BY productGroups.productGroup
+          ORDER BY profit DESC
+        `,
+        [year],
+      );
+
+      const productCategories = await queryAsync(
+        `
+          SELECT
+            prodCatNames.prodCatName,
+            productGroups.productGroup,
+            budgets.prodCatNameID,
+            SUM(budgets.quantity) AS quantity,
+            SUM(budgets.quantity * budgets.profit) AS profit
+          FROM budgets
+          INNER JOIN prodNames
+            ON prodNames.prodNameID = budgets.prodNameID
+          INNER JOIN productGroups
+            ON productGroups.prodGroupID = prodNames.prodGroupID
+          INNER JOIN prodCatNames
+            ON prodCatNames.prodCatNameID = budgets.prodCatNameID
+          WHERE YEAR(budgets.date) = ?
+          GROUP BY
+            prodCatNames.prodCatName,
+            productGroups.productGroup,
+            budgets.prodCatNameID
+          ORDER BY profit DESC
+        `,
+        [year],
+      );
+
+      return res.status(200).json({
+        success: true,
+        msg: "Products added",
+        productsProcessed: productIDs.length,
+        rowsAdded: insertResults.affectedRows,
+        productGroups,
+        productCategories,
+      });
+    } catch (err) {
+      console.error("Error adding products to budget:", err);
+
+      return res.status(500).json({
+        error: "The selected products could not be added",
+      });
+    }
+  },
+);
 
 router.post("/budgetfilterbtns", (req, res) => {
   let year = req.body.year;
@@ -2181,7 +2562,7 @@ router.post("/budgetfilterbtns", (req, res) => {
       if (results.length > 0) {
         return res.status(200).send(results);
       }
-    }
+    },
   );
 });
 
@@ -2196,23 +2577,47 @@ router.post("/budgetgroupbtns", (req, res) => {
       if (results.length > 0) {
         res.status(200).send(results);
       }
-    }
+    },
   );
 });
 
 router.post("/getbudgetdata", (req, res) => {
-  let pcat = req.body.prodcat;
-  let year = req.body.year;
+  const pcat = Number(req.body.prodcat);
+  const year = Number(req.body.year);
+
   db.query(
-    `SELECT budgets.*, abbreviation, country, region, price, profit FROM budgets INNER JOIN prodNames ON budgets.prodNameID = prodNames.prodNameID INNER JOIN countryList ON budgets.countryID=countryList.countryID WHERE budgets.prodCatNameID=${pcat} AND YEAR(date)=${year} ORDER BY abbreviation, region, country ASC, date ASC`,
+    `SELECT
+       budgets.*,
+       abbreviation,
+       country,
+       region,
+       price,
+       profit
+     FROM budgets
+     INNER JOIN prodNames
+       ON budgets.prodNameID = prodNames.prodNameID
+     INNER JOIN countryList
+       ON budgets.countryID = countryList.countryID
+     WHERE budgets.prodCatNameID = ?
+       AND YEAR(date) = ?
+     ORDER BY
+       abbreviation,
+       region,
+       country ASC,
+       date ASC`,
+    [pcat, year],
     (err, results) => {
       if (err) {
-        console.log(err);
+        console.error("Error loading budget data:", err);
+
+        return res.status(500).json({
+          error: "Budget data could not be loaded",
+        });
       }
-      if (results.length > 0) {
-        return res.status(200).send(results);
-      }
-    }
+
+      // Returning [] is required when the category has no remaining rows.
+      return res.status(200).send(results);
+    },
   );
 });
 
@@ -2227,11 +2632,11 @@ router.post("/bdgtregiondata", (req, res) => {
       if (results.length > 0) {
         res.status(200).send(results);
       }
-    }
+    },
   );
 });
 
-router.post("/savebdgtqty", (req, res) => {
+router.post("/savebdgtqty", requireEditableBudgetEntry, (req, res) => {
   let newqty = req.body.newqty;
   let entryID = req.body.entryID;
   db.query(
@@ -2245,11 +2650,11 @@ router.post("/savebdgtqty", (req, res) => {
           msg: "New Quantity Saved",
         });
       }
-    }
+    },
   );
 });
 
-router.post("/savebdgteconfig", (req, res) => {
+router.post("/savebdgteconfig", requireEditableBudgetProduct, (req, res) => {
   let year = req.body.year;
   yearshort = year - 2000;
   let item = req.body.item;
@@ -2273,7 +2678,7 @@ router.post("/savebdgteconfig", (req, res) => {
           // okind = "OK";
           // console.log("OK");
         }
-      }
+      },
     );
     // if (okind === "OK") {
 
@@ -2296,7 +2701,7 @@ router.post("/bdgtloadregcty", (req, res) => {
       if (results.length > 0) {
         res.status(200).send(results);
       }
-    }
+    },
   );
 });
 
@@ -2311,59 +2716,186 @@ router.post("/bdgtfullcountrylist", (req, res) => {
   });
 });
 
-router.post("/addbdgtcty", (req, res) => {
-  let countries = req.body.countries;
-  let pname = req.body.pname;
-  let pcatname = req.body.pcatname;
-  let year = req.body.year;
-  let yearshort = year - 2000;
+router.post("/addbdgtcty", requireEditableBudgetProduct, (req, res) => {
+  const year = Number(req.body.year);
 
-  countries.forEach((cty) => {
-    let quarter = [1, 4, 7, 10];
-    quarter.forEach((q) => {
-      let padprod = pad(pname, 3);
-      let padcountry = pad(Number(cty), 3);
-      let entryid = Number(yearshort + q.toString() + padprod + padcountry);
-      db.query(
-        `INSERT IGNORE INTO budgets (budgetentryID, date, prodNameID, quantity, customerID, countryID, prodCatNameID) VALUES (${entryid}, '${year}-${q}-01', ${pname}, 0, 9999, ${cty},${pcatname})`,
-        (err, results) => {
-          if (err) {
-            console.log(err);
-          }
-        }
+  const rawProductID =
+    req.body.prodNameID !== undefined ? req.body.prodNameID : req.body.pname;
+
+  const prodNameID = Number(rawProductID);
+  const prodCatNameID = Number(req.body.pcatname);
+
+  const countries = Array.isArray(req.body.countries)
+    ? [...new Set(req.body.countries.map(Number))]
+    : [];
+
+  if (
+    !Number.isInteger(year) ||
+    year < 2000 ||
+    year > 9999 ||
+    !Number.isInteger(prodNameID) ||
+    prodNameID <= 0 ||
+    !Number.isInteger(prodCatNameID) ||
+    prodCatNameID <= 0 ||
+    countries.length === 0 ||
+    countries.some(
+      (countryID) => !Number.isInteger(countryID) || countryID <= 0,
+    )
+  ) {
+    return res.status(400).json({
+      error: "Valid year, prodNameID, pcatname and countries are required",
+    });
+  }
+
+  const yearshort = year - 2000;
+  const quarterMonths = [1, 4, 7, 10];
+  const rows = [];
+
+  countries.forEach((countryID) => {
+    quarterMonths.forEach((month) => {
+      const paddedProduct = pad(prodNameID, 3);
+      const paddedCountry = pad(countryID, 3);
+
+      const budgetEntryID = Number(
+        yearshort.toString() + month.toString() + paddedProduct + paddedCountry,
       );
+
+      rows.push([
+        budgetEntryID,
+        `${year}-${month}-01`,
+        prodNameID,
+        0,
+        9999,
+        countryID,
+        prodCatNameID,
+      ]);
     });
   });
-  res.json({
-    success: true,
-    msg: "New Countries Added",
+
+  const sql = `
+      INSERT IGNORE INTO budgets (
+        budgetentryID,
+        date,
+        prodNameID,
+        quantity,
+        customerID,
+        countryID,
+        prodCatNameID
+      )
+      VALUES ?
+    `;
+
+  db.query(sql, [rows], (err, results) => {
+    if (err) {
+      console.error("Error adding budget countries:", err);
+
+      return res.status(500).json({
+        error: "The selected countries could not be added",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      msg: "New Countries Added",
+      rowsAdded: results.affectedRows,
+    });
   });
 });
 
-router.post("/bdgtdelctyrow", (req, res) => {
-  let year = req.body.year;
-  let yearshort = year - 2000;
-  let pname = req.body.pname;
-  let countryid = req.body.countryid;
-  let quarter = [1, 4, 7, 10];
-  quarter.forEach((q) => {
-    let padprod = pad(pname, 3);
-    let padcountry = pad(Number(countryid), 3);
-    let entryid = Number(yearshort + q.toString() + padprod + padcountry);
-    db.query(
-      `DELETE FROM budgets WHERE budgetentryID=${entryid}`,
-      (err, result) => {
-        if (err) {
-          console.log(err);
-        }
-      }
-    );
-  });
-  res.json({
-    success: true,
-    msg: "Country Deleted",
-  });
-});
+router.post(
+  "/bdgtdelctyrow",
+  requireEditableBudgetProduct,
+  async (req, res) => {
+    const year = Number(req.body.year);
+    const productNameID = Number(req.body.pname);
+    const countryID = Number(req.body.countryid);
+    const prodCatNameID = Number(req.body.prodcat);
+
+    const queryAsync = (sql, values) => {
+      return new Promise((resolve, reject) => {
+        db.query(sql, values, (err, results) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(results);
+          }
+        });
+      });
+    };
+
+    try {
+      const deleteResult = await queryAsync(
+        `DELETE FROM budgets
+         WHERE prodNameID = ?
+           AND countryID = ?
+           AND YEAR(date) = ?`,
+        [productNameID, countryID, year],
+      );
+
+      const categoryCount = await queryAsync(
+        `SELECT COUNT(*) AS remainingRows
+         FROM budgets
+         WHERE prodCatNameID = ?
+           AND YEAR(date) = ?`,
+        [prodCatNameID, year],
+      );
+
+      const productGroups = await queryAsync(
+        `SELECT
+           productGroups.productGroup,
+           SUM(budgets.quantity) AS quantity,
+           SUM(budgets.quantity * budgets.profit) AS profit
+         FROM budgets
+         INNER JOIN prodNames
+           ON prodNames.prodNameID = budgets.prodNameID
+         INNER JOIN productGroups
+           ON productGroups.prodGroupID = prodNames.prodGroupID
+         WHERE YEAR(budgets.date) = ?
+         GROUP BY productGroups.productGroup
+         ORDER BY profit DESC`,
+        [year],
+      );
+
+      const productCategories = await queryAsync(
+        `SELECT
+           prodCatNames.prodCatName,
+           productGroups.productGroup,
+           budgets.prodCatNameID,
+           SUM(budgets.quantity) AS quantity,
+           SUM(budgets.quantity * budgets.profit) AS profit
+         FROM budgets
+         INNER JOIN prodNames
+           ON prodNames.prodNameID = budgets.prodNameID
+         INNER JOIN productGroups
+           ON productGroups.prodGroupID = prodNames.prodGroupID
+         INNER JOIN prodCatNames
+           ON prodCatNames.prodCatNameID = budgets.prodCatNameID
+         WHERE YEAR(budgets.date) = ?
+         GROUP BY
+           prodCatNames.prodCatName,
+           productGroups.productGroup,
+           budgets.prodCatNameID
+         ORDER BY profit DESC`,
+        [year],
+      );
+
+      return res.status(200).json({
+        success: true,
+        msg: "Country Deleted",
+        rowsDeleted: deleteResult.affectedRows,
+        categoryHasRows: Number(categoryCount[0].remainingRows) > 0,
+        productGroups,
+        productCategories,
+      });
+    } catch (err) {
+      console.error("Error deleting budget country:", err);
+
+      return res.status(500).json({
+        error: "The country could not be deleted",
+      });
+    }
+  },
+);
 
 router.post("/yearbudgetdata", (req, res) => {
   let year = req.body.year;
@@ -2377,7 +2909,7 @@ router.post("/yearbudgetdata", (req, res) => {
       if (results.length > 0) {
         res.status(200).send(results);
       }
-    }
+    },
   );
 });
 
@@ -2400,7 +2932,7 @@ router.post("/bdgtlyearsalestotals", (req, res) => {
           msg: "No last year sales",
         });
       }
-    }
+    },
   );
 });
 
@@ -2424,7 +2956,7 @@ router.post("/budgetlyearsales", (req, res) => {
           msg: "No last year sales",
         });
       }
-    }
+    },
   );
 });
 
@@ -2450,7 +2982,7 @@ router.post("/bdgtlyearbdgt", (req, res) => {
           msg: "No last year budget",
         });
       }
-    }
+    },
   );
 });
 
@@ -2512,7 +3044,7 @@ router.post("/loadbudgetfile", (req, res) => {
               msg: "File Uploaded",
             });
           }
-        }
+        },
       );
     }
   });
@@ -2531,7 +3063,7 @@ router.post("/loadcurrentbudget", (req, res) => {
       if (results.length > 0) {
         res.status(200).send(results);
       }
-    }
+    },
   );
 });
 
@@ -2561,7 +3093,7 @@ router.post("/savenewbudgetcomment", (req, res) => {
           msg: "Comment succesfully saved",
         });
       }
-    }
+    },
   );
 });
 router.post("/deletebudgetcomment", (req, res) => {
@@ -2575,7 +3107,7 @@ router.post("/deletebudgetcomment", (req, res) => {
       if (results) {
         res.sendStatus(200);
       }
-    }
+    },
   );
 });
 
@@ -2598,7 +3130,7 @@ router.post("/getbdgtcomments", (req, res) => {
           msg: "No comments yet",
         });
       }
-    }
+    },
   );
 });
 
@@ -2625,7 +3157,7 @@ router.post("/getmyoperations", (req, res) => {
           msg: "No files assigned to this traffic manager",
         });
       }
-    }
+    },
   );
 });
 
@@ -2652,7 +3184,7 @@ router.post("/gettraderoperations", (req, res) => {
           msg: "No files assigned to this traffic manager",
         });
       }
-    }
+    },
   );
 });
 
@@ -2701,7 +3233,7 @@ router.post("/saveopedits", (req, res) => {
           msg: "Changes Saved",
         });
       }
-    }
+    },
   );
 });
 router.post("/savenewnote", (req, res) => {
@@ -2722,7 +3254,7 @@ router.post("/savenewnote", (req, res) => {
           message: "New Note Posted",
         });
       }
-    }
+    },
   );
 });
 
@@ -2744,7 +3276,7 @@ router.post("/getopnotes", (req, res) => {
           message: "New Notes Yet",
         });
       }
-    }
+    },
   );
 });
 
@@ -2760,7 +3292,7 @@ router.post("/getfulloptoedit", (req, res) => {
       if (results.length > 0) {
         res.status(200).send(results);
       }
-    }
+    },
   );
 });
 
@@ -2780,7 +3312,7 @@ router.post("/addQStonewmsglist", (req, res) => {
           message: "New QSID added to List",
         });
       }
-    }
+    },
   );
 });
 
@@ -2797,7 +3329,7 @@ router.post("/resetunreadusers", (req, res) => {
       if (results) {
         res.sendStatus(200);
       }
-    }
+    },
   );
 });
 
@@ -2844,7 +3376,7 @@ router.post("/removeUnreaduser", (req, res) => {
       if (results) {
         res.sendStatus(200);
       }
-    }
+    },
   );
 });
 
@@ -2859,8 +3391,1120 @@ router.post("/getActiveUsers", (req, res) => {
       if (results.length > 0) {
         res.status(200).send(results);
       }
-    }
+    },
   );
+});
+
+router.post("/budgetrowhistory", (req, res) => {
+  const budgetYear = Number(req.body.year);
+  const prodcat = Number(req.body.prodcat);
+  const product = req.body.product;
+  const region = req.body.region;
+  const country = req.body.country;
+  const requestedYears = Number(req.body.years) || 3;
+  const numberOfYears = Math.min(Math.max(requestedYears, 1), 5);
+
+  if (
+    !Number.isInteger(budgetYear) ||
+    !Number.isInteger(prodcat) ||
+    !product ||
+    !region ||
+    !country
+  ) {
+    return res.status(400).json({
+      error: "year, prodcat, product, region and country are required",
+    });
+  }
+
+  const endYear = budgetYear - 1;
+  const startYear = budgetYear - numberOfYears;
+
+  const budgetQuery = `
+    SELECT
+      YEAR(budgets.date) AS year,
+      QUARTER(budgets.date) AS quarter,
+      SUM(budgets.quantity) AS quantity
+    FROM budgets
+    INNER JOIN prodNames
+      ON budgets.prodNameID = prodNames.prodNameID
+    INNER JOIN countryList
+      ON budgets.countryID = countryList.countryID
+    WHERE YEAR(budgets.date) BETWEEN ? AND ?
+      AND budgets.prodCatNameID = ?
+      AND prodNames.abbreviation = ?
+      AND countryList.region = ?
+      AND countryList.country = ?
+    GROUP BY
+      YEAR(budgets.date),
+      QUARTER(budgets.date)
+    ORDER BY
+      YEAR(budgets.date) ASC,
+      QUARTER(budgets.date) ASC
+  `;
+
+  const salesQuery = `
+    SELECT
+      quarterlysales.y AS year,
+      quarterlysales.Q AS quarter,
+      SUM(quarterlysales.quantity) AS quantity
+    FROM quarterlysales
+    INNER JOIN prodNames
+      ON quarterlysales.productName = prodNames.prodNameID
+    INNER JOIN countryList
+      ON quarterlysales.countryID = countryList.countryID
+    WHERE quarterlysales.y BETWEEN ? AND ?
+      AND prodNames.prodCatNameID = ?
+      AND prodNames.abbreviation = ?
+      AND countryList.region = ?
+      AND countryList.country = ?
+    GROUP BY
+      quarterlysales.y,
+      quarterlysales.Q
+    ORDER BY
+      quarterlysales.y ASC,
+      quarterlysales.Q ASC
+  `;
+
+  const customerQuery = `
+    SELECT
+      YEAR(quotationsheet.\`from\`) AS year,
+      customerList.companyCode AS customer,
+      SUM(quotationsheet.quantity) AS quantity
+    FROM quotationsheet
+    INNER JOIN productList
+      ON quotationsheet.productID = productList.productID
+    INNER JOIN prodNames
+      ON productList.productName = prodNames.prodNameID
+    INNER JOIN PODList
+      ON quotationsheet.PODID = PODList.PODID
+    INNER JOIN countryList
+      ON PODList.countryID = countryList.countryID
+    INNER JOIN customerList
+      ON quotationsheet.customerID = customerList.customerID
+    WHERE YEAR(quotationsheet.\`from\`) BETWEEN ? AND ?
+      AND quotationsheet.saleComplete = -1
+      AND prodNames.prodCatNameID = ?
+      AND prodNames.abbreviation = ?
+      AND countryList.region = ?
+      AND countryList.country = ?
+    GROUP BY
+      YEAR(quotationsheet.\`from\`),
+      customerList.customerID,
+      customerList.companyCode
+    ORDER BY
+      customerList.companyCode ASC,
+      year ASC
+  `;
+
+  const queryValues = [startYear, endYear, prodcat, product, region, country];
+
+  const buildQuarterSeries = (rows) => {
+    const rowsByYear = {};
+
+    rows.forEach((row) => {
+      if (!rowsByYear[row.year]) {
+        rowsByYear[row.year] = {
+          Q1: 0,
+          Q2: 0,
+          Q3: 0,
+          Q4: 0,
+        };
+      }
+
+      const quarter = Number(row.quarter);
+
+      if (quarter >= 1 && quarter <= 4) {
+        rowsByYear[row.year]["Q" + quarter] = Number(row.quantity) || 0;
+      }
+    });
+
+    const series = [];
+
+    for (let year = endYear; year >= startYear; year -= 1) {
+      series.push({
+        year: year,
+        quarters: rowsByYear[year] || {
+          Q1: 0,
+          Q2: 0,
+          Q3: 0,
+          Q4: 0,
+        },
+      });
+    }
+
+    return series;
+  };
+
+  const buildCustomerSeries = (rows) => {
+    const customersByName = {};
+
+    rows.forEach((row) => {
+      if (!customersByName[row.customer]) {
+        customersByName[row.customer] = {
+          customer: row.customer,
+          quantity: 0,
+          quantitiesByYear: {},
+        };
+      }
+
+      const quantity = Number(row.quantity) || 0;
+
+      customersByName[row.customer].quantity += quantity;
+      customersByName[row.customer].quantitiesByYear[Number(row.year)] =
+        quantity;
+    });
+
+    return Object.keys(customersByName)
+      .map((customerName) => {
+        const customer = customersByName[customerName];
+        const years = [];
+
+        for (let year = startYear; year <= endYear; year += 1) {
+          years.push({
+            year: year,
+            quantity: customer.quantitiesByYear[year] || 0,
+          });
+        }
+
+        return {
+          customer: customer.customer,
+          quantity: customer.quantity,
+          years: years,
+        };
+      })
+      .sort((a, b) => b.quantity - a.quantity)
+      .slice(0, 10);
+  };
+
+  db.query(budgetQuery, queryValues, (budgetError, budgetResults) => {
+    if (budgetError) {
+      console.log(budgetError);
+
+      return res.status(500).json({
+        error: "Unable to load budget history",
+      });
+    }
+
+    db.query(salesQuery, queryValues, (salesError, salesResults) => {
+      if (salesError) {
+        console.log(salesError);
+
+        return res.status(500).json({
+          error: "Unable to load sales history",
+        });
+      }
+
+      db.query(customerQuery, queryValues, (customerError, customerResults) => {
+        if (customerError) {
+          console.log(customerError);
+
+          return res.status(500).json({
+            error: "Unable to load customer sales history",
+          });
+        }
+
+        return res.status(200).json({
+          budget: buildQuarterSeries(budgetResults),
+          sales: buildQuarterSeries(salesResults),
+          customers: buildCustomerSeries(customerResults),
+        });
+      });
+    });
+  });
+});
+
+router.post("/budgeteligibleorigins", (req, res) => {
+  const prodNameID = Number(req.body.prodNameID);
+
+  if (!Number.isInteger(prodNameID) || prodNameID <= 0) {
+    return res.status(400).json({
+      error: "A valid prodNameID is required",
+    });
+  }
+
+  const query = `
+    SELECT DISTINCT
+      countryList.countryID,
+      countryList.country
+    FROM productList
+    INNER JOIN supplierlist
+      ON productList.supplierID = supplierlist.supplierID
+    INNER JOIN countryList
+      ON supplierlist.countryID = countryList.countryID
+    WHERE productList.productName = ?
+    ORDER BY countryList.country ASC
+  `;
+
+  db.query(query, [prodNameID], (err, results) => {
+    if (err) {
+      console.log(err);
+
+      return res.status(500).json({
+        error: "Unable to load eligible origins",
+      });
+    }
+
+    return res.status(200).json(results);
+  });
+});
+
+router.post("/budgetallocationcustomers", (req, res) => {
+  const query = `
+    SELECT
+      customerID,
+      companyCode,
+      companyName,
+      country
+    FROM customerList
+    WHERE customerID <> 9999
+    ORDER BY companyCode ASC
+  `;
+
+  db.query(query, (err, results) => {
+    if (err) {
+      console.log(err);
+
+      return res.status(500).json({
+        error: "Unable to load customers",
+      });
+    }
+
+    return res.status(200).json(results);
+  });
+});
+
+router.post("/budgetallocationdetails", (req, res) => {
+  const budgetEntryID = String(req.body.budgetEntryID || "").trim();
+
+  if (!/^\d+$/.test(budgetEntryID)) {
+    return res.status(400).json({
+      error: "A valid budgetEntryID is required",
+    });
+  }
+
+  const budgetQuery = `
+    SELECT
+      budgets.budgetentryID AS budgetEntryID,
+      budgets.prodNameID,
+      budgets.countryID,
+      budgets.quantity AS budgetQuantity,
+      YEAR(budgets.date) AS year,
+      QUARTER(budgets.date) AS quarter,
+      prodNames.abbreviation AS product,
+      countryList.country
+    FROM budgets
+    INNER JOIN prodNames
+      ON budgets.prodNameID = prodNames.prodNameID
+    INNER JOIN countryList
+      ON budgets.countryID = countryList.countryID
+    WHERE budgets.budgetentryID = ?
+  `;
+
+  const allocationsQuery = `
+    SELECT
+      budgetAllocations.allocationID,
+      budgetAllocations.customerID,
+      customerList.companyCode AS customer,
+      customerList.companyName,
+      budgetAllocations.originCountryID,
+      countryList.country AS origin,
+      budgetAllocations.quantity
+    FROM budgetAllocations
+    INNER JOIN customerList
+      ON budgetAllocations.customerID = customerList.customerID
+    INNER JOIN countryList
+      ON budgetAllocations.originCountryID = countryList.countryID
+    WHERE budgetAllocations.budgetEntryID = ?
+    ORDER BY customerList.companyCode, countryList.country
+  `;
+
+  db.query(budgetQuery, [budgetEntryID], (budgetErr, budgetResults) => {
+    if (budgetErr) {
+      console.log(budgetErr);
+
+      return res.status(500).json({
+        error: "Unable to load budget entry",
+      });
+    }
+
+    if (budgetResults.length === 0) {
+      return res.status(404).json({
+        error: "Budget entry not found",
+      });
+    }
+
+    db.query(
+      allocationsQuery,
+      [budgetEntryID],
+      (allocationErr, allocationResults) => {
+        if (allocationErr) {
+          console.log(allocationErr);
+
+          return res.status(500).json({
+            error: "Unable to load allocations",
+          });
+        }
+
+        const budgetQuantity = Number(budgetResults[0].budgetQuantity) || 0;
+
+        const allocatedQuantity = allocationResults.reduce(
+          (total, allocation) => {
+            return total + (Number(allocation.quantity) || 0);
+          },
+          0,
+        );
+
+        return res.status(200).json({
+          budget: budgetResults[0],
+          allocations: allocationResults,
+          summary: {
+            budgetQuantity: budgetQuantity,
+            allocatedQuantity: allocatedQuantity,
+            remainingQuantity: budgetQuantity - allocatedQuantity,
+            complete:
+              budgetQuantity > 0 && allocatedQuantity === budgetQuantity,
+          },
+        });
+      },
+    );
+  });
+});
+
+router.post("/savebudgetallocation", requireEditableBudgetEntry, (req, res) => {
+  const budgetEntryID = String(req.body.budgetEntryID || "").trim();
+  const customerID = Number(req.body.customerID);
+  const originCountryID = Number(req.body.originCountryID);
+  const quantity = Number(req.body.quantity);
+
+  if (
+    !/^\d+$/.test(budgetEntryID) ||
+    !Number.isInteger(customerID) ||
+    customerID <= 0 ||
+    !Number.isInteger(originCountryID) ||
+    originCountryID <= 0 ||
+    !Number.isFinite(quantity) ||
+    quantity <= 0
+  ) {
+    return res.status(400).json({
+      error:
+        "Valid budgetEntryID, customerID, originCountryID and quantity are required",
+    });
+  }
+
+  const validationQuery = `
+    SELECT
+      budgets.quantity AS budgetQuantity,
+
+      EXISTS(
+        SELECT 1
+        FROM customerList
+        WHERE customerList.customerID = ?
+      ) AS validCustomer,
+
+      EXISTS(
+        SELECT 1
+        FROM productList
+        INNER JOIN supplierlist
+          ON productList.supplierID = supplierlist.supplierID
+        WHERE productList.productName = budgets.prodNameID
+          AND supplierlist.countryID = ?
+      ) AS validOrigin,
+
+      COALESCE(
+        (
+          SELECT SUM(budgetAllocations.quantity)
+          FROM budgetAllocations
+          WHERE budgetAllocations.budgetEntryID =
+                budgets.budgetentryID
+            AND NOT (
+              budgetAllocations.customerID = ?
+              AND budgetAllocations.originCountryID = ?
+            )
+        ),
+        0
+      ) AS allocatedOther
+
+    FROM budgets
+    WHERE budgets.budgetentryID = ?
+  `;
+
+  const validationValues = [
+    customerID,
+    originCountryID,
+    customerID,
+    originCountryID,
+    budgetEntryID,
+  ];
+
+  db.query(
+    validationQuery,
+    validationValues,
+    (validationErr, validationResults) => {
+      if (validationErr) {
+        console.log(validationErr);
+
+        return res.status(500).json({
+          error: "Unable to validate allocation",
+        });
+      }
+
+      if (validationResults.length === 0) {
+        return res.status(404).json({
+          error: "Budget entry not found",
+        });
+      }
+
+      const validation = validationResults[0];
+      const budgetQuantity = Number(validation.budgetQuantity) || 0;
+      const allocatedOther = Number(validation.allocatedOther) || 0;
+      const proposedTotal = allocatedOther + quantity;
+
+      if (!validation.validCustomer) {
+        return res.status(400).json({
+          error: "Selected customer does not exist",
+        });
+      }
+
+      if (!validation.validOrigin) {
+        return res.status(400).json({
+          error: "Selected origin is not available for this product",
+        });
+      }
+
+      if (proposedTotal > budgetQuantity) {
+        return res.status(400).json({
+          error: "Allocation exceeds the available budget quantity",
+          budgetQuantity: budgetQuantity,
+          currentlyAllocated: allocatedOther,
+          requestedQuantity: quantity,
+          proposedTotal: proposedTotal,
+          remainingQuantity: budgetQuantity - allocatedOther,
+        });
+      }
+
+      const saveQuery = `
+        INSERT INTO budgetAllocations (
+          budgetEntryID,
+          customerID,
+          originCountryID,
+          quantity
+        )
+        VALUES (?, ?, ?, ?)
+        ON DUPLICATE KEY UPDATE
+          quantity = VALUES(quantity)
+      `;
+
+      db.query(
+        saveQuery,
+        [budgetEntryID, customerID, originCountryID, quantity],
+        (saveErr) => {
+          if (saveErr) {
+            console.log(saveErr);
+
+            return res.status(500).json({
+              error: "Unable to save allocation",
+            });
+          }
+
+          return res.status(200).json({
+            success: true,
+            message: "Budget allocation saved",
+            budgetQuantity: budgetQuantity,
+            allocatedQuantity: proposedTotal,
+            remainingQuantity: budgetQuantity - proposedTotal,
+            complete: proposedTotal === budgetQuantity,
+          });
+        },
+      );
+    },
+  );
+});
+
+router.post(
+  "/deletebudgetallocation",
+  requireEditableBudgetAllocation,
+  (req, res) => {
+    const allocationID = Number(req.body.allocationID);
+
+    if (!Number.isInteger(allocationID) || allocationID <= 0) {
+      return res.status(400).json({
+        error: "A valid allocationID is required",
+      });
+    }
+
+    db.query(
+      "DELETE FROM budgetAllocations WHERE allocationID = ?",
+      [allocationID],
+      (err, results) => {
+        if (err) {
+          console.log(err);
+
+          return res.status(500).json({
+            error: "Unable to delete allocation",
+          });
+        }
+
+        if (results.affectedRows === 0) {
+          return res.status(404).json({
+            error: "Allocation not found",
+          });
+        }
+
+        return res.status(200).json({
+          success: true,
+          message: "Budget allocation deleted",
+        });
+      },
+    );
+  },
+);
+
+router.post("/budgetallocationstatuses", (req, res) => {
+  const year = Number(req.body.year);
+  const prodcat = Number(req.body.prodcat);
+
+  if (!Number.isInteger(year) || !Number.isInteger(prodcat)) {
+    return res.status(400).json({
+      error: "A valid year and prodcat are required",
+    });
+  }
+
+  const query = `
+    SELECT
+      allocationTotals.budgetEntryID,
+      allocationTotals.budgetQuantity,
+      allocationTotals.allocatedQuantity,
+      allocationTotals.budgetQuantity -
+        allocationTotals.allocatedQuantity AS remainingQuantity,
+
+      CASE
+        WHEN allocationTotals.budgetQuantity <= 0
+          THEN 'not-required'
+
+        WHEN allocationTotals.allocatedQuantity =
+             allocationTotals.budgetQuantity
+          THEN 'complete'
+
+        WHEN allocationTotals.allocatedQuantity >
+             allocationTotals.budgetQuantity
+          THEN 'over'
+
+        ELSE 'incomplete'
+      END AS status
+
+    FROM (
+      SELECT
+        budgets.budgetentryID AS budgetEntryID,
+        COALESCE(budgets.quantity, 0) AS budgetQuantity,
+        COALESCE(
+          (
+            SELECT SUM(budgetAllocations.quantity)
+            FROM budgetAllocations
+            WHERE budgetAllocations.budgetEntryID =
+                  budgets.budgetentryID
+          ),
+          0
+        ) AS allocatedQuantity
+
+      FROM budgets
+      WHERE YEAR(budgets.date) = ?
+        AND budgets.prodCatNameID = ?
+    ) AS allocationTotals
+  `;
+
+  db.query(query, [year, prodcat], (err, results) => {
+    if (err) {
+      console.log(err);
+
+      return res.status(500).json({
+        error: "Unable to load allocation statuses",
+      });
+    }
+
+    return res.status(200).json(results);
+  });
+});
+
+router.post("/budgetcategoryreadiness", (req, res) => {
+  const year = Number(req.body.year);
+  const prodCatNameID = Number(req.body.prodCatNameID);
+
+  if (
+    !Number.isInteger(year) ||
+    !Number.isInteger(prodCatNameID) ||
+    prodCatNameID <= 0
+  ) {
+    return res.status(400).json({
+      error: "A valid year and prodCatNameID are required",
+    });
+  }
+
+  const query = `
+    SELECT
+      budgets.budgetentryID AS budgetEntryID,
+      budgets.prodNameID,
+      prodNames.abbreviation AS product,
+      budgets.countryID,
+      countryList.country,
+      QUARTER(budgets.date) AS quarter,
+      budgets.quantity AS budgetQuantity,
+      COALESCE(SUM(budgetAllocations.quantity), 0)
+        AS allocatedQuantity
+
+    FROM budgets
+
+    INNER JOIN prodNames
+      ON budgets.prodNameID = prodNames.prodNameID
+
+    INNER JOIN countryList
+      ON budgets.countryID = countryList.countryID
+
+    LEFT JOIN budgetAllocations
+      ON budgets.budgetentryID =
+         budgetAllocations.budgetEntryID
+
+    WHERE YEAR(budgets.date) = ?
+      AND budgets.prodCatNameID = ?
+      AND budgets.quantity > 0
+
+    GROUP BY
+      budgets.budgetentryID,
+      budgets.prodNameID,
+      prodNames.abbreviation,
+      budgets.countryID,
+      countryList.country,
+      QUARTER(budgets.date),
+      budgets.quantity
+
+    ORDER BY
+      prodNames.abbreviation,
+      countryList.country,
+      quarter
+  `;
+
+  db.query(query, [year, prodCatNameID], (err, results) => {
+    if (err) {
+      console.log(err);
+
+      return res.status(500).json({
+        error: "Unable to validate the budget category",
+      });
+    }
+
+    const cells = results.map((cell) => {
+      const budgetQuantity = Number(cell.budgetQuantity) || 0;
+
+      const allocatedQuantity = Number(cell.allocatedQuantity) || 0;
+
+      let status = "incomplete";
+
+      if (allocatedQuantity === budgetQuantity) {
+        status = "complete";
+      } else if (allocatedQuantity > budgetQuantity) {
+        status = "over";
+      }
+
+      return {
+        budgetEntryID: cell.budgetEntryID,
+        prodNameID: cell.prodNameID,
+        product: cell.product,
+        countryID: cell.countryID,
+        country: cell.country,
+        quarter: Number(cell.quarter),
+        budgetQuantity: budgetQuantity,
+        allocatedQuantity: allocatedQuantity,
+        remainingQuantity: budgetQuantity - allocatedQuantity,
+        status: status,
+      };
+    });
+
+    const incompleteCells = cells.filter((cell) => {
+      return cell.status !== "complete";
+    });
+
+    return res.status(200).json({
+      year: year,
+      prodCatNameID: prodCatNameID,
+
+      summary: {
+        totalRequiredCells: cells.length,
+        completeCells: cells.length - incompleteCells.length,
+        incompleteCells: incompleteCells.length,
+
+        ready: cells.length > 0 && incompleteCells.length === 0,
+      },
+
+      incompleteCells: incompleteCells,
+    });
+  });
+});
+
+const getAuthenticatedTraderID = (req, res, callback) => {
+  const usercode = req.user && req.user.usercode ? req.user.usercode : "";
+
+  if (!usercode) {
+    return res.status(401).json({
+      error: "Unable to identify the authenticated user",
+    });
+  }
+
+  db.query(
+    `
+      SELECT traderID
+      FROM traderList
+      WHERE tCode = ?
+        AND active = 'y'
+      LIMIT 1
+    `,
+    [usercode],
+    (err, results) => {
+      if (err) {
+        console.log(err);
+
+        return res.status(500).json({
+          error: "Unable to identify the authenticated user",
+        });
+      }
+
+      if (results.length === 0) {
+        return res.status(403).json({
+          error: "The authenticated user is not active",
+        });
+      }
+
+      callback(results[0].traderID);
+    },
+  );
+};
+
+router.post("/budgetcategorystatus", (req, res) => {
+  const year = Number(req.body.year);
+  const prodCatNameID = Number(req.body.prodCatNameID);
+
+  if (
+    !Number.isInteger(year) ||
+    !Number.isInteger(prodCatNameID) ||
+    prodCatNameID <= 0
+  ) {
+    return res.status(400).json({
+      error: "A valid year and prodCatNameID are required",
+    });
+  }
+
+  const query = `
+    SELECT
+      budgetCategorySubmissions.submissionID,
+      budgetCategorySubmissions.budgetYear,
+      budgetCategorySubmissions.prodCatNameID,
+      prodCatNames.prodCatName,
+      budgetCategorySubmissions.status,
+      budgetCategorySubmissions.submittedByTraderID,
+      CONCAT(
+        submittedBy.tName,
+        ' ',
+        submittedBy.tLastName
+      ) AS submittedBy,
+      budgetCategorySubmissions.submittedAt,
+      budgetCategorySubmissions.reopenedByTraderID,
+      CONCAT(
+        reopenedBy.tName,
+        ' ',
+        reopenedBy.tLastName
+      ) AS reopenedBy,
+      budgetCategorySubmissions.reopenedAt,
+      budgetCategorySubmissions.updatedAt
+
+    FROM budgetCategorySubmissions
+
+    INNER JOIN prodCatNames
+      ON budgetCategorySubmissions.prodCatNameID =
+         prodCatNames.prodCatNameID
+
+    INNER JOIN traderList AS submittedBy
+      ON budgetCategorySubmissions.submittedByTraderID =
+         submittedBy.traderID
+
+    LEFT JOIN traderList AS reopenedBy
+      ON budgetCategorySubmissions.reopenedByTraderID =
+         reopenedBy.traderID
+
+    WHERE budgetCategorySubmissions.budgetYear = ?
+      AND budgetCategorySubmissions.prodCatNameID = ?
+  `;
+
+  db.query(query, [year, prodCatNameID], (err, results) => {
+    if (err) {
+      console.log(err);
+
+      return res.status(500).json({
+        error: "Unable to load category submission status",
+      });
+    }
+
+    if (results.length === 0) {
+      return res.status(200).json({
+        budgetYear: year,
+        prodCatNameID: prodCatNameID,
+        status: "draft",
+      });
+    }
+
+    return res.status(200).json(results[0]);
+  });
+});
+
+router.post("/submitbudgetcategory", authenticateToken, (req, res) => {
+  const year = Number(req.body.year);
+  const prodCatNameID = Number(req.body.prodCatNameID);
+
+  if (
+    !Number.isInteger(year) ||
+    !Number.isInteger(prodCatNameID) ||
+    prodCatNameID <= 0
+  ) {
+    return res.status(400).json({
+      error: "A valid year and prodCatNameID are required",
+    });
+  }
+
+  const validationQuery = `
+      SELECT
+        COUNT(*) AS totalRequiredCells,
+
+        COALESCE(
+          SUM(
+            CASE
+              WHEN validationCells.allocatedQuantity =
+                   validationCells.budgetQuantity
+              THEN 1
+              ELSE 0
+            END
+          ),
+          0
+        ) AS completeCells
+
+      FROM (
+        SELECT
+          budgets.budgetentryID,
+          budgets.quantity AS budgetQuantity,
+          COALESCE(
+            SUM(budgetAllocations.quantity),
+            0
+          ) AS allocatedQuantity
+
+        FROM budgets
+
+        LEFT JOIN budgetAllocations
+          ON budgets.budgetentryID =
+             budgetAllocations.budgetEntryID
+
+        WHERE YEAR(budgets.date) = ?
+          AND budgets.prodCatNameID = ?
+          AND budgets.quantity > 0
+
+        GROUP BY
+          budgets.budgetentryID,
+          budgets.quantity
+      ) AS validationCells
+    `;
+
+  db.query(
+    validationQuery,
+    [year, prodCatNameID],
+    (validationErr, validationResults) => {
+      if (validationErr) {
+        console.log(validationErr);
+
+        return res.status(500).json({
+          error: "Unable to validate the budget category",
+        });
+      }
+
+      const totalRequiredCells =
+        Number(validationResults[0].totalRequiredCells) || 0;
+
+      const completeCells = Number(validationResults[0].completeCells) || 0;
+
+      const incompleteCells = totalRequiredCells - completeCells;
+
+      if (totalRequiredCells === 0) {
+        return res.status(400).json({
+          error: "This category has no positive budget quantities to submit",
+        });
+      }
+
+      if (incompleteCells > 0) {
+        return res.status(409).json({
+          error: "The category contains incomplete allocations",
+          summary: {
+            totalRequiredCells: totalRequiredCells,
+            completeCells: completeCells,
+            incompleteCells: incompleteCells,
+            ready: false,
+          },
+        });
+      }
+
+      getAuthenticatedTraderID(req, res, (traderID) => {
+        const submissionQuery = `
+              INSERT INTO budgetCategorySubmissions (
+                budgetYear,
+                prodCatNameID,
+                status,
+                submittedByTraderID,
+                submittedAt
+              )
+              VALUES (?, ?, 'submitted', ?, CURRENT_TIMESTAMP)
+
+              ON DUPLICATE KEY UPDATE
+                submittedByTraderID =
+                  IF(
+                    status = 'reopened',
+                    VALUES(submittedByTraderID),
+                    submittedByTraderID
+                  ),
+
+                submittedAt =
+                  IF(
+                    status = 'reopened',
+                    CURRENT_TIMESTAMP,
+                    submittedAt
+                  ),
+
+                status = 'submitted'
+            `;
+
+        db.query(
+          submissionQuery,
+          [year, prodCatNameID, traderID],
+          (submissionErr) => {
+            if (submissionErr) {
+              console.log(submissionErr);
+
+              return res.status(500).json({
+                error: "Unable to submit the budget category",
+              });
+            }
+
+            return res.status(200).json({
+              success: true,
+              message: "Budget category submitted",
+              budgetYear: year,
+              prodCatNameID: prodCatNameID,
+              status: "submitted",
+              submittedByTraderID: traderID,
+            });
+          },
+        );
+      });
+    },
+  );
+});
+
+router.post("/reopenbudgetcategory", authenticateToken, (req, res) => {
+  const year = Number(req.body.year);
+  const prodCatNameID = Number(req.body.prodCatNameID);
+
+  if (
+    !Number.isInteger(year) ||
+    !Number.isInteger(prodCatNameID) ||
+    prodCatNameID <= 0
+  ) {
+    return res.status(400).json({
+      error: "A valid year and prodCatNameID are required",
+    });
+  }
+
+  getAuthenticatedTraderID(req, res, (traderID) => {
+    const query = `
+          UPDATE budgetCategorySubmissions
+          SET
+            status = 'reopened',
+            reopenedByTraderID = ?,
+            reopenedAt = CURRENT_TIMESTAMP
+          WHERE budgetYear = ?
+            AND prodCatNameID = ?
+            AND status = 'submitted'
+        `;
+
+    db.query(query, [traderID, year, prodCatNameID], (err, results) => {
+      if (err) {
+        console.log(err);
+
+        return res.status(500).json({
+          error: "Unable to reopen the budget category",
+        });
+      }
+
+      if (results.affectedRows === 0) {
+        return res.status(409).json({
+          error: "The category is not currently submitted",
+        });
+      }
+
+      return res.status(200).json({
+        success: true,
+        message: "Budget category reopened",
+        budgetYear: year,
+        prodCatNameID: prodCatNameID,
+        status: "reopened",
+        reopenedByTraderID: traderID,
+      });
+    });
+  });
+});
+
+router.post("/reopenbudgetcategory", authenticateToken, (req, res) => {
+  const year = Number(req.body.year);
+  const prodCatNameID = Number(req.body.prodCatNameID);
+
+  if (
+    !Number.isInteger(year) ||
+    !Number.isInteger(prodCatNameID) ||
+    prodCatNameID <= 0
+  ) {
+    return res.status(400).json({
+      error: "A valid year and prodCatNameID are required",
+    });
+  }
+
+  getAuthenticatedTraderID(req, res, (traderID) => {
+    const query = `
+          UPDATE budgetCategorySubmissions
+          SET
+            status = 'reopened',
+            reopenedByTraderID = ?,
+            reopenedAt = CURRENT_TIMESTAMP
+          WHERE budgetYear = ?
+            AND prodCatNameID = ?
+            AND status = 'submitted'
+        `;
+
+    db.query(query, [traderID, year, prodCatNameID], (err, results) => {
+      if (err) {
+        console.log(err);
+
+        return res.status(500).json({
+          error: "Unable to reopen the budget category",
+        });
+      }
+
+      if (results.affectedRows === 0) {
+        return res.status(409).json({
+          error: "The category is not currently submitted",
+        });
+      }
+
+      return res.status(200).json({
+        success: true,
+        message: "Budget category reopened",
+        budgetYear: year,
+        prodCatNameID: prodCatNameID,
+        status: "reopened",
+        reopenedByTraderID: traderID,
+      });
+    });
+  });
 });
 
 module.exports = router;

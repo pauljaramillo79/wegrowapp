@@ -1,64 +1,74 @@
-import React from "react";
+import React, { useState } from "react";
 import { NavLink, Route } from "react-router-dom";
 import "./BudgetGrid.css";
-import Budget2023a from "./Budget2023a";
-import Budget2024a from "./Budget2024a";
-import Budget2025a from "./Budget2025a";
-import Budget2026a from "./Budget2026a";
+import Budget from "./Budget";
 
 const BudgetGrid = () => {
   const role = JSON.parse(localStorage.getItem("role"));
+  const [showBudgetNav, setShowBudgetNav] = useState(false);
+
+  const availableYears =
+    role === 1 || role === 2 ? [2023, 2024, 2025, 2026, 2027] : [2026, 2027];
+
+  const toggleBudgetNav = () => {
+    setShowBudgetNav((current) => !current);
+  };
 
   return (
-    <div className="budgetcontainer">
-      <div className="budgetnav">
-        {role === 2 || role === 1 ? (
-          <>
-            <NavLink
-              activeClassName="navbaractive"
-              to="/budget/budget2023"
-              exact
-            >
-              2023
-            </NavLink>
-            <NavLink
-              activeClassName="navbaractive"
-              to="/budget/budget2024"
-              exact
-            >
-              2024
-            </NavLink>
-          </>
-        ) : (
-          ""
-        )}
+    <div
+      className={
+        showBudgetNav
+          ? "budgetcontainer budgetcontainer--nav-open"
+          : "budgetcontainer"
+      }
+    >
+      <aside
+        id="budget-year-navigation"
+        className={showBudgetNav ? "budgetnav budgetnav--open" : "budgetnav"}
+        aria-label="Budget years"
+      >
+        <button
+          className="budgetnav-toggle"
+          type="button"
+          aria-controls="budget-year-navigation"
+          aria-expanded={showBudgetNav}
+          aria-label={showBudgetNav ? "Hide budget years" : "Show budget years"}
+          onClick={toggleBudgetNav}
+        >
+          <span aria-hidden="true">{showBudgetNav ? "‹" : "›"}</span>
 
-        <NavLink activeClassName="navbaractive" to="/budget/budget2025" exact>
-          2025
-        </NavLink>
-        <NavLink activeClassName="navbaractive" to="/budget/budget2026" exact>
-          2026
-        </NavLink>
-      </div>
+          <span className="budgetnav-toggle__text">Years</span>
+        </button>
+
+        {availableYears.map((year) => {
+          return (
+            <NavLink
+              key={year}
+              activeClassName="navbaractive"
+              to={"/budget/budget" + year}
+              exact
+              tabIndex={showBudgetNav ? 0 : -1}
+            >
+              {year}
+            </NavLink>
+          );
+        })}
+      </aside>
+
       <div className="gridcontainer budgetgridcontainer">
-        {role === 2 || role === 1 ? (
-          <>
-            <Route path="/budget/budget2023">
-              <Budget2023a />
-            </Route>
-            <Route path="/budget/budget2024">
-              <Budget2024a />
-            </Route>
-          </>
-        ) : (
-          ""
-        )}
-        <Route path="/budget/budget2025">
-          <Budget2025a />
-        </Route>
-        <Route path="/budget/budget2026">
-          <Budget2026a />
-        </Route>
+        <Route
+          exact
+          path="/budget/budget:year"
+          render={({ match }) => {
+            const selectedYear = Number(match.params.year);
+
+            if (availableYears.indexOf(selectedYear) === -1) {
+              return null;
+            }
+
+            return <Budget key={selectedYear} year={selectedYear} />;
+          }}
+        />
       </div>
     </div>
   );
