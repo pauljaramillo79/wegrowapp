@@ -1,0 +1,25 @@
+.chatcontainer {
+  margin: 3rem 3rem;
+}
+.chatmain {
+  display: flex;
+  flex-direction: column;
+}
+.chatbody {
+  min-height: 400px;
+  width: 400px;
+  display: flex;
+  flex-direction: column;
+  background-color: white;
+}
+.chatfooter {
+  width: 400px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-top: 1rem;
+}
+.chatfooter input {
+  width: 60%;
+  padding: 0.4rem 1rem;
+}
