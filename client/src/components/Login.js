@@ -88,32 +88,30 @@ const Login = () => {
         setData={setData}
         data={data}
       />
-      <div className="Login">
-        <form className="LoginForm" onSubmit={handleFormSubmit}>
+      <div className='Login'>
+        <form className='LoginForm' onSubmit={handleFormSubmit}>
           <h2> Login </h2>
-          <Logo className="Logo" />
+          <Logo className='Logo' />
           <input
             autoFocus
-            type="text"
-            placeholder="username"
-            name="username"
-            id="username"
+            type='text'
+            placeholder='username'
+            name='username'
+            id='username'
             value={data.username}
             onChange={handleInputChange}
           />
           <input
-            type="password"
-            placeholder="password"
-            name="password"
-            id="password"
+            type='password'
+            placeholder='password'
+            name='password'
+            id='password'
             value={data.password}
             onChange={handleInputChange}
           />
           <button>Login</button>
-          {data.errorMessage && (
-            <span className="errormessage">{data.errorMessage}</span>
-          )}
-          <span className="successmessage">{cpwdsuccessmsg}</span>
+          {data.errorMessage && <span className='errormessage'>{data.errorMessage}</span>}
+          <span className='successmessage'>{cpwdsuccessmsg}</span>
         </form>
       </div>
     </>

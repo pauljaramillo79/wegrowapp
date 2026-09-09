@@ -12,7 +12,7 @@ import {
   AccordionItemPanel,
 } from "react-accessible-accordion";
 import { gsap } from "gsap";
-import * as XLSX from "xlsx";
+import * as XLSX from "xlsx/dist/xlsx.full.min.js";
 import useContextMenu from "../contexts/useContextMenu";
 import "./Budget2024a.css";
 import moment from "moment";
@@ -79,7 +79,7 @@ const Budget2024a = () => {
         duration: 2,
         ease: "power1.inOut",
         onComplete: onComplete,
-      }
+      },
     );
   }, [showmsg]);
 
@@ -95,7 +95,7 @@ const Budget2024a = () => {
         duration: 15,
         ease: "power1.inOut",
         // onComplete: onComplete,
-      }
+      },
     );
   }, [loadmsgrefresh]);
 
@@ -137,9 +137,7 @@ const Budget2024a = () => {
       if (searchterm && searchterm !== "") {
         const results = prodList.filter((item) => {
           if (searchterm && searchterm !== "") {
-            return item.abbreviation
-              .toLowerCase()
-              .includes(searchterm.toLowerCase());
+            return item.abbreviation.toLowerCase().includes(searchterm.toLowerCase());
           }
         });
         setFilteredProdnames(results);
@@ -277,8 +275,7 @@ const Budget2024a = () => {
     }
     if (
       qty === Number(OFormatedData[prod][reg][cty][q]) &&
-      Number(IFormatedData[prod][reg][cty][q]) !==
-        Number(OFormatedData[prod][reg][cty][q])
+      Number(IFormatedData[prod][reg][cty][q]) !== Number(OFormatedData[prod][reg][cty][q])
     ) {
       Axios.post("/savebdgtqty", {
         newqty: qty,
@@ -310,8 +307,7 @@ const Budget2024a = () => {
     }
     if (
       val === Number(Obdgtecondata[prod][reg][cty][item]) &&
-      Number(Ibdgtecondata[prod][reg][cty][item]) !==
-        Number(Obdgtecondata[prod][reg][cty][item])
+      Number(Ibdgtecondata[prod][reg][cty][item]) !== Number(Obdgtecondata[prod][reg][cty][item])
     ) {
       Axios.post("/savebdgteconfig", {
         year: bdgtyear,
@@ -339,7 +335,7 @@ const Budget2024a = () => {
         setIsNavigating(false);
       }
     },
-    [boardRef, setIsNavigating]
+    [boardRef, setIsNavigating],
   );
 
   const [editingQty, setEditingQty] = useState(false);
@@ -617,15 +613,9 @@ const Budget2024a = () => {
             // console.log(prodind, regind, ctyel["country"], ctyel["quantity"]);
             ctylevel[ctyel["country"]] = {
               quantity: Number(ctyel["quantity"].toFixed(0)),
-              avgprice: ctyel["avgprice"]
-                ? Number(ctyel["avgprice"].replace(/,/g, ""))
-                : 0,
-              avgprofit: ctyel["avgprofit"]
-                ? Number(ctyel["avgprofit"].replace(/,/g, ""))
-                : 0,
-              totalprofit: ctyel["totalprofit"]
-                ? Number(ctyel["totalprofit"].replace(/,/g, ""))
-                : 0,
+              avgprice: ctyel["avgprice"] ? Number(ctyel["avgprice"].replace(/,/g, "")) : 0,
+              avgprofit: ctyel["avgprofit"] ? Number(ctyel["avgprofit"].replace(/,/g, "")) : 0,
+              totalprofit: ctyel["totalprofit"] ? Number(ctyel["totalprofit"].replace(/,/g, "")) : 0,
             };
           });
           reglevel[regind] = ctylevel;
@@ -734,9 +724,7 @@ const Budget2024a = () => {
       console.log(response.data);
       setBdgtcomments(response.data);
       if (Array.isArray(response.data)) {
-        let commentset = [
-          ...new Set(response.data.map((x) => x.budgetEntryID)),
-        ];
+        let commentset = [...new Set(response.data.map((x) => x.budgetEntryID))];
         setBdgtcommentset(commentset);
         // console.log(bdgtcommentset);
       } else {
@@ -908,12 +896,12 @@ const Budget2024a = () => {
 
   return (
     <div>
-      <div className="bdgttitles">
-        <h2 className="bdgttitle">{bdgtyear} Budget</h2>
+      <div className='bdgttitles'>
+        <h2 className='bdgttitle'>{bdgtyear} Budget</h2>
         {lock === false ? (
-          <div className="addprodgroup">
+          <div className='addprodgroup'>
             <button
-              className="addprodbutton"
+              className='addprodbutton'
               onClick={(e) => {
                 showaddProd();
               }}
@@ -921,23 +909,23 @@ const Budget2024a = () => {
               Add Product
             </button>
             {showprodnamefilter ? (
-              <div className="addprodpane">
+              <div className='addprodpane'>
                 <input
                   ref={searchProdRef}
                   value={searchterm}
                   onChange={(e) => {
                     setSearchterm(e.target.value);
                   }}
-                  placeholder="Search Product Name"
-                  type="text"
+                  placeholder='Search Product Name'
+                  type='text'
                 />
                 <ul>
                   {filteredProdnames
                     ? filteredProdnames.map((item) => {
                         return [
-                          <div className="addprodrow">
+                          <div className='addprodrow'>
                             <input
-                              type="checkbox"
+                              type='checkbox'
                               name={item.prodNameID}
                               id={item.prodNameID}
                               value={item.prodNameID}
@@ -952,9 +940,7 @@ const Budget2024a = () => {
                                     if (prodstoadd[i] === item.prodNameID) {
                                       prodstoadd.splice(i, 1);
                                     }
-                                    if (
-                                      prodscattoadd[i] === item.prodCatNameID
-                                    ) {
+                                    if (prodscattoadd[i] === item.prodCatNameID) {
                                       prodscattoadd.splice(i, 1);
                                     }
                                   }
@@ -962,17 +948,15 @@ const Budget2024a = () => {
                                 }
                               }}
                             />{" "}
-                            <label for={item.prodNameID}>
-                              {item.abbreviation}
-                            </label>
+                            <label for={item.prodNameID}>{item.abbreviation}</label>
                           </div>,
                         ];
                       })
                     : "Please add a product."}
                 </ul>
-                <div className="addprodcanceladd">
+                <div className='addprodcanceladd'>
                   <button
-                    className="cancelprodbutton"
+                    className='cancelprodbutton'
                     onClick={(e) => {
                       setShowprodnamefilter(false);
                       setSearchterm("");
@@ -984,7 +968,7 @@ const Budget2024a = () => {
                     onClick={(e) => {
                       addprod();
                     }}
-                    className="addprodbutton"
+                    className='addprodbutton'
                   >
                     Confirm
                   </button>
@@ -997,51 +981,37 @@ const Budget2024a = () => {
         ) : (
           ""
         )}
-        {lock === false ? (
-          <ExportToCSV csvData={bdgtregiondta} fileName={"budget2024"} />
-        ) : (
-          ""
-        )}
+        {lock === false ? <ExportToCSV csvData={bdgtregiondta} fileName={"budget2024"} /> : ""}
       </div>
-      <div className="bdgttotals">
-        <ul className="bdgttotalsul">
+      <div className='bdgttotals'>
+        <ul className='bdgttotalsul'>
           <li>
-            <p className="bdgttyearfig">
-              {budgetyeartotals &&
-              budgetyeartotals[bdgtyear] &&
-              budgetyeartotals[bdgtyear]["quantity"]
-                ? budgetyeartotals[bdgtyear]["quantity"]
-                    .toFixed(0)
-                    .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+            <p className='bdgttyearfig'>
+              {budgetyeartotals && budgetyeartotals[bdgtyear] && budgetyeartotals[bdgtyear]["quantity"]
+                ? budgetyeartotals[bdgtyear]["quantity"].toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                 : 0}{" "}
               mt
             </p>
-            <p className="bdgttyearname">Quantity</p>
-            <div className="bdgtlyearfigs">
+            <p className='bdgttyearname'>Quantity</p>
+            <div className='bdgtlyearfigs'>
               <p>{bdgtyear - 1} YTD:</p>
               <p>
                 {lysalestotals && lysalestotals["quantity"]
-                  ? lysalestotals["quantity"]
-                      .toFixed()
-                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                  ? lysalestotals["quantity"].toFixed().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                   : ""}{" "}
                 mt
               </p>
             </div>
-            <div className="bdgtlyearfigs">
+            <div className='bdgtlyearfigs'>
               <p>{bdgtyear - 1} Budget:</p>
               <p>
-                {budgetyeartotals &&
-                budgetyeartotals[bdgtyear - 1] &&
-                budgetyeartotals[bdgtyear - 1]["quantity"]
-                  ? budgetyeartotals[bdgtyear - 1]["quantity"]
-                      .toFixed(0)
-                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                {budgetyeartotals && budgetyeartotals[bdgtyear - 1] && budgetyeartotals[bdgtyear - 1]["quantity"]
+                  ? budgetyeartotals[bdgtyear - 1]["quantity"].toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                   : 0}{" "}
                 mt
               </p>
             </div>
-            <div className="bdgtlyearfigs">
+            <div className='bdgtlyearfigs'>
               <p>{bdgtyear - 2} Budget:</p>
 
               <p>115,479 mt</p>
@@ -1049,110 +1019,77 @@ const Budget2024a = () => {
             </div>
           </li>
           <li>
-            <p className="bdgttyearfig">
-              {budgetyeartotals &&
-              budgetyeartotals[bdgtyear] &&
-              budgetyeartotals[bdgtyear]["revenue"]
-                ? "$" +
-                  budgetyeartotals[bdgtyear]["revenue"]
-                    .toFixed(0)
-                    .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+            <p className='bdgttyearfig'>
+              {budgetyeartotals && budgetyeartotals[bdgtyear] && budgetyeartotals[bdgtyear]["revenue"]
+                ? "$" + budgetyeartotals[bdgtyear]["revenue"].toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                 : 0}
             </p>
-            <p className="bdgttyearname">Revenue</p>
-            <div className="bdgtlyearfigs">
+            <p className='bdgttyearname'>Revenue</p>
+            <div className='bdgtlyearfigs'>
               <p>{bdgtyear - 1} YTD:</p>
               <p>
                 {lysalestotals && lysalestotals["revenue"]
-                  ? "$" +
-                    lysalestotals["revenue"]
-                      .toFixed()
-                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                  ? "$" + lysalestotals["revenue"].toFixed().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                   : ""}
               </p>
             </div>
-            <div className="bdgtlyearfigs">
+            <div className='bdgtlyearfigs'>
               <p>{bdgtyear - 1} Budget:</p>
               <p>
-                {budgetyeartotals &&
-                budgetyeartotals[bdgtyear - 1] &&
-                budgetyeartotals[bdgtyear - 1]["revenue"]
-                  ? "$" +
-                    budgetyeartotals[bdgtyear - 1]["revenue"]
-                      .toFixed(0)
-                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                {budgetyeartotals && budgetyeartotals[bdgtyear - 1] && budgetyeartotals[bdgtyear - 1]["revenue"]
+                  ? "$" + budgetyeartotals[bdgtyear - 1]["revenue"].toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                   : "$" + 0}
               </p>
             </div>
-            <div className="bdgtlyearfigs">
+            <div className='bdgtlyearfigs'>
               <p>{bdgtyear - 2} Revenue:</p>
               <p>$91,611,788</p>
               {/* <p>$98,083,156</p> */}
             </div>
           </li>
           <li>
-            <p className="bdgttyearfig">
-              {budgetyeartotals &&
-              budgetyeartotals[bdgtyear] &&
-              budgetyeartotals[bdgtyear]["totalprofit"]
-                ? "$" +
-                  budgetyeartotals[bdgtyear]["totalprofit"]
-                    .toFixed(0)
-                    .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+            <p className='bdgttyearfig'>
+              {budgetyeartotals && budgetyeartotals[bdgtyear] && budgetyeartotals[bdgtyear]["totalprofit"]
+                ? "$" + budgetyeartotals[bdgtyear]["totalprofit"].toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                 : 0}
             </p>
-            <p className="bdgttyearname">Profit</p>
-            <div className="bdgtlyearfigs">
+            <p className='bdgttyearname'>Profit</p>
+            <div className='bdgtlyearfigs'>
               <p>{bdgtyear - 1} YTD:</p>
               <p>
                 {lysalestotals && lysalestotals["profit"]
-                  ? "$" +
-                    lysalestotals["profit"]
-                      .toFixed()
-                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                  ? "$" + lysalestotals["profit"].toFixed().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                   : ""}
               </p>
             </div>
-            <div className="bdgtlyearfigs">
+            <div className='bdgtlyearfigs'>
               <p>{bdgtyear - 1} Budget:</p>
               <p>
-                {budgetyeartotals &&
-                budgetyeartotals[bdgtyear - 1] &&
-                budgetyeartotals[bdgtyear - 1]["totalprofit"]
-                  ? "$" +
-                    budgetyeartotals[bdgtyear - 1]["totalprofit"]
-                      .toFixed(0)
-                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                {budgetyeartotals && budgetyeartotals[bdgtyear - 1] && budgetyeartotals[bdgtyear - 1]["totalprofit"]
+                  ? "$" + budgetyeartotals[bdgtyear - 1]["totalprofit"].toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                   : "$" + 0}
               </p>
             </div>
-            <div className="bdgtlyearfigs">
+            <div className='bdgtlyearfigs'>
               <p>{bdgtyear - 2} Budget:</p>
               <p>$8,195,715</p>
               {/* <p>$4,007,228</p> */}
             </div>
           </li>
           <li>
-            <p className="bdgttyearfig">
-              {budgetyeartotals &&
-              budgetyeartotals[bdgtyear] &&
-              budgetyeartotals[bdgtyear]["totalprofit"]
+            <p className='bdgttyearfig'>
+              {budgetyeartotals && budgetyeartotals[bdgtyear] && budgetyeartotals[bdgtyear]["totalprofit"]
                 ? "$" +
-                  (
-                    budgetyeartotals[bdgtyear]["totalprofit"] /
-                    budgetyeartotals[bdgtyear]["quantity"]
-                  )
+                  (budgetyeartotals[bdgtyear]["totalprofit"] / budgetyeartotals[bdgtyear]["quantity"])
                     .toFixed(0)
                     .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                 : 0}
             </p>
-            <p className="bdgttyearname">Avg Profit</p>
-            <div className="bdgtlyearfigs">
+            <p className='bdgttyearname'>Avg Profit</p>
+            <div className='bdgtlyearfigs'>
               <p>{bdgtyear - 1} YTD:</p>
               <p>
-                {lysalestotals &&
-                lysalestotals["quantity"] &&
-                lysalestotals["profit"]
+                {lysalestotals && lysalestotals["quantity"] && lysalestotals["profit"]
                   ? "$" +
                     (lysalestotals["profit"] / lysalestotals["quantity"])
                       .toFixed()
@@ -1160,70 +1097,53 @@ const Budget2024a = () => {
                   : ""}
               </p>
             </div>
-            <div className="bdgtlyearfigs">
+            <div className='bdgtlyearfigs'>
               <p>{bdgtyear - 1} Budget:</p>
               <p>
-                {budgetyeartotals &&
-                budgetyeartotals[bdgtyear - 1] &&
-                budgetyeartotals[bdgtyear - 1]["totalprofit"]
+                {budgetyeartotals && budgetyeartotals[bdgtyear - 1] && budgetyeartotals[bdgtyear - 1]["totalprofit"]
                   ? "$" +
-                    (
-                      budgetyeartotals[bdgtyear - 1]["totalprofit"] /
-                      budgetyeartotals[bdgtyear - 1]["quantity"]
-                    )
+                    (budgetyeartotals[bdgtyear - 1]["totalprofit"] / budgetyeartotals[bdgtyear - 1]["quantity"])
                       .toFixed(0)
                       .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                   : "$" + 0}
               </p>
             </div>
-            <div className="bdgtlyearfigs">
+            <div className='bdgtlyearfigs'>
               <p>{bdgtyear - 2} Budget:</p>
               <p>$53</p>
               {/* <p>$26</p> */}
             </div>
           </li>
           <li>
-            <p className="bdgttyearfig">
-              {budgetyeartotals &&
-              budgetyeartotals[bdgtyear] &&
-              budgetyeartotals[bdgtyear]["totalprofit"]
-                ? (
-                    (budgetyeartotals[bdgtyear]["totalprofit"] /
-                      budgetyeartotals[bdgtyear]["revenue"]) *
-                    100
-                  ).toFixed(1) + "%"
+            <p className='bdgttyearfig'>
+              {budgetyeartotals && budgetyeartotals[bdgtyear] && budgetyeartotals[bdgtyear]["totalprofit"]
+                ? ((budgetyeartotals[bdgtyear]["totalprofit"] / budgetyeartotals[bdgtyear]["revenue"]) * 100).toFixed(
+                    1,
+                  ) + "%"
                 : 0}
             </p>
-            <p className="bdgttyearname">Margin</p>
-            <div className="bdgtlyearfigs">
+            <p className='bdgttyearname'>Margin</p>
+            <div className='bdgtlyearfigs'>
               <p>{bdgtyear - 1} YTD:</p>
               <p>
-                {lysalestotals &&
-                lysalestotals["profit"] &&
-                lysalestotals["revenue"]
-                  ? (
-                      (lysalestotals["profit"] / lysalestotals["revenue"]) *
-                      100
-                    ).toFixed(1)
+                {lysalestotals && lysalestotals["profit"] && lysalestotals["revenue"]
+                  ? ((lysalestotals["profit"] / lysalestotals["revenue"]) * 100).toFixed(1)
                   : ""}
                 %
               </p>
             </div>
-            <div className="bdgtlyearfigs">
+            <div className='bdgtlyearfigs'>
               <p>{bdgtyear - 1} Budget:</p>
               <p>
-                {budgetyeartotals &&
-                budgetyeartotals[bdgtyear - 1] &&
-                budgetyeartotals[bdgtyear - 1]["totalprofit"]
+                {budgetyeartotals && budgetyeartotals[bdgtyear - 1] && budgetyeartotals[bdgtyear - 1]["totalprofit"]
                   ? (
-                      (budgetyeartotals[bdgtyear - 1]["totalprofit"] /
-                        budgetyeartotals[bdgtyear - 1]["revenue"]) *
+                      (budgetyeartotals[bdgtyear - 1]["totalprofit"] / budgetyeartotals[bdgtyear - 1]["revenue"]) *
                       100
                     ).toFixed(1) + "%"
                   : "0.0%"}
               </p>
             </div>
-            <div className="bdgtlyearfigs">
+            <div className='bdgtlyearfigs'>
               <p>{bdgtyear - 2} Margin:</p>
               <p>5.3%</p>
               {/* <p>4.1%</p> */}
@@ -1231,37 +1151,24 @@ const Budget2024a = () => {
           </li>
         </ul>
       </div>
-      <div className="budgetfilterbuttons">
-        <div className="pgroupfbtns">
+      <div className='budgetfilterbuttons'>
+        <div className='pgroupfbtns'>
           <p>Product Groups:</p>
           {prodgroupsbtn
             ? prodgroupsbtn.map((item, i) => {
                 return (
                   <button
                     key={i}
-                    onClick={(e) =>
-                      handleProdGroupClick(e, i, item.productGroup)
-                    }
+                    onClick={(e) => handleProdGroupClick(e, i, item.productGroup)}
                     className={
-                      i === clickedProdGroup
-                        ? "budgetfilterbutton budgetfilterbuttonactive"
-                        : "budgetfilterbutton"
+                      i === clickedProdGroup ? "budgetfilterbutton budgetfilterbuttonactive" : "budgetfilterbutton"
                     }
                   >
                     {
                       <div>
-                        <p className="bdgtbtntitle">{item.productGroup}</p>
-                        <p>
-                          {item.quantity
-                            .toFixed(0)
-                            .replace(/\B(?=(\d{3})+(?!\d))/g, ",") + " mt"}
-                        </p>
-                        <p>
-                          {"$ " +
-                            item.profit
-                              .toFixed(0)
-                              .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-                        </p>
+                        <p className='bdgtbtntitle'>{item.productGroup}</p>
+                        <p>{item.quantity.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",") + " mt"}</p>
+                        <p>{"$ " + item.profit.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</p>
                       </div>
                     }
                   </button>
@@ -1269,7 +1176,7 @@ const Budget2024a = () => {
               })
             : "Please add a product."}
         </div>
-        <div className="pnamefbtns">
+        <div className='pnamefbtns'>
           <p>Product Name:</p>
           {budgetbtns
             ? budgetbtns.map((item, i) => {
@@ -1281,26 +1188,13 @@ const Budget2024a = () => {
                       onClick={(e) => {
                         handleProdCatClick(e, i, item);
                       }}
-                      className={
-                        i === clickedProdCat
-                          ? "pnamebutton pnamebuttonactive"
-                          : "pnamebutton"
-                      }
+                      className={i === clickedProdCat ? "pnamebutton pnamebuttonactive" : "pnamebutton"}
                     >
                       {
                         <div>
-                          <p className="bdgtbtntitle">{item.prodCatName}</p>
-                          <p>
-                            {item.quantity
-                              .toFixed(0)
-                              .replace(/\B(?=(\d{3})+(?!\d))/g, ",") + " mt"}
-                          </p>
-                          <p>
-                            {"$ " +
-                              item.profit
-                                .toFixed(0)
-                                .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-                          </p>
+                          <p className='bdgtbtntitle'>{item.prodCatName}</p>
+                          <p>{item.quantity.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",") + " mt"}</p>
+                          <p>{"$ " + item.profit.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</p>
                         </div>
                       }
                     </button>
@@ -1310,10 +1204,10 @@ const Budget2024a = () => {
             : "Please add a product."}
         </div>
       </div>
-      <div className="budgetprepdata">
-        <div className="bdgtleftbottompanel">
-          <div className="budgettablesandresponse">
-            <div className="budgettables" ref={boardRef}>
+      <div className='budgetprepdata'>
+        <div className='bdgtleftbottompanel'>
+          <div className='budgettablesandresponse'>
+            <div className='budgettables' ref={boardRef}>
               {formatedData
                 ? Object.keys(formatedData).map((prod, key) => {
                     let q1prodtotal = 0;
@@ -1323,8 +1217,8 @@ const Budget2024a = () => {
                     let pricetotal = 0;
                     let profittotal = 0;
                     return [
-                      <div className="bdgtpnametable">
-                        <div className="bdgtpnametabletitle">
+                      <div className='bdgtpnametable'>
+                        <div className='bdgtpnametabletitle'>
                           <h3>2024 {prod} Budget</h3>
                           {lock === false ? (
                             <FontAwesomeIcon
@@ -1347,53 +1241,43 @@ const Budget2024a = () => {
                             }
                           >
                             <h4>Select countries to add.</h4>
-                            <div className="bdgtselectctycty">
+                            <div className='bdgtselectctycty'>
                               {fullcountrylist
                                 ? fullcountrylist.map((ctyel) => {
                                     return (
-                                      <div className="addctyrow">
+                                      <div className='addctyrow'>
                                         <input
-                                          type="checkbox"
+                                          type='checkbox'
                                           name={ctyel.countryID}
                                           onClick={(e) => {
-                                            if (
-                                              e.target.checked &&
-                                              prodcountriestoadd
-                                            ) {
+                                            if (e.target.checked && prodcountriestoadd) {
                                               setProdcountriestoadd({
                                                 ...prodcountriestoadd,
                                                 [prod]: {
                                                   ...prodcountriestoadd[prod],
-                                                  [ctyel.countryID]:
-                                                    ctyel.country,
+                                                  [ctyel.countryID]: ctyel.country,
                                                 },
                                               });
                                             } else {
-                                              setProdcountriestoadd(
-                                                (current) => {
-                                                  const copy = {
-                                                    ...current,
-                                                  };
-                                                  delete copy[prod][
-                                                    ctyel.countryID
-                                                  ];
-                                                  return copy;
-                                                }
-                                              );
+                                              setProdcountriestoadd((current) => {
+                                                const copy = {
+                                                  ...current,
+                                                };
+                                                delete copy[prod][ctyel.countryID];
+                                                return copy;
+                                              });
                                             }
                                           }}
                                         />
-                                        <label for={ctyel.countyID}>
-                                          {ctyel.country}
-                                        </label>
+                                        <label for={ctyel.countyID}>{ctyel.country}</label>
                                       </div>
                                     );
                                   })
                                 : ""}
                             </div>
-                            <div className="addprodcanceladd">
+                            <div className='addprodcanceladd'>
                               <button
-                                className="cancelprodbutton"
+                                className='cancelprodbutton'
                                 onClick={(e) => {
                                   setShowprodctyadd({
                                     ...showprodctyadd,
@@ -1404,7 +1288,7 @@ const Budget2024a = () => {
                                 Cancel
                               </button>
                               <button
-                                className="addprodbutton"
+                                className='addprodbutton'
                                 onClick={(e) => {
                                   addbdgtcountry(prod);
                                 }}
@@ -1414,137 +1298,157 @@ const Budget2024a = () => {
                             </div>
                           </div>
                         </div>
-                        <div className="board">
+                        <div className='board'>
                           <table>
                             <thead>
                               <tr>
-                                <td className="countrycol">Country</td>
-                                <td className="bdgtdatacol">Q1</td>
-                                <td className="bdgtdatacol">Q2</td>
-                                <td className="bdgtdatacol">Q3</td>
-                                <td className="bdgtdatacol">Q4</td>
-                                <td className="bdgtdatacol">Total</td>
-                                <td className="bdgtcolseparation"></td>
-                                <td className="bdgtdatacol">Price</td>
-                                <td className="bdgtdatacol">Profit</td>
-                                <td className="bdgtdatacol">Ttl Profit</td>
-                                <td className="bdgtdatacol">% Mgn</td>
+                                <td className='countrycol'>Country</td>
+                                <td className='bdgtdatacol'>Q1</td>
+                                <td className='bdgtdatacol'>Q2</td>
+                                <td className='bdgtdatacol'>Q3</td>
+                                <td className='bdgtdatacol'>Q4</td>
+                                <td className='bdgtdatacol'>Total</td>
+                                <td className='bdgtcolseparation'></td>
+                                <td className='bdgtdatacol'>Price</td>
+                                <td className='bdgtdatacol'>Profit</td>
+                                <td className='bdgtdatacol'>Ttl Profit</td>
+                                <td className='bdgtdatacol'>% Mgn</td>
                               </tr>
                             </thead>
                             <tbody>
-                              {Object.keys(formatedData[prod]).map(
-                                (reg, key1) => {
-                                  let q1reg = 0;
-                                  let q2reg = 0;
-                                  let q3reg = 0;
-                                  let q4reg = 0;
-                                  let priceqty = 0;
-                                  let profitqty = 0;
+                              {Object.keys(formatedData[prod]).map((reg, key1) => {
+                                let q1reg = 0;
+                                let q2reg = 0;
+                                let q3reg = 0;
+                                let q4reg = 0;
+                                let priceqty = 0;
+                                let profitqty = 0;
 
-                                  Object.keys(formatedData[prod][reg]).forEach(
-                                    (ctry) => {
-                                      q1reg =
-                                        q1reg +
-                                        formatedData[prod][reg][ctry]["0"];
-                                      q2reg =
-                                        q2reg +
-                                        formatedData[prod][reg][ctry]["1"];
-                                      q3reg =
-                                        q3reg +
-                                        formatedData[prod][reg][ctry]["2"];
-                                      q4reg =
-                                        q4reg +
-                                        formatedData[prod][reg][ctry]["3"];
-                                      if (
-                                        bdgtecondata &&
-                                        bdgtecondata[prod] &&
-                                        bdgtecondata[prod][reg] &&
-                                        bdgtecondata[prod][reg][ctry] &&
-                                        bdgtecondata[prod][reg][ctry]["price"]
-                                      ) {
-                                        priceqty =
-                                          priceqty +
-                                          bdgtecondata[prod][reg][ctry][
-                                            "price"
-                                          ] *
-                                            (formatedData[prod][reg][ctry][
-                                              "0"
-                                            ] +
-                                              formatedData[prod][reg][ctry][
-                                                "1"
-                                              ] +
-                                              formatedData[prod][reg][ctry][
-                                                "2"
-                                              ] +
-                                              formatedData[prod][reg][ctry][
-                                                "3"
-                                              ]);
-                                      }
-                                      if (
-                                        bdgtecondata &&
-                                        bdgtecondata[prod] &&
-                                        bdgtecondata[prod][reg] &&
-                                        bdgtecondata[prod][reg][ctry] &&
-                                        bdgtecondata[prod][reg][ctry]["profit"]
-                                      ) {
-                                        profitqty =
-                                          profitqty +
-                                          bdgtecondata[prod][reg][ctry][
-                                            "profit"
-                                          ] *
-                                            (formatedData[prod][reg][ctry][
-                                              "0"
-                                            ] +
-                                              formatedData[prod][reg][ctry][
-                                                "1"
-                                              ] +
-                                              formatedData[prod][reg][ctry][
-                                                "2"
-                                              ] +
-                                              formatedData[prod][reg][ctry][
-                                                "3"
-                                              ]);
-                                      }
-                                    }
-                                  );
-                                  q1prodtotal = q1prodtotal + q1reg;
-                                  q2prodtotal = q2prodtotal + q2reg;
-                                  q3prodtotal = q3prodtotal + q3reg;
-                                  q4prodtotal = q4prodtotal + q4reg;
+                                Object.keys(formatedData[prod][reg]).forEach((ctry) => {
+                                  q1reg = q1reg + formatedData[prod][reg][ctry]["0"];
+                                  q2reg = q2reg + formatedData[prod][reg][ctry]["1"];
+                                  q3reg = q3reg + formatedData[prod][reg][ctry]["2"];
+                                  q4reg = q4reg + formatedData[prod][reg][ctry]["3"];
+                                  if (
+                                    bdgtecondata &&
+                                    bdgtecondata[prod] &&
+                                    bdgtecondata[prod][reg] &&
+                                    bdgtecondata[prod][reg][ctry] &&
+                                    bdgtecondata[prod][reg][ctry]["price"]
+                                  ) {
+                                    priceqty =
+                                      priceqty +
+                                      bdgtecondata[prod][reg][ctry]["price"] *
+                                        (formatedData[prod][reg][ctry]["0"] +
+                                          formatedData[prod][reg][ctry]["1"] +
+                                          formatedData[prod][reg][ctry]["2"] +
+                                          formatedData[prod][reg][ctry]["3"]);
+                                  }
+                                  if (
+                                    bdgtecondata &&
+                                    bdgtecondata[prod] &&
+                                    bdgtecondata[prod][reg] &&
+                                    bdgtecondata[prod][reg][ctry] &&
+                                    bdgtecondata[prod][reg][ctry]["profit"]
+                                  ) {
+                                    profitqty =
+                                      profitqty +
+                                      bdgtecondata[prod][reg][ctry]["profit"] *
+                                        (formatedData[prod][reg][ctry]["0"] +
+                                          formatedData[prod][reg][ctry]["1"] +
+                                          formatedData[prod][reg][ctry]["2"] +
+                                          formatedData[prod][reg][ctry]["3"]);
+                                  }
+                                });
+                                q1prodtotal = q1prodtotal + q1reg;
+                                q2prodtotal = q2prodtotal + q2reg;
+                                q3prodtotal = q3prodtotal + q3reg;
+                                q4prodtotal = q4prodtotal + q4reg;
 
-                                  bdgtq1qtytotal = bdgtq1qtytotal + q1reg;
-                                  bdgtq2qtytotal = bdgtq2qtytotal + q2reg;
-                                  bdgtq3qtytotal = bdgtq3qtytotal + q3reg;
-                                  bdgtq4qtytotal = bdgtq4qtytotal + q4reg;
+                                bdgtq1qtytotal = bdgtq1qtytotal + q1reg;
+                                bdgtq2qtytotal = bdgtq2qtytotal + q2reg;
+                                bdgtq3qtytotal = bdgtq3qtytotal + q3reg;
+                                bdgtq4qtytotal = bdgtq4qtytotal + q4reg;
 
-                                  // console.log(bdgtq1qtytotal);
+                                // console.log(bdgtq1qtytotal);
 
-                                  let regprice =
-                                    priceqty === 0
-                                      ? 0
-                                      : priceqty /
-                                        (q1reg + q2reg + q3reg + q4reg);
+                                let regprice = priceqty === 0 ? 0 : priceqty / (q1reg + q2reg + q3reg + q4reg);
 
-                                  let regprofit =
-                                    profitqty === 0
-                                      ? 0
-                                      : profitqty /
-                                        (q1reg + q2reg + q3reg + q4reg);
-                                  pricetotal = pricetotal + priceqty;
-                                  profittotal = profittotal + profitqty;
+                                let regprofit = profitqty === 0 ? 0 : profitqty / (q1reg + q2reg + q3reg + q4reg);
+                                pricetotal = pricetotal + priceqty;
+                                profittotal = profittotal + profitqty;
 
-                                  bdgtpriceprodtotal =
-                                    bdgtpriceprodtotal + priceqty;
-                                  bdgtprofitprodtotal =
-                                    bdgtprofitprodtotal + profitqty;
+                                bdgtpriceprodtotal = bdgtpriceprodtotal + priceqty;
+                                bdgtprofitprodtotal = bdgtprofitprodtotal + profitqty;
 
-                                  return [
-                                    <tr className="bdgtregionrow">
-                                      <td className="bdgtregioncol">
-                                        {lock === false ? (
-                                          <FontAwesomeIcon
-                                            className="bdgtctyrowadd"
-                                            icon={faPlusCircle}
+                                return [
+                                  <tr className='bdgtregionrow'>
+                                    <td className='bdgtregioncol'>
+                                      {lock === false ? (
+                                        <FontAwesomeIcon
+                                          className='bdgtctyrowadd'
+                                          icon={faPlusCircle}
+                                          onClick={(e) => {
+                                            setShowaddcty({
+                                              ...showaddcty,
+                                              [prod]: {
+                                                ...showaddcty[prod],
+                                                [reg]: !showaddcty[prod][reg],
+                                              },
+                                            });
+                                            loadregcountries(reg);
+                                          }}
+                                        />
+                                      ) : (
+                                        ""
+                                      )}
+                                      {reg === "Latin America" ? "L. America" : reg}
+                                      <div
+                                        className={
+                                          showaddcty && showaddcty[prod]
+                                            ? showaddcty[prod][reg]
+                                              ? "bdgtselectcty showbdgtpane"
+                                              : "bdgtselectcty hidebdgtpane"
+                                            : ""
+                                        }
+                                      >
+                                        <h4>Select countries to add in {reg}</h4>
+                                        <div className='bdgtselectctycty'>
+                                          {loadregcties && loadregcties[reg]
+                                            ? loadregcties[reg][0].map((el) => (
+                                                <div className='addctyrow'>
+                                                  <input
+                                                    type='checkbox'
+                                                    name={el.countryID}
+                                                    value={prod}
+                                                    onClick={(e) => {
+                                                      if (e.target.checked && prodcountriestoadd) {
+                                                        setProdcountriestoadd({
+                                                          ...prodcountriestoadd,
+                                                          [prod]: {
+                                                            ...prodcountriestoadd[prod],
+                                                            [el.countryID]: el.country,
+                                                          },
+                                                        });
+                                                      } else {
+                                                        setProdcountriestoadd((current) => {
+                                                          const copy = {
+                                                            ...current,
+                                                          };
+                                                          delete copy[prod][el.countryID];
+                                                          return copy;
+                                                        });
+                                                      }
+                                                    }}
+                                                  />
+                                                  <label for={el.countryID}>{el.country}</label>
+                                                </div>
+                                              ))
+                                            : ""}
+                                        </div>
+                                        <div className='addprodcanceladd'>
+                                          <button
+                                            className='cancelprodbutton'
                                             onClick={(e) => {
                                               setShowaddcty({
                                                 ...showaddcty,
@@ -1553,711 +1457,395 @@ const Budget2024a = () => {
                                                   [reg]: !showaddcty[prod][reg],
                                                 },
                                               });
-                                              loadregcountries(reg);
                                             }}
-                                          />
-                                        ) : (
-                                          ""
-                                        )}
-                                        {reg === "Latin America"
-                                          ? "L. America"
-                                          : reg}
-                                        <div
-                                          className={
-                                            showaddcty && showaddcty[prod]
-                                              ? showaddcty[prod][reg]
-                                                ? "bdgtselectcty showbdgtpane"
-                                                : "bdgtselectcty hidebdgtpane"
-                                              : ""
-                                          }
-                                        >
-                                          <h4>
-                                            Select countries to add in {reg}
-                                          </h4>
-                                          <div className="bdgtselectctycty">
-                                            {loadregcties && loadregcties[reg]
-                                              ? loadregcties[reg][0].map(
-                                                  (el) => (
-                                                    <div className="addctyrow">
-                                                      <input
-                                                        type="checkbox"
-                                                        name={el.countryID}
-                                                        value={prod}
-                                                        onClick={(e) => {
-                                                          if (
-                                                            e.target.checked &&
-                                                            prodcountriestoadd
-                                                          ) {
-                                                            setProdcountriestoadd(
-                                                              {
-                                                                ...prodcountriestoadd,
-                                                                [prod]: {
-                                                                  ...prodcountriestoadd[
-                                                                    prod
-                                                                  ],
-                                                                  [el.countryID]:
-                                                                    el.country,
-                                                                },
-                                                              }
-                                                            );
-                                                          } else {
-                                                            setProdcountriestoadd(
-                                                              (current) => {
-                                                                const copy = {
-                                                                  ...current,
-                                                                };
-                                                                delete copy[
-                                                                  prod
-                                                                ][el.countryID];
-                                                                return copy;
-                                                              }
-                                                            );
-                                                          }
-                                                        }}
-                                                      />
-                                                      <label for={el.countryID}>
-                                                        {el.country}
-                                                      </label>
-                                                    </div>
-                                                  )
-                                                )
-                                              : ""}
-                                          </div>
-                                          <div className="addprodcanceladd">
-                                            <button
-                                              className="cancelprodbutton"
-                                              onClick={(e) => {
-                                                setShowaddcty({
-                                                  ...showaddcty,
-                                                  [prod]: {
-                                                    ...showaddcty[prod],
-                                                    [reg]: !showaddcty[prod][
-                                                      reg
-                                                    ],
-                                                  },
-                                                });
-                                              }}
-                                            >
-                                              Cancel
-                                            </button>
-                                            <button
-                                              className="addprodbutton"
-                                              onClick={(e) => {
-                                                addbdgtcountry(prod);
-                                              }}
-                                            >
-                                              Confirm
-                                            </button>
-                                          </div>
+                                          >
+                                            Cancel
+                                          </button>
+                                          <button
+                                            className='addprodbutton'
+                                            onClick={(e) => {
+                                              addbdgtcountry(prod);
+                                            }}
+                                          >
+                                            Confirm
+                                          </button>
                                         </div>
-                                      </td>
+                                      </div>
+                                    </td>
 
-                                      <td className="bdgtregioncolttl">
-                                        {q1reg}
-                                      </td>
-                                      <td className="bdgtregioncolttl">
-                                        {q2reg}
-                                      </td>
-                                      <td className="bdgtregioncolttl">
-                                        {q3reg}
-                                      </td>
-                                      <td className="bdgtregioncolttl">
-                                        {q4reg}
-                                      </td>
-                                      <td className="bdgtregioncolttl">
-                                        {q1reg + q2reg + q3reg + q4reg}
-                                      </td>
-                                      <td className="bdgtcolseparation"></td>
-                                      <td className="bdgtregioncolttl">
-                                        {/* {priceqty === 0
+                                    <td className='bdgtregioncolttl'>{q1reg}</td>
+                                    <td className='bdgtregioncolttl'>{q2reg}</td>
+                                    <td className='bdgtregioncolttl'>{q3reg}</td>
+                                    <td className='bdgtregioncolttl'>{q4reg}</td>
+                                    <td className='bdgtregioncolttl'>{q1reg + q2reg + q3reg + q4reg}</td>
+                                    <td className='bdgtcolseparation'></td>
+                                    <td className='bdgtregioncolttl'>
+                                      {/* {priceqty === 0
                                         ? 0
                                         : (
                                             priceqty /
                                             (q1reg + q2reg + q3reg + q4reg)
                                           ).toFixed(0)} */}
-                                        {"$" +
-                                          regprice
-                                            .toFixed(0)
-                                            .replace(
-                                              /\B(?=(\d{3})+(?!\d))/g,
-                                              ","
-                                            )}
-                                      </td>
-                                      <td className="bdgtregioncolttl">
-                                        {"$" +
-                                          regprofit
-                                            .toFixed(0)
-                                            .replace(
-                                              /\B(?=(\d{3})+(?!\d))/g,
-                                              ","
-                                            )}
-                                      </td>
-                                      <td className="bdgtregioncolttl">
-                                        {"$" +
-                                          (
-                                            regprofit *
-                                            (q1reg + q2reg + q3reg + q4reg)
-                                          )
-                                            .toFixed(0)
-                                            .replace(
-                                              /\B(?=(\d{3})+(?!\d))/g,
-                                              ","
-                                            )}
-                                      </td>
-                                      <td className="bdgtregioncolttl">
-                                        {regprofit === 0 || regprice === 0
-                                          ? 0 + "%"
-                                          : (
-                                              (regprofit / regprice) *
-                                              100
-                                            ).toFixed(1) + "%"}
-                                      </td>
-                                    </tr>,
-                                    Object.keys(formatedData[prod][reg]).map(
-                                      (cty) => {
-                                        let indexecon = indecon;
-                                        indecon = indecon + 2;
-                                        //   q1reg = 0;
-                                        return [
-                                          <tr>
-                                            <td className="countrycol">
-                                              {cty === "Dominican Republic"
-                                                ? "Dom Rep"
-                                                : cty}
-                                            </td>
-                                            {Object.keys(
-                                              formatedData[prod][reg][cty]
-                                            ).map((q) => {
-                                              let index = ind;
-                                              // console.log(index);
-                                              ind = ind + 1;
-                                              return [
-                                                <td
-                                                  onContextMenu={async (e) => {
-                                                    e.preventDefault();
-                                                    //Right click
-                                                    const clickdone = await delayedclicked();
-                                                    //Give focus to new comment textarea
-                                                    if (clickdone === true) {
-                                                      commentRef.current.focus();
-                                                    }
-                                                    setPoints({
-                                                      x: e.pageX,
-                                                      y: e.pageY,
-                                                      // x: 0,
-                                                      // y: 0,
-                                                    });
+                                      {"$" + regprice.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                                    </td>
+                                    <td className='bdgtregioncolttl'>
+                                      {"$" + regprofit.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                                    </td>
+                                    <td className='bdgtregioncolttl'>
+                                      {"$" +
+                                        (regprofit * (q1reg + q2reg + q3reg + q4reg))
+                                          .toFixed(0)
+                                          .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                                    </td>
+                                    <td className='bdgtregioncolttl'>
+                                      {regprofit === 0 || regprice === 0
+                                        ? 0 + "%"
+                                        : ((regprofit / regprice) * 100).toFixed(1) + "%"}
+                                    </td>
+                                  </tr>,
+                                  Object.keys(formatedData[prod][reg]).map((cty) => {
+                                    let indexecon = indecon;
+                                    indecon = indecon + 2;
+                                    //   q1reg = 0;
+                                    return [
+                                      <tr>
+                                        <td className='countrycol'>{cty === "Dominican Republic" ? "Dom Rep" : cty}</td>
+                                        {Object.keys(formatedData[prod][reg][cty]).map((q) => {
+                                          let index = ind;
+                                          // console.log(index);
+                                          ind = ind + 1;
+                                          return [
+                                            <td
+                                              onContextMenu={async (e) => {
+                                                e.preventDefault();
+                                                //Right click
+                                                const clickdone = await delayedclicked();
+                                                //Give focus to new comment textarea
+                                                if (clickdone === true) {
+                                                  commentRef.current.focus();
+                                                }
+                                                setPoints({
+                                                  x: e.pageX,
+                                                  y: e.pageY,
+                                                  // x: 0,
+                                                  // y: 0,
+                                                });
+                                              }}
+                                              className={
+                                                budgetdata && budgetdata[index]
+                                                  ? bdgtcommentset &&
+                                                    bdgtcommentset.includes(budgetdata[index]["budgetentryID"])
+                                                    ? "bdgtdatacol cellwithcomment"
+                                                    : "bdgtdatacol"
+                                                  : ""
+                                              }
+                                            >
+                                              <div
+                                                style={{
+                                                  position: "relative",
+                                                }}
+                                                className={`tile ${activeIndex === index ? "active" : ""} ${
+                                                  budgetdata && budgetdata[index]
+                                                    ? bdgtcommentset &&
+                                                      bdgtcommentset.includes(budgetdata[index]["budgetentryID"])
+                                                      ? "cellwithcomment"
+                                                      : ""
+                                                    : ""
+                                                }`}
+                                              >
+                                                <input
+                                                  value={formatedData[prod][reg][cty][q]}
+                                                  readOnly
+                                                  onChange={(e) => {
+                                                    handleChange1(e, prod, reg, cty, q);
                                                   }}
                                                   className={
-                                                    budgetdata &&
-                                                    budgetdata[index]
+                                                    budgetdata && budgetdata[index]
                                                       ? bdgtcommentset &&
-                                                        bdgtcommentset.includes(
-                                                          budgetdata[index][
-                                                            "budgetentryID"
-                                                          ]
-                                                        )
-                                                        ? "bdgtdatacol cellwithcomment"
-                                                        : "bdgtdatacol"
+                                                        bdgtcommentset.includes(budgetdata[index]["budgetentryID"])
+                                                        ? "cell-input cellwithcomment"
+                                                        : "cell-input"
                                                       : ""
                                                   }
-                                                >
+                                                  onFocus={(e) => {
+                                                    setActiveIndex(index);
+                                                    e.target.select();
+                                                    setEditingQty(true);
+                                                    setEditingEcon(false);
+                                                    setClicked(false);
+                                                    setNewcomment("");
+                                                  }}
+                                                  ref={(el) => (inputRefs.current[index] = el)}
+                                                  onBlur={(e) => {
+                                                    saveNewValue(e, index, prod, reg, cty, q);
+                                                    setShowmsg(!showmsg);
+                                                  }}
+                                                  id={
+                                                    budgetdata && budgetdata[index]
+                                                      ? budgetdata[index]["budgetentryID"]
+                                                      : ""
+                                                  }
+                                                />
+                                                {clicked && activeIndex === index && (
                                                   <div
+                                                    className='contextMenu'
                                                     style={{
-                                                      position: "relative",
+                                                      zIndex: 10,
                                                     }}
-                                                    className={`tile ${
-                                                      activeIndex === index
-                                                        ? "active"
-                                                        : ""
-                                                    } ${
-                                                      budgetdata &&
-                                                      budgetdata[index]
-                                                        ? bdgtcommentset &&
-                                                          bdgtcommentset.includes(
-                                                            budgetdata[index][
-                                                              "budgetentryID"
-                                                            ]
-                                                          )
-                                                          ? "cellwithcomment"
-                                                          : ""
-                                                        : ""
-                                                    }`}
+                                                    // top={points.y}
+                                                    // left={points.x}
+                                                    // top={0}
+                                                    // left={0}
+                                                    // onBlur={(e) => {
+                                                    //   e.preventDefault();
+                                                    //   setClicked(false);
+                                                    //   setNewcomment("");
+                                                    // }}
                                                   >
-                                                    <input
-                                                      value={
-                                                        formatedData[prod][reg][
-                                                          cty
-                                                        ][q]
-                                                      }
-                                                      readOnly
-                                                      onChange={(e) => {
-                                                        handleChange1(
-                                                          e,
-                                                          prod,
-                                                          reg,
-                                                          cty,
-                                                          q
-                                                        );
-                                                      }}
-                                                      className={
-                                                        budgetdata &&
-                                                        budgetdata[index]
-                                                          ? bdgtcommentset &&
-                                                            bdgtcommentset.includes(
-                                                              budgetdata[index][
-                                                                "budgetentryID"
-                                                              ]
-                                                            )
-                                                            ? "cell-input cellwithcomment"
-                                                            : "cell-input"
-                                                          : ""
-                                                      }
-                                                      onFocus={(e) => {
-                                                        setActiveIndex(index);
-                                                        e.target.select();
-                                                        setEditingQty(true);
-                                                        setEditingEcon(false);
-                                                        setClicked(false);
-                                                        setNewcomment("");
-                                                      }}
-                                                      ref={(el) =>
-                                                        (inputRefs.current[
-                                                          index
-                                                        ] = el)
-                                                      }
-                                                      onBlur={(e) => {
-                                                        saveNewValue(
-                                                          e,
-                                                          index,
-                                                          prod,
-                                                          reg,
-                                                          cty,
-                                                          q
-                                                        );
-                                                        setShowmsg(!showmsg);
-                                                      }}
-                                                      id={
-                                                        budgetdata &&
-                                                        budgetdata[index]
-                                                          ? budgetdata[index][
-                                                              "budgetentryID"
-                                                            ]
-                                                          : ""
-                                                      }
-                                                    />
-                                                    {clicked &&
-                                                      activeIndex === index && (
-                                                        <div
-                                                          className="contextMenu"
-                                                          style={{
-                                                            zIndex: 10,
+                                                    <ul>
+                                                      <li className='bdgtcomment'>
+                                                        {bdgtcomments && Array.isArray(bdgtcomments)
+                                                          ? bdgtcomments.map((comm) => {
+                                                              // console.log(
+                                                              //   comm.bdgtEntryID
+                                                              // );
+                                                              if (
+                                                                comm.budgetEntryID ===
+                                                                budgetdata[index]["budgetentryID"]
+                                                              ) {
+                                                                return [
+                                                                  <div className='singlecomment'>
+                                                                    <p>{comm.user + ": " + comm.bdgtComment}</p>
+
+                                                                    <FontAwesomeIcon
+                                                                      icon={faMinusCircle}
+                                                                      className='commenticon'
+                                                                      onClick={(e) => {
+                                                                        deleteComment(comm.bdgtcommentID);
+                                                                      }}
+                                                                    />
+                                                                  </div>,
+                                                                ];
+                                                              }
+                                                            })
+                                                          : ""}
+                                                      </li>
+                                                      <li>
+                                                        <textarea
+                                                          ref={commentRef}
+                                                          maxLength={200}
+                                                          onChange={(e) => {
+                                                            setNewcomment(e.target.value);
+                                                            // console.log(
+                                                            //   budgetdata[
+                                                            //     index
+                                                            //   ]
+                                                            // );
                                                           }}
-                                                          // top={points.y}
-                                                          // left={points.x}
-                                                          // top={0}
-                                                          // left={0}
-                                                          // onBlur={(e) => {
-                                                          //   e.preventDefault();
-                                                          //   setClicked(false);
-                                                          //   setNewcomment("");
-                                                          // }}
+                                                          type='textarea'
+                                                          value={newcomment}
+                                                        />
+                                                      </li>
+                                                      <li>
+                                                        <button
+                                                          onClick={(e) => {
+                                                            e.preventDefault();
+
+                                                            saveNewBudgetComment(
+                                                              budgetdata[index]["budgetentryID"],
+                                                              budgetdata[index]["prodCatNameID"],
+                                                            );
+                                                          }}
                                                         >
-                                                          <ul>
-                                                            <li className="bdgtcomment">
-                                                              {bdgtcomments &&
-                                                              Array.isArray(
-                                                                bdgtcomments
-                                                              )
-                                                                ? bdgtcomments.map(
-                                                                    (comm) => {
-                                                                      // console.log(
-                                                                      //   comm.bdgtEntryID
-                                                                      // );
-                                                                      if (
-                                                                        comm.budgetEntryID ===
-                                                                        budgetdata[
-                                                                          index
-                                                                        ][
-                                                                          "budgetentryID"
-                                                                        ]
-                                                                      ) {
-                                                                        return [
-                                                                          <div className="singlecomment">
-                                                                            <p>
-                                                                              {comm.user +
-                                                                                ": " +
-                                                                                comm.bdgtComment}
-                                                                            </p>
-
-                                                                            <FontAwesomeIcon
-                                                                              icon={
-                                                                                faMinusCircle
-                                                                              }
-                                                                              className="commenticon"
-                                                                              onClick={(
-                                                                                e
-                                                                              ) => {
-                                                                                deleteComment(
-                                                                                  comm.bdgtcommentID
-                                                                                );
-                                                                              }}
-                                                                            />
-                                                                          </div>,
-                                                                        ];
-                                                                      }
-                                                                    }
-                                                                  )
-                                                                : ""}
-                                                            </li>
-                                                            <li>
-                                                              <textarea
-                                                                ref={commentRef}
-                                                                maxLength={200}
-                                                                onChange={(
-                                                                  e
-                                                                ) => {
-                                                                  setNewcomment(
-                                                                    e.target
-                                                                      .value
-                                                                  );
-                                                                  // console.log(
-                                                                  //   budgetdata[
-                                                                  //     index
-                                                                  //   ]
-                                                                  // );
-                                                                }}
-                                                                type="textarea"
-                                                                value={
-                                                                  newcomment
-                                                                }
-                                                              />
-                                                            </li>
-                                                            <li>
-                                                              <button
-                                                                onClick={(
-                                                                  e
-                                                                ) => {
-                                                                  e.preventDefault();
-
-                                                                  saveNewBudgetComment(
-                                                                    budgetdata[
-                                                                      index
-                                                                    ][
-                                                                      "budgetentryID"
-                                                                    ],
-                                                                    budgetdata[
-                                                                      index
-                                                                    ][
-                                                                      "prodCatNameID"
-                                                                    ]
-                                                                  );
-                                                                }}
-                                                              >
-                                                                Add Comment
-                                                              </button>
-                                                            </li>
-                                                          </ul>
-                                                        </div>
-                                                      )}
+                                                          Add Comment
+                                                        </button>
+                                                      </li>
+                                                    </ul>
                                                   </div>
-                                                </td>,
-                                              ];
-                                            })}
+                                                )}
+                                              </div>
+                                            </td>,
+                                          ];
+                                        })}
 
-                                            <td className="bdgtcountrytotals">
-                                              {formatedData[prod][reg][cty][
-                                                "0"
-                                              ] +
-                                                formatedData[prod][reg][cty][
-                                                  "1"
-                                                ] +
-                                                formatedData[prod][reg][cty][
-                                                  "2"
-                                                ] +
-                                                formatedData[prod][reg][cty][
-                                                  "3"
-                                                ]}
-                                            </td>
-                                            <td className="bdgtcolseparation"></td>
-                                            <td className="bdgtctyeconomics">
-                                              <input
-                                                className="cell-input"
-                                                value={
-                                                  bdgtecondata &&
-                                                  bdgtecondata[prod] &&
-                                                  bdgtecondata[prod][reg] &&
-                                                  bdgtecondata[prod][reg][
-                                                    cty
-                                                  ] &&
-                                                  bdgtecondata[prod][reg][cty][
-                                                    "price"
-                                                  ] !== null
-                                                    ? bdgtecondata[prod][reg][
-                                                        cty
-                                                      ]["price"]
-                                                    : "na"
-                                                }
-                                                onChange={(e) => {
-                                                  handleEconChange(
-                                                    e,
-                                                    prod,
-                                                    reg,
-                                                    cty,
-                                                    "price"
-                                                  );
-                                                }}
-                                                readOnly
-                                                onFocus={(e) => {
-                                                  setActiveEconIndex(indexecon);
-                                                  e.target.select();
-                                                  setEditingQty(false);
-                                                  setEditingEcon(true);
-                                                  setActiveIndex(-1);
-                                                }}
-                                                ref={(el) =>
-                                                  (inputEconRefs.current[
-                                                    indexecon
-                                                  ] = el)
-                                                }
-                                                onBlur={(e) => {
-                                                  saveNewEconValue(
-                                                    e,
-                                                    indexecon,
-                                                    prod,
-                                                    reg,
-                                                    cty,
-                                                    "price"
-                                                  );
-                                                  setShowmsg(!showmsg);
-                                                }}
-                                              />
-                                            </td>
-                                            <td className="bdgtctyeconomics">
-                                              <input
-                                                readOnly
-                                                className="cell-input"
-                                                value={
-                                                  bdgtecondata &&
-                                                  bdgtecondata[prod] &&
-                                                  bdgtecondata[prod][reg] &&
-                                                  bdgtecondata[prod][reg][
-                                                    cty
-                                                  ] &&
-                                                  bdgtecondata[prod][reg][cty][
-                                                    "profit"
-                                                  ] !== null
-                                                    ? bdgtecondata[prod][reg][
-                                                        cty
-                                                      ]["profit"]
-                                                    : "na"
-                                                }
-                                                onChange={(e) => {
-                                                  handleEconChange(
-                                                    e,
-                                                    prod,
-                                                    reg,
-                                                    cty,
-                                                    "profit"
-                                                  );
-                                                }}
-                                                onFocus={(e) => {
-                                                  setActiveEconIndex(
-                                                    indexecon + 1
-                                                  );
-                                                  e.target.select();
-                                                  setEditingQty(false);
-                                                  setEditingEcon(true);
-                                                  setActiveIndex(-1);
-                                                }}
-                                                ref={(el) =>
-                                                  (inputEconRefs.current[
-                                                    indexecon + 1
-                                                  ] = el)
-                                                }
-                                                onBlur={(e) => {
-                                                  saveNewEconValue(
-                                                    e,
-                                                    indexecon,
-                                                    prod,
-                                                    reg,
-                                                    cty,
-                                                    "profit"
-                                                  );
-                                                  setShowmsg(!showmsg);
-                                                }}
-                                              />
-                                            </td>
-                                            <td className="bdgtctyeconomics">
-                                              {bdgtecondata &&
-                                              formatedData &&
-                                              bdgtecondata[prod] &&
-                                              formatedData[prod] &&
-                                              bdgtecondata[prod][reg] &&
-                                              formatedData[prod][reg] &&
-                                              bdgtecondata[prod][reg][cty] &&
-                                              formatedData[prod][reg][cty] &&
-                                              bdgtecondata[prod][reg][cty][
-                                                "profit"
-                                              ] !== null
-                                                ? (
-                                                    bdgtecondata[prod][reg][
-                                                      cty
-                                                    ]["profit"] *
-                                                    (formatedData[prod][reg][
-                                                      cty
-                                                    ][0] +
-                                                      formatedData[prod][reg][
-                                                        cty
-                                                      ][1] +
-                                                      formatedData[prod][reg][
-                                                        cty
-                                                      ][2] +
-                                                      formatedData[prod][reg][
-                                                        cty
-                                                      ][3])
-                                                  ).toFixed(0)
-                                                : 0}
-                                            </td>
-                                            <td className="bdgtctyeconomics">
-                                              {bdgtecondata &&
+                                        <td className='bdgtcountrytotals'>
+                                          {formatedData[prod][reg][cty]["0"] +
+                                            formatedData[prod][reg][cty]["1"] +
+                                            formatedData[prod][reg][cty]["2"] +
+                                            formatedData[prod][reg][cty]["3"]}
+                                        </td>
+                                        <td className='bdgtcolseparation'></td>
+                                        <td className='bdgtctyeconomics'>
+                                          <input
+                                            className='cell-input'
+                                            value={
+                                              bdgtecondata &&
                                               bdgtecondata[prod] &&
                                               bdgtecondata[prod][reg] &&
                                               bdgtecondata[prod][reg][cty] &&
-                                              bdgtecondata[prod][reg][cty][
-                                                "profit"
-                                              ] !== null &&
-                                              bdgtecondata[prod][reg][cty][
-                                                "price"
-                                              ] !== 0
-                                                ? (
-                                                    (bdgtecondata[prod][reg][
-                                                      cty
-                                                    ]["profit"] /
-                                                      bdgtecondata[prod][reg][
-                                                        cty
-                                                      ]["price"]) *
-                                                    100
-                                                  ).toFixed(1) + "%"
-                                                : "0%"}
-                                            </td>
-                                            {lock === false ? (
-                                              <FontAwesomeIcon
-                                                className="bdgtctydelete"
-                                                icon={faMinusCircle}
-                                                onClick={(e) => {
-                                                  setShowdelctybtns({
-                                                    ...showdelctybtns,
-                                                    [prod]: {
-                                                      ...showdelctybtns[prod],
-                                                      [reg]: {
-                                                        ...showdelctybtns[prod][
-                                                          reg
-                                                        ],
-                                                        [cty]: !showdelctybtns[
-                                                          prod
-                                                        ][reg][cty],
-                                                      },
-                                                    },
-                                                  });
-                                                }}
-                                              />
-                                            ) : (
-                                              ""
-                                            )}
-                                            {lock === false ? (
-                                              <button
-                                                className={
-                                                  showdelctybtns &&
-                                                  showdelctybtns[prod] &&
-                                                  showdelctybtns[prod][reg][
-                                                    cty
-                                                  ] === true
-                                                    ? "bdgtctydeletebtn showbdgtpane"
-                                                    : "bdgtctydeletebtn hidebdgtpane"
-                                                }
-                                                onClick={(e) => {
-                                                  deletectyrow(prod, cty);
-                                                }}
-                                              >
-                                                Delete
-                                              </button>
-                                            ) : (
-                                              ""
-                                            )}
-                                          </tr>,
-                                        ];
-                                      }
-                                    ),
-                                  ];
-                                }
-                              )}
+                                              bdgtecondata[prod][reg][cty]["price"] !== null
+                                                ? bdgtecondata[prod][reg][cty]["price"]
+                                                : "na"
+                                            }
+                                            onChange={(e) => {
+                                              handleEconChange(e, prod, reg, cty, "price");
+                                            }}
+                                            readOnly
+                                            onFocus={(e) => {
+                                              setActiveEconIndex(indexecon);
+                                              e.target.select();
+                                              setEditingQty(false);
+                                              setEditingEcon(true);
+                                              setActiveIndex(-1);
+                                            }}
+                                            ref={(el) => (inputEconRefs.current[indexecon] = el)}
+                                            onBlur={(e) => {
+                                              saveNewEconValue(e, indexecon, prod, reg, cty, "price");
+                                              setShowmsg(!showmsg);
+                                            }}
+                                          />
+                                        </td>
+                                        <td className='bdgtctyeconomics'>
+                                          <input
+                                            readOnly
+                                            className='cell-input'
+                                            value={
+                                              bdgtecondata &&
+                                              bdgtecondata[prod] &&
+                                              bdgtecondata[prod][reg] &&
+                                              bdgtecondata[prod][reg][cty] &&
+                                              bdgtecondata[prod][reg][cty]["profit"] !== null
+                                                ? bdgtecondata[prod][reg][cty]["profit"]
+                                                : "na"
+                                            }
+                                            onChange={(e) => {
+                                              handleEconChange(e, prod, reg, cty, "profit");
+                                            }}
+                                            onFocus={(e) => {
+                                              setActiveEconIndex(indexecon + 1);
+                                              e.target.select();
+                                              setEditingQty(false);
+                                              setEditingEcon(true);
+                                              setActiveIndex(-1);
+                                            }}
+                                            ref={(el) => (inputEconRefs.current[indexecon + 1] = el)}
+                                            onBlur={(e) => {
+                                              saveNewEconValue(e, indexecon, prod, reg, cty, "profit");
+                                              setShowmsg(!showmsg);
+                                            }}
+                                          />
+                                        </td>
+                                        <td className='bdgtctyeconomics'>
+                                          {bdgtecondata &&
+                                          formatedData &&
+                                          bdgtecondata[prod] &&
+                                          formatedData[prod] &&
+                                          bdgtecondata[prod][reg] &&
+                                          formatedData[prod][reg] &&
+                                          bdgtecondata[prod][reg][cty] &&
+                                          formatedData[prod][reg][cty] &&
+                                          bdgtecondata[prod][reg][cty]["profit"] !== null
+                                            ? (
+                                                bdgtecondata[prod][reg][cty]["profit"] *
+                                                (formatedData[prod][reg][cty][0] +
+                                                  formatedData[prod][reg][cty][1] +
+                                                  formatedData[prod][reg][cty][2] +
+                                                  formatedData[prod][reg][cty][3])
+                                              ).toFixed(0)
+                                            : 0}
+                                        </td>
+                                        <td className='bdgtctyeconomics'>
+                                          {bdgtecondata &&
+                                          bdgtecondata[prod] &&
+                                          bdgtecondata[prod][reg] &&
+                                          bdgtecondata[prod][reg][cty] &&
+                                          bdgtecondata[prod][reg][cty]["profit"] !== null &&
+                                          bdgtecondata[prod][reg][cty]["price"] !== 0
+                                            ? (
+                                                (bdgtecondata[prod][reg][cty]["profit"] /
+                                                  bdgtecondata[prod][reg][cty]["price"]) *
+                                                100
+                                              ).toFixed(1) + "%"
+                                            : "0%"}
+                                        </td>
+                                        {lock === false ? (
+                                          <FontAwesomeIcon
+                                            className='bdgtctydelete'
+                                            icon={faMinusCircle}
+                                            onClick={(e) => {
+                                              setShowdelctybtns({
+                                                ...showdelctybtns,
+                                                [prod]: {
+                                                  ...showdelctybtns[prod],
+                                                  [reg]: {
+                                                    ...showdelctybtns[prod][reg],
+                                                    [cty]: !showdelctybtns[prod][reg][cty],
+                                                  },
+                                                },
+                                              });
+                                            }}
+                                          />
+                                        ) : (
+                                          ""
+                                        )}
+                                        {lock === false ? (
+                                          <button
+                                            className={
+                                              showdelctybtns &&
+                                              showdelctybtns[prod] &&
+                                              showdelctybtns[prod][reg][cty] === true
+                                                ? "bdgtctydeletebtn showbdgtpane"
+                                                : "bdgtctydeletebtn hidebdgtpane"
+                                            }
+                                            onClick={(e) => {
+                                              deletectyrow(prod, cty);
+                                            }}
+                                          >
+                                            Delete
+                                          </button>
+                                        ) : (
+                                          ""
+                                        )}
+                                      </tr>,
+                                    ];
+                                  }),
+                                ];
+                              })}
                               <tr>
-                                <td className="bdgttotal">Total</td>
-                                <td className="bdgttotalqty">{q1prodtotal}</td>
-                                <td className="bdgttotalqty">{q2prodtotal}</td>
-                                <td className="bdgttotalqty">{q3prodtotal}</td>
-                                <td className="bdgttotalqty">{q4prodtotal}</td>
-                                <td className="bdgttotalqty">
-                                  {q1prodtotal +
-                                    q2prodtotal +
-                                    q3prodtotal +
-                                    q4prodtotal}
+                                <td className='bdgttotal'>Total</td>
+                                <td className='bdgttotalqty'>{q1prodtotal}</td>
+                                <td className='bdgttotalqty'>{q2prodtotal}</td>
+                                <td className='bdgttotalqty'>{q3prodtotal}</td>
+                                <td className='bdgttotalqty'>{q4prodtotal}</td>
+                                <td className='bdgttotalqty'>
+                                  {q1prodtotal + q2prodtotal + q3prodtotal + q4prodtotal}
                                 </td>
-                                <td class="bdgtcolseparation"></td>
-                                <td className="bdgttotalqty">
-                                  {pricetotal === 0 ||
-                                  q1prodtotal +
-                                    q2prodtotal +
-                                    q3prodtotal +
-                                    q4prodtotal ===
-                                    0
+                                <td class='bdgtcolseparation'></td>
+                                <td className='bdgttotalqty'>
+                                  {pricetotal === 0 || q1prodtotal + q2prodtotal + q3prodtotal + q4prodtotal === 0
                                     ? 0
                                     : "$" +
-                                      (
-                                        pricetotal /
-                                        (q1prodtotal +
-                                          q2prodtotal +
-                                          q3prodtotal +
-                                          q4prodtotal)
-                                      )
+                                      (pricetotal / (q1prodtotal + q2prodtotal + q3prodtotal + q4prodtotal))
                                         .toFixed(0)
                                         .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                                 </td>
-                                <td className="bdgttotalqty">
-                                  {profittotal === 0 ||
-                                  q1prodtotal +
-                                    q2prodtotal +
-                                    q3prodtotal +
-                                    q4prodtotal ===
-                                    0
+                                <td className='bdgttotalqty'>
+                                  {profittotal === 0 || q1prodtotal + q2prodtotal + q3prodtotal + q4prodtotal === 0
                                     ? 0
                                     : "$" +
-                                      (
-                                        profittotal /
-                                        (q1prodtotal +
-                                          q2prodtotal +
-                                          q3prodtotal +
-                                          q4prodtotal)
-                                      )
+                                      (profittotal / (q1prodtotal + q2prodtotal + q3prodtotal + q4prodtotal))
                                         .toFixed(0)
                                         .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                                 </td>
-                                <td className="bdgttotalqty">
+                                <td className='bdgttotalqty'>
                                   {profittotal === 0
                                     ? 0
-                                    : "$" +
-                                      profittotal
-                                        .toFixed(0)
-                                        .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                                    : "$" + profittotal.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                                 </td>
-                                <td className="bdgttotalqty">
+                                <td className='bdgttotalqty'>
                                   {profittotal === 0 || pricetotal == 0
                                     ? 0
-                                    : (
-                                        (profittotal / pricetotal) *
-                                        100
-                                      ).toFixed(1) + "%"}
+                                    : ((profittotal / pricetotal) * 100).toFixed(1) + "%"}
                                 </td>
                               </tr>
                             </tbody>
@@ -2268,76 +1856,58 @@ const Budget2024a = () => {
                   })
                 : ""}
               {formatedData ? (
-                <div className="bdgtpnametable">
-                  <div className="bdgtpnametabletitle">
+                <div className='bdgtpnametable'>
+                  <div className='bdgtpnametabletitle'>
                     <h3>2024 Total {activeCname} Summary</h3>
                   </div>
-                  <div className="board">
+                  <div className='board'>
                     <table>
                       <thead>
                         <tr>
-                          <td className="countrycol">Total Summary</td>
-                          <td className="bdgtdatacol">Q1</td>
-                          <td className="bdgtdatacol">Q2</td>
-                          <td className="bdgtdatacol">Q3</td>
-                          <td className="bdgtdatacol">Q4</td>
-                          <td className="bdgtdatacol">Total</td>
-                          <td className="bdgtcolseparation"></td>
-                          <td className="bdgtdatacol">Price</td>
-                          <td className="bdgtdatacol">Profit</td>
-                          <td className="bdgtdatacol">Ttl Profit</td>
-                          <td className="bdgtdatacol">% Mgn</td>
+                          <td className='countrycol'>Total Summary</td>
+                          <td className='bdgtdatacol'>Q1</td>
+                          <td className='bdgtdatacol'>Q2</td>
+                          <td className='bdgtdatacol'>Q3</td>
+                          <td className='bdgtdatacol'>Q4</td>
+                          <td className='bdgtdatacol'>Total</td>
+                          <td className='bdgtcolseparation'></td>
+                          <td className='bdgtdatacol'>Price</td>
+                          <td className='bdgtdatacol'>Profit</td>
+                          <td className='bdgtdatacol'>Ttl Profit</td>
+                          <td className='bdgtdatacol'>% Mgn</td>
                         </tr>
                       </thead>
                       <tbody>
                         <tr>
-                          <td className="countrycol bdgtctyttl">Global</td>
-                          <td className="bdgtprodtotals">{bdgtq1qtytotal}</td>
-                          <td className="bdgtprodtotals">{bdgtq2qtytotal}</td>
-                          <td className="bdgtprodtotals">{bdgtq3qtytotal}</td>
-                          <td className="bdgtprodtotals">{bdgtq4qtytotal}</td>
+                          <td className='countrycol bdgtctyttl'>Global</td>
+                          <td className='bdgtprodtotals'>{bdgtq1qtytotal}</td>
+                          <td className='bdgtprodtotals'>{bdgtq2qtytotal}</td>
+                          <td className='bdgtprodtotals'>{bdgtq3qtytotal}</td>
+                          <td className='bdgtprodtotals'>{bdgtq4qtytotal}</td>
 
-                          <td className="bdgtprodtotals bdgtcountrytotals">
-                            {bdgtq1qtytotal +
-                              bdgtq2qtytotal +
-                              bdgtq3qtytotal +
-                              bdgtq4qtytotal}
+                          <td className='bdgtprodtotals bdgtcountrytotals'>
+                            {bdgtq1qtytotal + bdgtq2qtytotal + bdgtq3qtytotal + bdgtq4qtytotal}
                           </td>
-                          <td className="bdgtcolseparation"></td>
-                          <td className="bdgtctyeconomics bdgtprodtotals">
+                          <td className='bdgtcolseparation'></td>
+                          <td className='bdgtctyeconomics bdgtprodtotals'>
                             {"$ " +
                               (
                                 bdgtpriceprodtotal /
-                                (bdgtq1qtytotal +
-                                  bdgtq2qtytotal +
-                                  bdgtq3qtytotal +
-                                  bdgtq4qtytotal)
+                                (bdgtq1qtytotal + bdgtq2qtytotal + bdgtq3qtytotal + bdgtq4qtytotal)
                               ).toFixed(0)}
                           </td>
-                          <td className="bdgtctyeconomics bdgtprodtotals">
+                          <td className='bdgtctyeconomics bdgtprodtotals'>
                             {"$ " +
                               (
                                 bdgtprofitprodtotal /
-                                (bdgtq1qtytotal +
-                                  bdgtq2qtytotal +
-                                  bdgtq3qtytotal +
-                                  bdgtq4qtytotal)
+                                (bdgtq1qtytotal + bdgtq2qtytotal + bdgtq3qtytotal + bdgtq4qtytotal)
                               ).toFixed(0)}
                           </td>
-                          <td
-                            className="bdgtctyeconomics bdgtprodtotals"
-                            style={{ width: "auto" }}
-                          >
+                          <td className='bdgtctyeconomics bdgtprodtotals' style={{ width: "auto" }}>
                             {"$ " + bdgtprofitprodtotal}
                           </td>
-                          <td
-                            className="bdgtctyeconomics bdgtprodtotals"
-                            style={{ width: "auto" }}
-                          >
-                            {(
-                              (bdgtprofitprodtotal / bdgtpriceprodtotal) *
-                              100
-                            ).toFixed(0) + "%"}
+                          <td className='bdgtctyeconomics bdgtprodtotals' style={{ width: "auto" }}>
+                            {((bdgtprofitprodtotal / bdgtpriceprodtotal) * 100).toFixed(0) + "%"}
                           </td>
                         </tr>
                       </tbody>
@@ -2348,11 +1918,11 @@ const Budget2024a = () => {
                 ""
               )}
             </div>
-            <span className="bdgtresponsemsg" ref={refresmsg}>
+            <span className='bdgtresponsemsg' ref={refresmsg}>
               {bdgtresponsemsg}
             </span>
           </div>
-          <div className="lyearfigures">
+          <div className='lyearfigures'>
             {formatedData && bdgtlyearsales
               ? Object.keys(formatedData).map((prod) => {
                   let lyearqtytotal = 0;
@@ -2362,15 +1932,15 @@ const Budget2024a = () => {
                     <h3>
                       {bdgtyear - 1} {prod} Sales Figures
                     </h3>,
-                    <table className="lyeartable">
-                      <thead className="lyearhead">
+                    <table className='lyeartable'>
+                      <thead className='lyearhead'>
                         <tr>
-                          <td className="lyearcountrycol">Country</td>
-                          <td className="lyeardatah">Qty</td>
-                          <td className="lyeardatah">Price</td>
-                          <td className="lyeardatah">Profit</td>
-                          <td className="lyeardatah">Ttl Profit</td>
-                          <td className="lyeardatah">Margin</td>
+                          <td className='lyearcountrycol'>Country</td>
+                          <td className='lyeardatah'>Qty</td>
+                          <td className='lyeardatah'>Price</td>
+                          <td className='lyeardatah'>Profit</td>
+                          <td className='lyeardatah'>Ttl Profit</td>
+                          <td className='lyeardatah'>Margin</td>
                         </tr>
                       </thead>
                       <tbody>
@@ -2379,72 +1949,50 @@ const Budget2024a = () => {
                           let lyearregprice = 0;
                           let lyearregprofit = 0;
                           let lyearregttlprofit = 0;
-                          Object.keys(formatedData[prod][reg]).forEach(
-                            (ctry) => {
-                              if (
-                                bdgtlyearsales &&
-                                bdgtlyearsales[prod] &&
-                                bdgtlyearsales[prod][reg] &&
-                                bdgtlyearsales[prod][reg][ctry] &&
-                                bdgtlyearsales[prod][reg][ctry]["quantity"] &&
-                                bdgtlyearsales[prod][reg][ctry]["avgprice"] &&
-                                bdgtlyearsales[prod][reg][ctry]["avgprofit"] &&
-                                bdgtlyearsales[prod][reg][ctry]["totalprofit"]
-                              ) {
-                                lyearregqty =
-                                  lyearregqty +
-                                  bdgtlyearsales[prod][reg][ctry]["quantity"];
-                                lyearregprice =
-                                  lyearregprice +
-                                  bdgtlyearsales[prod][reg][ctry]["quantity"] *
-                                    bdgtlyearsales[prod][reg][ctry]["avgprice"];
-                                lyearregprofit =
-                                  lyearregprofit +
-                                  bdgtlyearsales[prod][reg][ctry]["quantity"] *
-                                    bdgtlyearsales[prod][reg][ctry][
-                                      "avgprofit"
-                                    ];
-                                lyearregttlprofit =
-                                  lyearregttlprofit +
-                                  bdgtlyearsales[prod][reg][ctry][
-                                    "totalprofit"
-                                  ];
-                              }
+                          Object.keys(formatedData[prod][reg]).forEach((ctry) => {
+                            if (
+                              bdgtlyearsales &&
+                              bdgtlyearsales[prod] &&
+                              bdgtlyearsales[prod][reg] &&
+                              bdgtlyearsales[prod][reg][ctry] &&
+                              bdgtlyearsales[prod][reg][ctry]["quantity"] &&
+                              bdgtlyearsales[prod][reg][ctry]["avgprice"] &&
+                              bdgtlyearsales[prod][reg][ctry]["avgprofit"] &&
+                              bdgtlyearsales[prod][reg][ctry]["totalprofit"]
+                            ) {
+                              lyearregqty = lyearregqty + bdgtlyearsales[prod][reg][ctry]["quantity"];
+                              lyearregprice =
+                                lyearregprice +
+                                bdgtlyearsales[prod][reg][ctry]["quantity"] *
+                                  bdgtlyearsales[prod][reg][ctry]["avgprice"];
+                              lyearregprofit =
+                                lyearregprofit +
+                                bdgtlyearsales[prod][reg][ctry]["quantity"] *
+                                  bdgtlyearsales[prod][reg][ctry]["avgprofit"];
+                              lyearregttlprofit = lyearregttlprofit + bdgtlyearsales[prod][reg][ctry]["totalprofit"];
                             }
-                          );
+                          });
                           return [
                             <tr>
-                              <td className="lyearregrow lyearcountrycol">
+                              <td className='lyearregrow lyearcountrycol'>
                                 {reg === "Latin America" ? "L. America" : reg}
                               </td>
-                              <td className="lyearregrowdata">{lyearregqty}</td>
-                              <td className="lyearregrowdata">
-                                {lyearregqty === 0
-                                  ? 0
-                                  : "$ " +
-                                    (lyearregprice / lyearregqty).toFixed(0)}
+                              <td className='lyearregrowdata'>{lyearregqty}</td>
+                              <td className='lyearregrowdata'>
+                                {lyearregqty === 0 ? 0 : "$ " + (lyearregprice / lyearregqty).toFixed(0)}
                               </td>
-                              <td className="lyearregrowdata">
-                                {lyearregqty === 0
-                                  ? 0
-                                  : "$ " +
-                                    (lyearregprofit / lyearregqty).toFixed(0)}
+                              <td className='lyearregrowdata'>
+                                {lyearregqty === 0 ? 0 : "$ " + (lyearregprofit / lyearregqty).toFixed(0)}
                               </td>
-                              <td className="lyearregrowdata">
+                              <td className='lyearregrowdata'>
                                 {lyearregqty === 0
                                   ? "$ " + 0
-                                  : "$ " +
-                                    lyearregprofit
-                                      .toFixed(0)
-                                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                                  : "$ " + lyearregprofit.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                               </td>
-                              <td className="lyearregrowdata">
+                              <td className='lyearregrowdata'>
                                 {lyearregprice === 0
                                   ? +0 + "%"
-                                  : (
-                                      (lyearregprofit / lyearregprice) *
-                                      100
-                                    ).toFixed(0) + "%"}
+                                  : ((lyearregprofit / lyearregprice) * 100).toFixed(0) + "%"}
                               </td>
 
                               {/* <td colSpan={3}></td> */}
@@ -2457,9 +2005,7 @@ const Budget2024a = () => {
                                 bdgtlyearsales[prod][reg][cty] &&
                                 bdgtlyearsales[prod][reg][cty]["quantity"]
                               ) {
-                                lyearqtytotal =
-                                  lyearqtytotal +
-                                  bdgtlyearsales[prod][reg][cty]["quantity"];
+                                lyearqtytotal = lyearqtytotal + bdgtlyearsales[prod][reg][cty]["quantity"];
                               }
                               if (
                                 bdgtlyearsales &&
@@ -2490,87 +2036,60 @@ const Budget2024a = () => {
 
                               return [
                                 <tr>
-                                  <td className="lyearcountrycol">
-                                    {cty === "Dominican Republic"
-                                      ? "Dom Rep"
-                                      : cty}
-                                  </td>
-                                  <td className="lyeardata">
+                                  <td className='lyearcountrycol'>{cty === "Dominican Republic" ? "Dom Rep" : cty}</td>
+                                  <td className='lyeardata'>
                                     {bdgtlyearsales &&
                                     bdgtlyearsales[prod] &&
                                     bdgtlyearsales[prod][reg] &&
                                     bdgtlyearsales[prod][reg][cty] &&
                                     bdgtlyearsales[prod][reg][cty]["quantity"]
-                                      ? bdgtlyearsales[prod][reg][cty][
-                                          "quantity"
-                                        ]
+                                      ? bdgtlyearsales[prod][reg][cty]["quantity"]
                                       : 0}
                                   </td>
-                                  <td className="lyeardata">
+                                  <td className='lyeardata'>
                                     {bdgtlyearsales &&
                                     bdgtlyearsales[prod] &&
                                     bdgtlyearsales[prod][reg] &&
                                     bdgtlyearsales[prod][reg][cty] &&
                                     bdgtlyearsales[prod][reg][cty]["avgprice"]
-                                      ? "$ " +
-                                        bdgtlyearsales[prod][reg][cty][
-                                          "avgprice"
-                                        ]
+                                      ? "$ " + bdgtlyearsales[prod][reg][cty]["avgprice"]
                                       : 0}
                                   </td>
-                                  <td className="lyeardata">
+                                  <td className='lyeardata'>
                                     {bdgtlyearsales &&
                                     bdgtlyearsales[prod] &&
                                     bdgtlyearsales[prod][reg] &&
                                     bdgtlyearsales[prod][reg][cty] &&
                                     bdgtlyearsales[prod][reg][cty]["avgprofit"]
-                                      ? "$ " +
-                                        bdgtlyearsales[prod][reg][cty][
-                                          "avgprofit"
-                                        ]
+                                      ? "$ " + bdgtlyearsales[prod][reg][cty]["avgprofit"]
                                       : 0}
                                   </td>
-                                  <td
-                                    className="lyeardata"
-                                    style={{ width: "90px" }}
-                                  >
+                                  <td className='lyeardata' style={{ width: "90px" }}>
                                     {bdgtlyearsales &&
                                     bdgtlyearsales[prod] &&
                                     bdgtlyearsales[prod][reg] &&
                                     bdgtlyearsales[prod][reg][cty] &&
-                                    bdgtlyearsales[prod][reg][cty][
-                                      "avgprofit"
-                                    ] &&
+                                    bdgtlyearsales[prod][reg][cty]["avgprofit"] &&
                                     bdgtlyearsales[prod][reg][cty]["quantity"]
                                       ? "$ " +
                                         (
-                                          bdgtlyearsales[prod][reg][cty][
-                                            "avgprofit"
-                                          ] *
-                                          bdgtlyearsales[prod][reg][cty][
-                                            "quantity"
-                                          ]
+                                          bdgtlyearsales[prod][reg][cty]["avgprofit"] *
+                                          bdgtlyearsales[prod][reg][cty]["quantity"]
                                         )
                                           .toFixed(0)
                                           .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                                       : "$ " + 0}
                                   </td>
-                                  <td className="lyeardata">
+                                  <td className='lyeardata'>
                                     {bdgtlyearsales &&
                                     bdgtlyearsales[prod] &&
                                     bdgtlyearsales[prod][reg] &&
                                     bdgtlyearsales[prod][reg][cty] &&
-                                    bdgtlyearsales[prod][reg][cty][
-                                      "avgprofit"
-                                    ] &&
+                                    bdgtlyearsales[prod][reg][cty]["avgprofit"] &&
                                     bdgtlyearsales[prod][reg][cty]["avgprice"]
                                       ? (
-                                          (bdgtlyearsales[prod][reg][cty][
-                                            "avgprofit"
-                                          ] /
-                                            bdgtlyearsales[prod][reg][cty][
-                                              "avgprice"
-                                            ]) *
+                                          (bdgtlyearsales[prod][reg][cty]["avgprofit"] /
+                                            bdgtlyearsales[prod][reg][cty]["avgprice"]) *
                                           100
                                         ).toFixed(0) + "%"
                                       : 0 + "%"}
@@ -2581,57 +2100,27 @@ const Budget2024a = () => {
                           ];
                         })}
                         <tr>
-                          <td
-                            className="lyearcountrycolttl"
-                            style={{ background: "rgb(160, 182, 103)" }}
-                          >
+                          <td className='lyearcountrycolttl' style={{ background: "rgb(160, 182, 103)" }}>
                             Total
                           </td>
-                          <td
-                            className="lyeardatattl"
-                            style={{ background: "rgb(160, 182, 103)" }}
-                          >
+                          <td className='lyeardatattl' style={{ background: "rgb(160, 182, 103)" }}>
                             {lyearqtytotal}
                           </td>
-                          <td
-                            className="lyeardatattl"
-                            style={{ background: "rgb(160, 182, 103)" }}
-                          >
-                            {lyearqtytotal === 0
-                              ? 0
-                              : "$ " +
-                                (lyearpricetotal / lyearqtytotal).toFixed(0)}
+                          <td className='lyeardatattl' style={{ background: "rgb(160, 182, 103)" }}>
+                            {lyearqtytotal === 0 ? 0 : "$ " + (lyearpricetotal / lyearqtytotal).toFixed(0)}
                           </td>
-                          <td
-                            className="lyeardatattl"
-                            style={{ background: "rgb(160, 182, 103)" }}
-                          >
-                            {lyearqtytotal === 0
-                              ? 0
-                              : "$ " +
-                                (lyearprofittotal / lyearqtytotal).toFixed(0)}
+                          <td className='lyeardatattl' style={{ background: "rgb(160, 182, 103)" }}>
+                            {lyearqtytotal === 0 ? 0 : "$ " + (lyearprofittotal / lyearqtytotal).toFixed(0)}
                           </td>
-                          <td
-                            className="lyeardatattl"
-                            style={{ background: "rgb(160, 182, 103)" }}
-                          >
+                          <td className='lyeardatattl' style={{ background: "rgb(160, 182, 103)" }}>
                             {lyearqtytotal === 0
                               ? "$ " + 0
-                              : "$ " +
-                                lyearprofittotal
-                                  .toFixed(0)
-                                  .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                              : "$ " + lyearprofittotal.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                           </td>
-                          <td
-                            className="lyeardatattl"
-                            style={{ background: "rgb(160, 182, 103)" }}
-                          >
+                          <td className='lyeardatattl' style={{ background: "rgb(160, 182, 103)" }}>
                             {lyearpricetotal === 0
                               ? 0 + "%"
-                              : (
-                                  (lyearprofittotal / lyearpricetotal) *
-                                  100
-                                ).toFixed(0) + "%"}
+                              : ((lyearprofittotal / lyearpricetotal) * 100).toFixed(0) + "%"}
                           </td>
                         </tr>
                       </tbody>
@@ -2640,7 +2129,7 @@ const Budget2024a = () => {
                 })
               : ""}
           </div>
-          <div className="lyearfigures">
+          <div className='lyearfigures'>
             {formatedData && lybformateddata
               ? Object.keys(formatedData).map((prod) => {
                   let lyearbqtytotal = 0;
@@ -2650,38 +2139,23 @@ const Budget2024a = () => {
                     <h3>
                       {bdgtyear - 1} {prod} Budget
                     </h3>,
-                    <table className="lyeartable">
-                      <thead className="lyearhead">
+                    <table className='lyeartable'>
+                      <thead className='lyearhead'>
                         <tr>
                           {/* <td className="lyearcountrycol">Country</td> */}
-                          <td
-                            className="lyeardatah"
-                            style={{ background: "rgb(68, 65, 162)" }}
-                          >
+                          <td className='lyeardatah' style={{ background: "rgb(68, 65, 162)" }}>
                             Qty
                           </td>
-                          <td
-                            className="lyeardatah"
-                            style={{ background: "rgb(68, 65, 162)" }}
-                          >
+                          <td className='lyeardatah' style={{ background: "rgb(68, 65, 162)" }}>
                             Price
                           </td>
-                          <td
-                            className="lyeardatah"
-                            style={{ background: "rgb(68, 65, 162)" }}
-                          >
+                          <td className='lyeardatah' style={{ background: "rgb(68, 65, 162)" }}>
                             Profit
                           </td>
-                          <td
-                            className="lyeardatah"
-                            style={{ background: "rgb(68, 65, 162)" }}
-                          >
+                          <td className='lyeardatah' style={{ background: "rgb(68, 65, 162)" }}>
                             Ttl Profit
                           </td>
-                          <td
-                            className="lyeardatah"
-                            style={{ background: "rgb(68, 65, 162)" }}
-                          >
+                          <td className='lyeardatah' style={{ background: "rgb(68, 65, 162)" }}>
                             Margin
                           </td>
                         </tr>
@@ -2691,73 +2165,48 @@ const Budget2024a = () => {
                           let lyearregbqty = 0;
                           let lyearregbprice = 0;
                           let lyearregbprofit = 0;
-                          Object.keys(formatedData[prod][reg]).forEach(
-                            (ctry) => {
-                              if (
-                                lybformateddata &&
-                                lybformateddata[prod] &&
-                                lybformateddata[prod][reg] &&
-                                lybformateddata[prod][reg][ctry] &&
-                                lybformateddata[prod][reg][ctry]["quantity"] &&
-                                lybformateddata[prod][reg][ctry]["avgprice"] &&
-                                lybformateddata[prod][reg][ctry]["avgprofit"]
-                              ) {
-                                lyearregbqty =
-                                  lyearregbqty +
-                                  lybformateddata[prod][reg][ctry]["quantity"];
-                                lyearregbprice =
-                                  lyearregbprice +
-                                  lybformateddata[prod][reg][ctry]["quantity"] *
-                                    lybformateddata[prod][reg][ctry][
-                                      "avgprice"
-                                    ];
-                                lyearregbprofit =
-                                  lyearregbprofit +
-                                  lybformateddata[prod][reg][ctry]["quantity"] *
-                                    lybformateddata[prod][reg][ctry][
-                                      "avgprofit"
-                                    ];
-                              }
+                          Object.keys(formatedData[prod][reg]).forEach((ctry) => {
+                            if (
+                              lybformateddata &&
+                              lybformateddata[prod] &&
+                              lybformateddata[prod][reg] &&
+                              lybformateddata[prod][reg][ctry] &&
+                              lybformateddata[prod][reg][ctry]["quantity"] &&
+                              lybformateddata[prod][reg][ctry]["avgprice"] &&
+                              lybformateddata[prod][reg][ctry]["avgprofit"]
+                            ) {
+                              lyearregbqty = lyearregbqty + lybformateddata[prod][reg][ctry]["quantity"];
+                              lyearregbprice =
+                                lyearregbprice +
+                                lybformateddata[prod][reg][ctry]["quantity"] *
+                                  lybformateddata[prod][reg][ctry]["avgprice"];
+                              lyearregbprofit =
+                                lyearregbprofit +
+                                lybformateddata[prod][reg][ctry]["quantity"] *
+                                  lybformateddata[prod][reg][ctry]["avgprofit"];
                             }
-                          );
+                          });
                           return [
                             <tr>
                               {/* <td className="lyearregrow lyearcountrycol">
                                 {reg === "Latin America" ? "L. America" : reg}
                               </td> */}
-                              <td className="lyearregrowdata">
-                                {lyearregbqty}
+                              <td className='lyearregrowdata'>{lyearregbqty}</td>
+                              <td className='lyearregrowdata'>
+                                {lyearregbqty === 0 ? 0 : "$ " + (lyearregbprice / lyearregbqty).toFixed(0)}
                               </td>
-                              <td className="lyearregrowdata">
-                                {lyearregbqty === 0
-                                  ? 0
-                                  : "$ " +
-                                    (lyearregbprice / lyearregbqty).toFixed(0)}
+                              <td className='lyearregrowdata'>
+                                {lyearregbqty === 0 ? 0 : "$ " + (lyearregbprofit / lyearregbqty).toFixed(0)}
                               </td>
-                              <td className="lyearregrowdata">
-                                {lyearregbqty === 0
-                                  ? 0
-                                  : "$ " +
-                                    (lyearregbprofit / lyearregbqty).toFixed(0)}
-                              </td>
-                              <td
-                                className="lyearregrowdata"
-                                style={{ width: "90px" }}
-                              >
+                              <td className='lyearregrowdata' style={{ width: "90px" }}>
                                 {lyearregbqty === 0
                                   ? "$ " + 0
-                                  : "$ " +
-                                    lyearregbprofit
-                                      .toFixed(0)
-                                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                                  : "$ " + lyearregbprofit.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                               </td>
-                              <td className="lyearregrowdata">
+                              <td className='lyearregrowdata'>
                                 {lyearregbprice === 0
                                   ? 0 + "%"
-                                  : (
-                                      (lyearregbprofit / lyearregbprice) *
-                                      100
-                                    ).toFixed(0) + "%"}
+                                  : ((lyearregbprofit / lyearregbprice) * 100).toFixed(0) + "%"}
                               </td>
                               {/* <td colSpan={3}></td> */}
                             </tr>,
@@ -2769,9 +2218,7 @@ const Budget2024a = () => {
                                 lybformateddata[prod][reg][cty] &&
                                 lybformateddata[prod][reg][cty]["quantity"]
                               ) {
-                                lyearbqtytotal =
-                                  lyearbqtytotal +
-                                  lybformateddata[prod][reg][cty]["quantity"];
+                                lyearbqtytotal = lyearbqtytotal + lybformateddata[prod][reg][cty]["quantity"];
                               }
                               if (
                                 lybformateddata &&
@@ -2807,79 +2254,59 @@ const Budget2024a = () => {
                                       ? "Dom Rep"
                                       : cty}
                                   </td> */}
-                                  <td className="lyeardata">
+                                  <td className='lyeardata'>
                                     {lybformateddata &&
                                     lybformateddata[prod] &&
                                     lybformateddata[prod][reg] &&
                                     lybformateddata[prod][reg][cty] &&
                                     lybformateddata[prod][reg][cty]["quantity"]
-                                      ? lybformateddata[prod][reg][cty][
-                                          "quantity"
-                                        ]
+                                      ? lybformateddata[prod][reg][cty]["quantity"]
                                       : 0}
                                   </td>
-                                  <td className="lyeardata">
+                                  <td className='lyeardata'>
                                     {lybformateddata &&
                                     lybformateddata[prod] &&
                                     lybformateddata[prod][reg] &&
                                     lybformateddata[prod][reg][cty] &&
                                     lybformateddata[prod][reg][cty]["avgprice"]
-                                      ? "$ " +
-                                        lybformateddata[prod][reg][cty][
-                                          "avgprice"
-                                        ]
+                                      ? "$ " + lybformateddata[prod][reg][cty]["avgprice"]
                                       : 0}
                                   </td>
-                                  <td className="lyeardata">
+                                  <td className='lyeardata'>
                                     {lybformateddata &&
                                     lybformateddata[prod] &&
                                     lybformateddata[prod][reg] &&
                                     lybformateddata[prod][reg][cty] &&
                                     lybformateddata[prod][reg][cty]["avgprofit"]
-                                      ? "$ " +
-                                        lybformateddata[prod][reg][cty][
-                                          "avgprofit"
-                                        ]
+                                      ? "$ " + lybformateddata[prod][reg][cty]["avgprofit"]
                                       : 0}
                                   </td>
-                                  <td className="lyeardata">
+                                  <td className='lyeardata'>
                                     {lybformateddata &&
                                     lybformateddata[prod] &&
                                     lybformateddata[prod][reg] &&
                                     lybformateddata[prod][reg][cty] &&
-                                    lybformateddata[prod][reg][cty][
-                                      "avgprofit"
-                                    ] &&
+                                    lybformateddata[prod][reg][cty]["avgprofit"] &&
                                     lybformateddata[prod][reg][cty]["quantity"]
                                       ? "$ " +
                                         (
-                                          lybformateddata[prod][reg][cty][
-                                            "avgprofit"
-                                          ] *
-                                          lybformateddata[prod][reg][cty][
-                                            "quantity"
-                                          ]
+                                          lybformateddata[prod][reg][cty]["avgprofit"] *
+                                          lybformateddata[prod][reg][cty]["quantity"]
                                         )
                                           .toFixed(0)
                                           .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                                       : "$ " + 0}
                                   </td>
-                                  <td className="lyeardata">
+                                  <td className='lyeardata'>
                                     {lybformateddata &&
                                     lybformateddata[prod] &&
                                     lybformateddata[prod][reg] &&
                                     lybformateddata[prod][reg][cty] &&
-                                    lybformateddata[prod][reg][cty][
-                                      "avgprofit"
-                                    ] &&
+                                    lybformateddata[prod][reg][cty]["avgprofit"] &&
                                     lybformateddata[prod][reg][cty]["avgprice"]
                                       ? (
-                                          (lybformateddata[prod][reg][cty][
-                                            "avgprofit"
-                                          ] /
-                                            lybformateddata[prod][reg][cty][
-                                              "avgprice"
-                                            ]) *
+                                          (lybformateddata[prod][reg][cty]["avgprofit"] /
+                                            lybformateddata[prod][reg][cty]["avgprice"]) *
                                           100
                                         ).toFixed(0) + "%"
                                       : 0 + "%"}
@@ -2891,51 +2318,24 @@ const Budget2024a = () => {
                         })}
                         <tr>
                           {/* <td className="lyearcountrycolttl">Total</td> */}
-                          <td
-                            className="lyeardatattl"
-                            style={{ background: "rgb(68, 65, 162)" }}
-                          >
+                          <td className='lyeardatattl' style={{ background: "rgb(68, 65, 162)" }}>
                             {lyearbqtytotal}
                           </td>
-                          <td
-                            className="lyeardatattl"
-                            style={{ background: "rgb(68, 65, 162)" }}
-                          >
-                            {lyearbqtytotal === 0
-                              ? 0
-                              : "$ " +
-                                (lyearbpricetotal / lyearbqtytotal).toFixed(0)}
+                          <td className='lyeardatattl' style={{ background: "rgb(68, 65, 162)" }}>
+                            {lyearbqtytotal === 0 ? 0 : "$ " + (lyearbpricetotal / lyearbqtytotal).toFixed(0)}
                           </td>
-                          <td
-                            className="lyeardatattl"
-                            style={{ background: "rgb(68, 65, 162)" }}
-                          >
-                            {lyearbqtytotal === 0
-                              ? 0
-                              : "$ " +
-                                (lyearbprofittotal / lyearbqtytotal).toFixed(0)}
+                          <td className='lyeardatattl' style={{ background: "rgb(68, 65, 162)" }}>
+                            {lyearbqtytotal === 0 ? 0 : "$ " + (lyearbprofittotal / lyearbqtytotal).toFixed(0)}
                           </td>
-                          <td
-                            className="lyeardatattl"
-                            style={{ background: "rgb(68, 65, 162)" }}
-                          >
+                          <td className='lyeardatattl' style={{ background: "rgb(68, 65, 162)" }}>
                             {lyearbqtytotal === 0
                               ? "$ " + 0
-                              : "$ " +
-                                lyearbprofittotal
-                                  .toFixed(0)
-                                  .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                              : "$ " + lyearbprofittotal.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                           </td>
-                          <td
-                            className="lyeardatattl"
-                            style={{ background: "rgb(68, 65, 162)" }}
-                          >
+                          <td className='lyeardatattl' style={{ background: "rgb(68, 65, 162)" }}>
                             {lyearbpricetotal === 0
                               ? 0 + "%"
-                              : (
-                                  (lyearbprofittotal / lyearbpricetotal) *
-                                  100
-                                ).toFixed(0) + "%"}
+                              : ((lyearbprofittotal / lyearbpricetotal) * 100).toFixed(0) + "%"}
                           </td>
                         </tr>
                       </tbody>
@@ -2945,10 +2345,10 @@ const Budget2024a = () => {
               : ""}
           </div>
         </div>
-        <div className="budgetbyprod">
+        <div className='budgetbyprod'>
           <h4>Budget Summary Figures 2024</h4>
 
-          <div className="bdgtsummarybuttons1">
+          <div className='bdgtsummarybuttons1'>
             <p>Level 1:</p>
             <button
               onClick={(e) => {
@@ -2996,7 +2396,7 @@ const Budget2024a = () => {
               Country
             </button>
           </div>
-          <div className="bdgtsummarybuttons2">
+          <div className='bdgtsummarybuttons2'>
             <p>Level 2:</p>
             <button
               onClick={(e) => {
@@ -3044,7 +2444,7 @@ const Budget2024a = () => {
               Country
             </button>
           </div>
-          <div className="bdgtsummarybuttons">
+          <div className='bdgtsummarybuttons'>
             <p>Show:</p>
             <button
               onClick={(e) => {
@@ -3083,40 +2483,28 @@ const Budget2024a = () => {
               Margin (%)
             </button>
           </div>
-          <ul className="bdgtsummarytable">
-            <li className="stblrow stblheader">
-              <p className="stblcollarge">Country</p>
-              <p className="stblfig">Q1</p>
-              <p className="stblfig">Q2</p>
-              <p className="stblfig">Q3</p>
-              <p className="stblfig">Q4</p>
-              <p className="stblfig">Total</p>
+          <ul className='bdgtsummarytable'>
+            <li className='stblrow stblheader'>
+              <p className='stblcollarge'>Country</p>
+              <p className='stblfig'>Q1</p>
+              <p className='stblfig'>Q2</p>
+              <p className='stblfig'>Q3</p>
+              <p className='stblfig'>Q4</p>
+              <p className='stblfig'>Total</p>
             </li>
-            <div className="bdgtsummarydata">
+            <div className='bdgtsummarydata'>
               {bdgtregiondta
                 ? Object.entries(bdgtregiondta.groupBy(summarygroupby1))
                     .sort(([, a], [, b]) => {
-                      if (
-                        summarygroupby3 === "quantity" ||
-                        summarygroupby3 === "profit"
-                      ) {
-                        return (
-                          sumvalues(b, summarygroupby3) -
-                          sumvalues(a, summarygroupby3)
-                        );
+                      if (summarygroupby3 === "quantity" || summarygroupby3 === "profit") {
+                        return sumvalues(b, summarygroupby3) - sumvalues(a, summarygroupby3);
                       }
                       if (summarygroupby3 === "avgprofit") {
-                        return (
-                          calcavg(b, "profit", "quantity") -
-                          calcavg(a, "profit", "quantity")
-                        );
+                        return calcavg(b, "profit", "quantity") - calcavg(a, "profit", "quantity");
                       }
                       if (summarygroupby3 === "margin") {
                         // console.log(calcavg(b, "revenue", "quantity"));
-                        return (
-                          calcavg(b, "profit", "revenue") -
-                          calcavg(a, "profit", "revenue")
-                        );
+                        return calcavg(b, "profit", "revenue") - calcavg(a, "profit", "revenue");
                       }
                     })
                     .map((reg, key) => {
@@ -3172,193 +2560,98 @@ const Budget2024a = () => {
                         // q4total = 0;
                       });
                       return [
-                        <Accordion className="bdgtacc" allowZeroExpanded={true}>
+                        <Accordion className='bdgtacc' allowZeroExpanded={true}>
                           <AccordionItem style={{ border: "none" }}>
                             <AccordionItemHeading>
-                              <AccordionItemButton className="bsummaccordion_button">
-                                <li className="stblrow">
-                                  <p className="stblcollarge">
+                              <AccordionItemButton className='bsummaccordion_button'>
+                                <li className='stblrow'>
+                                  <p className='stblcollarge'>
                                     {reg[0] === "Latin America"
                                       ? "L. America"
                                       : reg[0] === "Dominican Republic"
                                       ? "Dom Rep"
                                       : reg[0]}
                                   </p>
-                                  <p className="stblfig">
+                                  <p className='stblfig'>
                                     {summarygroupby3 === "quantity"
-                                      ? q1
-                                          .toFixed(0)
-                                          .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                      ? q1.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                                       : summarygroupby3 === "profit"
-                                      ? "$" +
-                                        p1
-                                          .toFixed(0)
-                                          .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                                      : p1 !== 0 &&
-                                        q1 !== 0 &&
-                                        summarygroupby3 === "avgprofit"
-                                      ? "$" +
-                                        (p1 / q1)
-                                          .toFixed(0)
-                                          .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                                      : p1 !== 0 &&
-                                        q1 !== 0 &&
-                                        summarygroupby3 === "margin"
-                                      ? ((p1 / r1) * 100)
-                                          .toFixed(1)
-                                          .replace(
-                                            /\B(?=(\d{3})+(?!\d))/g,
-                                            ","
-                                          ) + "%"
+                                      ? "$" + p1.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                      : p1 !== 0 && q1 !== 0 && summarygroupby3 === "avgprofit"
+                                      ? "$" + (p1 / q1).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                      : p1 !== 0 && q1 !== 0 && summarygroupby3 === "margin"
+                                      ? ((p1 / r1) * 100).toFixed(1).replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "%"
                                       : "-"}
                                   </p>
-                                  <p className="stblfig">
+                                  <p className='stblfig'>
                                     {summarygroupby3 === "quantity"
-                                      ? q2
-                                          .toFixed(0)
-                                          .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                      ? q2.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                                       : summarygroupby3 === "profit"
-                                      ? "$ " +
-                                        p2
-                                          .toFixed(0)
-                                          .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                                      : p2 !== 0 &&
-                                        q2 !== 0 &&
-                                        summarygroupby3 === "avgprofit"
-                                      ? "$" +
-                                        (p2 / q2)
-                                          .toFixed(0)
-                                          .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                                      : p2 !== 0 &&
-                                        q2 !== 0 &&
-                                        summarygroupby3 === "margin"
-                                      ? ((p2 / r2) * 100)
-                                          .toFixed(1)
-                                          .replace(
-                                            /\B(?=(\d{3})+(?!\d))/g,
-                                            ","
-                                          ) + "%"
+                                      ? "$ " + p2.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                      : p2 !== 0 && q2 !== 0 && summarygroupby3 === "avgprofit"
+                                      ? "$" + (p2 / q2).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                      : p2 !== 0 && q2 !== 0 && summarygroupby3 === "margin"
+                                      ? ((p2 / r2) * 100).toFixed(1).replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "%"
                                       : "-"}
                                   </p>
-                                  <p className="stblfig">
+                                  <p className='stblfig'>
                                     {summarygroupby3 === "quantity"
-                                      ? q3
-                                          .toFixed(0)
-                                          .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                      ? q3.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                                       : summarygroupby3 === "profit"
-                                      ? "$ " +
-                                        p3
-                                          .toFixed(0)
-                                          .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                                      : p3 !== 0 &&
-                                        q3 !== 0 &&
-                                        summarygroupby3 === "avgprofit"
-                                      ? "$" +
-                                        (p3 / q3)
-                                          .toFixed(0)
-                                          .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                                      : p3 !== 0 &&
-                                        q3 !== 0 &&
-                                        summarygroupby3 === "margin"
-                                      ? ((p3 / r3) * 100)
-                                          .toFixed(1)
-                                          .replace(
-                                            /\B(?=(\d{3})+(?!\d))/g,
-                                            ","
-                                          ) + "%"
+                                      ? "$ " + p3.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                      : p3 !== 0 && q3 !== 0 && summarygroupby3 === "avgprofit"
+                                      ? "$" + (p3 / q3).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                      : p3 !== 0 && q3 !== 0 && summarygroupby3 === "margin"
+                                      ? ((p3 / r3) * 100).toFixed(1).replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "%"
                                       : "-"}
                                   </p>
-                                  <p className="stblfig">
+                                  <p className='stblfig'>
                                     {summarygroupby3 === "quantity"
-                                      ? q4
-                                          .toFixed(0)
-                                          .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                      ? q4.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                                       : summarygroupby3 === "profit"
-                                      ? "$ " +
-                                        p4
-                                          .toFixed(0)
-                                          .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                                      : p4 !== 0 &&
-                                        q4 !== 0 &&
-                                        summarygroupby3 === "avgprofit"
-                                      ? "$" +
-                                        (p4 / q4)
-                                          .toFixed(0)
-                                          .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                                      : p4 !== 0 &&
-                                        q4 !== 0 &&
-                                        summarygroupby3 === "margin"
-                                      ? ((p4 / r4) * 100)
-                                          .toFixed(1)
-                                          .replace(
-                                            /\B(?=(\d{3})+(?!\d))/g,
-                                            ","
-                                          ) + "%"
+                                      ? "$ " + p4.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                      : p4 !== 0 && q4 !== 0 && summarygroupby3 === "avgprofit"
+                                      ? "$" + (p4 / q4).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                      : p4 !== 0 && q4 !== 0 && summarygroupby3 === "margin"
+                                      ? ((p4 / r4) * 100).toFixed(1).replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "%"
                                       : "-"}
                                   </p>
-                                  <p className="stblfig stbltotal">
+                                  <p className='stblfig stbltotal'>
                                     {summarygroupby3 === "quantity"
-                                      ? (q1 + q2 + q3 + q4)
-                                          .toFixed(0)
-                                          .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                      ? (q1 + q2 + q3 + q4).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                                       : summarygroupby3 === "profit"
-                                      ? "$ " +
-                                        (p1 + p2 + p3 + p4)
-                                          .toFixed(0)
-                                          .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                      ? "$ " + (p1 + p2 + p3 + p4).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                                       : p1 + p2 + p3 + p4 !== 0 &&
                                         q1 + q2 + q3 + q4 !== 0 &&
                                         summarygroupby3 === "avgprofit"
                                       ? "$" +
-                                        (
-                                          (p1 + p2 + p3 + p4) /
-                                          (q1 + q2 + q3 + q4)
-                                        )
+                                        ((p1 + p2 + p3 + p4) / (q1 + q2 + q3 + q4))
                                           .toFixed(0)
                                           .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                                       : p1 + p2 + p3 + p4 !== 0 &&
                                         r1 + r2 + r3 + r4 !== 0 &&
                                         summarygroupby3 === "margin"
-                                      ? (
-                                          ((p1 + p2 + p3 + p4) /
-                                            (r1 + r2 + r3 + r4)) *
-                                          100
-                                        )
+                                      ? (((p1 + p2 + p3 + p4) / (r1 + r2 + r3 + r4)) * 100)
                                           .toFixed(1)
-                                          .replace(
-                                            /\B(?=(\d{3})+(?!\d))/g,
-                                            ","
-                                          ) + "%"
+                                          .replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "%"
                                       : "-"}
                                   </p>
                                 </li>
                               </AccordionItemButton>
                             </AccordionItemHeading>
                             {
-                              <AccordionItemPanel className="bdgtaccpanel">
+                              <AccordionItemPanel className='bdgtaccpanel'>
                                 {Object.entries(reg[1].groupBy(summarygroupby2))
                                   .sort(([, a], [, b]) => {
-                                    if (
-                                      summarygroupby3 === "quantity" ||
-                                      summarygroupby3 === "profit"
-                                    ) {
-                                      return (
-                                        sumvalues(b, summarygroupby3) -
-                                        sumvalues(a, summarygroupby3)
-                                      );
+                                    if (summarygroupby3 === "quantity" || summarygroupby3 === "profit") {
+                                      return sumvalues(b, summarygroupby3) - sumvalues(a, summarygroupby3);
                                     }
                                     if (summarygroupby3 === "avgprofit") {
-                                      return (
-                                        calcavg(b, "profit", "quantity") -
-                                        calcavg(a, "profit", "quantity")
-                                      );
+                                      return calcavg(b, "profit", "quantity") - calcavg(a, "profit", "quantity");
                                     }
                                     if (summarygroupby3 === "margin") {
                                       // console.log(calcavg(b, "revenue", "quantity"));
-                                      return (
-                                        calcavg(b, "profit", "revenue") -
-                                        calcavg(a, "profit", "revenue")
-                                      );
+                                      return calcavg(b, "profit", "revenue") - calcavg(a, "profit", "revenue");
                                     }
                                   })
                                   .map((cty) => {
@@ -3434,204 +2727,77 @@ const Budget2024a = () => {
                                     });
 
                                     return (
-                                      <li className="stblrow">
-                                        <p className="stblcollarge">
+                                      <li className='stblrow'>
+                                        <p className='stblcollarge'>
                                           {cty[0] === "Dominican Republic"
                                             ? "Dom Rep"
                                             : cty[0] === "Latin America"
                                             ? "L. America"
                                             : cty[0]}
                                         </p>
-                                        <p className="stblfig">
+                                        <p className='stblfig'>
                                           {summarygroupby3 === "quantity"
-                                            ? q21
-                                                .toFixed(0)
-                                                .replace(
-                                                  /\B(?=(\d{3})+(?!\d))/g,
-                                                  ","
-                                                )
+                                            ? q21.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                                             : summarygroupby3 === "profit"
-                                            ? "$ " +
-                                              p21
-                                                .toFixed(0)
-                                                .replace(
-                                                  /\B(?=(\d{3})+(?!\d))/g,
-                                                  ","
-                                                )
-                                            : p21 !== 0 &&
-                                              q21 !== 0 &&
-                                              summarygroupby3 === "avgprofit"
-                                            ? "$ " +
-                                              (p21 / q21)
-                                                .toFixed(0)
-                                                .replace(
-                                                  /\B(?=(\d{3})+(?!\d))/g,
-                                                  ","
-                                                )
-                                            : p21 !== 0 &&
-                                              r21 !== 0 &&
-                                              summarygroupby3 === "margin"
-                                            ? ((p21 / r21) * 100)
-                                                .toFixed(1)
-                                                .replace(
-                                                  /\B(?=(\d{3})+(?!\d))/g,
-                                                  ","
-                                                ) + "%"
+                                            ? "$ " + p21.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                            : p21 !== 0 && q21 !== 0 && summarygroupby3 === "avgprofit"
+                                            ? "$ " + (p21 / q21).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                            : p21 !== 0 && r21 !== 0 && summarygroupby3 === "margin"
+                                            ? ((p21 / r21) * 100).toFixed(1).replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "%"
                                             : "-"}
                                         </p>
-                                        <p className="stblfig">
+                                        <p className='stblfig'>
                                           {summarygroupby3 === "quantity"
-                                            ? q22
-                                                .toFixed(0)
-                                                .replace(
-                                                  /\B(?=(\d{3})+(?!\d))/g,
-                                                  ","
-                                                )
+                                            ? q22.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                                             : summarygroupby3 === "profit"
-                                            ? "$ " +
-                                              p22
-                                                .toFixed(0)
-                                                .replace(
-                                                  /\B(?=(\d{3})+(?!\d))/g,
-                                                  ","
-                                                )
-                                            : p22 !== 0 &&
-                                              q22 !== 0 &&
-                                              summarygroupby3 === "avgprofit"
-                                            ? "$ " +
-                                              (p22 / q22)
-                                                .toFixed(0)
-                                                .replace(
-                                                  /\B(?=(\d{3})+(?!\d))/g,
-                                                  ","
-                                                )
-                                            : p22 !== 0 &&
-                                              r22 !== 0 &&
-                                              summarygroupby3 === "margin"
-                                            ? ((p22 / r22) * 100)
-                                                .toFixed(1)
-                                                .replace(
-                                                  /\B(?=(\d{3})+(?!\d))/g,
-                                                  ","
-                                                ) + "%"
+                                            ? "$ " + p22.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                            : p22 !== 0 && q22 !== 0 && summarygroupby3 === "avgprofit"
+                                            ? "$ " + (p22 / q22).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                            : p22 !== 0 && r22 !== 0 && summarygroupby3 === "margin"
+                                            ? ((p22 / r22) * 100).toFixed(1).replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "%"
                                             : "-"}
                                         </p>
-                                        <p className="stblfig">
+                                        <p className='stblfig'>
                                           {summarygroupby3 === "quantity"
-                                            ? q23
-                                                .toFixed(0)
-                                                .replace(
-                                                  /\B(?=(\d{3})+(?!\d))/g,
-                                                  ","
-                                                )
+                                            ? q23.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                                             : summarygroupby3 === "profit"
-                                            ? "$ " +
-                                              p23
-                                                .toFixed(0)
-                                                .replace(
-                                                  /\B(?=(\d{3})+(?!\d))/g,
-                                                  ","
-                                                )
-                                            : p23 !== 0 &&
-                                              q23 !== 0 &&
-                                              summarygroupby3 === "avgprofit"
-                                            ? "$ " +
-                                              (p23 / q23)
-                                                .toFixed(0)
-                                                .replace(
-                                                  /\B(?=(\d{3})+(?!\d))/g,
-                                                  ","
-                                                )
-                                            : p23 !== 0 &&
-                                              r23 !== 0 &&
-                                              summarygroupby3 === "margin"
-                                            ? ((p23 / r23) * 100)
-                                                .toFixed(1)
-                                                .replace(
-                                                  /\B(?=(\d{3})+(?!\d))/g,
-                                                  ","
-                                                ) + "%"
+                                            ? "$ " + p23.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                            : p23 !== 0 && q23 !== 0 && summarygroupby3 === "avgprofit"
+                                            ? "$ " + (p23 / q23).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                            : p23 !== 0 && r23 !== 0 && summarygroupby3 === "margin"
+                                            ? ((p23 / r23) * 100).toFixed(1).replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "%"
                                             : "-"}
                                         </p>
-                                        <p className="stblfig">
+                                        <p className='stblfig'>
                                           {summarygroupby3 === "quantity"
-                                            ? q24
-                                                .toFixed(0)
-                                                .replace(
-                                                  /\B(?=(\d{3})+(?!\d))/g,
-                                                  ","
-                                                )
+                                            ? q24.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                                             : summarygroupby3 === "profit"
-                                            ? "$ " +
-                                              p24
-                                                .toFixed(0)
-                                                .replace(
-                                                  /\B(?=(\d{3})+(?!\d))/g,
-                                                  ","
-                                                )
-                                            : p24 !== 0 &&
-                                              q24 !== 0 &&
-                                              summarygroupby3 === "avgprofit"
-                                            ? "$ " +
-                                              (p24 / q24)
-                                                .toFixed(0)
-                                                .replace(
-                                                  /\B(?=(\d{3})+(?!\d))/g,
-                                                  ","
-                                                )
-                                            : p24 !== 0 &&
-                                              r24 !== 0 &&
-                                              summarygroupby3 === "margin"
-                                            ? ((p24 / r24) * 100)
-                                                .toFixed(1)
-                                                .replace(
-                                                  /\B(?=(\d{3})+(?!\d))/g,
-                                                  ","
-                                                ) + "%"
+                                            ? "$ " + p24.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                            : p24 !== 0 && q24 !== 0 && summarygroupby3 === "avgprofit"
+                                            ? "$ " + (p24 / q24).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                            : p24 !== 0 && r24 !== 0 && summarygroupby3 === "margin"
+                                            ? ((p24 / r24) * 100).toFixed(1).replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "%"
                                             : "-"}
                                         </p>
-                                        <p className="stblfig stbltotal">
+                                        <p className='stblfig stbltotal'>
                                           {summarygroupby3 === "quantity"
-                                            ? (q21 + q22 + q23 + q24)
-                                                .toFixed(0)
-                                                .replace(
-                                                  /\B(?=(\d{3})+(?!\d))/g,
-                                                  ","
-                                                )
+                                            ? (q21 + q22 + q23 + q24).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                                             : summarygroupby3 === "profit"
                                             ? "$ " +
-                                              (p21 + p22 + p23 + p24)
-                                                .toFixed(0)
-                                                .replace(
-                                                  /\B(?=(\d{3})+(?!\d))/g,
-                                                  ","
-                                                )
+                                              (p21 + p22 + p23 + p24).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                                             : p21 + p22 + p23 + p24 !== 0 &&
                                               q21 + q22 + q23 + q24 !== 0 &&
                                               summarygroupby3 === "avgprofit"
                                             ? "$ " +
-                                              (
-                                                (p21 + p22 + p23 + p24) /
-                                                (q21 + q22 + q23 + q24)
-                                              )
+                                              ((p21 + p22 + p23 + p24) / (q21 + q22 + q23 + q24))
                                                 .toFixed(0)
-                                                .replace(
-                                                  /\B(?=(\d{3})+(?!\d))/g,
-                                                  ","
-                                                )
+                                                .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                                             : p21 + p22 + p23 + p24 !== 0 &&
                                               r21 + r22 + r23 + r24 !== 0 &&
                                               summarygroupby3 === "margin"
-                                            ? (
-                                                ((p21 + p22 + p23 + p24) /
-                                                  (r21 + r22 + r23 + r24)) *
-                                                100
-                                              )
+                                            ? (((p21 + p22 + p23 + p24) / (r21 + r22 + r23 + r24)) * 100)
                                                 .toFixed(1)
-                                                .replace(
-                                                  /\B(?=(\d{3})+(?!\d))/g,
-                                                  ","
-                                                ) + "%"
+                                                .replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "%"
                                             : "-"}
                                         </p>
                                       </li>
@@ -3644,120 +2810,68 @@ const Budget2024a = () => {
                       ];
                     })
                 : ""}
-              <li className="stblrow stblfooter">
-                <p className="stblcollarge  stbltotal">TOTAL</p>
-                <p className="stblfig stbltotal">
+              <li className='stblrow stblfooter'>
+                <p className='stblcollarge  stbltotal'>TOTAL</p>
+                <p className='stblfig stbltotal'>
                   {summarygroupby3 === "quantity"
                     ? q1total.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                     : summarygroupby3 === "profit"
-                    ? "$ " +
-                      p1total.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                    : q1total !== 0 &&
-                      p1total !== 0 &&
-                      summarygroupby3 === "avgprofit"
-                    ? "$" +
-                      (p1total / q1total)
-                        .toFixed(0)
-                        .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                    : q1total !== 0 &&
-                      r1total !== 0 &&
-                      summarygroupby3 === "margin"
-                    ? ((p1total / r1total) * 100)
-                        .toFixed(1)
-                        .replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "%"
+                    ? "$ " + p1total.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                    : q1total !== 0 && p1total !== 0 && summarygroupby3 === "avgprofit"
+                    ? "$" + (p1total / q1total).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                    : q1total !== 0 && r1total !== 0 && summarygroupby3 === "margin"
+                    ? ((p1total / r1total) * 100).toFixed(1).replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "%"
                     : "-"}
                 </p>
-                <p className="stblfig stbltotal">
+                <p className='stblfig stbltotal'>
                   {summarygroupby3 === "quantity"
                     ? q2total.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                     : summarygroupby3 === "profit"
-                    ? "$ " +
-                      p2total.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                    : q2total !== 0 &&
-                      p2total !== 0 &&
-                      summarygroupby3 === "avgprofit"
-                    ? "$" +
-                      (p2total / q2total)
-                        .toFixed(0)
-                        .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                    : r2total !== 0 &&
-                      p2total !== 0 &&
-                      summarygroupby3 === "margin"
-                    ? ((p2total / r2total) * 100)
-                        .toFixed(1)
-                        .replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "%"
+                    ? "$ " + p2total.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                    : q2total !== 0 && p2total !== 0 && summarygroupby3 === "avgprofit"
+                    ? "$" + (p2total / q2total).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                    : r2total !== 0 && p2total !== 0 && summarygroupby3 === "margin"
+                    ? ((p2total / r2total) * 100).toFixed(1).replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "%"
                     : "-"}
                 </p>
-                <p className="stblfig stbltotal">
+                <p className='stblfig stbltotal'>
                   {summarygroupby3 === "quantity"
                     ? q3total.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                     : summarygroupby3 === "profit"
-                    ? "$ " +
-                      p3total.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                    : q3total !== 0 &&
-                      p3total !== 0 &&
-                      summarygroupby3 === "avgprofit"
-                    ? "$" +
-                      (p3total / q3total)
-                        .toFixed(0)
-                        .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                    : r3total !== 0 &&
-                      p3total !== 0 &&
-                      summarygroupby3 === "margin"
-                    ? ((p3total / r3total) * 100)
-                        .toFixed(1)
-                        .replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "%"
+                    ? "$ " + p3total.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                    : q3total !== 0 && p3total !== 0 && summarygroupby3 === "avgprofit"
+                    ? "$" + (p3total / q3total).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                    : r3total !== 0 && p3total !== 0 && summarygroupby3 === "margin"
+                    ? ((p3total / r3total) * 100).toFixed(1).replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "%"
                     : "-"}
                 </p>
-                <p className="stblfig stbltotal">
+                <p className='stblfig stbltotal'>
                   {summarygroupby3 === "quantity"
                     ? q4total.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                     : summarygroupby3 === "profit"
-                    ? "$ " +
-                      p4total.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                    : q4total !== 0 &&
-                      p4total !== 0 &&
-                      summarygroupby3 === "avgprofit"
-                    ? "$" +
-                      (p4total / q4total)
-                        .toFixed(0)
-                        .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                    : r4total !== 0 &&
-                      p4total !== 0 &&
-                      summarygroupby3 === "margin"
-                    ? ((p4total / r4total) * 100)
-                        .toFixed(1)
-                        .replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "%"
+                    ? "$ " + p4total.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                    : q4total !== 0 && p4total !== 0 && summarygroupby3 === "avgprofit"
+                    ? "$" + (p4total / q4total).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                    : r4total !== 0 && p4total !== 0 && summarygroupby3 === "margin"
+                    ? ((p4total / r4total) * 100).toFixed(1).replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "%"
                     : "-"}
                 </p>
-                <p className="stblfig stbltotal">
+                <p className='stblfig stbltotal'>
                   {summarygroupby3 === "quantity"
-                    ? (q1total + q2total + q3total + q4total)
-                        .toFixed(0)
-                        .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                    ? (q1total + q2total + q3total + q4total).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                     : summarygroupby3 === "profit"
-                    ? "$ " +
-                      (p1total + p2total + p3total + p4total)
-                        .toFixed(0)
-                        .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                    ? "$ " + (p1total + p2total + p3total + p4total).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                     : q1total + q2total + q3total + q4total !== 0 &&
                       p1total + p2total + p3total + p4total !== 0 &&
                       summarygroupby3 === "avgprofit"
                     ? "$" +
-                      (
-                        (p1total + p2total + p3total + p4total) /
-                        (q1total + q2total + q3total + q4total)
-                      )
+                      ((p1total + p2total + p3total + p4total) / (q1total + q2total + q3total + q4total))
                         .toFixed(0)
                         .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                     : r1total + r2total + r3total + r4total !== 0 &&
                       p1total + p2total + p3total + p4total !== 0 &&
                       summarygroupby3 === "margin"
-                    ? (
-                        ((p1total + p2total + p3total + p4total) /
-                          (r1total + r2total + r3total + r4total)) *
-                        100
-                      )
+                    ? (((p1total + p2total + p3total + p4total) / (r1total + r2total + r3total + r4total)) * 100)
                         .toFixed(1)
                         .replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "%"
                     : "-"}

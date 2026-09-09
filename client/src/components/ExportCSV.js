@@ -1,12 +1,11 @@
 import React from "react";
 import * as FileSaver from "file-saver";
-import * as XLSX from "xlsx";
+import * as XLSX from "xlsx/dist/xlsx.full.min.js";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAlignRight, faDownload } from "@fortawesome/free-solid-svg-icons";
 
 const ExportCSV = ({ csvData, fileName }) => {
-  const fileType =
-    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
+  const fileType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
   const fileExtension = ".xlsx";
 
   const exportToCSV = (csvData, fileName) => {
@@ -17,7 +16,7 @@ const ExportCSV = ({ csvData, fileName }) => {
     FileSaver.saveAs(data, fileName + fileExtension);
   };
   return (
-    <div className="bdgtexport" onClick={(e) => exportToCSV(csvData, fileName)}>
+    <div className='bdgtexport' onClick={(e) => exportToCSV(csvData, fileName)}>
       <FontAwesomeIcon style={{ marginRight: "0.5rem" }} icon={faDownload} />
       Export
     </div>
