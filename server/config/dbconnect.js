@@ -6,18 +6,19 @@ require("dotenv").config({
   path: path.join(__dirname, ".env"),
 });
 
-const isAws = Boolean(process.env.RDS_HOSTNAME);
-const isTest84 = !isAws && process.env.DB_TARGET === "test84";
+const awsHost = process.env.EXTERNAL_RDS_HOSTNAME || process.env.RDS_HOSTNAME;
 
+const isAws = Boolean(awsHost);
+const isTest84 = !isAws && process.env.DB_TARGET === "test84";
 let dbconnect;
 
 if (isAws) {
   dbconnect = {
-    host: process.env.RDS_HOSTNAME,
-    user: process.env.RDS_USERNAME,
-    password: process.env.RDS_PASSWORD,
-    port: Number(process.env.RDS_PORT || 3306),
-    database: process.env.RDS_DB_NAME || "ebdb",
+    host: awsHost,
+    user: process.env.EXTERNAL_RDS_USERNAME || process.env.RDS_USERNAME,
+    password: process.env.EXTERNAL_RDS_PASSWORD || process.env.RDS_PASSWORD,
+    port: Number(process.env.EXTERNAL_RDS_PORT || process.env.RDS_PORT || 3306),
+    database: process.env.EXTERNAL_RDS_DB_NAME || process.env.RDS_DB_NAME || "ebdb",
     multipleStatements: true,
   };
 } else if (isTest84) {
