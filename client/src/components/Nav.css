@@ -6,7 +6,7 @@
   display: flex;
   z-index: 21;
   top: 6vh;
-  border-bottom: solid #11159a1px;
+  border-bottom: solid #11159a 1px;
 
   /* padding: 0rem 0rem; */
 }
@@ -33,13 +33,11 @@
 }
 #navbar a:hover {
   cursor: pointer;
-  background: rgb(123, 120, 219);
+  background: #546ce5;
   color: white;
 }
 .navbaractive {
-  background-color: rgb(223, 223, 223);
-  background-color: rgb(160, 182, 103);
-  background-color: rgb(123, 120, 219);
+  background-color: #546ce5;
   color: white;
   /* border-bottom: dashed 1px black; */
 }

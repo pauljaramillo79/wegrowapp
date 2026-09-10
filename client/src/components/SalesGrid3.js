@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "./SalesGrid3.css";
-import Sales from "./Sales";
+import Sales1 from "./Sales1";
 import SalesQS3 from "./SalesQS3";
 import QSEditModal from "./QSEditModal";
 import "./PositionsTableSort.css";
@@ -16,6 +16,29 @@ const SalesGrid3 = () => {
   };
 
   const hideEditModal = () => setQSModalState(false);
+
+  const closeDrawerAndFocusQuotation = () => {
+    setIsSalesDrawerOpen(false);
+
+    // Wait until the drawer has unmounted and React has applied the QS load.
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => {
+        const firstEditableField = document.querySelector(
+          ".salesQS3 .salesQS-form input:not([type='hidden']):not([readonly]):not([disabled]), " +
+            ".salesQS3 .salesQS-form select:not([disabled]), " +
+            ".salesQS3 .salesQS-form textarea:not([readonly]):not([disabled])",
+        );
+
+        if (firstEditableField) {
+          firstEditableField.focus();
+
+          if (typeof firstEditableField.select === "function") {
+            firstEditableField.select();
+          }
+        }
+      });
+    });
+  };
 
   useEffect(() => {
     const handleEscape = (event) => {
@@ -68,7 +91,8 @@ const SalesGrid3 = () => {
             </button>
 
             <div className='sales-drawer__content'>
-              <Sales
+              <Sales1
+                onQuotationEdit={closeDrawerAndFocusQuotation}
                 showEditModal={showEditModal}
                 hideEditModal={hideEditModal}
                 QSmodalState={QSmodalState}

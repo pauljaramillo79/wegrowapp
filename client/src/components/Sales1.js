@@ -1,7 +1,7 @@
 import React, { useEffect, useContext, useState } from "react";
 import Axios from "axios";
-import SalesTableSort from "./SalesTableSort";
-import "./Sales.css";
+import SalesTableSort1 from "./SalesTableSort1";
+import "./Sales1.css";
 import { ReactComponent as RefreshIcon } from "../assets/_images/refreshicon.svg";
 import { RefreshPositionsContext } from "../contexts/RefreshPositionsProvider";
 import { LoadQSContext } from "../contexts/LoadQSProvider";
@@ -93,7 +93,7 @@ const Sales = (props) => {
       WGP: { ...columns.WGP, filterText: "" },
       WGS: { ...columns.WGS, filterText: "" },
       abbreviation: { ...columns.abbreviation, filterText: "" },
-      supplier: { ...columns.supplie, filterText: "" },
+      supplier: { ...columns.supplier, filterText: "" },
       customer: { ...columns.customer, filterText: "" },
       beginning: { ...columns.beginning, filterText: "" },
       finish: { ...columns.finish, filterText: "" },
@@ -114,6 +114,7 @@ const Sales = (props) => {
     <div className='saleslist'>
       <div className='salestitleline'>
         <h3 className='saleslisttitle'>Sales List</h3>
+        <span className='sales-row-actions-hint'>Right-click a row for actions</span>
         <button className='clearfilterbutton' onClick={clearFilters}>
           Clear Filters
         </button>
@@ -158,7 +159,8 @@ const Sales = (props) => {
           }}
         />
       </div>
-      <SalesTableSort
+      <SalesTableSort1
+        onQuotationEdit={props.onQuotationEdit}
         config={CONFIG}
         userID={loaduser}
         limit={limit}

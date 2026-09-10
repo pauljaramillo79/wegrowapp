@@ -1,5 +1,5 @@
 .sales-workspace {
-  --sales-accent: #4441a2;
+  --sales-accent: #11159a;
   --sales-page-top: calc(6vh + 35px);
   position: fixed;
   inset: var(--sales-page-top) 0 0;
@@ -45,7 +45,7 @@
 
 .sales-drawer-tab:hover,
 .sales-drawer__close-tab:hover {
-  background: #5753b7;
+  background: #546ce5;
 }
 
 .sales-drawer-tab:focus-visible,

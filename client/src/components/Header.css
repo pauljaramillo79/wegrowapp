@@ -29,7 +29,7 @@
 }
 #navigation .logoutButton:hover {
   cursor: pointer;
-  background-color: rgba(68, 65, 162, 0.75);
+  background-color: #546ce5;
   /* color: white; */
 }
 h2 {
@@ -58,7 +58,7 @@ h2 {
   font-size: 1rem;
 }
 .Logoheader .cls-1 {
-  fill: #93ad3c;
+  fill: #a7cd2b;
 }
 
 .Logoheader .cls-2 {
