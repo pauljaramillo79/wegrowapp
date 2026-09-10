@@ -40,7 +40,7 @@
   width: 60%;
   padding: 0.8rem;
   background-color: white;
-  border: #11159a1px solid;
+  border: #11159a 1px solid;
   border-radius: 1.3rem;
   margin: 1rem 0;
   margin-bottom: 1rem;
@@ -55,4 +55,11 @@
   color: red;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 0.8rem;
+}
+.Logo .cls-1 {
+  fill: #a7cd2b;
+}
+
+.Logo .cls-2 {
+  fill: #11159a;
 }

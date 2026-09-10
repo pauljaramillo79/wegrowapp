@@ -97,27 +97,35 @@ function App() {
                   <Switch>
                     {role === 6 ? (
                       <>
-                        <Route path='/'>
+                        <Route exact path='/'>
                           <SalesGrid2 />
                         </Route>
+
+                        <Route path='/sales'>
+                          <SalesGrid2 />
+                        </Route>
+
+                        {/* <Route path='/budget'>
+                          <BudgetGrid />
+                        </Route> */}
                       </>
                     ) : role === 5 ? (
                       <>
                         {" "}
-                        <Route path='/analysis'>
+                        {/* <Route path='/analysis'>
                           <AnalysisGrid />
-                        </Route>
-                        <Route exact path='/'>
+                        </Route> */}
+                        {/* <Route exact path='/'>
                           <PositionsGrid />
-                        </Route>
+                        </Route> */}
                         <Route path='/sales'>
                           <SalesGrid2 />
                         </Route>
-                        <Route path='/logistics'>
+                        {/* <Route path='/logistics'>
                           <LogisticsProvider>
                             <LogisticsGrid />
                           </LogisticsProvider>
-                        </Route>
+                        </Route> */}
                         <Route path='/budget'>
                           <BudgetGrid />
                         </Route>

@@ -29,6 +29,7 @@ const Budget = ({ year }) => {
   const usercode = JSON.parse(localStorage.getItem("WGusercode"));
 
   const commentRef = useRef(null);
+  const role = JSON.parse(localStorage.getItem("role"));
 
   const delayedclicked = () => {
     return new Promise((resolve, reject) => {
@@ -1297,7 +1298,7 @@ const Budget = ({ year }) => {
             ""
           )}
         </div>
-        <ExportToCSV csvData={bdgtregiondta} fileName={"budget" + bdgtyear} />
+        {role === 1 ? <ExportToCSV csvData={bdgtregiondta} fileName={"budget" + bdgtyear} /> : ""}
         <BudgetCategorySubmission
           year={bdgtyear}
           prodCatNameID={activePCatName}
