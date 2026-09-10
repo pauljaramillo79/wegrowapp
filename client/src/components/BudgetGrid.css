@@ -165,7 +165,7 @@
   margin: 0.2rem 0;
   padding: 0.5rem 1rem;
   border-radius: 1rem;
-  border: #11159asolid 1px;
+  border: #11159a solid 1px;
   color: #000f9f;
   background-color: white;
   width: 150px;
@@ -173,7 +173,7 @@
 }
 .budgetfilterbutton:hover {
   cursor: pointer;
-  background-color: rgb(150, 148, 207);
+  background-color: #4056c3;
   color: white;
 }
 .budgetfilterbutton:active {
