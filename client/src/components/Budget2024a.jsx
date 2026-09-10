@@ -2143,19 +2143,19 @@ const Budget2024a = () => {
                       <thead className='lyearhead'>
                         <tr>
                           {/* <td className="lyearcountrycol">Country</td> */}
-                          <td className='lyeardatah' style={{ background: "rgb(68, 65, 162)" }}>
+                          <td className='lyeardatah' style={{ background: "#11159a" }}>
                             Qty
                           </td>
-                          <td className='lyeardatah' style={{ background: "rgb(68, 65, 162)" }}>
+                          <td className='lyeardatah' style={{ background: "#11159a" }}>
                             Price
                           </td>
-                          <td className='lyeardatah' style={{ background: "rgb(68, 65, 162)" }}>
+                          <td className='lyeardatah' style={{ background: "#11159a" }}>
                             Profit
                           </td>
-                          <td className='lyeardatah' style={{ background: "rgb(68, 65, 162)" }}>
+                          <td className='lyeardatah' style={{ background: "#11159a" }}>
                             Ttl Profit
                           </td>
-                          <td className='lyeardatah' style={{ background: "rgb(68, 65, 162)" }}>
+                          <td className='lyeardatah' style={{ background: "#11159a" }}>
                             Margin
                           </td>
                         </tr>
@@ -2318,21 +2318,21 @@ const Budget2024a = () => {
                         })}
                         <tr>
                           {/* <td className="lyearcountrycolttl">Total</td> */}
-                          <td className='lyeardatattl' style={{ background: "rgb(68, 65, 162)" }}>
+                          <td className='lyeardatattl' style={{ background: "#11159a" }}>
                             {lyearbqtytotal}
                           </td>
-                          <td className='lyeardatattl' style={{ background: "rgb(68, 65, 162)" }}>
+                          <td className='lyeardatattl' style={{ background: "#11159a" }}>
                             {lyearbqtytotal === 0 ? 0 : "$ " + (lyearbpricetotal / lyearbqtytotal).toFixed(0)}
                           </td>
-                          <td className='lyeardatattl' style={{ background: "rgb(68, 65, 162)" }}>
+                          <td className='lyeardatattl' style={{ background: "#11159a" }}>
                             {lyearbqtytotal === 0 ? 0 : "$ " + (lyearbprofittotal / lyearbqtytotal).toFixed(0)}
                           </td>
-                          <td className='lyeardatattl' style={{ background: "rgb(68, 65, 162)" }}>
+                          <td className='lyeardatattl' style={{ background: "#11159a" }}>
                             {lyearbqtytotal === 0
                               ? "$ " + 0
                               : "$ " + lyearbprofittotal.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                           </td>
-                          <td className='lyeardatattl' style={{ background: "rgb(68, 65, 162)" }}>
+                          <td className='lyeardatattl' style={{ background: "#11159a" }}>
                             {lyearbpricetotal === 0
                               ? 0 + "%"
                               : ((lyearbprofittotal / lyearbpricetotal) * 100).toFixed(0) + "%"}

@@ -33,7 +33,7 @@
   position: sticky;
   top: 0;
   font-weight: bold;
-  border-bottom: 1px solid rgb(68, 65, 162);
+  border-bottom: 1px solid #11159a;
   margin-bottom: 0.5rem;
   background-color: white;
   z-index: 2;
@@ -46,7 +46,7 @@
   top: 19px;
   font-size: 0.9rem;
   width: 100%;
-  border-bottom: 1px solid rgb(68, 65, 162);
+  border-bottom: 1px solid #11159a;
   z-index: -1;
   position: sticky;
   background-color: white;
@@ -108,7 +108,7 @@
   justify-content: space-between;
 }
 .profreporttitle button {
-  background-color: rgb(68, 65, 162);
+  background-color: #11159a;
   color: white;
   padding: 0.25rem 2rem;
   width: 150px;

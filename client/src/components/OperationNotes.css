@@ -23,7 +23,7 @@
 }
 .opnotepost {
   padding: 0.4rem 1rem;
-  background-color: rgb(68, 65, 162);
+  background-color: #11159a;
   border-radius: 0.5rem;
   border: none;
   color: white;
@@ -44,12 +44,12 @@
 }
 .otherusermsg .opnote {
   background-color: rgb(227, 226, 235);
-  color: rgb(68, 65, 162);
-  border: solid 1px rgb(68, 65, 162);
+  color: #11159a;
+  border: solid 1px #11159a;
 }
 .opnote {
   width: 100%;
-  background-color: rgb(68, 65, 162);
+  background-color: #11159a;
   color: white;
   padding: 0.5rem 1rem;
   border-radius: 0.5rem;
@@ -63,7 +63,7 @@
   font-size: 0.8rem;
 }
 .operationNotes {
-  border: solid 1px rgb(68, 65, 162);
+  border: solid 1px #11159a;
   border-radius: 0.7rem;
   padding: 1rem;
   height: 50vh;

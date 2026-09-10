@@ -1,0 +1,145 @@
+.sales-workspace {
+  --sales-accent: #4441a2;
+  --sales-page-top: calc(6vh + 35px);
+  position: fixed;
+  inset: var(--sales-page-top) 0 0;
+  z-index: 1;
+  box-sizing: border-box;
+  overflow: hidden;
+  background: #f5f6f9;
+}
+
+.sales-workspace__quotation {
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  padding: 8px 12px 46px;
+  overflow: hidden;
+}
+
+.sales-drawer-tab,
+.sales-drawer__close-tab {
+  position: fixed;
+  left: 50%;
+  z-index: 1002;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 132px;
+  height: 42px;
+  padding: 4px 18px 6px;
+  color: #fff;
+  font: 600 0.82rem/1 "Roboto", sans-serif;
+  background: var(--sales-accent);
+  border: 0;
+  border-radius: 10px 10px 0 0;
+  box-shadow: 0 -4px 15px rgba(27, 31, 59, 0.2);
+  transform: translateX(-50%);
+  cursor: pointer;
+}
+
+.sales-drawer-tab {
+  bottom: 0;
+}
+
+.sales-drawer-tab:hover,
+.sales-drawer__close-tab:hover {
+  background: #5753b7;
+}
+
+.sales-drawer-tab:focus-visible,
+.sales-drawer__close-tab:focus-visible {
+  outline: 3px solid rgba(68, 65, 162, 0.3);
+  outline-offset: 2px;
+}
+
+.sales-drawer-tab__handle {
+  width: 30px;
+  height: 3px;
+  margin-bottom: 5px;
+  background: rgba(255, 255, 255, 0.65);
+  border-radius: 999px;
+}
+
+.sales-drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(24, 28, 45, 0.24);
+  animation: sales-backdrop-in 160ms ease-out;
+}
+
+.sales-drawer {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: min(64vh, 720px);
+  background: #fff;
+  border-radius: 14px 14px 0 0;
+  box-shadow: 0 -14px 45px rgba(25, 31, 52, 0.24);
+  animation: sales-drawer-in 220ms ease-out;
+}
+
+.sales-drawer__close-tab {
+  position: absolute;
+  top: -42px;
+}
+
+.sales-drawer__content {
+  box-sizing: border-box;
+  height: 100%;
+  padding: 14px 18px;
+  overflow: hidden;
+}
+
+.sales-drawer__content .saleslist {
+  height: 100%;
+}
+
+@keyframes sales-drawer-in {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes sales-backdrop-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (max-width: 1100px), (max-height: 720px) {
+  .sales-workspace {
+    overflow: auto;
+  }
+  .sales-workspace__quotation {
+    height: auto;
+    min-height: 100%;
+    padding: 8px 10px 52px;
+    overflow: visible;
+  }
+}
+
+@media (max-width: 720px) {
+  .sales-drawer {
+    height: 72vh;
+  }
+  .sales-drawer__content {
+    padding: 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sales-drawer,
+  .sales-drawer-backdrop {
+    animation: none;
+  }
+}

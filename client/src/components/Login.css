@@ -26,7 +26,7 @@
 .LoginForm h2 {
   font-family: "Roboto", sans-serif;
   /* padding-top: 3.5rem; */
-  color: rgb(68, 65, 162);
+  color: #11159a;
   font-size: 2rem;
 }
 .LoginForm input {
@@ -40,14 +40,14 @@
   width: 60%;
   padding: 0.8rem;
   background-color: white;
-  border: rgb(68, 65, 162) 1px solid;
+  border: #11159a1px solid;
   border-radius: 1.3rem;
   margin: 1rem 0;
   margin-bottom: 1rem;
 }
 .LoginForm button:hover,
 .loginForm button:focus {
-  background-color: rgb(68, 65, 162);
+  background-color: #11159a;
   color: white;
   cursor: pointer;
 }

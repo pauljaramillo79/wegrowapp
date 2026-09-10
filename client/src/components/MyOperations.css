@@ -13,10 +13,10 @@
 }
 .trafficbuttons button:hover {
   cursor: pointer;
-  background-color: rgb(68, 65, 162);
+  background-color: #11159a;
 }
 .trafficbuttons .activetrfbtn {
-  background-color: rgb(68, 65, 162);
+  background-color: #11159a;
 }
 .opheader {
   display: flex;
@@ -55,7 +55,7 @@
   border-top-left-radius: 1rem;
   border-bottom-left-radius: 1rem;
   top: 125px;
-  border: solid rgb(68, 65, 162);
+  border: solid #11159a;
 }
 .trafficbuttons .traderOpButton {
   background-color: rgb(208, 173, 109);

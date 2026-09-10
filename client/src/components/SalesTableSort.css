@@ -50,18 +50,18 @@
 }
 .react-confirm-alert-body > h1 {
   padding-bottom: 1.3rem;
-  color: rgb(68, 65, 162);
+  color: #11159a;
 }
 .react-confirm-alert-button-group {
   justify-content: center;
 }
 .react-confirm-alert-button-group > button {
   background-color: transparent;
-  color: rgb(68, 65, 162);
+  color: #11159a;
   padding: 0.3rem 1.5rem;
   border: none;
-  border: 2px solid rgb(68, 65, 162);
-  /* background-color: rgb(68, 65, 162); */
+  border: 2px solid #11159a;
+  /* background-color: #11159a; */
   align-self: center;
   border-radius: 3rem;
   font-family: "Roboto", sans-serif;

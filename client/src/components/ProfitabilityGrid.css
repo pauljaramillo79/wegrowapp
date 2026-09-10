@@ -39,7 +39,7 @@
   padding: 0.3rem 1rem;
   margin-left: 1rem;
   color: white;
-  background-color: rgb(68, 65, 162);
+  background-color: #11159a;
 }
 .customdateinputs button:hover {
   cursor: pointer;
@@ -57,7 +57,7 @@
 }
 .active,
 .active:hover {
-  background-color: rgb(68, 65, 162);
+  background-color: #11159a;
   color: white;
 }
 .prsummarystats {

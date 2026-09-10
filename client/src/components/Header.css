@@ -5,7 +5,7 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  border-bottom: solid rgb(68, 65, 162) 1px;
+  border-bottom: solid #11159a 1px;
   align-items: center;
   box-shadow: 0 8px 8px 0 rgba(160, 182, 103, 0.2);
   height: 60px;
@@ -20,8 +20,8 @@
   color: white;
   padding: 0.3rem 1.5rem;
   border: none;
-  /* border: 2x solid rgb(68, 65, 162); */
-  background-color: rgb(68, 65, 162);
+  /* border: 2x solid #11159a; */
+  background-color: #11159a;
   align-self: center;
   border-radius: 3rem;
   font-family: "Roboto", sans-serif;

@@ -28,7 +28,7 @@
   padding: 0.25rem 1rem;
   border-radius: 0.75rem;
   border: none;
-  background-color: rgb(68, 65, 162);
+  background-color: #11159a;
   color: white;
 }
 .contextMenu ul li button:hover {
@@ -36,7 +36,7 @@
   background-color: rgb(121, 119, 190);
 }
 .contextMenu ul li button:active {
-  background-color: rgb(68, 65, 162);
+  background-color: #11159a;
 }
 
 .cellwithcomment {

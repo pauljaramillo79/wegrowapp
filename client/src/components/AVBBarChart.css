@@ -78,14 +78,14 @@
 .groupbuttons button:hover {
   cursor: pointer;
   background-color: rgb(211, 210, 225);
-  color: rgb(68, 65, 162);
+  color: #11159a;
 }
 .groupbuttons button:active {
-  background-color: rgb(68, 65, 162);
+  background-color: #11159a;
   color: white;
 }
 .groupbuttons .activegroupbutton {
-  background-color: rgb(68, 65, 162);
+  background-color: #11159a;
   color: white;
 }
 .groupbuttons .AVBReset {

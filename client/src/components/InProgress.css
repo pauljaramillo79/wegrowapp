@@ -41,7 +41,7 @@
   border-radius: 0.75rem;
   border: none;
   color: white;
-  background-color: rgb(68, 65, 162);
+  background-color: #11159a;
 }
 .inprogresslist li button:hover {
   cursor: pointer;

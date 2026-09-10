@@ -1,0 +1,644 @@
+.salesQS3 {
+  --qs-accent: #4441a2;
+  --qs-accent-hover: #5753b7;
+  --qs-focus: rgba(68, 65, 162, 0.14);
+  --qs-border: #d6dbe5;
+  --qs-field-bg: #fff;
+  --qs-readonly: #f2f4f7;
+  --qs-text: #252a3a;
+  --qs-label: #555e70;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  color: var(--qs-text);
+  font-family: "Roboto", sans-serif;
+  font-size: 13px;
+}
+
+.salesQS3 *,
+.salesQS3 *::before,
+.salesQS3 *::after {
+  box-sizing: border-box;
+}
+
+/* Quotation navigation */
+.salesQS3 .salesQStitleline {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  height: 36px;
+  margin-bottom: 6px;
+  padding: 4px 9px;
+  background: #fff;
+  border: 1px solid var(--qs-border);
+  border-radius: 7px;
+}
+
+.salesQS3 .salesQStitleline h3 {
+  position: static;
+  width: auto;
+  margin: 0;
+  color: var(--qs-accent);
+  font-size: 14px;
+  line-height: 1;
+}
+
+.salesQS3 .salesQStitleline > span {
+  width: auto !important;
+  color: var(--qs-label);
+  font-size: 12px;
+}
+
+.salesQS3 .QSindexbox {
+  display: flex;
+  flex-direction: column;
+  margin: 0 0 0 auto;
+}
+
+.salesQS3 .salesQSnavbuttons {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.salesQS3 .salesQSnavbuttons button,
+.salesQS3 .salesQSnavbuttons select,
+.salesQS3 .salesQSnavbuttons input {
+  width: auto;
+  min-width: 54px;
+  height: 26px;
+  margin: 0;
+  padding: 2px 7px;
+  color: var(--qs-text);
+  font: inherit;
+  background: #fff;
+  border: 1px solid var(--qs-border);
+  border-radius: 5px;
+}
+
+.salesQS3 .salesQSnavbuttons input {
+  width: 82px;
+}
+
+.salesQS3 .salesQSnavbuttons button {
+  color: var(--qs-accent);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.salesQS3 .salesQSnavbuttons button:hover {
+  color: #fff;
+  background: var(--qs-accent);
+}
+
+.salesQS3 .QSIDerror {
+  position: absolute;
+  margin: 27px 0 0;
+  color: #c62828;
+  font-size: 10px;
+}
+
+/* Main three-column form */
+.salesQS3 .salesQS-form {
+  display: grid;
+  grid-template-columns: minmax(330px, 1fr) minmax(340px, 1fr) minmax(620px, 1.35fr);
+  align-items: start;
+  gap: 7px;
+  width: 100%;
+  height: calc(100% - 42px);
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: transparent !important;
+}
+
+.salesQS3 .salesQS-form > section {
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+}
+
+.salesQS3 #salesQS-1,
+.salesQS3 #salesQS-2,
+.salesQS3 #salesQS-3 {
+  min-height: 0;
+  flex-basis: auto;
+}
+
+.salesQS3 .salesQS-form fieldset {
+  min-width: 0;
+  margin: 0 0 5px;
+  padding: 9px 10px 7px;
+  background: #fff;
+  border: 1px solid var(--qs-border);
+  border-radius: 6px;
+}
+
+.salesQS3 .salesQS-form legend {
+  position: relative;
+  top: 6px;
+  padding: 0;
+  margin: 0 0 10px;
+  color: var(--qs-accent);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.035em;
+  text-transform: uppercase;
+}
+
+.salesQS3 .form-group {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(88px, 40%) minmax(0, 1fr);
+  align-items: center;
+  gap: 5px;
+  width: 100%;
+  min-height: 25px;
+  padding: 1px 0;
+}
+
+.salesQS3 .form-group label {
+  min-width: 0;
+  color: var(--qs-label);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.1;
+  font-family: "Gabarito", sans-serif;
+}
+
+.salesQS3 .salesQS-form input,
+.salesQS3 .salesQS-form select {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  height: 25px;
+  min-height: 25px;
+  margin: 0;
+  padding: 2px 6px;
+  overflow: hidden;
+  color: var(--qs-text);
+  font: inherit;
+  line-height: 19px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  background: var(--qs-field-bg);
+  border: 1px solid #cbd2de;
+  border-radius: 4px;
+  outline: none;
+}
+
+.salesQS3 .salesQS-form input:focus,
+.salesQS3 .salesQS-form select:focus {
+  border-color: var(--qs-accent);
+  box-shadow: 0 0 0 2px var(--qs-focus);
+}
+
+.salesQS3 .salesQS-form input[readonly] {
+  color: #697386;
+  background: var(--qs-readonly);
+}
+
+.salesQS3 .QSfig,
+.salesQS3 .QSfig2 {
+  padding-right: 7px;
+  text-align: right;
+}
+
+/* Search fields: QSSearchField returns extra fragment siblings. */
+.salesQS3 .form-group > .flexbreak {
+  display: none;
+}
+
+.salesQS3 .form-group > .QSsearchresults-container {
+  position: absolute;
+  top: calc(100% - 1px);
+  right: 0;
+  left: 40%;
+  z-index: 50;
+  display: block;
+  width: auto;
+}
+
+.salesQS3 .QSsearchresults {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 50;
+  width: 300px;
+  max-height: 160px;
+  margin: 0;
+  padding: 3px 0;
+  overflow-y: auto;
+  font-size: 12px;
+  list-style: none;
+  background: #fff;
+  border: 1px solid var(--qs-border);
+  border-radius: 0 0 5px 5px;
+  box-shadow: 0 8px 18px rgba(31, 38, 62, 0.18);
+}
+
+.salesQS3 .QSsearchresults li {
+  padding: 5px 7px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.salesQS3 .QSsearchresults li:hover,
+.salesQS3 .QSsearchresults li:focus {
+  background: #eef0ff;
+}
+.salesQS3 .QSsearchresults-hide {
+  display: none;
+}
+
+/* Choice controls */
+.salesQS3 .saletype-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 23px;
+}
+
+.salesQS3 .saletype-group label {
+  flex: 1;
+  color: var(--qs-text);
+  font-size: 13px;
+  font-family: "Gabarito", sans-serif;
+}
+
+.salesQS3 .saletype-group input,
+.salesQS3 .soldcheckbox input,
+.salesQS3 #shipmenttyperadio input {
+  flex: 0 0 13px;
+  width: 13px;
+  height: 13px;
+  min-height: 13px;
+  padding: 0;
+  accent-color: var(--qs-accent);
+}
+
+.salesQS3 .WGPSelect,
+.salesQS3 .USWGPSelect {
+  flex: 2;
+  width: 110px;
+  margin-left: 4px;
+}
+
+.salesQS3 .saleboxes {
+  display: flex;
+  gap: 4px;
+}
+
+.salesQS3 .soldcheckbox {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 25px;
+  margin: 0 0 5px;
+  padding: 2px 7px;
+  background: #fff;
+  border: 1px solid var(--qs-border);
+  border-radius: 5px;
+}
+
+.salesQS3 .soldcheckbox label {
+  margin: 0;
+  color: var(--qs-text);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.salesQS3 #shipmenttyperadio {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  width: 100%;
+  min-height: 27px;
+  margin-bottom: 5px;
+  padding: 4px 9px;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid var(--qs-border);
+  border-radius: 5px;
+}
+
+.salesQS3 #shipmenttyperadio label {
+  flex: 0 1 auto;
+  min-width: 0 !important;
+  margin: 0 10px 0 0;
+  color: var(--qs-text);
+  white-space: nowrap;
+}
+
+.salesQS3 #shipmenttyperadio label:last-child {
+  margin-right: 0;
+}
+
+/* Figures */
+.salesQS3 #salesQS-3-fieldset {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(245px, 0.72fr);
+  grid-template-rows: auto 1fr;
+  gap: 0 7px;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 7px 9px 6px;
+}
+
+.salesQS3 #salesQS-3-fieldset > legend {
+  grid-column: 1 / -1;
+}
+
+.salesQS3 #salesQS-3-col1,
+.salesQS3 #salesQS-3-col2 {
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+}
+
+.salesQS3 #salesQS-3-col1 > fieldset {
+  display: block;
+}
+
+.salesQS3 #salesQS-3-col1 .form-group {
+  grid-template-columns: minmax(130px, 62%) minmax(90px, 38%);
+}
+
+.salesQS3 #salesQS-3-col2 .form-group {
+  grid-template-columns: minmax(120px, 58%) minmax(90px, 42%);
+}
+
+.salesQS3 #salesQS-3 {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+}
+
+.salesQS3 #salesQS-3 > #salesQS-3-fieldset {
+  min-height: 0;
+}
+
+.salesQS3 #salesQS-3-col1 > .form-group,
+.salesQS3 #salesQS-3-col2 > .form-group {
+  padding-right: 7px;
+  padding-left: 7px;
+}
+
+.salesQS3 #exchangerate {
+  grid-template-columns: minmax(105px, 37%) minmax(80px, 1fr) 14px;
+}
+
+.salesQS3 #exchangerate svg {
+  width: 13px;
+  height: 13px;
+  cursor: pointer;
+}
+
+.salesQS3 #exchangerate button {
+  grid-column: 1 / -1;
+  justify-content: center;
+  margin-top: 2px;
+  align-items: center;
+}
+
+/* Actions */
+.salesQS3 #QSbuttons {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 5px;
+  margin-top: 5px;
+  padding: 4px 5px;
+  background: #fff;
+  border: 1px solid var(--qs-border);
+  border-radius: 5px;
+}
+
+.salesQS3 #QSbuttons span {
+  margin-right: auto;
+  padding: 0;
+  color: #18794e;
+}
+
+.salesQS3 .salesQS-form button {
+  width: auto;
+  min-height: 25px;
+  margin: 0;
+  padding: 3px 10px;
+  color: var(--qs-accent);
+  font: 600 12px/1 "Roboto", sans-serif;
+  background: #fff;
+  border: 1px solid var(--qs-accent);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.salesQS3 .salesQS-form button:hover,
+.salesQS3 .salesQS-form button:focus {
+  color: #fff;
+  background: var(--qs-accent);
+}
+
+/* Calculators */
+.salesQS3 .bottompopupcalculator,
+.salesQS3 .bottompopupcalculatorlg {
+  position: absolute;
+  z-index: 60;
+  max-width: min(680px, 80vw);
+  padding: 12px;
+  background: #fff;
+  border: 1px solid var(--qs-border);
+  border-radius: 7px;
+  box-shadow: 0 14px 34px rgba(31, 38, 62, 0.2);
+}
+
+.salesQS3 .bottompopupcalculator {
+  width: 360px;
+}
+.salesQS3 .bottompopupcalculatorlg {
+  display: flex;
+  width: 650px;
+}
+.salesQS3 .bottompopupcalculatorlg-1 {
+  display: flex;
+  flex: 0 0 60%;
+  flex-direction: column;
+}
+.salesQS3 .bottompopupcalculatorlg-2 {
+  flex: 1;
+}
+.salesQS3 .bottompopupcalculator ul {
+  margin: 5px 0 0 14px;
+}
+
+/* Confirmation dialog is rendered outside .salesQS3. */
+.custom-ui {
+  min-width: 520px;
+  min-height: 190px;
+  padding: 32px;
+  text-align: center;
+  background: #fff;
+  border-radius: 12px;
+}
+
+.custom-ui h1 {
+  margin: 0 0 20px;
+  color: #4441a2;
+}
+.confirmmsg {
+  max-width: 450px;
+  margin-bottom: 18px;
+}
+.custom-ui button {
+  margin: 0 8px;
+  padding: 5px 18px;
+  color: #4441a2;
+  background: #fff;
+  border: 1px solid #4441a2;
+  border-radius: 20px;
+}
+.custom-ui button:hover {
+  color: #fff;
+  background: #4441a2;
+  cursor: pointer;
+}
+.custom-ui ul {
+  margin-bottom: 16px;
+}
+.editsline {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+.editsheader {
+  font-weight: 700;
+}
+.edititem,
+.editfig {
+  min-width: 125px;
+}
+.edititem {
+  text-align: left;
+}
+.editfig {
+  text-align: right;
+}
+
+/* Responsive fallback: compact single viewport is a desktop behavior. */
+@media (max-width: 1250px), (max-height: 720px) {
+  .salesQS3 {
+    height: auto;
+    min-height: 100%;
+    font-size: 13px;
+  }
+
+  .salesQS3 .salesQS-form {
+    grid-template-columns: repeat(2, minmax(280px, 1fr));
+    height: auto;
+    overflow: visible;
+  }
+
+  .salesQS3 #salesQS-3 {
+    grid-column: 1 / -1;
+  }
+  .salesQS3 #salesQS-3-fieldset {
+    height: auto;
+  }
+}
+
+@media (max-width: 720px) {
+  .salesQS3 .salesQStitleline {
+    height: auto;
+    flex-wrap: wrap;
+  }
+
+  .salesQS3 .QSindexbox {
+    width: 100%;
+    margin-left: 0;
+    overflow-x: auto;
+  }
+
+  .salesQS3 .salesQS-form {
+    grid-template-columns: 1fr;
+  }
+  .salesQS3 #salesQS-3 {
+    grid-column: auto;
+  }
+  .salesQS3 #salesQS-3-fieldset {
+    grid-template-columns: 1fr;
+  }
+  .salesQS3 #salesQS-3-fieldset > legend {
+    grid-column: auto;
+  }
+  .salesQS3 #salesQS-3-col1 > fieldset {
+    display: block;
+  }
+}
+
+/* 2026-09-10 final layout corrections. Keep these rules last. */
+.salesQS3 #shipmenttyperadio {
+  display: flex !important;
+  grid-template-columns: none !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+}
+
+.salesQS3 #shipmenttyperadio > input {
+  flex: 0 0 13px !important;
+  width: 13px !important;
+  min-width: 13px !important;
+}
+
+.salesQS3 #shipmenttyperadio > label {
+  flex: 0 1 auto !important;
+  width: auto !important;
+  min-width: 0 !important;
+  margin-right: 10px !important;
+}
+
+.salesQS3 #salesQS-3-col1 > fieldset {
+  display: block !important;
+  columns: auto !important;
+}
+
+.salesQS3 #salesQS-3-col1 > fieldset > .form-group {
+  display: grid !important;
+  width: 100% !important;
+}
+
+.salesQS3 .salesQS-form fieldset > legend {
+  position: relative !important;
+  top: 18px !important;
+  margin-bottom: 10px !important;
+  background: transparent !important;
+}
+
+.salesQS3 #salesQS-3 {
+  position: relative !important;
+  display: grid !important;
+  grid-template-rows: minmax(0, 1fr) auto !important;
+  padding-bottom: 38px !important;
+}
+
+.salesQS3 #salesQS-3 > #salesQS-3-fieldset {
+  height: auto !important;
+  min-height: 0 !important;
+}
+
+.salesQS3 #salesQS-3 > #QSbuttons {
+  position: absolute !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  z-index: 20 !important;
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}

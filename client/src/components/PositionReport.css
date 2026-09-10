@@ -4,7 +4,7 @@
 }
 .positionreporttitle {
   font-family: "Roboto", sans-serif;
-  color: rgb(68, 65, 162);
+  color: #11159a;
   background-color: white;
   z-index: 90;
 }
@@ -60,7 +60,7 @@
   top: 0;
 }
 /* .postooltip {
-  border: solid 1px rgb(68, 65, 162) !important;
+  border: solid 1px #11159a!important;
   font-family: "Roboto", sans-serif !important;
   background-color: white !important;
   border-radius: 0.5rem !important;
@@ -74,7 +74,7 @@
   position: absolute;
   z-index: 50;
   background-color: white;
-  border: rgb(68, 65, 162) 1px solid;
+  border: #11159a1px solid;
   padding: 1rem;
   border-radius: 0.5rem;
   width: 900px;

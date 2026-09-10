@@ -26,7 +26,7 @@
 .salesQS-form legend {
   /* background-color: white; */
   font-weight: 900;
-  color: rgb(68, 65, 162);
+  color: #11159a;
   font-size: 1rem;
 }
 .salesQS-form input {
@@ -103,13 +103,13 @@
   width: 32%;
   margin-right: 0.5rem;
   padding: 0.3rem 1.5rem;
-  border: 2px solid rgb(68, 65, 162);
+  border: 2px solid #11159a;
   background-color: transparent;
   border-radius: 3rem;
   margin-top: 0.5rem;
 }
 .salesQS-form button:hover {
-  background-color: rgb(68, 65, 162);
+  background-color: #11159a;
   color: white;
 }
 .QSfig {
@@ -185,7 +185,7 @@
 }
 .salesQSnavbuttons button:hover {
   cursor: pointer;
-  background-color: rgb(68, 65, 162);
+  background-color: #11159a;
   color: white;
 }
 #exchangerate label {
@@ -203,7 +203,7 @@
   margin-top: 1rem;
   margin-right: 0;
   margin-left: 0;
-  background-color: rgb(68, 65, 162);
+  background-color: #11159a;
   color: white;
   border: none;
 }
@@ -241,7 +241,7 @@
   text-align: center;
 }
 .custom-ui h1 {
-  color: rgb(68, 65, 162);
+  color: #11159a;
   margin-bottom: 2rem;
 }
 .confirmmsg {
@@ -250,7 +250,7 @@
 }
 .custom-ui button {
   padding: 0.3rem 1.5rem;
-  border: solid 2px rgb(68, 65, 162);
+  border: solid 2px #11159a;
   background-color: white;
   border-radius: 3rem;
   margin: 0 1rem;
@@ -360,6 +360,6 @@
   justify-content: space-between;
 }
 .salesQS-form button:focus {
-  background-color: rgb(68, 65, 162);
+  background-color: #11159a;
   color: white;
 }

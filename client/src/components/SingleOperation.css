@@ -36,7 +36,7 @@
   color: white;
   border-radius: 0.8rem;
   border: none;
-  background-color: rgb(68, 65, 162);
+  background-color: #11159a;
   margin-left: 0.5rem;
 }
 .opsavebutton:hover {
@@ -68,7 +68,7 @@
   min-height: 100%;
   border-top-left-radius: 1rem;
   border-bottom-left-radius: 1rem;
-  background-color: rgb(68, 65, 162);
+  background-color: #11159a;
   padding: 1.5rem 2rem;
   width: 15vw;
   min-width: 250px;
@@ -79,7 +79,7 @@
   font-size: 1rem;
 }
 .opleftlabel h3 {
-  background-color: rgb(68, 65, 162);
+  background-color: #11159a;
   font-size: 0.8rem;
   font-weight: 400;
   z-index: 0;
@@ -210,7 +210,7 @@
   border-radius: 1rem;
   background-color: gray;
   color: white;
-  background-color: rgb(68, 65, 162);
+  background-color: #11159a;
 }
 .opsearchclearbtn:hover {
   cursor: pointer;

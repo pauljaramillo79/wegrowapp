@@ -12,7 +12,7 @@ h3 {
 }
 .saleslisttitle {
   font-family: "Roboto", sans-serif;
-  color: rgb(68, 65, 162);
+  color: #11159a;
   /* padding-bottom: 1rem; */
 }
 .refreshicon {
@@ -27,14 +27,14 @@ h3 {
 }
 .clearfilterbutton {
   border-radius: 1.5rem;
-  border: 1px solid rgb(68, 65, 162);
+  border: 1px solid #11159a;
   margin-right: 1rem;
   width: 200px;
-  color: rgb(68, 65, 162);
+  color: #11159a;
   background-color: white;
 }
 .clearfilterbutton:hover {
   cursor: pointer;
   color: white;
-  background-color: rgb(68, 65, 162);
+  background-color: #11159a;
 }

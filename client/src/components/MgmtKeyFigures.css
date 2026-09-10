@@ -10,7 +10,7 @@
   overflow-y: auto;
 }
 .keyfigures-list h4 {
-  color: rgb(68, 65, 162);
+  color: #11159a;
 }
 .keyfigure-volume {
   display: flex;
@@ -67,6 +67,6 @@
   margin: 0 1rem;
   padding: 0.2rem 1rem;
   border-radius: 1rem;
-  border: rgb(68, 65, 162) 1px solid;
+  border: #11159a1px solid;
   background-color: white;
 }

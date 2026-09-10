@@ -1,0 +1,60 @@
+.saleslist h3 {
+  position: sticky;
+  top: 0;
+  z-index: 11;
+  display: inline-block;
+  background-color: white;
+  width: auto;
+}
+.saleslist {
+  overflow: auto;
+  height: 100%;
+  font-family: "Roboto", sans-serif;
+}
+.saleslisttitle {
+  font-family: "Roboto", sans-serif;
+  color: #11159a;
+  margin: 0;
+}
+.refreshicon {
+  height: 25px;
+  cursor: pointer;
+}
+.salestitleline {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: sticky;
+  top: 0;
+  z-index: 12;
+  min-width: max-content;
+  padding: 4px 4px 12px;
+  background-color: rgba(255, 255, 255, 0.98);
+  border-bottom: 1px solid #e2e6ec;
+}
+.salestitleline .saleslisttitle {
+  margin-right: auto;
+}
+.salestitleline select {
+  height: 34px;
+  padding: 0 30px 0 10px;
+  color: #34384a;
+  background: white;
+  border: 1px solid #cfd5df;
+  border-radius: 7px;
+}
+.clearfilterbutton {
+  height: 34px;
+  border-radius: 7px;
+  border: 1px solid #11159a;
+  margin: 0;
+  width: auto;
+  padding: 0 14px;
+  color: #11159a;
+  background-color: white;
+}
+.clearfilterbutton:hover {
+  cursor: pointer;
+  color: white;
+  background-color: #11159a;
+}

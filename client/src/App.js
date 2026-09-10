@@ -5,6 +5,7 @@ import Login from "./components/Login";
 import Home from "./components/Home";
 import SalesGrid from "./components/SalesGrid";
 import SalesGrid2 from "./components/SalesGrid2";
+import SalesGrid3 from "./components/SalesGrid3";
 import Header from "./components/Header";
 import PositionsGrid from "./components/PositionsGrid";
 import Register from "./components/Register";
@@ -36,19 +37,10 @@ const reducer = (state, action) => {
     case "LOGIN":
       // When successful Login, this sets values for user, WGusercode, WGuserID, refreshtoken, accesstoken, isAuthenticated and role
       localStorage.setItem("user", JSON.stringify(action.payload.user));
-      localStorage.setItem(
-        "WGusercode",
-        JSON.stringify(action.payload.usercode),
-      );
+      localStorage.setItem("WGusercode", JSON.stringify(action.payload.usercode));
       localStorage.setItem("WGuserID", JSON.stringify(action.payload.userID));
-      localStorage.setItem(
-        "refreshtoken",
-        JSON.stringify(action.payload.refreshtoken),
-      );
-      localStorage.setItem(
-        "accesstoken",
-        JSON.stringify(action.payload.accesstoken),
-      );
+      localStorage.setItem("refreshtoken", JSON.stringify(action.payload.refreshtoken));
+      localStorage.setItem("accesstoken", JSON.stringify(action.payload.accesstoken));
       localStorage.setItem("isAuthenticated", true);
       localStorage.setItem("role", action.payload.role);
       return {
@@ -94,7 +86,7 @@ function App() {
     <LoadQSProvider>
       <RefreshPositionsProvider>
         <AuthContext.Provider value={{ state, dispatch }}>
-          <div className="App">
+          <div className='App'>
             {!state.isAuthenticated ? (
               <Login />
             ) : (
@@ -105,103 +97,103 @@ function App() {
                   <Switch>
                     {role === 6 ? (
                       <>
-                        <Route path="/">
+                        <Route path='/'>
                           <SalesGrid2 />
                         </Route>
                       </>
                     ) : role === 5 ? (
                       <>
                         {" "}
-                        <Route path="/analysis">
+                        <Route path='/analysis'>
                           <AnalysisGrid />
                         </Route>
-                        <Route exact path="/">
+                        <Route exact path='/'>
                           <PositionsGrid />
                         </Route>
-                        <Route path="/sales">
+                        <Route path='/sales'>
                           <SalesGrid2 />
                         </Route>
-                        <Route path="/logistics">
+                        <Route path='/logistics'>
                           <LogisticsProvider>
                             <LogisticsGrid />
                           </LogisticsProvider>
                         </Route>
-                        <Route path="/budget">
+                        <Route path='/budget'>
                           <BudgetGrid />
                         </Route>
                       </>
                     ) : role === 4 ? (
-                      <Route path="/">
+                      <Route path='/'>
                         <LogisticsProvider>
                           <LogisticsGrid />
                         </LogisticsProvider>
                       </Route>
                     ) : role === 3 ? (
                       <>
-                        <Route path="/analysis">
+                        <Route path='/analysis'>
                           <AnalysisGrid />
                         </Route>
-                        <Route exact path="/">
+                        <Route exact path='/'>
                           <PositionsGrid />
                         </Route>
-                        <Route path="/sales">
+                        <Route path='/sales'>
                           <SalesGrid2 />
                         </Route>
-                        <Route path="/logistics">
+                        <Route path='/logistics'>
                           <LogisticsProvider>
                             <LogisticsGrid />
                           </LogisticsProvider>
                         </Route>
-                        <Route path="/budget">
+                        <Route path='/budget'>
                           <BudgetGrid />
                         </Route>
                       </>
                     ) : role === 2 ? (
                       <>
-                        <Route path="/management">
+                        <Route path='/management'>
                           <ManagementGrid />
                         </Route>
-                        <Route path="/analysis">
+                        <Route path='/analysis'>
                           <AnalysisGrid />
                         </Route>
-                        <Route exact path="/">
+                        <Route exact path='/'>
                           <PositionsGrid />
                         </Route>
-                        <Route path="/sales">
+                        <Route path='/sales'>
                           <SalesGrid2 />
                         </Route>
-                        <Route path="/logistics">
+                        <Route path='/logistics'>
                           <LogisticsProvider>
                             <LogisticsGrid />
                           </LogisticsProvider>
                         </Route>
-                        <Route path="/budget">
+                        <Route path='/budget'>
                           <BudgetGrid />
                         </Route>
                       </>
                     ) : role === 1 ? (
                       <>
-                        <Route path="/management">
+                        <Route path='/management'>
                           <ManagementGrid />
                         </Route>
-                        <Route path="/analysis">
+                        <Route path='/analysis'>
                           <AnalysisGrid />
                         </Route>
-                        <Route exact path="/">
+                        <Route exact path='/'>
                           <PositionsGrid />
                         </Route>
-                        <Route path="/sales">
-                          <SalesGrid2 />
+                        <Route path='/sales'>
+                          <SalesGrid3 />
                         </Route>
-                        <Route path="/logistics">
+                        <Route path='/logistics'>
                           <LogisticsProvider>
                             <LogisticsGrid />
                           </LogisticsProvider>
                         </Route>
-                        <Route path="/budget">
+                        <Route path='/budget'>
                           <BudgetGrid />
                         </Route>
-                        <Route path="/admin">
+                        <Route path='/admin'>
                           <Admin />
                         </Route>
                       </>

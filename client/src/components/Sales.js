@@ -1,7 +1,7 @@
 import React, { useEffect, useContext, useState } from "react";
 import Axios from "axios";
 import SalesTableSort from "./SalesTableSort";
-import "./Sales.css";
+import "./Sales1.css";
 import { ReactComponent as RefreshIcon } from "../assets/_images/refreshicon.svg";
 import { RefreshPositionsContext } from "../contexts/RefreshPositionsProvider";
 import { LoadQSContext } from "../contexts/LoadQSProvider";
@@ -10,15 +10,13 @@ const Sales = (props) => {
   const role = JSON.parse(localStorage.getItem("role"));
 
   const { toggleQSrefresh } = useContext(RefreshPositionsContext);
-  const { loaduser, setLoaduser, QStoload, setFromdropdown } = useContext(
-    LoadQSContext
-  );
+  const { loaduser, setLoaduser, QStoload, setFromdropdown } = useContext(LoadQSContext);
   const [traders, setTraders] = useState();
   const [userID, setUserID] = useState(
     // QStoload && loaduser
     //   ? loaduser
     //   : JSON.parse(localStorage.getItem("WGusercode"))
-    loaduser
+    loaduser,
   );
   const [limit, setLimit] = useState(300);
   const [columns, setColumns] = useState();
@@ -113,10 +111,10 @@ const Sales = (props) => {
     });
   };
   return (
-    <div className="saleslist">
-      <div className="salestitleline">
-        <h3 className="saleslisttitle">Sales List</h3>
-        <button className="clearfilterbutton" onClick={clearFilters}>
+    <div className='saleslist'>
+      <div className='salestitleline'>
+        <h3 className='saleslisttitle'>Sales List</h3>
+        <button className='clearfilterbutton' onClick={clearFilters}>
           Clear Filters
         </button>
         <select onChange={(e) => setLimit(e.target.value)}>
@@ -135,7 +133,7 @@ const Sales = (props) => {
               setLoaduser(e.target.value);
             }}
           >
-            <option value="all">All</option>
+            <option value='all'>All</option>
             {traders
               ? traders.map((trader) => {
                   if (trader.trader === loaduser) {
@@ -145,9 +143,7 @@ const Sales = (props) => {
                       </option>
                     );
                   } else {
-                    return (
-                      <option value={trader.trader}>{trader.trader}</option>
-                    );
+                    return <option value={trader.trader}>{trader.trader}</option>;
                   }
                 })
               : "reload"}
@@ -156,7 +152,7 @@ const Sales = (props) => {
           ""
         )}
         <RefreshIcon
-          className="refreshicon"
+          className='refreshicon'
           onClick={(e) => {
             toggleQSrefresh();
           }}

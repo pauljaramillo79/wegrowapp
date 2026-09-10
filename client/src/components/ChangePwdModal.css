@@ -29,7 +29,7 @@
 }
 .modal-main h2 {
   padding-bottom: 1rem;
-  color: rgb(68, 65, 162);
+  color: #11159a;
 }
 .modal-main p {
   padding-bottom: 2rem;
@@ -44,11 +44,11 @@
   margin-top: 1rem;
 }
 .confirmbutton {
-  border: rgb(68, 65, 162) 1px solid;
+  border: #11159a1px solid;
 }
 .confirmbutton:hover,
 .confirmbutton:focus {
-  background-color: rgb(68, 65, 162);
+  background-color: #11159a;
   color: white;
   cursor: pointer;
 }

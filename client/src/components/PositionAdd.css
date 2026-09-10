@@ -4,7 +4,7 @@
 }
 .positionaddtitle {
   font-family: "Roboto", sans-serif;
-  color: rgb(68, 65, 162);
+  color: #11159a;
 }
 #positionaddform {
   display: flex;
@@ -48,13 +48,13 @@
 #positionaddform button {
   margin-top: 1.5rem;
   padding: 0.3rem 1.5rem;
-  border: 2px solid rgb(68, 65, 162);
+  border: 2px solid #11159a;
   background-color: transparent;
   border-radius: 3rem;
 }
 
 #positionaddform button:hover {
-  background-color: rgb(68, 65, 162);
+  background-color: #11159a;
   color: white;
   cursor: pointer;
 }

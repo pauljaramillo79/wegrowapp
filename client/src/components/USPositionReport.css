@@ -35,7 +35,7 @@
   vertical-align: top;
 }
 .usprodgroup {
-  background-color: rgb(68, 65, 162);
+  background-color: #11159a;
   color: white;
 }
 .mktpriceupdate {
@@ -51,7 +51,7 @@
   background-color: white;
   border-radius: 0.5rem;
   padding: 1rem;
-  border: 1px solid rgb(68, 65, 162);
+  border: 1px solid #11159a;
   z-index: 10;
 }
 .mktpriceupdatemenu button {
