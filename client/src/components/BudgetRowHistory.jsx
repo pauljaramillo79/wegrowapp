@@ -10,14 +10,16 @@ const compactNumber = (value) => {
 };
 
 const normalizeSeries = (series = []) =>
-  series.map((item) => ({
-    year: Number(item.year),
-    quarters: QUARTERS.map((quarter) => {
-      const nestedValue = item.quarters && item.quarters[quarter];
-      const value = nestedValue !== undefined && nestedValue !== null ? nestedValue : item[quarter];
-      return Number(value !== undefined && value !== null ? value : 0);
-    }),
-  }));
+  series
+    .map((item) => ({
+      year: Number(item.year),
+      quarters: QUARTERS.map((quarter) => {
+        const nestedValue = item.quarters && item.quarters[quarter];
+        const value = nestedValue !== undefined && nestedValue !== null ? nestedValue : item[quarter];
+        return Number(value !== undefined && value !== null ? value : 0);
+      }),
+    }))
+    .sort((a, b) => a.year - b.year);
 
 const HistoryChart = ({ title, subtitle, series, loading }) => {
   const allValues = series.reduce((values, item) => values.concat(item.quarters), []);
