@@ -1,7 +1,7 @@
 import React from "react";
 import "./Header.css";
 import { AuthContext } from "../App";
-import { ReactComponent as Logo } from "../assets/_images/logo-simple.svg";
+import { ReactComponent as Logo } from "../assets/_images/logo-simple1.svg";
 
 const Header = () => {
   const { state, dispatch } = React.useContext(AuthContext);
@@ -11,16 +11,16 @@ const Header = () => {
     });
   };
   return (
-    <div id="navigation">
-      <h2>Dashboard</h2>
+    <div id='navigation'>
+      {/* <h2>Dashboard</h2> */}
       {state.isAuthenticated ? (
         <>
           {" "}
-          <div className="welcomemsg">
-            <Logo className="Logoheader" />
-            <p className="userwelcome">Welcome {state.user}</p>
+          <div className='welcomemsg'>
+            <Logo className='Logoheader' />
+            <p className='userwelcome'>Welcome {state.user}</p>
           </div>
-          <button className="logoutButton" onClick={logoutHandler}>
+          <button className='logoutButton' onClick={logoutHandler}>
             Logout
           </button>
         </>

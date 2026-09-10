@@ -8,12 +8,12 @@
   border-bottom: solid rgb(68, 65, 162) 1px;
   align-items: center;
   box-shadow: 0 8px 8px 0 rgba(160, 182, 103, 0.2);
-  height: 6vh;
-  padding: 0.3rem 3rem;
+  height: 60px;
+  padding: 0.3rem 1rem;
   font-family: "Roboto", sans-serif;
-  /* background-color: white; */
-  background-color: rgb(160, 182, 103);
-  color: white;
+  background-color: white;
+  /* background-color: rgb(160, 182, 103); */
+  /* color: white; */
 }
 #navigation .logoutButton {
   background-color: transparent;
@@ -30,7 +30,7 @@
 #navigation .logoutButton:hover {
   cursor: pointer;
   background-color: rgba(68, 65, 162, 0.75);
-  color: white;
+  /* color: white; */
 }
 h2 {
   margin: 0;
@@ -38,22 +38,29 @@ h2 {
 .welcomemsg {
   display: flex;
   align-items: baseline;
-  color: white;
+  /* color: white; */
 }
-.welcomemsg .cls-1 {
+/* .welcomemsg .cls-1 {
   fill: white;
   stroke: white;
   stroke-miterlimit: 0;
   stroke-width: 0;
-}
+} */
 
 .Logoheader {
   width: 2rem;
   height: 1.3rem;
   margin: 0 0.5rem;
-  color: white;
+  /* color: white; */
 }
 .userwelcome {
   display: flex;
   font-size: 1rem;
+}
+.Logoheader .cls-1 {
+  fill: #93ad3c;
+}
+
+.Logoheader .cls-2 {
+  fill: #11159a;
 }
